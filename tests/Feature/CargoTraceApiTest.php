@@ -86,5 +86,28 @@ class CargoTraceApiTest extends TestCase
             'resolution_notes' => 'Masalah telah diverifikasi dan diselesaikan.',
         ]);
     }
+
+    public function test_public_intelligence_endpoints_work(): void
+    {
+        // 1. Countries
+        $resCountry = $this->getJson('/api/countries?code=ID');
+        $resCountry->assertStatus(200)->assertJsonPath('success', true);
+
+        // 2. Risk
+        $resRisk = $this->getJson('/api/risk');
+        $resRisk->assertStatus(200)->assertJsonPath('success', true);
+
+        // 3. Ports
+        $resPorts = $this->getJson('/api/ports');
+        $resPorts->assertStatus(200)->assertJsonPath('success', true);
+
+        // 4. News
+        $resNews = $this->getJson('/api/news');
+        $resNews->assertStatus(200)->assertJsonPath('success', true);
+
+        // 5. Currency
+        $resCur = $this->getJson('/api/currency');
+        $resCur->assertStatus(200)->assertJsonPath('success', true);
+    }
 }
 

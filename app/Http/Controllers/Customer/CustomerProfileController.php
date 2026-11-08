@@ -64,3 +64,4 @@ class CustomerProfileController extends Controller
         return back()->with('status', 'Profil akun Anda berhasil diperbarui.');
     }
 }
+

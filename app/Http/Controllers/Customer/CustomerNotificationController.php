@@ -73,3 +73,4 @@ class CustomerNotificationController extends Controller
         return back()->with('status', 'Semua notifikasi telah ditandai sebagai dibaca.');
     }
 }
+

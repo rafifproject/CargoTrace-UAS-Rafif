@@ -248,3 +248,4 @@ new Chart(trendCtx, {
 });
 </script>
 @endpush
+

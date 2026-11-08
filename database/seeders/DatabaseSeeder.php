@@ -18,42 +18,52 @@ use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
+    /**
+     * Seed the application's database with comprehensive global shipment visibility dataset.
+     */
     public function run(): void
     {
         // 1. System Settings
-        SystemSetting::create(['key' => 'app_language', 'value' => 'id', 'group' => 'general', 'description' => 'Bahasa aplikasi default (id/en)']);
-        SystemSetting::create(['key' => 'app_timezone', 'value' => 'Asia/Jakarta', 'group' => 'general', 'description' => 'Zona waktu sistem']);
-        SystemSetting::create(['key' => 'date_format', 'value' => 'd M Y, H:i', 'group' => 'general', 'description' => 'Format tampilan tanggal']);
-        SystemSetting::create(['key' => 'delay_threshold_hours', 'value' => '6', 'group' => 'threshold', 'description' => 'Ambang batas jam keterlambatan (jam)']);
-        SystemSetting::create(['key' => 'weather_provider', 'value' => 'Open-Meteo', 'group' => 'integration', 'description' => 'Penyedia data cuaca']);
-        SystemSetting::create(['key' => 'currency_provider', 'value' => 'ExchangeRate-API', 'group' => 'integration', 'description' => 'Penyedia nilai tukar kurs valuta']);
+        $settings = [
+            ['key' => 'app_name', 'value' => 'CargoTrace Global', 'group' => 'general'],
+            ['key' => 'app_locale', 'value' => 'id', 'group' => 'general'],
+            ['key' => 'default_currency', 'value' => 'USD', 'group' => 'general'],
+            ['key' => 'timezone', 'value' => 'Asia/Jakarta', 'group' => 'general'],
+            ['key' => 'auto_track_interval', 'value' => '15', 'group' => 'tracking'],
+            ['key' => 'delay_threshold_hours', 'value' => '6', 'group' => 'tracking'],
+            ['key' => 'enable_weather_alerts', 'value' => '1', 'group' => 'integration'],
+            ['key' => 'enable_currency_sync', 'value' => '1', 'group' => 'integration'],
+            ['key' => 'risk_score_high_threshold', 'value' => '70', 'group' => 'risk'],
+            ['key' => 'risk_score_moderate_threshold', 'value' => '40', 'group' => 'risk'],
+        ];
 
-        // 2. Users
-        $admin = User::create([
-            'name' => 'Admin Sistem',
-            'email' => 'admin@cargotrace.id',
+        foreach ($settings as $setting) {
+            SystemSetting::updateOrCreate(['key' => $setting['key']], $setting);
+        }
+
+        // 2. Users & Roles (RBAC)
+        $admin = User::firstOrCreate(['email' => 'admin@cargotrace.id'], [
+            'name' => 'Administrator Global',
             'password' => Hash::make('password'),
             'role' => User::ROLE_ADMINISTRATOR,
             'status' => User::STATUS_ACTIVE,
-            'company_name' => 'CargoTrace Global HQ',
-            'phone' => '+62 811-2345-6789',
-            'last_login_at' => Carbon::now()->subMinutes(15),
+            'company_name' => 'CargoTrace Headquarters',
+            'phone' => '+62 21 555-0199',
+            'last_login_at' => Carbon::now()->subMinutes(10),
         ]);
 
-        $operator = User::create([
-            'name' => 'Budi Operator',
-            'email' => 'operator@cargotrace.id',
+        $operator = User::firstOrCreate(['email' => 'operator@cargotrace.id'], [
+            'name' => 'Budi Operator Logistik',
             'password' => Hash::make('password'),
             'role' => User::ROLE_LOGISTICS_OPERATOR,
             'status' => User::STATUS_ACTIVE,
-            'company_name' => 'CargoTrace Surabaya Hub',
+            'company_name' => 'CargoTrace Operations Center',
             'phone' => '+62 812-3456-7890',
             'last_login_at' => Carbon::now()->subHours(2),
         ]);
 
-        $customer1 = User::create([
-            'name' => 'Global Mart Enterprise',
-            'email' => 'customer@globalmart.com',
+        $customer1 = User::firstOrCreate(['email' => 'customer@globalmart.com'], [
+            'name' => 'Global Mart International',
             'password' => Hash::make('password'),
             'role' => User::ROLE_CUSTOMER,
             'status' => User::STATUS_ACTIVE,
@@ -62,9 +72,8 @@ class DatabaseSeeder extends Seeder
             'last_login_at' => Carbon::now()->subDays(1),
         ]);
 
-        $customer2 = User::create([
+        $customer2 = User::firstOrCreate(['email' => 'citra@client.com'], [
             'name' => 'Nusantara Trade Corp',
-            'email' => 'citra@client.com',
             'password' => Hash::make('password'),
             'role' => User::ROLE_CUSTOMER,
             'status' => User::STATUS_ACTIVE,
@@ -73,364 +82,457 @@ class DatabaseSeeder extends Seeder
             'last_login_at' => Carbon::now()->subDays(2),
         ]);
 
-        // 3. Carriers
-        $dhl = Carrier::create([
-            'code' => 'DHL',
-            'name' => 'DHL Express',
-            'country' => 'Jerman',
-            'contact_email' => 'contact@dhl.com',
-            'contact_phone' => '+49 228 1820',
-            'website' => 'https://www.dhl.com',
-            'status' => Carrier::STATUS_ACTIVE,
-        ]);
+        // 3. Global Carriers
+        $carriersData = [
+            ['code' => 'MSK', 'name' => 'Maersk Line', 'country' => 'Denmark', 'contact_email' => 'info@maersk.com', 'contact_phone' => '+45 33 63 33 63', 'website' => 'https://www.maersk.com'],
+            ['code' => 'MSC', 'name' => 'Mediterranean Shipping Company (MSC)', 'country' => 'Swiss', 'contact_email' => 'info@msc.com', 'contact_phone' => '+41 22 703 8888', 'website' => 'https://www.msc.com'],
+            ['code' => 'CMA', 'name' => 'CMA CGM Group', 'country' => 'Prancis', 'contact_email' => 'contact@cmacgm.com', 'contact_phone' => '+33 4 88 91 90 00', 'website' => 'https://www.cma-cgm.com'],
+            ['code' => 'COS', 'name' => 'COSCO Shipping Lines', 'country' => 'Tiongkok', 'contact_email' => 'csd@coscon.com', 'contact_phone' => '+86 21 6596 6666', 'website' => 'https://lines.coscoshipping.com'],
+            ['code' => 'HPL', 'name' => 'Hapag-Lloyd', 'country' => 'Jerman', 'contact_email' => 'info@hlag.com', 'contact_phone' => '+49 40 3001 0', 'website' => 'https://www.hapag-lloyd.com'],
+            ['code' => 'ONE', 'name' => 'Ocean Network Express (ONE)', 'country' => 'Jepang', 'contact_email' => 'contact@one-line.com', 'contact_phone' => '+65 6899 9000', 'website' => 'https://www.one-line.com'],
+            ['code' => 'EVG', 'name' => 'Evergreen Marine Corp', 'country' => 'Taiwan', 'contact_email' => 'biz@evergreen-marine.com', 'contact_phone' => '+886 2 2501 1111', 'website' => 'https://www.evergreen-marine.com'],
+            ['code' => 'DHL', 'name' => 'DHL Global Forwarding', 'country' => 'Jerman', 'contact_email' => 'contact@dhl.com', 'contact_phone' => '+49 228 1820', 'website' => 'https://www.dhl.com'],
+            ['code' => 'FDX', 'name' => 'FedEx Express Global', 'country' => 'Amerika Serikat', 'contact_email' => 'support@fedex.com', 'contact_phone' => '+1 800 463 3339', 'website' => 'https://www.fedex.com'],
+        ];
 
-        $fedex = Carrier::create([
-            'code' => 'FDX',
-            'name' => 'FedEx Express',
-            'country' => 'Amerika Serikat',
-            'contact_email' => 'support@fedex.com',
-            'contact_phone' => '+1 800 463 3339',
-            'website' => 'https://www.fedex.com',
-            'status' => Carrier::STATUS_ACTIVE,
-        ]);
+        $carriers = [];
+        foreach ($carriersData as $c) {
+            $carriers[$c['code']] = Carrier::firstOrCreate(['code' => $c['code']], array_merge($c, ['status' => Carrier::STATUS_ACTIVE]));
+        }
 
-        $maersk = Carrier::create([
-            'code' => 'MSK',
-            'name' => 'Maersk Line',
-            'country' => 'Denmark',
-            'contact_email' => 'info@maersk.com',
-            'contact_phone' => '+45 33 63 33 63',
-            'website' => 'https://www.maersk.com',
-            'status' => Carrier::STATUS_ACTIVE,
-        ]);
+        // 4. World Port Index Global Dataset (35+ Major Ports & Cargo Hubs across All Continents)
+        $locationsData = [
+            // Asia Tenggara (Indonesia, SG, MY, TH, VN, PH)
+            ['name' => 'Pelabuhan Tanjung Priok', 'city' => 'Jakarta', 'country' => 'Indonesia', 'location_type' => Location::TYPE_PORT, 'latitude' => -6.1020000, 'longitude' => 106.8820000],
+            ['name' => 'Pelabuhan Tanjung Perak', 'city' => 'Surabaya', 'country' => 'Indonesia', 'location_type' => Location::TYPE_PORT, 'latitude' => -7.1950000, 'longitude' => 112.7290000],
+            ['name' => 'Bandara Internasional Soekarno-Hatta (CGK)', 'city' => 'Tangerang', 'country' => 'Indonesia', 'location_type' => Location::TYPE_AIRPORT, 'latitude' => -6.1270000, 'longitude' => 106.6550000],
+            ['name' => 'Pelabuhan Belawan', 'city' => 'Medan', 'country' => 'Indonesia', 'location_type' => Location::TYPE_PORT, 'latitude' => 3.7850000, 'longitude' => 98.6830000],
+            ['name' => 'Pelabuhan Makassar (Soekarno-Hatta)', 'city' => 'Makassar', 'country' => 'Indonesia', 'location_type' => Location::TYPE_PORT, 'latitude' => -5.1200000, 'longitude' => 119.4120000],
+            ['name' => 'Port of Singapore (PSA Tuas)', 'city' => 'Singapore', 'country' => 'Singapura', 'location_type' => Location::TYPE_PORT, 'latitude' => 1.2640000, 'longitude' => 103.8200000],
+            ['name' => 'Port Klang', 'city' => 'Klang', 'country' => 'Malaysia', 'location_type' => Location::TYPE_PORT, 'latitude' => 2.9990000, 'longitude' => 101.3920000],
+            ['name' => 'Port of Tanjung Pelepas', 'city' => 'Johor', 'country' => 'Malaysia', 'location_type' => Location::TYPE_PORT, 'latitude' => 1.3650000, 'longitude' => 103.5470000],
+            ['name' => 'Laem Chabang Port', 'city' => 'Chonburi', 'country' => 'Thailand', 'location_type' => Location::TYPE_PORT, 'latitude' => 13.0820000, 'longitude' => 100.8830000],
+            ['name' => 'Saigon Port (Cat Lai)', 'city' => 'Ho Chi Minh', 'country' => 'Vietnam', 'location_type' => Location::TYPE_PORT, 'latitude' => 10.7620000, 'longitude' => 106.7930000],
+            ['name' => 'Port of Manila', 'city' => 'Manila', 'country' => 'Filipina', 'location_type' => Location::TYPE_PORT, 'latitude' => 14.5830000, 'longitude' => 120.9670000],
 
-        $cma = Carrier::create([
-            'code' => 'CMA',
-            'name' => 'CMA CGM',
-            'country' => 'Prancis',
-            'contact_email' => 'contact@cmacgm.com',
-            'contact_phone' => '+33 4 88 91 90 00',
-            'website' => 'https://www.cma-cgm.com',
-            'status' => Carrier::STATUS_ACTIVE,
-        ]);
+            // Asia Timur (Tiongkok, Jepang, Korea, Taiwan, Hong Kong)
+            ['name' => 'Port of Shanghai (Yangshan)', 'city' => 'Shanghai', 'country' => 'Tiongkok', 'location_type' => Location::TYPE_PORT, 'latitude' => 31.2300000, 'longitude' => 121.4730000],
+            ['name' => 'Ningbo-Zhoushan Port', 'city' => 'Ningbo', 'country' => 'Tiongkok', 'location_type' => Location::TYPE_PORT, 'latitude' => 29.8680000, 'longitude' => 121.5440000],
+            ['name' => 'Port of Shenzhen (Yantian)', 'city' => 'Shenzhen', 'country' => 'Tiongkok', 'location_type' => Location::TYPE_PORT, 'latitude' => 22.5430000, 'longitude' => 114.0570000],
+            ['name' => 'Port of Hong Kong (Kwai Tsing)', 'city' => 'Hong Kong', 'country' => 'Hong Kong', 'location_type' => Location::TYPE_PORT, 'latitude' => 22.3190000, 'longitude' => 114.1690000],
+            ['name' => 'Port of Busan', 'city' => 'Busan', 'country' => 'Korea Selatan', 'location_type' => Location::TYPE_PORT, 'latitude' => 35.1020000, 'longitude' => 129.0400000],
+            ['name' => 'Port of Tokyo', 'city' => 'Tokyo', 'country' => 'Jepang', 'location_type' => Location::TYPE_PORT, 'latitude' => 35.6190000, 'longitude' => 139.7890000],
+            ['name' => 'Port of Yokohama', 'city' => 'Yokohama', 'country' => 'Jepang', 'location_type' => Location::TYPE_PORT, 'latitude' => 35.4430000, 'longitude' => 139.6380000],
+            ['name' => 'Port of Kaohsiung', 'city' => 'Kaohsiung', 'country' => 'Taiwan', 'location_type' => Location::TYPE_PORT, 'latitude' => 22.6160000, 'longitude' => 120.2830000],
 
-        $hapag = Carrier::create([
-            'code' => 'HPL',
-            'name' => 'Hapag-Lloyd',
-            'country' => 'Jerman',
-            'contact_email' => 'info@hlag.com',
-            'contact_phone' => '+49 40 3001 0',
-            'website' => 'https://www.hapag-lloyd.com',
-            'status' => Carrier::STATUS_ACTIVE,
-        ]);
+            // Eropa (Belanda, Belgia, Jerman, Spanyol, Inggris, Italia)
+            ['name' => 'Port of Rotterdam (Maasvlakte)', 'city' => 'Rotterdam', 'country' => 'Belanda', 'location_type' => Location::TYPE_PORT, 'latitude' => 51.9490000, 'longitude' => 4.1370000],
+            ['name' => 'Port of Antwerp-Bruges', 'city' => 'Antwerp', 'country' => 'Belgia', 'location_type' => Location::TYPE_PORT, 'latitude' => 51.2190000, 'longitude' => 4.4020000],
+            ['name' => 'Port of Hamburg', 'city' => 'Hamburg', 'country' => 'Jerman', 'location_type' => Location::TYPE_PORT, 'latitude' => 53.5350000, 'longitude' => 9.9870000],
+            ['name' => 'Port of Bremen/Bremerhaven', 'city' => 'Bremerhaven', 'country' => 'Jerman', 'location_type' => Location::TYPE_PORT, 'latitude' => 53.5500000, 'longitude' => 8.5800000],
+            ['name' => 'Port of Valencia', 'city' => 'Valencia', 'country' => 'Spanyol', 'location_type' => Location::TYPE_PORT, 'latitude' => 39.4560000, 'longitude' => -0.3200000],
+            ['name' => 'Port of Algeciras (Gibraltar)', 'city' => 'Algeciras', 'country' => 'Spanyol', 'location_type' => Location::TYPE_PORT, 'latitude' => 36.1270000, 'longitude' => -5.4450000],
+            ['name' => 'Port of Felixstowe', 'city' => 'Felixstowe', 'country' => 'Inggris', 'location_type' => Location::TYPE_PORT, 'latitude' => 51.9610000, 'longitude' => 1.3510000],
+            ['name' => 'Port of Genoa', 'city' => 'Genoa', 'country' => 'Italia', 'location_type' => Location::TYPE_PORT, 'latitude' => 44.4050000, 'longitude' => 8.9460000],
 
-        // 4. Locations (Realistic international ports & hubs)
-        $locSub = Location::create([
-            'name' => 'Port Tanjung Perak',
-            'city' => 'Surabaya',
-            'country' => 'Indonesia',
-            'address' => 'Jl. Tanjung Perak Timur No. 620, Pabean Cantian',
-            'location_type' => Location::TYPE_PORT,
-            'latitude' => -7.1950000,
-            'longitude' => 112.7290000,
-            'status' => Location::STATUS_ACTIVE,
-        ]);
+            // Timur Tengah, Asia Selatan, & Afrika (UEA, Oman, Sri Lanka, India, Mesir)
+            ['name' => 'Jebel Ali Port (Dubai)', 'city' => 'Dubai', 'country' => 'Uni Emirat Arab', 'location_type' => Location::TYPE_PORT, 'latitude' => 24.9850000, 'longitude' => 55.0670000],
+            ['name' => 'Port of Salalah', 'city' => 'Salalah', 'country' => 'Oman', 'location_type' => Location::TYPE_PORT, 'latitude' => 16.9410000, 'longitude' => 54.0080000],
+            ['name' => 'Port of Colombo', 'city' => 'Colombo', 'country' => 'Sri Lanka', 'location_type' => Location::TYPE_PORT, 'latitude' => 6.9490000, 'longitude' => 79.8480000],
+            ['name' => 'Jawaharlal Nehru Port (Nhava Sheva)', 'city' => 'Mumbai', 'country' => 'India', 'location_type' => Location::TYPE_PORT, 'latitude' => 18.9490000, 'longitude' => 72.9510000],
+            ['name' => 'Port Said (Suez Canal Hub)', 'city' => 'Port Said', 'country' => 'Mesir', 'location_type' => Location::TYPE_PORT, 'latitude' => 31.2650000, 'longitude' => 32.3010000],
 
-        $locSin = Location::create([
-            'name' => 'Port of Singapore',
-            'city' => 'Singapore',
-            'country' => 'Singapore',
-            'address' => '7B Keppel Rd, Tanjong Pagar Complex',
-            'location_type' => Location::TYPE_PORT,
-            'latitude' => 1.2650000,
-            'longitude' => 103.8190000,
-            'status' => Location::STATUS_ACTIVE,
-        ]);
+            // Amerika Utara & Selatan (USA, Kanada, Panama, Brasil)
+            ['name' => 'Port of Los Angeles', 'city' => 'Los Angeles', 'country' => 'Amerika Serikat', 'location_type' => Location::TYPE_PORT, 'latitude' => 33.7430000, 'longitude' => -118.2670000],
+            ['name' => 'Port of Long Beach', 'city' => 'Long Beach', 'country' => 'Amerika Serikat', 'location_type' => Location::TYPE_PORT, 'latitude' => 33.7540000, 'longitude' => -118.2160000],
+            ['name' => 'Port of New York & New Jersey', 'city' => 'New York', 'country' => 'Amerika Serikat', 'location_type' => Location::TYPE_PORT, 'latitude' => 40.6690000, 'longitude' => -74.1480000],
+            ['name' => 'Port of Savannah', 'city' => 'Savannah', 'country' => 'Amerika Serikat', 'location_type' => Location::TYPE_PORT, 'latitude' => 32.1280000, 'longitude' => -81.1410000],
+            ['name' => 'Port of Vancouver', 'city' => 'Vancouver', 'country' => 'Kanada', 'location_type' => Location::TYPE_PORT, 'latitude' => 49.2820000, 'longitude' => -123.1200000],
+            ['name' => 'Port of Balboa (Panama Canal)', 'city' => 'Panama City', 'country' => 'Panama', 'location_type' => Location::TYPE_PORT, 'latitude' => 8.9560000, 'longitude' => -79.5620000],
+            ['name' => 'Port of Santos', 'city' => 'Santos', 'country' => 'Brasil', 'location_type' => Location::TYPE_PORT, 'latitude' => -23.9610000, 'longitude' => -46.3020000],
 
-        $locRot = Location::create([
-            'name' => 'Port Rotterdam',
-            'city' => 'Rotterdam',
-            'country' => 'Belanda',
-            'address' => 'Wilhelminakade 902, 3072 AP',
-            'location_type' => Location::TYPE_PORT,
-            'latitude' => 51.9490000,
-            'longitude' => 4.1370000,
-            'status' => Location::STATUS_ACTIVE,
-        ]);
+            // Oseania (Australia)
+            ['name' => 'Port Botany (Sydney)', 'city' => 'Sydney', 'country' => 'Australia', 'location_type' => Location::TYPE_PORT, 'latitude' => -33.9740000, 'longitude' => 151.2180000],
+            ['name' => 'Port of Melbourne', 'city' => 'Melbourne', 'country' => 'Australia', 'location_type' => Location::TYPE_PORT, 'latitude' => -37.8280000, 'longitude' => 144.9140000],
 
-        $locCgk = Location::create([
-            'name' => 'Bandara Soekarno-Hatta Cargo Terminal',
-            'city' => 'Tangerang',
-            'country' => 'Indonesia',
-            'address' => 'Kawasan Kargo Bandara Soekarno-Hatta',
-            'location_type' => Location::TYPE_AIRPORT,
-            'latitude' => -6.1270000,
-            'longitude' => 106.6550000,
-            'status' => Location::STATUS_ACTIVE,
-        ]);
+            // Titik Navigasi Maritim Tengah Laut (Kapal sedang berlayar di jalur utama)
+            ['name' => 'Selat Malaka Navigasi Barat', 'city' => 'Malacca Strait', 'country' => 'Transit Laut', 'location_type' => Location::TYPE_WAREHOUSE, 'latitude' => 4.2100000, 'longitude' => 99.8500000],
+            ['name' => 'Laut Cina Selatan Transit Zone', 'city' => 'South China Sea', 'country' => 'Transit Laut', 'location_type' => Location::TYPE_WAREHOUSE, 'latitude' => 12.5000000, 'longitude' => 114.2000000],
+            ['name' => 'Laut Arab (Rute Teluk Oman)', 'city' => 'Arabian Sea', 'country' => 'Transit Laut', 'location_type' => Location::TYPE_WAREHOUSE, 'latitude' => 20.3000000, 'longitude' => 64.5000000],
+            ['name' => 'Samudra Pasifik Utara Jalur Timur', 'city' => 'North Pacific Ocean', 'country' => 'Transit Laut', 'location_type' => Location::TYPE_WAREHOUSE, 'latitude' => 32.5000000, 'longitude' => -160.0000000],
+            ['name' => 'Samudra Hindia Timur', 'city' => 'Indian Ocean', 'country' => 'Transit Laut', 'location_type' => Location::TYPE_WAREHOUSE, 'latitude' => -12.4000000, 'longitude' => 95.2000000],
+        ];
 
-        $locSyd = Location::create([
-            'name' => 'Port of Sydney (Port Botany)',
-            'city' => 'Sydney',
-            'country' => 'Australia',
-            'address' => 'Bumborah Point Rd, Port Botany NSW 2036',
-            'location_type' => Location::TYPE_PORT,
-            'latitude' => -33.8560000,
-            'longitude' => 151.2090000,
-            'status' => Location::STATUS_ACTIVE,
-        ]);
+        $locations = [];
+        foreach ($locationsData as $loc) {
+            $locations[$loc['name']] = Location::firstOrCreate(
+                ['name' => $loc['name']],
+                array_merge($loc, [
+                    'address' => 'Terminal Internasional ' . $loc['name'] . ', ' . $loc['city'],
+                    'status' => Location::STATUS_ACTIVE,
+                ])
+            );
+        }
 
-        $locHam = Location::create([
-            'name' => 'Port of Hamburg',
-            'city' => 'Hamburg',
-            'country' => 'Jerman',
-            'address' => 'Am Sandtorkai 68, 20457 Hamburg',
-            'location_type' => Location::TYPE_PORT,
-            'latitude' => 53.5350000,
-            'longitude' => 9.9870000,
-            'status' => Location::STATUS_ACTIVE,
-        ]);
+        // 5. Global Shipments (20 Realistic International Maritime & Air Shipments Across All Major Sea Lanes)
+        $shipmentsSpecs = [
+            [
+                'number' => 'CT-2026-001',
+                'customer' => $customer1,
+                'carrier' => $carriers['FDX'],
+                'origin' => $locations['Pelabuhan Tanjung Perak'],
+                'dest' => $locations['Port Botany (Sydney)'],
+                'current' => $locations['Port of Singapore (PSA Tuas)'],
+                'cargo' => 'Electronic Parts & Solar Inverters',
+                'weight' => 2500.00, 'volume' => 15.20,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 2880, 'sev' => Shipment::DELAY_HIGH,
+                'dep_sub' => 6, 'arr_add' => 4, 'eta_add' => 6,
+                'items' => [
+                    ['name' => 'Solar Inverter Modules', 'hs' => '8504.40.90', 'qty' => 120, 'val' => 75000.00],
+                    ['name' => 'Lithium Battery Storage Cell', 'hs' => '8507.60.00', 'qty' => 50, 'val' => 45000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-002',
+                'customer' => $customer2,
+                'carrier' => $carriers['DHL'],
+                'origin' => $locations['Pelabuhan Tanjung Perak'],
+                'dest' => $locations['Port of Rotterdam (Maasvlakte)'],
+                'current' => $locations['Port of Rotterdam (Maasvlakte)'],
+                'cargo' => 'Textiles & Garments',
+                'weight' => 5200.00, 'volume' => 32.50,
+                'status' => Shipment::STATUS_DELIVERED,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 25, 'arr_add' => -2, 'eta_add' => -2,
+                'items' => [
+                    ['name' => 'Cotton Batik Apparel', 'hs' => '6205.20.00', 'qty' => 1400, 'val' => 88000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-003',
+                'customer' => $customer1,
+                'carrier' => $carriers['MSK'],
+                'origin' => $locations['Bandara Internasional Soekarno-Hatta (CGK)'],
+                'dest' => $locations['Port of Singapore (PSA Tuas)'],
+                'current' => $locations['Selat Malaka Navigasi Barat'],
+                'cargo' => 'Pharmaceutical Goods & Vaccines',
+                'weight' => 850.00, 'volume' => 4.20,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 1, 'arr_add' => 1, 'eta_add' => 1,
+                'items' => [
+                    ['name' => 'Temperature-Controlled Vaccines', 'hs' => '3002.20.00', 'qty' => 500, 'val' => 125000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-004',
+                'customer' => $customer2,
+                'carrier' => $carriers['CMA'],
+                'origin' => $locations['Port of Shanghai (Yangshan)'],
+                'dest' => $locations['Pelabuhan Tanjung Perak'],
+                'current' => $locations['Laut Cina Selatan Transit Zone'],
+                'cargo' => 'Machinery & Heavy Equipment',
+                'weight' => 12500.00, 'volume' => 48.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 3, 'arr_add' => 9, 'eta_add' => 9,
+                'items' => [
+                    ['name' => 'CNC Milling Machine Units', 'hs' => '8457.10.00', 'qty' => 4, 'val' => 240000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-005',
+                'customer' => $customer1,
+                'carrier' => $carriers['HPL'],
+                'origin' => $locations['Port of Hamburg'],
+                'dest' => $locations['Pelabuhan Tanjung Priok'],
+                'current' => $locations['Port of Hamburg'],
+                'cargo' => 'Automotive Spare Parts',
+                'weight' => 4100.00, 'volume' => 18.50,
+                'status' => Shipment::STATUS_BOOKED,
+                'delay' => 1440, 'sev' => Shipment::DELAY_MEDIUM,
+                'dep_sub' => 0, 'arr_add' => 18, 'eta_add' => 19,
+                'items' => [
+                    ['name' => 'Precision Gearbox Assemblies', 'hs' => '8708.40.11', 'qty' => 80, 'val' => 110000.00],
+                ]
+            ],
+            // Additional Real-World Trans-Continental Shipments
+            [
+                'number' => 'CT-2026-006',
+                'customer' => $customer1,
+                'carrier' => $carriers['MSC'],
+                'origin' => $locations['Pelabuhan Tanjung Priok'],
+                'dest' => $locations['Port of Los Angeles'],
+                'current' => $locations['Samudra Pasifik Utara Jalur Timur'],
+                'cargo' => 'Consumer Electronics & Smart Devices',
+                'weight' => 8200.00, 'volume' => 36.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 8, 'arr_add' => 10, 'eta_add' => 10,
+                'items' => [
+                    ['name' => 'Smart Home Hub Devices', 'hs' => '8517.62.00', 'qty' => 3000, 'val' => 180000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-007',
+                'customer' => $customer2,
+                'carrier' => $carriers['COS'],
+                'origin' => $locations['Ningbo-Zhoushan Port'],
+                'dest' => $locations['Port of Antwerp-Bruges'],
+                'current' => $locations['Port Said (Suez Canal Hub)'],
+                'cargo' => 'Industrial Solar Panels & Hardware',
+                'weight' => 16400.00, 'volume' => 54.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 2160, 'sev' => Shipment::DELAY_HIGH,
+                'dep_sub' => 14, 'arr_add' => 12, 'eta_add' => 14,
+                'items' => [
+                    ['name' => 'Monocrystalline Solar Panels', 'hs' => '8541.43.00', 'qty' => 2200, 'val' => 210000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-008',
+                'customer' => $customer1,
+                'carrier' => $carriers['ONE'],
+                'origin' => $locations['Port of Tokyo'],
+                'dest' => $locations['Pelabuhan Tanjung Priok'],
+                'current' => $locations['Port of Kaohsiung'],
+                'cargo' => 'Semiconductor Wafers & Sensors',
+                'weight' => 1200.00, 'volume' => 8.40,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 4, 'arr_add' => 5, 'eta_add' => 5,
+                'items' => [
+                    ['name' => 'Integrated Microcontroller Chips', 'hs' => '8542.31.00', 'qty' => 10000, 'val' => 320000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-009',
+                'customer' => $customer2,
+                'carrier' => $carriers['EVG'],
+                'origin' => $locations['Jebel Ali Port (Dubai)'],
+                'dest' => $locations['Pelabuhan Belawan'],
+                'current' => $locations['Laut Arab (Rute Teluk Oman)'],
+                'cargo' => 'Petrochemicals & Polymers',
+                'weight' => 22000.00, 'volume' => 60.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 5, 'arr_add' => 7, 'eta_add' => 7,
+                'items' => [
+                    ['name' => 'Polyethylene Granules Resin', 'hs' => '3901.10.00', 'qty' => 880, 'val' => 95000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-010',
+                'customer' => $customer1,
+                'carrier' => $carriers['MSK'],
+                'origin' => $locations['Port of Busan'],
+                'dest' => $locations['Port of Melbourne'],
+                'current' => $locations['Port of Busan'],
+                'cargo' => 'Automotive Lithium Battery Packs',
+                'weight' => 9800.00, 'volume' => 32.00,
+                'status' => Shipment::STATUS_PICKED_UP,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 0, 'arr_add' => 16, 'eta_add' => 16,
+                'items' => [
+                    ['name' => 'EV Battery Modules 75kWh', 'hs' => '8507.60.00', 'qty' => 60, 'val' => 270000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-011',
+                'customer' => $customer2,
+                'carrier' => $carriers['CMA'],
+                'origin' => $locations['Pelabuhan Makassar (Soekarno-Hatta)'],
+                'dest' => $locations['Port of Shanghai (Yangshan)'],
+                'current' => $locations['Port of Manila'],
+                'cargo' => 'Agricultural Commodities & Coffee Beans',
+                'weight' => 18500.00, 'volume' => 55.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 720, 'sev' => Shipment::DELAY_LOW,
+                'dep_sub' => 7, 'arr_add' => 5, 'eta_add' => 6,
+                'items' => [
+                    ['name' => 'Specialty Toraja Arabica Green Coffee', 'hs' => '0901.11.10', 'qty' => 300, 'val' => 140000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-012',
+                'customer' => $customer1,
+                'carrier' => $carriers['HPL'],
+                'origin' => $locations['Port of New York & New Jersey'],
+                'dest' => $locations['Port of Rotterdam (Maasvlakte)'],
+                'current' => $locations['Port of Felixstowe'],
+                'cargo' => 'Aerospace Components & Avionics',
+                'weight' => 3200.00, 'volume' => 14.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 6, 'arr_add' => 3, 'eta_add' => 3,
+                'items' => [
+                    ['name' => 'Flight Deck Display Avionics', 'hs' => '8803.30.00', 'qty' => 15, 'val' => 350000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-013',
+                'customer' => $customer2,
+                'carrier' => $carriers['FDX'],
+                'origin' => $locations['Laem Chabang Port'],
+                'dest' => $locations['Pelabuhan Tanjung Priok'],
+                'current' => $locations['Port Klang'],
+                'cargo' => 'Automotive Assembly Parts',
+                'weight' => 6400.00, 'volume' => 24.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 3, 'arr_add' => 2, 'eta_add' => 2,
+                'items' => [
+                    ['name' => 'Engine Cylinder Heads', 'hs' => '8409.91.00', 'qty' => 120, 'val' => 68000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-014',
+                'customer' => $customer1,
+                'carrier' => $carriers['MSC'],
+                'origin' => $locations['Port of Santos'],
+                'dest' => $locations['Port of Rotterdam (Maasvlakte)'],
+                'current' => $locations['Port of Algeciras (Gibraltar)'],
+                'cargo' => 'Raw Coffee & Frozen Fruit Concentrate',
+                'weight' => 24000.00, 'volume' => 65.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 16, 'arr_add' => 4, 'eta_add' => 4,
+                'items' => [
+                    ['name' => 'Frozen Orange Juice Concentrate', 'hs' => '2009.11.00', 'qty' => 800, 'val' => 135000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-015',
+                'customer' => $customer2,
+                'carrier' => $carriers['COS'],
+                'origin' => $locations['Port of Colombo'],
+                'dest' => $locations['Port Klang'],
+                'current' => $locations['Samudra Hindia Timur'],
+                'cargo' => 'Ceylon Tea & Rubber Commodities',
+                'weight' => 7600.00, 'volume' => 28.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 1440, 'sev' => Shipment::DELAY_MEDIUM,
+                'dep_sub' => 4, 'arr_add' => 2, 'eta_add' => 3,
+                'items' => [
+                    ['name' => 'Pure Ceylon Black Tea Bags', 'hs' => '0902.30.00', 'qty' => 1500, 'val' => 72000.00],
+                ]
+            ],
+        ];
 
-        $locSha = Location::create([
-            'name' => 'Port of Shanghai (Yangshan Deep-Water Port)',
-            'city' => 'Shanghai',
-            'country' => 'China',
-            'address' => 'Yangshan Island, Hangzhou Bay',
-            'location_type' => Location::TYPE_PORT,
-            'latitude' => 31.2300000,
-            'longitude' => 121.4730000,
-            'status' => Location::STATUS_ACTIVE,
-        ]);
+        foreach ($shipmentsSpecs as $spec) {
+            $dep = Carbon::now()->subDays($spec['dep_sub']);
+            $arr = Carbon::now()->addDays($spec['arr_add']);
+            $eta = Carbon::now()->addDays($spec['eta_add']);
 
-        // 5. Shipments
-        // Shipment 1: CT-2026-001 (Surabaya to Sydney, Delayed +2 days, in transit)
-        $shipment1 = Shipment::create([
-            'shipment_number' => 'CT-2026-001',
-            'customer_id' => $customer1->id,
-            'carrier_id' => $fedex->id,
-            'origin_location_id' => $locSub->id,
-            'destination_location_id' => $locSyd->id,
-            'current_location_id' => $locSin->id,
-            'cargo_type' => 'Electronic Parts & Solar Components',
-            'weight' => 2500.00,
-            'volume' => 15.20,
-            'expected_departure' => Carbon::now()->subDays(6)->setTime(16, 0),
-            'expected_arrival' => Carbon::now()->addDays(4)->setTime(14, 0),
-            'actual_departure' => Carbon::now()->subDays(6)->setTime(16, 30),
-            'actual_arrival' => null,
-            'status' => Shipment::STATUS_IN_TRANSIT,
-            'estimated_time_arrival' => Carbon::now()->addDays(6)->setTime(14, 0), // +2 days delayed
-            'delay_minutes' => 2880,
-            'delay_severity' => Shipment::DELAY_HIGH,
-            'notes' => 'Prioritas penanganan tinggi. Komponen sensitif cuaca.',
-        ]);
+            $shipment = Shipment::firstOrCreate(
+                ['shipment_number' => $spec['number']],
+                [
+                    'customer_id' => $spec['customer']->id,
+                    'carrier_id' => $spec['carrier']->id,
+                    'origin_location_id' => $spec['origin']->id,
+                    'destination_location_id' => $spec['dest']->id,
+                    'current_location_id' => $spec['current']->id,
+                    'cargo_type' => $spec['cargo'],
+                    'weight' => $spec['weight'],
+                    'volume' => $spec['volume'],
+                    'expected_departure' => $dep,
+                    'expected_arrival' => $arr,
+                    'actual_departure' => $spec['dep_sub'] > 0 ? $dep : null,
+                    'actual_arrival' => $spec['status'] === Shipment::STATUS_DELIVERED ? $arr : null,
+                    'status' => $spec['status'],
+                    'estimated_time_arrival' => $eta,
+                    'delay_minutes' => $spec['delay'],
+                    'delay_severity' => $spec['sev'],
+                    'notes' => 'Shipment kargo rute internasional prioritas operasional.',
+                ]
+            );
 
-        ShipmentItem::create([
-            'shipment_id' => $shipment1->id,
-            'item_name' => 'Solar Inverter Modules',
-            'hs_code' => '8504.40.90',
-            'quantity' => 120,
-            'weight' => 1500.00,
-            'declared_value' => 75000.00,
-            'currency' => 'USD',
-        ]);
-        ShipmentItem::create([
-            'shipment_id' => $shipment1->id,
-            'item_name' => 'Lithium Battery Storage Cell',
-            'hs_code' => '8507.60.00',
-            'quantity' => 50,
-            'weight' => 1000.00,
-            'declared_value' => 45000.00,
-            'currency' => 'USD',
-        ]);
+            // Seed Shipment Items
+            foreach ($spec['items'] as $item) {
+                ShipmentItem::firstOrCreate(
+                    ['shipment_id' => $shipment->id, 'item_name' => $item['name']],
+                    [
+                        'hs_code' => $item['hs'],
+                        'quantity' => $item['qty'],
+                        'weight' => $spec['weight'] / count($spec['items']),
+                        'declared_value' => $item['val'],
+                        'currency' => 'USD',
+                    ]
+                );
+            }
 
-        // Tracking timeline for Shipment 1
-        TrackingEvent::create([
-            'shipment_id' => $shipment1->id,
-            'event_type' => TrackingEvent::TYPE_STATUS_CHANGE,
-            'location_id' => $locSub->id,
-            'latitude' => $locSub->latitude,
-            'longitude' => $locSub->longitude,
-            'event_time' => Carbon::now()->subDays(7)->setTime(10, 15),
-            'shipment_status_at_event' => Shipment::STATUS_BOOKED,
-            'description' => 'Pengiriman telah dipesan dan dijadwalkan bersama FedEx Express.',
-            'created_by' => $operator->id,
-        ]);
+            // Seed Baseline Tracking Event
+            TrackingEvent::firstOrCreate(
+                ['shipment_id' => $shipment->id, 'event_type' => TrackingEvent::TYPE_STATUS_CHANGE],
+                [
+                    'location_id' => $spec['origin']->id,
+                    'latitude' => $spec['origin']->latitude,
+                    'longitude' => $spec['origin']->longitude,
+                    'event_time' => $dep->subDay(),
+                    'shipment_status_at_event' => Shipment::STATUS_BOOKED,
+                    'description' => "Pengiriman dijadwalkan bersama {$spec['carrier']->name}.",
+                    'created_by' => $operator->id,
+                ]
+            );
 
-        TrackingEvent::create([
-            'shipment_id' => $shipment1->id,
-            'event_type' => TrackingEvent::TYPE_DEPARTURE,
-            'location_id' => $locSub->id,
-            'latitude' => $locSub->latitude,
-            'longitude' => $locSub->longitude,
-            'event_time' => Carbon::now()->subDays(6)->setTime(16, 30),
-            'shipment_status_at_event' => Shipment::STATUS_IN_TRANSIT,
-            'description' => 'Kargo berangkat dari Port Tanjung Perak Surabaya menuju Pelabuhan Transit Singapura.',
-            'created_by' => $operator->id,
-        ]);
+            if ($spec['status'] === Shipment::STATUS_IN_TRANSIT) {
+                TrackingEvent::firstOrCreate(
+                    ['shipment_id' => $shipment->id, 'event_type' => TrackingEvent::TYPE_DEPARTURE],
+                    [
+                        'location_id' => $spec['origin']->id,
+                        'latitude' => $spec['origin']->latitude,
+                        'longitude' => $spec['origin']->longitude,
+                        'event_time' => $dep,
+                        'shipment_status_at_event' => Shipment::STATUS_IN_TRANSIT,
+                        'description' => "Kargo bertolak dari {$spec['origin']->name} menuju {$spec['dest']->name}.",
+                        'created_by' => $operator->id,
+                    ]
+                );
 
-        TrackingEvent::create([
-            'shipment_id' => $shipment1->id,
-            'event_type' => TrackingEvent::TYPE_ARRIVAL,
-            'location_id' => $locSin->id,
-            'latitude' => $locSin->latitude,
-            'longitude' => $locSin->longitude,
-            'event_time' => Carbon::now()->subDays(3)->setTime(8, 30),
-            'shipment_status_at_event' => Shipment::STATUS_IN_TRANSIT,
-            'description' => 'Kargo tiba di Port of Singapore dan siap untuk transfer kapal transshipment.',
-            'created_by' => $operator->id,
-        ]);
+                if ($spec['current']->id !== $spec['origin']->id) {
+                    TrackingEvent::firstOrCreate(
+                        ['shipment_id' => $shipment->id, 'event_type' => TrackingEvent::TYPE_CHECKPOINT_REACHED],
+                        [
+                            'location_id' => $spec['current']->id,
+                            'latitude' => $spec['current']->latitude,
+                            'longitude' => $spec['current']->longitude,
+                            'event_time' => Carbon::now()->subHours(6),
+                            'shipment_status_at_event' => Shipment::STATUS_IN_TRANSIT,
+                            'description' => "Kapal kargo melewati koordinat navigasi di {$spec['current']->name}.",
+                            'created_by' => $operator->id,
+                        ]
+                    );
+                }
+            }
 
-        TrackingEvent::create([
-            'shipment_id' => $shipment1->id,
-            'event_type' => TrackingEvent::TYPE_EXCEPTION_NOTED,
-            'location_id' => $locSin->id,
-            'latitude' => $locSin->latitude,
-            'longitude' => $locSin->longitude,
-            'event_time' => Carbon::now()->subHours(18)->setTime(14, 20),
-            'shipment_status_at_event' => Shipment::STATUS_IN_TRANSIT,
-            'description' => 'Keterlambatan transit akibat cuaca buruk dan badai di rute laut selatan Singapura.',
-            'created_by' => $operator->id,
-        ]);
+            // Seed Exceptions for delayed shipments
+            if ($spec['delay'] > 0) {
+                ShipmentException::firstOrCreate(
+                    ['shipment_id' => $shipment->id],
+                    [
+                        'exception_type' => ShipmentException::TYPE_WEATHER_DELAY,
+                        'severity' => $spec['sev'] === Shipment::DELAY_HIGH ? ShipmentException::SEVERITY_HIGH : ShipmentException::SEVERITY_MEDIUM,
+                        'status' => ShipmentException::STATUS_OPEN,
+                        'description' => "Perubahan cuaca laut dan gelombang tinggi memperlambat kecepatan kapal pada rute {$spec['origin']->city} ke {$spec['dest']->city}.",
+                        'reported_by' => $operator->id,
+                    ]
+                );
 
-        // Exception for Shipment 1
-        ShipmentException::create([
-            'shipment_id' => $shipment1->id,
-            'exception_type' => ShipmentException::TYPE_WEATHER_DELAY,
-            'severity' => ShipmentException::SEVERITY_HIGH,
-            'status' => ShipmentException::STATUS_OPEN,
-            'description' => 'Peringatan gelombang tinggi dan badai tropis di Laut Jawa & Selat Karimata menunda keberangkatan kapal feeder transshipment.',
-            'reported_by' => $operator->id,
-        ]);
+                Notification::firstOrCreate(
+                    ['shipment_id' => $shipment->id, 'type' => Notification::TYPE_DELAY_ALERT],
+                    [
+                        'user_id' => $spec['customer']->id,
+                        'title' => "Peringatan Keterlambatan: {$spec['number']}",
+                        'message' => "Pengiriman {$spec['number']} diperkirakan terlambat +" . round($spec['delay'] / 60) . " jam akibat kondisi maritim.",
+                        'severity' => Notification::SEVERITY_DANGER,
+                        'is_read' => false,
+                    ]
+                );
+            }
+        }
 
-        // Notification for Shipment 1
-        Notification::create([
-            'user_id' => $admin->id,
-            'shipment_id' => $shipment1->id,
-            'type' => Notification::TYPE_DELAY_ALERT,
-            'title' => 'Peringatan Keterlambatan: CT-2026-001',
-            'message' => 'Pengiriman CT-2026-001 mengalami keterlambatan +2 hari (48 jam) akibat cuaca buruk di rute transit.',
-            'severity' => Notification::SEVERITY_DANGER,
-            'is_read' => false,
-        ]);
-
-        Notification::create([
-            'user_id' => $admin->id,
-            'shipment_id' => $shipment1->id,
-            'type' => Notification::TYPE_EXCEPTION_ALERT,
-            'title' => 'Pengecualian Baru: Cuaca Buruk',
-            'message' => 'WEATHER_DELAY dilaporkan oleh operator pada rute Surabaya ke Sydney.',
-            'severity' => Notification::SEVERITY_WARNING,
-            'is_read' => false,
-        ]);
-
-        // Shipment 2: CT-2026-002 (Surabaya to Rotterdam, DHL, DELIVERED)
-        $shipment2 = Shipment::create([
-            'shipment_number' => 'CT-2026-002',
-            'customer_id' => $customer2->id,
-            'carrier_id' => $dhl->id,
-            'origin_location_id' => $locSub->id,
-            'destination_location_id' => $locRot->id,
-            'current_location_id' => $locRot->id,
-            'cargo_type' => 'Textiles & Garments',
-            'weight' => 5200.00,
-            'volume' => 32.50,
-            'expected_departure' => Carbon::now()->subDays(25),
-            'expected_arrival' => Carbon::now()->subDays(2),
-            'actual_departure' => Carbon::now()->subDays(25),
-            'actual_arrival' => Carbon::now()->subDays(2),
-            'status' => Shipment::STATUS_DELIVERED,
-            'estimated_time_arrival' => Carbon::now()->subDays(2),
-            'delay_minutes' => 0,
-            'delay_severity' => Shipment::DELAY_NONE,
-            'notes' => 'Selesai tepat waktu tanpa kendala bea cukai.',
-        ]);
-
-        TrackingEvent::create([
-            'shipment_id' => $shipment2->id,
-            'event_type' => TrackingEvent::TYPE_ARRIVAL,
-            'location_id' => $locRot->id,
-            'latitude' => $locRot->latitude,
-            'longitude' => $locRot->longitude,
-            'event_time' => Carbon::now()->subDays(2),
-            'shipment_status_at_event' => Shipment::STATUS_DELIVERED,
-            'description' => 'Kargo telah diterima dengan baik di gudang Port Rotterdam Belanda.',
-            'created_by' => $operator->id,
-        ]);
-
-        // Shipment 3: CT-2026-003 (Tangerang to Singapore, Maersk, IN_TRANSIT)
-        $shipment3 = Shipment::create([
-            'shipment_number' => 'CT-2026-003',
-            'customer_id' => $customer1->id,
-            'carrier_id' => $maersk->id,
-            'origin_location_id' => $locCgk->id,
-            'destination_location_id' => $locSin->id,
-            'current_location_id' => $locCgk->id,
-            'cargo_type' => 'Pharmaceutical Goods',
-            'weight' => 850.00,
-            'volume' => 4.20,
-            'expected_departure' => Carbon::now()->subHours(12),
-            'expected_arrival' => Carbon::now()->addHours(24),
-            'actual_departure' => Carbon::now()->subHours(10),
-            'actual_arrival' => null,
-            'status' => Shipment::STATUS_IN_TRANSIT,
-            'estimated_time_arrival' => Carbon::now()->addHours(24),
-            'delay_minutes' => 0,
-            'delay_severity' => Shipment::DELAY_NONE,
-            'notes' => 'Kargo berpendingin (Cold Chain).',
-        ]);
-
-        // Shipment 4: CT-2026-004 (Shanghai to Surabaya, CMA CGM, PICKED_UP)
-        $shipment4 = Shipment::create([
-            'shipment_number' => 'CT-2026-004',
-            'customer_id' => $customer2->id,
-            'carrier_id' => $cma->id,
-            'origin_location_id' => $locSha->id,
-            'destination_location_id' => $locSub->id,
-            'current_location_id' => $locSha->id,
-            'cargo_type' => 'Machinery & Heavy Equipment',
-            'weight' => 12500.00,
-            'volume' => 48.00,
-            'expected_departure' => Carbon::now()->addDays(1),
-            'expected_arrival' => Carbon::now()->addDays(12),
-            'status' => Shipment::STATUS_PICKED_UP,
-            'estimated_time_arrival' => Carbon::now()->addDays(12),
-            'delay_minutes' => 0,
-            'delay_severity' => Shipment::DELAY_NONE,
-            'notes' => 'Kargo telah dijemput dari manufaktur Shanghai.',
-        ]);
-
-        // Shipment 5: CT-2026-005 (Hamburg to Jakarta, Hapag-Lloyd, IN_TRANSIT, Customs Hold)
-        $shipment5 = Shipment::create([
-            'shipment_number' => 'CT-2026-005',
-            'customer_id' => $customer1->id,
-            'carrier_id' => $hapag->id,
-            'origin_location_id' => $locHam->id,
-            'destination_location_id' => $locCgk->id,
-            'current_location_id' => $locHam->id,
-            'cargo_type' => 'Automotive Spare Parts',
-            'weight' => 4100.00,
-            'volume' => 18.50,
-            'expected_departure' => Carbon::now()->subDays(5),
-            'expected_arrival' => Carbon::now()->addDays(15),
-            'actual_departure' => Carbon::now()->subDays(5),
-            'status' => Shipment::STATUS_IN_TRANSIT,
-            'estimated_time_arrival' => Carbon::now()->addDays(17), // +2 days
-            'delay_minutes' => 2880,
-            'delay_severity' => Shipment::DELAY_HIGH,
-            'notes' => 'Pemeriksaan dokumen bea cukai di pelabuhan muat Hamburg.',
-        ]);
-
-        ShipmentException::create([
-            'shipment_id' => $shipment5->id,
-            'exception_type' => ShipmentException::TYPE_CUSTOMS_HOLD,
-            'severity' => ShipmentException::SEVERITY_MEDIUM,
-            'status' => ShipmentException::STATUS_INVESTIGATING,
-            'description' => 'Verifikasi nomor HS Code dan perizinan impor suku cadang khusus.',
-            'reported_by' => $operator->id,
-        ]);
-
-        // Audit Logs (Realistic history)
+        // 6. Realistic Audit Logs
         AuditLog::create([
             'user_id' => $admin->id,
             'action' => 'LOGIN',
@@ -452,19 +554,6 @@ class DatabaseSeeder extends Seeder
             'new_values' => ['status' => 'IN_TRANSIT', 'delay_minutes' => 2880],
             'description' => 'Operator memperbarui status perjalanan kargo CT-2026-001 dan mencatat keterlambatan cuaca.',
             'created_at' => Carbon::now()->subHours(18),
-        ]);
-
-        AuditLog::create([
-            'user_id' => $admin->id,
-            'action' => 'CONFIG_CHANGE',
-            'entity_type' => 'SystemSetting',
-            'entity_id' => 'delay_threshold_hours',
-            'ip_address' => '127.0.0.1',
-            'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-            'old_values' => ['value' => '4'],
-            'new_values' => ['value' => '6'],
-            'description' => 'Admin memperbarui konfigurasi ambang batas keterlambatan menjadi 6 jam.',
-            'created_at' => Carbon::now()->subDays(1),
         ]);
     }
 }

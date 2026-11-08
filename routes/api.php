@@ -4,12 +4,20 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CarrierApiController;
 use App\Http\Controllers\Api\ExceptionApiController;
 use App\Http\Controllers\Api\LocationApiController;
+use App\Http\Controllers\Api\PublicIntelligenceApiController;
 use App\Http\Controllers\Api\ShipmentApiController;
 use Illuminate\Support\Facades\Route;
 
 // Public Auth Endpoints
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+// UAS Required Public Intelligence Endpoints (PROJECT FINAL PDF Page 9)
+Route::get('/countries', [PublicIntelligenceApiController::class, 'countries']);
+Route::get('/risk', [PublicIntelligenceApiController::class, 'risk']);
+Route::get('/ports', [PublicIntelligenceApiController::class, 'ports']);
+Route::get('/news', [PublicIntelligenceApiController::class, 'news']);
+Route::get('/currency', [PublicIntelligenceApiController::class, 'currency']);
 
 // Protected API Endpoints (Sanctum Authenticated)
 Route::middleware('auth:sanctum')->group(function () {

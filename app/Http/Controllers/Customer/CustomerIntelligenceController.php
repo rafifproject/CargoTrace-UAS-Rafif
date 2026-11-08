@@ -61,3 +61,4 @@ class CustomerIntelligenceController extends Controller
         return view('customer.intelligence.comparison', compact('dataA', 'dataB', 'countryA', 'countryB'));
     }
 }
+

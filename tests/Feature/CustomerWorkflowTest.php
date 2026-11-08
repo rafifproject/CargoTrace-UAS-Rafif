@@ -138,3 +138,4 @@ class CustomerWorkflowTest extends TestCase
         $response->assertRedirect(route('customer.dashboard'));
     }
 }
+

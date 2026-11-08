@@ -115,3 +115,4 @@ class CustomerShipmentController extends Controller
         return view('customer.shipments.map', compact('mapShipments', 'myShipments', 'selectedShipmentId'));
     }
 }
+

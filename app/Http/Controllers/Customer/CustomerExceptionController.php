@@ -33,3 +33,4 @@ class CustomerExceptionController extends Controller
         return view('customer.exceptions.index', compact('exceptions', 'activeCount'));
     }
 }
+
