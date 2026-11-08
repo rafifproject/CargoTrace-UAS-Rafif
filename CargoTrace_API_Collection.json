@@ -222,6 +222,81 @@
           }
         }
       ]
+    },
+    {
+      "name": "06. Intelijen Global Publik (Public Intelligence APIs)",
+      "item": [
+        {
+          "name": "Profil Makroekonomi Negara (World Bank & REST Countries)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/countries?code=ID",
+              "query": [
+                { "key": "code", "value": "ID" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Indeks Risiko Rantai Pasok Global (Live Weighted Model)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/risk" }
+          }
+        },
+        {
+          "name": "Direktori Pelabuhan Dunia (World Port Index)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ports?search=Singapore",
+              "query": [
+                { "key": "search", "value": "Singapore" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Berita Logistik Global (Lexicon Sentiment Analysis)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/news?category=all",
+              "query": [
+                { "key": "category", "value": "all" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Kurs Mata Uang Live (ExchangeRate-API)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/currency?base=USD",
+              "query": [
+                { "key": "base", "value": "USD" }
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }
