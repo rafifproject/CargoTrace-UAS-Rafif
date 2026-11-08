@@ -6,10 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Pelacakan Kargo') | CargoTrace - Customer Portal</title>
 
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Inter & Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -73,18 +73,47 @@
         <!-- ==================== SIDEBAR CUSTOMER ==================== -->
         <aside class="w-64 bg-[#0A1128] text-slate-300 flex flex-col flex-shrink-0 z-30 border-r border-slate-800 select-none">
             <!-- Sidebar Header / Logo -->
-            <div class="h-16 flex items-center px-5 border-b border-slate-800/80 gap-3">
-                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 flex-shrink-0">
-                    <polygon points="20,2 36,11 36,29 20,38 4,29 4,11" fill="rgba(0,168,232,0.15)" stroke="#00A8E8" stroke-width="1.2"/>
-                    <rect x="12" y="14" width="16" height="13" rx="1.5" fill="none" stroke="#00A8E8" stroke-width="1.6"/>
-                    <line x1="12" y1="19" x2="28" y2="19" stroke="#00A8E8" stroke-width="1.6"/>
-                    <line x1="20" y1="14" x2="20" y2="19" stroke="#00A8E8" stroke-width="1.6"/>
-                    <ellipse cx="20" cy="20" rx="14" ry="5" fill="none" stroke="rgba(0,168,232,0.4)" stroke-width="0.9" transform="rotate(-15 20 20)"/>
-                    <path d="M28 12 L32 8 M28 12 L31 15" stroke="#00A8E8" stroke-width="1.2" stroke-linecap="round"/>
-                </svg>
+            <div class="h-16 flex items-center px-4 border-b border-slate-800/80 gap-3">
+                <div class="w-9 h-9 flex-shrink-0 drop-shadow-[0_0_12px_rgba(0,194,255,0.5)]">
+                    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                        <defs>
+                            <linearGradient id="sbTopCust" x1="60" y1="20" x2="60" y2="55" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#38BDF8"/>
+                                <stop offset="100%" stop-color="#0284C7"/>
+                            </linearGradient>
+                            <linearGradient id="sbLeftCust" x1="25" y1="40" x2="60" y2="95" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#0369A1"/>
+                                <stop offset="100%" stop-color="#075985"/>
+                            </linearGradient>
+                            <linearGradient id="sbRightCust" x1="60" y1="40" x2="95" y2="95" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#0284C7"/>
+                                <stop offset="100%" stop-color="#0369A1"/>
+                            </linearGradient>
+                            <linearGradient id="sbOrbitCust" x1="10" y1="85" x2="110" y2="35" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#00F0FF" stop-opacity="0.95"/>
+                                <stop offset="70%" stop-color="#00A8E8" stop-opacity="0.95"/>
+                                <stop offset="100%" stop-color="#38BDF8" stop-opacity="0"/>
+                            </linearGradient>
+                        </defs>
+                        <polygon points="60,24 88,40 60,56 32,40" fill="url(#sbTopCust)" stroke="#38BDF8" stroke-width="2.5" stroke-linejoin="round"/>
+                        <polygon points="32,40 60,56 60,88 32,72" fill="url(#sbLeftCust)" stroke="#0284C7" stroke-width="2.5" stroke-linejoin="round"/>
+                        <polygon points="60,56 88,40 88,72 60,88" fill="url(#sbRightCust)" stroke="#38BDF8" stroke-width="2.5" stroke-linejoin="round"/>
+                        <line x1="60" y1="56" x2="60" y2="88" stroke="#38BDF8" stroke-width="2"/>
+                        <path d="M 16,84 C 18,98 52,106 82,90 C 98,82 106,68 102,52 C 100,44 94,38 88,34" 
+                              fill="none" stroke="url(#sbOrbitCust)" stroke-width="4.5" stroke-linecap="round"/>
+                        <g transform="translate(90, 48) rotate(-42)">
+                            <path d="M0,0 L12,-4 L10,0 L14,3 L10,3 L8,6 L6,6 L7,2 L2,2 Z" fill="#00F0FF" stroke="#FFFFFF" stroke-width="0.8"/>
+                        </g>
+                        <g transform="translate(100, 36) rotate(-42) scale(0.85)">
+                            <path d="M0,0 L12,-4 L10,0 L14,3 L10,3 L8,6 L6,6 L7,2 L2,2 Z" fill="#38BDF8" stroke="#FFFFFF" stroke-width="0.8"/>
+                        </g>
+                    </svg>
+                </div>
                 <div>
-                    <h1 class="font-bold text-white text-base tracking-tight leading-tight">CargoTrace</h1>
-                    <p class="text-[10px] text-cyan-400 font-medium tracking-wide uppercase">Customer Portal</p>
+                    <h1 class="font-extrabold text-white text-lg tracking-tight leading-none" style="font-family: 'Outfit', sans-serif;">
+                        Cargo<span class="text-[#00C2FF]">Trace</span>
+                    </h1>
+                    <p class="text-[9px] text-cyan-400 font-bold tracking-wider uppercase mt-1">Customer Portal</p>
                 </div>
             </div>
 
