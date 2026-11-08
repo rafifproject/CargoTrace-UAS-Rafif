@@ -89,11 +89,12 @@ All features and business rules are verified with PHPUnit / Pest:
 php artisan test
 ```
 
-### Verified Test Cases (26 Tests Passed):
+### Verified Test Cases (31 Tests Passed):
 - `AuthenticationTest`: Login, invalid credentials, session regeneration, and public registration role isolation.
 - `RbacAuthorizationTest`: Admin routes protection, operator/customer 403 authorization guard.
 - `ShipmentModelTest`: Database seeding verification, automatic delay calculation, chronological append-only events.
 - `OperatorWorkflowTest`: Complete operator operational workflow, shipment creation with auto-first event, append-only checkpoints, exception lifecycle (report & resolve), and profile settings.
+- `CustomerWorkflowTest`: Strict Anti-IDOR customer isolation, own shipments visibility, cross-customer 404 block, admin/operator 403 guard, role-based login redirects, and profile updates.
 - `CargoTraceApiTest`: Sanctum bearer tokens, JSON schema compliance, append-only tracking events, exception resolution.
 - `GlobalIntelligenceServiceTest`: Mocked weather responses, mathematical weighted risk formula validation.
 

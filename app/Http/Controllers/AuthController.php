@@ -28,6 +28,10 @@ class AuthController extends Controller
             return redirect()->route('operator.dashboard');
         }
 
+        if ($user->isCustomer()) {
+            return redirect()->route('customer.dashboard');
+        }
+
         return redirect()->route('admin.dashboard');
     }
 
@@ -129,7 +133,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('admin.dashboard')->with('status', 'Pendaftaran akun berhasil!');
+        return $this->redirectByRole($user)->with('status', 'Pendaftaran akun berhasil! Selamat datang di CargoTrace.');
     }
 
     public function logout(Request $request): RedirectResponse

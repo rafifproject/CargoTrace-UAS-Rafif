@@ -4,6 +4,12 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarrierController;
+use App\Http\Controllers\Customer\CustomerDashboardController;
+use App\Http\Controllers\Customer\CustomerExceptionController;
+use App\Http\Controllers\Customer\CustomerIntelligenceController;
+use App\Http\Controllers\Customer\CustomerNotificationController;
+use App\Http\Controllers\Customer\CustomerProfileController;
+use App\Http\Controllers\Customer\CustomerShipmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExceptionController;
 use App\Http\Controllers\GlobalIntelligenceController;
@@ -25,9 +31,14 @@ Route::get('/', function () {
     if (! auth()->check()) {
         return redirect()->route('login');
     }
-    return auth()->user()->isOperator()
-        ? redirect()->route('operator.dashboard')
-        : redirect()->route('admin.dashboard');
+    $user = auth()->user();
+    if ($user->isOperator()) {
+        return redirect()->route('operator.dashboard');
+    }
+    if ($user->isCustomer()) {
+        return redirect()->route('customer.dashboard');
+    }
+    return redirect()->route('admin.dashboard');
 });
 
 // Authentication Routes
@@ -135,4 +146,40 @@ Route::middleware(['auth', 'role:LOGISTICS_OPERATOR'])->prefix('operator')->name
     // 16. Profil Akun
     Route::get('/profile', [OperatorProfileController::class, 'index'])->name('profile.index');
     Route::put('/profile', [OperatorProfileController::class, 'update'])->name('profile.update');
+});
+
+// =====================================================================
+// CUSTOMER PORTAL ROUTES (Self-Service Cargo Tracking)
+// =====================================================================
+Route::middleware(['auth', 'role:CUSTOMER'])->prefix('customer')->name('customer.')->group(function () {
+
+    // 03. Beranda Customer
+    Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
+
+    // 04, 05, 07. Pengiriman Saya & Detail
+    Route::get('/shipments', [CustomerShipmentController::class, 'index'])->name('shipments.index');
+    Route::get('/shipments/map', [CustomerShipmentController::class, 'map'])->name('shipments.map');
+    Route::get('/shipments/{shipment}', [CustomerShipmentController::class, 'show'])->name('shipments.show');
+
+    // 06. Riwayat Pelacakan
+    Route::get('/tracking', [CustomerShipmentController::class, 'tracking'])->name('tracking.index');
+
+    // 08. Informasi Pengecualian
+    Route::get('/exceptions', [CustomerExceptionController::class, 'index'])->name('exceptions.index');
+
+    // 09, 10, 11. Layanan Informasi (Cuaca, Berita, Komparasi)
+    Route::prefix('intelligence')->name('intelligence.')->group(function () {
+        Route::get('/weather', [CustomerIntelligenceController::class, 'weather'])->name('weather');
+        Route::get('/news', [CustomerIntelligenceController::class, 'news'])->name('news');
+        Route::get('/comparison', [CustomerIntelligenceController::class, 'comparison'])->name('comparison');
+    });
+
+    // 12. Notifikasi
+    Route::get('/notifications', [CustomerNotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{notification}/read', [CustomerNotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [CustomerNotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+
+    // 13. Profil Akun
+    Route::get('/profile', [CustomerProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [CustomerProfileController::class, 'update'])->name('profile.update');
 });
