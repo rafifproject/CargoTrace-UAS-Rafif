@@ -92,7 +92,9 @@
                 @forelse($exceptions as $ex)
                 <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-900/40 transition-colors">
                     <td class="px-5 py-3.5 font-mono font-semibold text-slate-700 dark:text-slate-200">
-                        EX-{{ str_pad($ex->id, 5, '0', STR_PAD_LEFT) }}
+                        <a href="{{ route('operator.exceptions.show', $ex->id) }}" class="text-cyan-600 dark:text-cyan-400 hover:underline">
+                            EX-{{ str_pad($ex->id, 5, '0', STR_PAD_LEFT) }}
+                        </a>
                     </td>
                     <td class="px-3 py-3.5">
                         <a href="{{ route('operator.shipments.show', $ex->shipment_id) }}" class="font-mono text-cyan-600 dark:text-cyan-400 hover:underline font-semibold">
@@ -139,13 +141,16 @@
                         @endif
                     </td>
                     <td class="px-3 py-3.5 text-center">
-                        @if($ex->status !== 'RESOLVED')
-                            <button onclick="openResolveModal({{ $ex->id }}, '{{ addslashes($ex->shipment?->shipment_number ?? '') }}')" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-[11px] transition-colors shadow-sm">
-                                <i data-lucide="check" class="w-3 h-3"></i> Selesaikan
-                            </button>
-                        @else
-                            <span class="text-[11px] text-slate-400">Selesai</span>
-                        @endif
+                        <div class="inline-flex items-center gap-1.5">
+                            <a href="{{ route('operator.exceptions.show', $ex->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium text-[11px] transition-colors" title="Lihat Detail Pengecualian">
+                                <i data-lucide="eye" class="w-3 h-3"></i> Detail
+                            </a>
+                            @if($ex->status !== 'RESOLVED')
+                                <button onclick="openResolveModal({{ $ex->id }}, '{{ addslashes($ex->shipment?->shipment_number ?? '') }}')" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-[11px] transition-colors shadow-sm">
+                                    <i data-lucide="check" class="w-3 h-3"></i> Selesaikan
+                                </button>
+                            @endif
+                        </div>
                     </td>
                 </tr>
                 @empty
