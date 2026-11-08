@@ -1,0 +1,228 @@
+{
+  "info": {
+    "name": "CargoTrace REST API - Administrator & Logistics Integration",
+    "description": "Postman Collection resmi untuk pengujian seluruh endpoint REST API CargoTrace Platform (UAS Web Programming 2).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. Autentikasi (Authentication)",
+      "item": [
+        {
+          "name": "Login API (Dapatkan Token Sanctum)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('auth_token', jsonData.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@cargotrace.id\",\n  \"password\": \"password\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/login" }
+          }
+        },
+        {
+          "name": "Get Profile Pengguna",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/user" }
+          }
+        },
+        {
+          "name": "Logout API",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/logout" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Pengiriman (Shipments)",
+      "item": [
+        {
+          "name": "Daftar Semua Pengiriman",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/shipments?page=1" }
+          }
+        },
+        {
+          "name": "Detail Pengiriman",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/shipments/1" }
+          }
+        },
+        {
+          "name": "Tambah Pengiriman Baru",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shipment_number\": \"CT-2026-999\",\n  \"customer_id\": 3,\n  \"carrier_id\": 1,\n  \"origin_location_id\": 1,\n  \"destination_location_id\": 2,\n  \"cargo_type\": \"Medical Supplies\",\n  \"weight\": 1200.50,\n  \"volume\": 8.20,\n  \"expected_departure\": \"2026-03-01 10:00:00\",\n  \"expected_arrival\": \"2026-03-05 15:00:00\",\n  \"estimated_time_arrival\": \"2026-03-05 15:00:00\",\n  \"notes\": \"Kargo prioritas tinggi\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/shipments" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. Pelacakan (Tracking Timeline)",
+      "item": [
+        {
+          "name": "Ambil Riwayat Tracking Kargo",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/shipments/1/tracking" }
+          }
+        },
+        {
+          "name": "Catat Event Tracking Baru (Append-Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_type\": \"CHECKPOINT_REACHED\",\n  \"location_id\": 2,\n  \"latitude\": 1.265,\n  \"longitude\": 103.819,\n  \"event_time\": \"2026-01-15 14:00:00\",\n  \"shipment_status_at_event\": \"IN_TRANSIT\",\n  \"description\": \"Pemeriksaan kontainer di gerbang pelabuhan selesai.\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/shipments/1/tracking" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. Pengecualian (Exceptions)",
+      "item": [
+        {
+          "name": "Ambil Exception Kargo",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/shipments/1/exceptions" }
+          }
+        },
+        {
+          "name": "Laporkan Exception Baru",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exception_type\": \"PORT_CONGESTION\",\n  \"severity\": \"MEDIUM\",\n  \"description\": \"Antrian sandar kapal di dermaga terminal memakan waktu 12 jam.\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/shipments/1/exceptions" }
+          }
+        },
+        {
+          "name": "Selesaikan Exception (Resolve)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"RESOLVED\",\n  \"resolution_notes\": \"Kapal telah mendapatkan slot sandar dan proses bongkar muat selesai.\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/exceptions/1" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. Ekspedisi & Lokasi",
+      "item": [
+        {
+          "name": "Daftar Ekspedisi (Carriers)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/carriers" }
+          }
+        },
+        {
+          "name": "Daftar Lokasi (Locations)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/locations" }
+          }
+        }
+      ]
+    }
+  ]
+}
+
