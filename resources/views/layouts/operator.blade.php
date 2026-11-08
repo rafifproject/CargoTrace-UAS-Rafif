@@ -74,7 +74,14 @@
         <aside class="w-64 bg-[#0A1128] text-slate-300 flex flex-col flex-shrink-0 z-30 border-r border-slate-800 select-none">
             <!-- Sidebar Header / Logo -->
             <div class="h-16 flex items-center px-5 border-b border-slate-800/80 gap-3">
-                <img src="/images/logo.png" alt="CargoTrace Logo" class="h-8 w-auto object-contain">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 flex-shrink-0">
+                    <polygon points="20,2 36,11 36,29 20,38 4,29 4,11" fill="rgba(0,168,232,0.15)" stroke="#00A8E8" stroke-width="1.2"/>
+                    <rect x="12" y="14" width="16" height="13" rx="1.5" fill="none" stroke="#00A8E8" stroke-width="1.6"/>
+                    <line x1="12" y1="19" x2="28" y2="19" stroke="#00A8E8" stroke-width="1.6"/>
+                    <line x1="20" y1="14" x2="20" y2="19" stroke="#00A8E8" stroke-width="1.6"/>
+                    <ellipse cx="20" cy="20" rx="14" ry="5" fill="none" stroke="rgba(0,168,232,0.4)" stroke-width="0.9" transform="rotate(-15 20 20)"/>
+                    <path d="M28 12 L32 8 M28 12 L31 15" stroke="#00A8E8" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>
                 <div>
                     <h1 class="font-bold text-white text-base tracking-tight leading-tight">CargoTrace</h1>
                     <p class="text-[10px] text-cyan-400 font-medium tracking-wide uppercase">Operations Hub</p>

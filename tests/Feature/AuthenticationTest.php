@@ -21,7 +21,7 @@ class AuthenticationTest extends TestCase
     {
         $response = $this->get('/login');
         $response->assertStatus(200);
-        $response->assertSee('Masuk ke Akun');
+        $response->assertSee('Masuk ke CargoTrace');
         $response->assertSee('CargoTrace');
     }
 

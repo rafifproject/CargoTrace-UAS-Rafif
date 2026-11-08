@@ -14,6 +14,16 @@ use Illuminate\View\View;
 class OperatorExceptionController extends Controller
 {
     /**
+     * Mockup 09: Detail Pengecualian
+     */
+    public function show(ShipmentException $exception): View
+    {
+        $exception->load(['shipment.origin', 'shipment.destination', 'shipment.carrier', 'reporter', 'resolver']);
+
+        return view('operator.exceptions.show', compact('exception'));
+    }
+
+    /**
      * Mockup 08: Manajemen Pengecualian (Exception Management)
      */
     public function index(Request $request): View

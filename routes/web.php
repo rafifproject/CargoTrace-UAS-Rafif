@@ -122,8 +122,9 @@ Route::middleware(['auth', 'role:LOGISTICS_OPERATOR'])->prefix('operator')->name
     // 06. Riwayat Pelacakan
     Route::get('/tracking', [OperatorShipmentController::class, 'tracking'])->name('tracking.index');
 
-    // 08. Manajemen Pengecualian
+    // 08-09. Manajemen Pengecualian & Detail Pengecualian
     Route::get('/exceptions', [OperatorExceptionController::class, 'index'])->name('exceptions.index');
+    Route::get('/exceptions/{exception}', [OperatorExceptionController::class, 'show'])->name('exceptions.show');
     Route::post('/exceptions', [OperatorExceptionController::class, 'store'])->name('exceptions.store');
     Route::patch('/exceptions/{exception}/resolve', [OperatorExceptionController::class, 'resolve'])->name('exceptions.resolve');
 
