@@ -145,14 +145,39 @@
             center: [15, 100],
             zoom: 3,
             minZoom: 2,
-            maxZoom: 19
+            maxZoom: 20
         });
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap kontributor | CargoTrace',
+        // 1. Google Maps Real-World Standard (Nama Jalan, Nama Toko, POI Bisnis, Gedung, Restoran, SPBU)
+        const googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps'
+        });
+
+        // 2. Google Hybrid Satellite (Citra Satelit + Label Jalan & Toko)
+        const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps Satelit'
+        });
+
+        // 3. OpenStreetMap Standar
+        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            maxNativeZoom: 19
-        }).addTo(map);
+            attribution: '&copy; OpenStreetMap contributors'
+        });
+
+        // Pasang Google Maps (Jalan + Toko/POI) sebagai peta dasar utama
+        googleStreets.addTo(map);
+
+        // Layer Switcher Control di sudut kanan atas peta
+        const baseMaps = {
+            "🗺️ Google Maps (Jalan & Toko/POI)": googleStreets,
+            "🛰️ Satelit Hybrid": googleHybrid,
+            "🌍 OpenStreetMap": osm
+        };
+        L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
         const shipments = {!! json_encode($mapShipments) !!};
         const allBounds = [];
