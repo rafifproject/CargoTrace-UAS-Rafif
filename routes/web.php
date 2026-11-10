@@ -4,6 +4,7 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarrierController;
+use App\Http\Controllers\Customer\CustomerCarrierController;
 use App\Http\Controllers\Customer\CustomerDashboardController;
 use App\Http\Controllers\Customer\CustomerExceptionController;
 use App\Http\Controllers\Customer\CustomerIntelligenceController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\ExceptionController;
 use App\Http\Controllers\GlobalIntelligenceController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Operator\OperatorCarrierController;
 use App\Http\Controllers\Operator\OperatorDashboardController;
 use App\Http\Controllers\Operator\OperatorExceptionController;
 use App\Http\Controllers\Operator\OperatorIntelligenceController;
@@ -130,6 +132,9 @@ Route::middleware(['auth', 'role:LOGISTICS_OPERATOR'])->prefix('operator')->name
     Route::post('/exceptions', [OperatorExceptionController::class, 'store'])->name('exceptions.store');
     Route::patch('/exceptions/{exception}/resolve', [OperatorExceptionController::class, 'resolve'])->name('exceptions.resolve');
 
+    // Fitur Ekspedisi - Peta Sebaran Titik Ekspedisi Global
+    Route::get('/carriers', [OperatorCarrierController::class, 'index'])->name('carriers.index');
+
     // 09-14. Intelijen Global
     Route::prefix('intelligence')->name('intelligence.')->group(function () {
         Route::get('/weather', [OperatorIntelligenceController::class, 'weather'])->name('weather');
@@ -171,6 +176,9 @@ Route::middleware(['auth', 'role:CUSTOMER'])->prefix('customer')->name('customer
 
     // 08. Informasi Pengecualian
     Route::get('/exceptions', [CustomerExceptionController::class, 'index'])->name('exceptions.index');
+
+    // Fitur Ekspedisi - Peta Sebaran Titik Ekspedisi Global
+    Route::get('/carriers', [CustomerCarrierController::class, 'index'])->name('carriers.index');
 
     // 09-14. Layanan Intelijen & Informasi Global
     Route::prefix('intelligence')->name('intelligence.')->group(function () {

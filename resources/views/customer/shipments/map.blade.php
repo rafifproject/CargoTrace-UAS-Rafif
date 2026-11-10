@@ -80,27 +80,17 @@
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Visualisasi interaktif posisi kargo Anda, rute perjalanan internasional, dan estimasi waktu tiba (ETA)</p>
         </div>
         <div>
-            <form method="GET" action="{{ route('customer.shipments.map') }}" class="flex items-center gap-2 flex-wrap">
-                @if(isset($carriers) && count($carriers) > 1)
-                <select name="carrier_id" onchange="this.form.submit()" class="px-3 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500">
-                    <option value="">Semua Mitra Ekspedisi</option>
-                    @foreach($carriers as $c)
-                        <option value="{{ $c->id }}" {{ request('carrier_id') == $c->id ? 'selected' : '' }}>
-                            {{ $c->name }} ({{ $c->code }})
-                        </option>
-                    @endforeach
-                </select>
-                @endif
+            <form method="GET" action="{{ route('customer.shipments.map') }}" class="flex items-center gap-2">
                 <select name="shipment_id" onchange="this.form.submit()" class="px-3 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500">
-                    <option value="">Semua Kargo Saya</option>
+                    <option value="">Tampilkan Semua Kargo Saya</option>
                     @foreach($myShipments as $s)
                         <option value="{{ $s->id }}" {{ request('shipment_id') == $s->id ? 'selected' : '' }}>
                             {{ $s->shipment_number }} &ndash; {{ $s->origin?->city }} &rarr; {{ $s->destination?->city }}
                         </option>
                     @endforeach
                 </select>
-                @if(request()->hasAny(['shipment_id', 'carrier_id']))
-                    <a href="{{ route('customer.shipments.map') }}" class="px-2.5 py-1.5 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 rounded-lg" title="Reset Filter">
+                @if(request('shipment_id'))
+                    <a href="{{ route('customer.shipments.map') }}" class="px-2.5 py-1.5 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 rounded-lg" title="Reset Tampilan">
                         <i data-lucide="x" class="w-3.5 h-3.5"></i>
                     </a>
                 @endif

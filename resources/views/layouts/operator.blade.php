@@ -177,6 +177,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('operator.carriers.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('operator.carriers.index') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
+                                <i data-lucide="building-2" class="w-4 h-4 {{ request()->routeIs('operator.carriers.index') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
+                                <span>Mitra Ekspedisi</span>
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('operator.exceptions.index') }}" class="flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('operator.exceptions.index') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
                                 <div class="flex items-center gap-3">
                                     <i data-lucide="alert-triangle" class="w-4 h-4 {{ request()->routeIs('operator.exceptions.index') ? 'text-cyan-400' : 'text-slate-400' }}"></i>

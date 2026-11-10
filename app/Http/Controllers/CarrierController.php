@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
 use App\Models\Carrier;
+use App\Services\GlobalIntelligenceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CarrierController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, GlobalIntelligenceService $intelligenceService): View
     {
         $query = Carrier::withCount('shipments');
 
@@ -28,7 +29,42 @@ class CarrierController extends Controller
 
         $carriers = $query->orderBy('name', 'asc')->paginate(10)->withQueryString();
 
-        return view('admin.carriers.index', compact('carriers'));
+        // Titik-titik lokasi kantor pusat 206 ekspedisi global untuk Peta Ekspedisi
+        $countriesList = $intelligenceService->getCountriesMaster();
+        $countryMap = [];
+        foreach ($countriesList as $c) {
+            $countryMap[strtolower($c['name'])] = $c;
+            $countryMap[strtolower($c['code'])] = $c;
+            $iso = strtolower(str_replace('_EAST', '', $c['code']));
+            $countryMap[$iso] = $c;
+        }
+
+        $allCarriers = Carrier::withCount('shipments')->where('status', Carrier::STATUS_ACTIVE)->get();
+        $mapCarriers = $allCarriers->map(function ($c) use ($countryMap) {
+            $cLower = strtolower(trim($c->country));
+            $countryInfo = $countryMap[$cLower] ?? null;
+            $lat = $countryInfo['lat'] ?? 0.0;
+            $lng = $countryInfo['lng'] ?? 0.0;
+            $iso = $countryInfo ? strtolower(str_replace('_EAST', '', $countryInfo['code'])) : 'un';
+            $flag = $countryInfo['flag'] ?? '🌐';
+
+            return [
+                'id'              => $c->id,
+                'code'            => $c->code,
+                'name'            => $c->name,
+                'country'         => $c->country,
+                'contact_email'   => $c->contact_email,
+                'contact_phone'   => $c->contact_phone,
+                'website'         => $c->website,
+                'shipments_count' => $c->shipments_count,
+                'lat'             => $lat,
+                'lng'             => $lng,
+                'iso'             => $iso,
+                'flag'            => $flag,
+            ];
+        });
+
+        return view('admin.carriers.index', compact('carriers', 'mapCarriers'));
     }
 
     public function store(Request $request): RedirectResponse
