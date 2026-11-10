@@ -16,25 +16,41 @@
             <div>
                 <label for="country_a" class="sr-only">Negara A</label>
                 <select id="country_a" name="country_a" onchange="this.form.submit()" class="px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white font-bold">
-                    <option value="ID" {{ $countryA === 'ID' ? 'selected' : '' }}>Indonesia (ID)</option>
-                    <option value="SG" {{ $countryA === 'SG' ? 'selected' : '' }}>Singapura (SG)</option>
-                    <option value="NL" {{ $countryA === 'NL' ? 'selected' : '' }}>Belanda (NL)</option>
-                    <option value="DE" {{ $countryA === 'DE' ? 'selected' : '' }}>Jerman (DE)</option>
-                    <option value="CN" {{ $countryA === 'CN' ? 'selected' : '' }}>Tiongkok (CN)</option>
-                    <option value="US" {{ $countryA === 'US' ? 'selected' : '' }}>Amerika Serikat (US)</option>
+                    @if(isset($countriesList))
+                        @foreach($countriesList as $c)
+                            <option value="{{ $c['code'] }}" {{ $countryA === $c['code'] ? 'selected' : '' }}>
+                                {{ $c['flag'] ?? '' }} {{ $c['name'] }} ({{ $c['code'] }})
+                            </option>
+                        @endforeach
+                    @else
+                        <option value="ID" {{ $countryA === 'ID' ? 'selected' : '' }}>Indonesia (ID)</option>
+                        <option value="SG" {{ $countryA === 'SG' ? 'selected' : '' }}>Singapura (SG)</option>
+                        <option value="NL" {{ $countryA === 'NL' ? 'selected' : '' }}>Belanda (NL)</option>
+                        <option value="DE" {{ $countryA === 'DE' ? 'selected' : '' }}>Jerman (DE)</option>
+                        <option value="CN" {{ $countryA === 'CN' ? 'selected' : '' }}>Tiongkok (CN)</option>
+                        <option value="US" {{ $countryA === 'US' ? 'selected' : '' }}>Amerika Serikat (US)</option>
+                    @endif
                 </select>
             </div>
             <span class="text-xs font-black text-cyan-500">VS</span>
             <div>
                 <label for="country_b" class="sr-only">Negara B</label>
                 <select id="country_b" name="country_b" onchange="this.form.submit()" class="px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white font-bold">
-                    <option value="AU" {{ $countryB === 'AU' ? 'selected' : '' }}>Australia (AU)</option>
-                    <option value="ID" {{ $countryB === 'ID' ? 'selected' : '' }}>Indonesia (ID)</option>
-                    <option value="SG" {{ $countryB === 'SG' ? 'selected' : '' }}>Singapura (SG)</option>
-                    <option value="NL" {{ $countryB === 'NL' ? 'selected' : '' }}>Belanda (NL)</option>
-                    <option value="DE" {{ $countryB === 'DE' ? 'selected' : '' }}>Jerman (DE)</option>
-                    <option value="CN" {{ $countryB === 'CN' ? 'selected' : '' }}>Tiongkok (CN)</option>
-                    <option value="US" {{ $countryB === 'US' ? 'selected' : '' }}>Amerika Serikat (US)</option>
+                    @if(isset($countriesList))
+                        @foreach($countriesList as $c)
+                            <option value="{{ $c['code'] }}" {{ $countryB === $c['code'] ? 'selected' : '' }}>
+                                {{ $c['flag'] ?? '' }} {{ $c['name'] }} ({{ $c['code'] }})
+                            </option>
+                        @endforeach
+                    @else
+                        <option value="AU" {{ $countryB === 'AU' ? 'selected' : '' }}>Australia (AU)</option>
+                        <option value="ID" {{ $countryB === 'ID' ? 'selected' : '' }}>Indonesia (ID)</option>
+                        <option value="SG" {{ $countryB === 'SG' ? 'selected' : '' }}>Singapura (SG)</option>
+                        <option value="NL" {{ $countryB === 'NL' ? 'selected' : '' }}>Belanda (NL)</option>
+                        <option value="DE" {{ $countryB === 'DE' ? 'selected' : '' }}>Jerman (DE)</option>
+                        <option value="CN" {{ $countryB === 'CN' ? 'selected' : '' }}>Tiongkok (CN)</option>
+                        <option value="US" {{ $countryB === 'US' ? 'selected' : '' }}>Amerika Serikat (US)</option>
+                    @endif
                 </select>
             </div>
         </form>

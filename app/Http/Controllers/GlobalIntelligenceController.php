@@ -82,12 +82,13 @@ class GlobalIntelligenceController extends Controller
     {
         $country = strtoupper($request->input('country', 'ID'));
         $data = $this->intelligenceService->getCountryEconomy($country);
+        $countriesList = $this->intelligenceService->getCountriesMaster();
 
         // Historical GDP Growth trend for chart
         $years = ['2020', '2021', '2022', '2023', '2024', '2025'];
         $growth = [-2.07, 3.69, 5.31, 5.05, 5.03, 5.12];
 
-        return view('admin.intelligence.economy', compact('data', 'country', 'years', 'growth'));
+        return view('admin.intelligence.economy', compact('data', 'country', 'years', 'growth', 'countriesList'));
     }
 
     /**
@@ -130,8 +131,9 @@ class GlobalIntelligenceController extends Controller
 
         $dataA = $this->intelligenceService->getCountryEconomy($countryA);
         $dataB = $this->intelligenceService->getCountryEconomy($countryB);
+        $countriesList = $this->intelligenceService->getCountriesMaster();
 
-        return view('admin.intelligence.comparison', compact('dataA', 'dataB', 'countryA', 'countryB'));
+        return view('admin.intelligence.comparison', compact('dataA', 'dataB', 'countryA', 'countryB', 'countriesList'));
     }
 }
 

@@ -54,11 +54,12 @@ class OperatorIntelligenceController extends Controller
     {
         $country = strtoupper($request->input('country', 'ID'));
         $data    = $this->intelligenceService->getCountryEconomy($country);
+        $countriesList = $this->intelligenceService->getCountriesMaster();
 
         $years  = ['2020', '2021', '2022', '2023', '2024', '2025'];
         $growth = [-2.07, 3.69, 5.31, 5.05, 5.03, 5.12];
 
-        return view('operator.intelligence.economy', compact('data', 'country', 'years', 'growth'));
+        return view('operator.intelligence.economy', compact('data', 'country', 'years', 'growth', 'countriesList'));
     }
 
     /** Mockup 11: Berita Logistik Global */
@@ -95,8 +96,9 @@ class OperatorIntelligenceController extends Controller
 
         $dataA = $this->intelligenceService->getCountryEconomy($countryA);
         $dataB = $this->intelligenceService->getCountryEconomy($countryB);
+        $countriesList = $this->intelligenceService->getCountriesMaster();
 
-        return view('operator.intelligence.comparison', compact('dataA', 'dataB', 'countryA', 'countryB'));
+        return view('operator.intelligence.comparison', compact('dataA', 'dataB', 'countryA', 'countryB', 'countriesList'));
     }
 }
 

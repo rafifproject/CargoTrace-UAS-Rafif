@@ -489,7 +489,7 @@ class GlobalIntelligenceService
      */
     public function getGlobalPorts(): array
     {
-        return Cache::remember('arcgis_live_global_ports_v6', 43200, function () {
+        return Cache::remember('arcgis_live_global_ports_v7', 43200, function () {
             $curated = $this->getBaselineCuratedPorts();
             try {
                 $endpoint = "https://services1.arcgis.com/cc7nIINtrZ67dyVJ/ArcGIS/rest/services/Transportation_Use/FeatureServer/2/query";
@@ -884,7 +884,7 @@ class GlobalIntelligenceService
      */
     public function getGlobalWeatherHubs(): array
     {
-        return [
+        $curated = [
             // Skandinavia & Kutub Utara
             ['code' => 'GL', 'iso' => 'gl', 'country' => 'Greenland', 'region' => 'Arctic', 'city' => 'Nuuk / Greenland Sea', 'lat' => 72.000, 'lng' => -40.000, 'temp' => -29.1, 'condition' => 'Freezing Blizzard', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 88, 'wind' => 45.0, 'precipitation' => 12.0, 'risk' => 'High Risk / Storm', 'risk_score' => 92],
             ['code' => 'IS', 'iso' => 'is', 'country' => 'Iceland', 'region' => 'Europe', 'city' => 'Reykjavik / North Atlantic', 'lat' => 64.963, 'lng' => -19.020, 'temp' => -3.1, 'condition' => 'Cold Overcast', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 82, 'wind' => 32.0, 'precipitation' => 2.5, 'risk' => 'Medium Risk', 'risk_score' => 48],
@@ -961,63 +961,307 @@ class GlobalIntelligenceService
             ['code' => 'AS', 'iso' => 'as', 'country' => 'American Samoa', 'region' => 'Oceania', 'city' => 'Port of Pago Pago / South Pacific', 'lat' => -14.271, 'lng' => -170.132, 'temp' => 28.8, 'condition' => 'Warm Tropical Sea', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 78, 'wind' => 15.5, 'precipitation' => 0.4, 'risk' => 'Low Risk', 'risk_score' => 20],
             ['code' => 'AQ', 'iso' => 'aq', 'country' => 'Antarctica', 'region' => 'Antarctica', 'city' => 'McMurdo Logistics Station / Ross Sea', 'lat' => -75.250, 'lng' => -0.071, 'temp' => -29.0, 'condition' => 'Polar Whiteout', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 84, 'wind' => 52.0, 'precipitation' => 15.0, 'risk' => 'High Risk / Storm', 'risk_score' => 95],
         ];
+
+        $curatedIndex = [];
+        foreach ($curated as $h) {
+            $curatedIndex[strtoupper($h['code'])] = $h;
+        }
+
+        $allHubs = [];
+        foreach ($this->getCountriesMaster() as $c) {
+            $code = strtoupper($c['code']);
+            if (isset($curatedIndex[$code])) {
+                $allHubs[] = $curatedIndex[$code];
+            } else {
+                $lat = (float) $c['lat'];
+                $lng = (float) $c['lng'];
+                $iso = strtolower(str_replace('_EAST', '', $c['code']));
+
+                $absLat = abs($lat);
+                if ($absLat > 60) {
+                    $temp = round(-12 + (sin($lng) * 4), 1);
+                    $cond = 'Cold Overcast';
+                    $icon = 'cloud';
+                    $emoji = '☁️';
+                    $hum = 82;
+                    $wind = 28.0;
+                    $precip = 2.0;
+                    $risk = 'Medium Risk';
+                    $riskScore = 45;
+                    $region = 'Arctic / Sub-Polar';
+                } elseif ($absLat > 35) {
+                    $temp = round(14 + (cos($lng) * 5), 1);
+                    $cond = 'Mild Sea Breeze';
+                    $icon = 'sun';
+                    $emoji = '☀️';
+                    $hum = 65;
+                    $wind = 16.0;
+                    $precip = 0.5;
+                    $risk = 'Low Risk';
+                    $riskScore = 18;
+                    $region = 'Temperate';
+                } elseif ($absLat > 20) {
+                    $temp = round(24 + (sin($lng) * 4), 1);
+                    $cond = 'Sunny Maritime Air';
+                    $icon = 'sun';
+                    $emoji = '☀️';
+                    $hum = 58;
+                    $wind = 14.0;
+                    $precip = 0.0;
+                    $risk = 'Low Risk';
+                    $riskScore = 15;
+                    $region = 'Sub-Tropical';
+                } else {
+                    $temp = round(29 + (cos($lng) * 2), 1);
+                    $cond = 'Tropical Sea Breeze';
+                    $icon = 'sun';
+                    $emoji = '☀️';
+                    $hum = 76;
+                    $wind = 15.0;
+                    $precip = 1.0;
+                    $risk = 'Low Risk';
+                    $riskScore = 20;
+                    $region = 'Tropical';
+                }
+
+                $allHubs[] = [
+                    'code' => $code,
+                    'iso' => $iso,
+                    'country' => $c['name'],
+                    'region' => $region,
+                    'city' => $c['hub'],
+                    'lat' => $lat,
+                    'lng' => $lng,
+                    'temp' => $temp,
+                    'condition' => $cond,
+                    'icon' => $icon,
+                    'icon_emoji' => $emoji,
+                    'humidity' => $hum,
+                    'wind' => $wind,
+                    'precipitation' => $precip,
+                    'risk' => $risk,
+                    'risk_score' => $riskScore,
+                ];
+            }
+        }
+
+        return $allHubs;
     }
 
     /**
-     * 8. Master Daftar Negara Global untuk Search & Quick Pan di Peta
+     * 8. Master Daftar Seluruh 195+ Negara Global untuk Search & Quick Pan di Peta
      */
     public function getCountriesMaster(): array
     {
         return [
-            ['code' => 'AF', 'name' => 'Afghanistan', 'flag' => '🇦🇫', 'lat' => 33.939, 'lng' => 67.710, 'hub' => 'Kabul Dry Port'],
-            ['code' => 'AX', 'name' => 'Åland Islands', 'flag' => '🇦🇽', 'lat' => 60.178, 'lng' => 19.915, 'hub' => 'Port of Mariehamn'],
-            ['code' => 'AL', 'name' => 'Albania', 'flag' => '🇦🇱', 'lat' => 41.312, 'lng' => 19.454, 'hub' => 'Port of Durrës'],
-            ['code' => 'DZ', 'name' => 'Algeria', 'flag' => '🇩🇿', 'lat' => 28.033, 'lng' => 1.659, 'hub' => 'Port of Algiers'],
-            ['code' => 'AS', 'name' => 'American Samoa', 'flag' => '🇦🇸', 'lat' => -14.271, 'lng' => -170.132, 'hub' => 'Port of Pago Pago'],
-            ['code' => 'AD', 'name' => 'Andorra', 'flag' => '🇦🇩', 'lat' => 42.506, 'lng' => 1.521, 'hub' => 'Andorra Inland Hub'],
-            ['code' => 'AO', 'name' => 'Angola', 'flag' => '🇦🇴', 'lat' => -11.202, 'lng' => 17.873, 'hub' => 'Port of Luanda'],
-            ['code' => 'AI', 'name' => 'Anguilla', 'flag' => '🇦🇮', 'lat' => 18.220, 'lng' => -63.068, 'hub' => 'Blowing Point Port'],
-            ['code' => 'AQ', 'name' => 'Antarctica', 'flag' => '🇦🇶', 'lat' => -75.250, 'lng' => -0.071, 'hub' => 'McMurdo Logistics Station'],
-            ['code' => 'AR', 'name' => 'Argentina', 'flag' => '🇦🇷', 'lat' => -38.416, 'lng' => -63.616, 'hub' => 'Port of Buenos Aires'],
-            ['code' => 'AU', 'name' => 'Australia', 'flag' => '🇦🇺', 'lat' => -25.274, 'lng' => 133.775, 'hub' => 'Port Botany (Sydney)'],
-            ['code' => 'AT', 'name' => 'Austria', 'flag' => '🇦🇹', 'lat' => 47.516, 'lng' => 14.550, 'hub' => 'Vienna Container Terminal'],
-            ['code' => 'BE', 'name' => 'Belgium', 'flag' => '🇧🇪', 'lat' => 50.503, 'lng' => 4.469, 'hub' => 'Port of Antwerp-Bruges'],
-            ['code' => 'BR', 'name' => 'Brazil', 'flag' => '🇧🇷', 'lat' => -14.235, 'lng' => -51.925, 'hub' => 'Port of Santos'],
-            ['code' => 'CA', 'name' => 'Canada', 'flag' => '🇨🇦', 'lat' => 56.130, 'lng' => -106.346, 'hub' => 'Port of Vancouver'],
-            ['code' => 'CL', 'name' => 'Chile', 'flag' => '🇨🇱', 'lat' => -35.675, 'lng' => -71.542, 'hub' => 'Port of San Antonio'],
-            ['code' => 'CN', 'name' => 'China', 'flag' => '🇨🇳', 'lat' => 35.861, 'lng' => 104.195, 'hub' => 'Port of Shanghai'],
-            ['code' => 'DK', 'name' => 'Denmark', 'flag' => '🇩🇰', 'lat' => 56.263, 'lng' => 9.501, 'hub' => 'Port of Aarhus'],
-            ['code' => 'EG', 'name' => 'Egypt', 'flag' => '🇪🇬', 'lat' => 26.820, 'lng' => 30.802, 'hub' => 'Port Said (Suez Canal)'],
-            ['code' => 'FR', 'name' => 'France', 'flag' => '🇫🇷', 'lat' => 46.227, 'lng' => 2.213, 'hub' => 'Port of Le Havre / Marseille'],
-            ['code' => 'DE', 'name' => 'Germany', 'flag' => '🇩🇪', 'lat' => 51.165, 'lng' => 10.451, 'hub' => 'Port of Hamburg'],
-            ['code' => 'GR', 'name' => 'Greece', 'flag' => '🇬🇷', 'lat' => 39.074, 'lng' => 21.824, 'hub' => 'Port of Piraeus'],
-            ['code' => 'HK', 'name' => 'Hong Kong', 'flag' => '🇭🇰', 'lat' => 22.319, 'lng' => 114.169, 'hub' => 'Port of Hong Kong'],
-            ['code' => 'IN', 'name' => 'India', 'flag' => '🇮🇳', 'lat' => 20.593, 'lng' => 78.962, 'hub' => 'Jawaharlal Nehru Port (JNPT)'],
             ['code' => 'ID', 'name' => 'Indonesia', 'flag' => '🇮🇩', 'lat' => -0.789, 'lng' => 113.921, 'hub' => 'Pelabuhan Tanjung Priok'],
-            ['code' => 'IT', 'name' => 'Italy', 'flag' => '🇮🇹', 'lat' => 41.871, 'lng' => 12.567, 'hub' => 'Port of Genoa / Trieste'],
-            ['code' => 'JP', 'name' => 'Japan', 'flag' => '🇯🇵', 'lat' => 36.204, 'lng' => 138.252, 'hub' => 'Port of Tokyo / Yokohama'],
-            ['code' => 'MY', 'name' => 'Malaysia', 'flag' => '🇲🇾', 'lat' => 4.210, 'lng' => 101.975, 'hub' => 'Port Klang / Tanjung Pelepas'],
-            ['code' => 'MX', 'name' => 'Mexico', 'flag' => '🇲🇽', 'lat' => 23.634, 'lng' => -102.552, 'hub' => 'Port of Manzanillo'],
-            ['code' => 'NL', 'name' => 'Netherlands', 'flag' => '🇳🇱', 'lat' => 52.132, 'lng' => 5.291, 'hub' => 'Port of Rotterdam'],
-            ['code' => 'NZ', 'name' => 'New Zealand', 'flag' => '🇳🇿', 'lat' => -40.900, 'lng' => 174.885, 'hub' => 'Port of Tauranga'],
-            ['code' => 'PA', 'name' => 'Panama', 'flag' => '🇵🇦', 'lat' => 8.537, 'lng' => -80.782, 'hub' => 'Port of Balboa (Panama Canal)'],
-            ['code' => 'PH', 'name' => 'Philippines', 'flag' => '🇵🇭', 'lat' => 12.879, 'lng' => 121.774, 'hub' => 'Port of Manila'],
-            ['code' => 'QA', 'name' => 'Qatar', 'flag' => '🇶🇦', 'lat' => 25.354, 'lng' => 51.183, 'hub' => 'Hamad Port (Doha)'],
-            ['code' => 'SA', 'name' => 'Saudi Arabia', 'flag' => '🇸🇦', 'lat' => 23.885, 'lng' => 45.079, 'hub' => 'Jeddah Islamic Port'],
-            ['code' => 'SC', 'name' => 'Seychelles', 'flag' => '🇸🇨', 'lat' => -4.679, 'lng' => 55.492, 'hub' => 'Port Victoria'],
-            ['code' => 'SG', 'name' => 'Singapore', 'flag' => '🇸🇬', 'lat' => 1.352, 'lng' => 103.819, 'hub' => 'Port of Singapore (Tuas)'],
-            ['code' => 'ZA', 'name' => 'South Africa', 'flag' => '🇿🇦', 'lat' => -30.559, 'lng' => 22.937, 'hub' => 'Port of Durban'],
-            ['code' => 'KR', 'name' => 'South Korea', 'flag' => '🇰🇷', 'lat' => 35.907, 'lng' => 127.766, 'hub' => 'Port of Busan'],
-            ['code' => 'ES', 'name' => 'Spain', 'flag' => '🇪🇸', 'lat' => 40.463, 'lng' => -3.749, 'hub' => 'Port of Valencia / Algeciras'],
-            ['code' => 'SE', 'name' => 'Sweden', 'flag' => '🇸🇪', 'lat' => 60.128, 'lng' => 18.643, 'hub' => 'Port of Gothenburg'],
-            ['code' => 'TH', 'name' => 'Thailand', 'flag' => '🇹🇭', 'lat' => 15.870, 'lng' => 100.992, 'hub' => 'Laem Chabang Port'],
-            ['code' => 'TR', 'name' => 'Turkey', 'flag' => '🇹🇷', 'lat' => 38.963, 'lng' => 35.243, 'hub' => 'Port of Ambarli (Istanbul)'],
-            ['code' => 'AE', 'name' => 'United Arab Emirates', 'flag' => '🇦🇪', 'lat' => 23.424, 'lng' => 53.847, 'hub' => 'Jebel Ali Port (Dubai)'],
-            ['code' => 'GB', 'name' => 'United Kingdom', 'flag' => '🇬🇧', 'lat' => 55.378, 'lng' => -3.435, 'hub' => 'Port of Felixstowe'],
-            ['code' => 'US', 'name' => 'United States', 'flag' => '🇺🇸', 'lat' => 37.090, 'lng' => -95.712, 'hub' => 'Port of LA & Long Beach'],
+            ['code' => 'MY', 'name' => 'Malaysia', 'flag' => '🇲🇾', 'lat' => 4.21, 'lng' => 101.975, 'hub' => 'Port Klang / Tanjung Pelepas'],
+            ['code' => 'SG', 'name' => 'Singapura', 'flag' => '🇸🇬', 'lat' => 1.352, 'lng' => 103.819, 'hub' => 'Port of Singapore (Tuas)'],
+            ['code' => 'TH', 'name' => 'Thailand', 'flag' => '🇹🇭', 'lat' => 15.87, 'lng' => 100.992, 'hub' => 'Laem Chabang Port'],
             ['code' => 'VN', 'name' => 'Vietnam', 'flag' => '🇻🇳', 'lat' => 14.058, 'lng' => 108.277, 'hub' => 'Saigon Port (Cat Lai)'],
+            ['code' => 'PH', 'name' => 'Filipina', 'flag' => '🇵🇭', 'lat' => 12.879, 'lng' => 121.774, 'hub' => 'Port of Manila'],
+            ['code' => 'MM', 'name' => 'Myanmar', 'flag' => '🇲🇲', 'lat' => 21.916, 'lng' => 95.956, 'hub' => 'Port of Yangon'],
+            ['code' => 'KH', 'name' => 'Kamboja', 'flag' => '🇰🇭', 'lat' => 12.565, 'lng' => 104.99, 'hub' => 'Sihanoukville Port'],
+            ['code' => 'LA', 'name' => 'Laos', 'flag' => '🇱🇦', 'lat' => 19.856, 'lng' => 102.495, 'hub' => 'Vientiane Logistics Park'],
+            ['code' => 'BN', 'name' => 'Brunei Darussalam', 'flag' => '🇧🇳', 'lat' => 4.535, 'lng' => 114.727, 'hub' => 'Muara Port'],
+            ['code' => 'TL', 'name' => 'Timor Leste', 'flag' => '🇹🇱', 'lat' => -8.874, 'lng' => 125.727, 'hub' => 'Port of Tibar Bay (Dili)'],
+            ['code' => 'CN', 'name' => 'Tiongkok', 'flag' => '🇨🇳', 'lat' => 35.861, 'lng' => 104.195, 'hub' => 'Port of Shanghai / Ningbo'],
+            ['code' => 'JP', 'name' => 'Jepang', 'flag' => '🇯🇵', 'lat' => 36.204, 'lng' => 138.252, 'hub' => 'Port of Tokyo / Yokohama'],
+            ['code' => 'KR', 'name' => 'Korea Selatan', 'flag' => '🇰🇷', 'lat' => 35.907, 'lng' => 127.766, 'hub' => 'Port of Busan'],
+            ['code' => 'TW', 'name' => 'Taiwan', 'flag' => '🇹🇼', 'lat' => 23.697, 'lng' => 120.96, 'hub' => 'Port of Kaohsiung'],
+            ['code' => 'HK', 'name' => 'Hong Kong', 'flag' => '🇭🇰', 'lat' => 22.319, 'lng' => 114.169, 'hub' => 'Port of Hong Kong'],
+            ['code' => 'MO', 'name' => 'Makau', 'flag' => '🇲🇴', 'lat' => 22.198, 'lng' => 113.543, 'hub' => 'Port of Macau'],
+            ['code' => 'MN', 'name' => 'Mongolia', 'flag' => '🇲🇳', 'lat' => 46.862, 'lng' => 103.846, 'hub' => 'Ulaanbaatar Logistics Hub'],
+            ['code' => 'KP', 'name' => 'Korea Utara', 'flag' => '🇰🇵', 'lat' => 40.339, 'lng' => 127.51, 'hub' => 'Port of Nampo'],
+            ['code' => 'IN', 'name' => 'India', 'flag' => '🇮🇳', 'lat' => 20.593, 'lng' => 78.962, 'hub' => 'Jawaharlal Nehru Port (JNPT)'],
+            ['code' => 'PK', 'name' => 'Pakistan', 'flag' => '🇵🇰', 'lat' => 30.375, 'lng' => 69.345, 'hub' => 'Port of Karachi / Gwadar'],
+            ['code' => 'BD', 'name' => 'Bangladesh', 'flag' => '🇧🇩', 'lat' => 23.685, 'lng' => 90.356, 'hub' => 'Chittagong Port'],
+            ['code' => 'LK', 'name' => 'Sri Lanka', 'flag' => '🇱🇰', 'lat' => 7.873, 'lng' => 80.771, 'hub' => 'Port of Colombo'],
+            ['code' => 'NP', 'name' => 'Nepal', 'flag' => '🇳🇵', 'lat' => 28.394, 'lng' => 84.124, 'hub' => 'Birgunj Dry Port'],
+            ['code' => 'BT', 'name' => 'Bhutan', 'flag' => '🇧🇹', 'lat' => 27.514, 'lng' => 90.433, 'hub' => 'Phuentsholing Dry Port'],
+            ['code' => 'MV', 'name' => 'Maladewa', 'flag' => '🇲🇻', 'lat' => 3.202, 'lng' => 73.22, 'hub' => 'Port of Male'],
+            ['code' => 'AF', 'name' => 'Afganistan', 'flag' => '🇦🇫', 'lat' => 33.939, 'lng' => 67.71, 'hub' => 'Kabul Dry Port'],
+            ['code' => 'KZ', 'name' => 'Kazakhstan', 'flag' => '🇰🇿', 'lat' => 48.019, 'lng' => 66.923, 'hub' => 'Port of Aktau / Khorgos'],
+            ['code' => 'UZ', 'name' => 'Uzbekistan', 'flag' => '🇺🇿', 'lat' => 41.377, 'lng' => 64.585, 'hub' => 'Tashkent Logistics Centre'],
+            ['code' => 'TM', 'name' => 'Turkmenistan', 'flag' => '🇹🇲', 'lat' => 38.969, 'lng' => 59.556, 'hub' => 'Turkmenbashi International Port'],
+            ['code' => 'KG', 'name' => 'Kirgizstan', 'flag' => '🇰🇬', 'lat' => 41.204, 'lng' => 74.766, 'hub' => 'Bishkek Cargo Terminal'],
+            ['code' => 'TJ', 'name' => 'Tajikistan', 'flag' => '🇹🇯', 'lat' => 38.861, 'lng' => 71.276, 'hub' => 'Dushanbe Freight Terminal'],
+            ['code' => 'AZ', 'name' => 'Azerbaijan', 'flag' => '🇦🇿', 'lat' => 40.143, 'lng' => 47.576, 'hub' => 'Baku International Sea Port (Alyat)'],
+            ['code' => 'AM', 'name' => 'Armenia', 'flag' => '🇦🇲', 'lat' => 40.069, 'lng' => 45.038, 'hub' => 'Yerevan Inland Cargo Port'],
+            ['code' => 'GE', 'name' => 'Georgia', 'flag' => '🇬🇪', 'lat' => 42.315, 'lng' => 43.356, 'hub' => 'Port of Poti / Batumi'],
+            ['code' => 'SA', 'name' => 'Arab Saudi', 'flag' => '🇸🇦', 'lat' => 23.885, 'lng' => 45.079, 'hub' => 'Jeddah Islamic Port / King Abdulaziz'],
+            ['code' => 'AE', 'name' => 'Uni Emirat Arab', 'flag' => '🇦🇪', 'lat' => 23.424, 'lng' => 53.847, 'hub' => 'Jebel Ali Port (Dubai) / Khalifa'],
+            ['code' => 'QA', 'name' => 'Qatar', 'flag' => '🇶🇦', 'lat' => 25.354, 'lng' => 51.183, 'hub' => 'Hamad Port (Doha)'],
+            ['code' => 'KW', 'name' => 'Kuwait', 'flag' => '🇰🇼', 'lat' => 29.311, 'lng' => 47.481, 'hub' => 'Shuwaikh Port'],
+            ['code' => 'OM', 'name' => 'Oman', 'flag' => '🇴🇲', 'lat' => 21.512, 'lng' => 55.923, 'hub' => 'Port of Salalah / Sohar'],
+            ['code' => 'BH', 'name' => 'Bahrain', 'flag' => '🇧🇭', 'lat' => 26.066, 'lng' => 50.557, 'hub' => 'Khalifa Bin Salman Port'],
+            ['code' => 'IQ', 'name' => 'Irak', 'flag' => '🇮🇶', 'lat' => 33.223, 'lng' => 43.679, 'hub' => 'Grand Faw Port / Umm Qasr'],
+            ['code' => 'IR', 'name' => 'Iran', 'flag' => '🇮🇷', 'lat' => 32.427, 'lng' => 53.688, 'hub' => 'Bandar Abbas Port (Shahid Rajaee)'],
+            ['code' => 'JO', 'name' => 'Yordania', 'flag' => '🇯🇴', 'lat' => 30.585, 'lng' => 36.238, 'hub' => 'Port of Aqaba'],
+            ['code' => 'LB', 'name' => 'Lebanon', 'flag' => '🇱🇧', 'lat' => 33.854, 'lng' => 35.862, 'hub' => 'Port of Beirut'],
+            ['code' => 'IL', 'name' => 'Israel', 'flag' => '🇮🇱', 'lat' => 31.046, 'lng' => 34.851, 'hub' => 'Port of Haifa / Ashdod'],
+            ['code' => 'PS', 'name' => 'Palestina', 'flag' => '🇵🇸', 'lat' => 31.952, 'lng' => 35.233, 'hub' => 'Gaza Sea Terminal / West Bank Hub'],
+            ['code' => 'YE', 'name' => 'Yaman', 'flag' => '🇾🇪', 'lat' => 15.552, 'lng' => 48.516, 'hub' => 'Port of Aden / Hodeidah'],
+            ['code' => 'SY', 'name' => 'Suriah', 'flag' => '🇸🇾', 'lat' => 34.802, 'lng' => 38.996, 'hub' => 'Port of Latakia / Tartus'],
+            ['code' => 'CY', 'name' => 'Siprus', 'flag' => '🇨🇾', 'lat' => 35.126, 'lng' => 33.429, 'hub' => 'Port of Limassol'],
+            ['code' => 'GB', 'name' => 'Inggris Raya', 'flag' => '🇬🇧', 'lat' => 55.378, 'lng' => -3.435, 'hub' => 'Port of Felixstowe / Southampton'],
+            ['code' => 'FR', 'name' => 'Prancis', 'flag' => '🇫🇷', 'lat' => 46.227, 'lng' => 2.213, 'hub' => 'Port of Le Havre / Marseille'],
+            ['code' => 'DE', 'name' => 'Jerman', 'flag' => '🇩🇪', 'lat' => 51.165, 'lng' => 10.451, 'hub' => 'Port of Hamburg / Bremerhaven'],
+            ['code' => 'NL', 'name' => 'Belanda', 'flag' => '🇳🇱', 'lat' => 52.132, 'lng' => 5.291, 'hub' => 'Port of Rotterdam / Amsterdam'],
+            ['code' => 'BE', 'name' => 'Belgia', 'flag' => '🇧🇪', 'lat' => 50.503, 'lng' => 4.469, 'hub' => 'Port of Antwerp-Bruges'],
+            ['code' => 'CH', 'name' => 'Swiss', 'flag' => '🇨🇭', 'lat' => 46.818, 'lng' => 8.227, 'hub' => 'Port of Basel (Rhine)'],
+            ['code' => 'AT', 'name' => 'Austria', 'flag' => '🇦🇹', 'lat' => 47.516, 'lng' => 14.55, 'hub' => 'Vienna Container Terminal'],
+            ['code' => 'IE', 'name' => 'Irlandia', 'flag' => '🇮🇪', 'lat' => 53.142, 'lng' => -7.692, 'hub' => 'Dublin Port'],
+            ['code' => 'LU', 'name' => 'Luksemburg', 'flag' => '🇱🇺', 'lat' => 49.815, 'lng' => 6.129, 'hub' => 'Bettembourg Multimodal Hub'],
+            ['code' => 'MC', 'name' => 'Monako', 'flag' => '🇲🇨', 'lat' => 43.738, 'lng' => 7.424, 'hub' => 'Port Hercule'],
+            ['code' => 'LI', 'name' => 'Liechtenstein', 'flag' => '🇱🇮', 'lat' => 47.166, 'lng' => 9.555, 'hub' => 'Schaan Logistics Terminal'],
+            ['code' => 'IT', 'name' => 'Italia', 'flag' => '🇮🇹', 'lat' => 41.871, 'lng' => 12.567, 'hub' => 'Port of Genoa / Gioia Tauro / Trieste'],
+            ['code' => 'ES', 'name' => 'Spanyol', 'flag' => '🇪🇸', 'lat' => 40.463, 'lng' => -3.749, 'hub' => 'Port of Valencia / Algeciras / Barcelona'],
+            ['code' => 'PT', 'name' => 'Portugal', 'flag' => '🇵🇹', 'lat' => 39.399, 'lng' => -8.224, 'hub' => 'Port of Sines / Lisbon'],
+            ['code' => 'GR', 'name' => 'Yunani', 'flag' => '🇬🇷', 'lat' => 39.074, 'lng' => 21.824, 'hub' => 'Port of Piraeus (COSCO)'],
+            ['code' => 'TR', 'name' => 'Turki', 'flag' => '🇹🇷', 'lat' => 38.963, 'lng' => 35.243, 'hub' => 'Port of Ambarli / Mersin'],
+            ['code' => 'HR', 'name' => 'Kroasia', 'flag' => '🇭🇷', 'lat' => 45.1, 'lng' => 15.2, 'hub' => 'Port of Rijeka'],
+            ['code' => 'AL', 'name' => 'Albania', 'flag' => '🇦🇱', 'lat' => 41.312, 'lng' => 19.454, 'hub' => 'Port of Durrës'],
+            ['code' => 'RS', 'name' => 'Serbia', 'flag' => '🇷🇸', 'lat' => 44.016, 'lng' => 21.005, 'hub' => 'Belgrade Danube River Port'],
+            ['code' => 'BA', 'name' => 'Bosnia & Herzegovina', 'flag' => '🇧🇦', 'lat' => 43.915, 'lng' => 17.679, 'hub' => 'Port of Brcko / Ploce Corridor'],
+            ['code' => 'SI', 'name' => 'Slovenia', 'flag' => '🇸🇮', 'lat' => 46.151, 'lng' => 14.995, 'hub' => 'Port of Koper'],
+            ['code' => 'MK', 'name' => 'Makedonia Utara', 'flag' => '🇲🇰', 'lat' => 41.608, 'lng' => 21.745, 'hub' => 'Skopje Transport Hub'],
+            ['code' => 'ME', 'name' => 'Montenegro', 'flag' => '🇲🇪', 'lat' => 42.708, 'lng' => 19.374, 'hub' => 'Port of Bar'],
+            ['code' => 'XK', 'name' => 'Kosovo', 'flag' => '🇽🇰', 'lat' => 42.602, 'lng' => 20.902, 'hub' => 'Pristina Inland Logistics Port'],
+            ['code' => 'MT', 'name' => 'Malta', 'flag' => '🇲🇹', 'lat' => 35.937, 'lng' => 14.375, 'hub' => 'Marsaxlokk Freeport'],
+            ['code' => 'SM', 'name' => 'San Marino', 'flag' => '🇸🇲', 'lat' => 43.942, 'lng' => 12.457, 'hub' => 'San Marino Inland Terminal'],
+            ['code' => 'VA', 'name' => 'Vatikan', 'flag' => '🇻🇦', 'lat' => 41.902, 'lng' => 12.453, 'hub' => 'Vatican Rail Cargo Terminal'],
+            ['code' => 'AD', 'name' => 'Andorra', 'flag' => '🇦🇩', 'lat' => 42.506, 'lng' => 1.521, 'hub' => 'Andorra Inland Hub'],
+            ['code' => 'SE', 'name' => 'Swedia', 'flag' => '🇸🇪', 'lat' => 60.128, 'lng' => 18.643, 'hub' => 'Port of Gothenburg'],
+            ['code' => 'NO', 'name' => 'Norwegia', 'flag' => '🇳🇴', 'lat' => 60.472, 'lng' => 8.468, 'hub' => 'Port of Oslo / Bergen'],
+            ['code' => 'DK', 'name' => 'Denmark', 'flag' => '🇩🇰', 'lat' => 56.263, 'lng' => 9.501, 'hub' => 'Port of Aarhus / Copenhagen'],
+            ['code' => 'FI', 'name' => 'Finlandia', 'flag' => '🇫🇮', 'lat' => 61.924, 'lng' => 25.748, 'hub' => 'Port of Helsinki (Vuosaari)'],
+            ['code' => 'IS', 'name' => 'Islandia', 'flag' => '🇮🇸', 'lat' => 64.963, 'lng' => -19.02, 'hub' => 'Port of Reykjavik / Sundahofn'],
+            ['code' => 'EE', 'name' => 'Estonia', 'flag' => '🇪🇪', 'lat' => 58.595, 'lng' => 25.013, 'hub' => 'Port of Tallinn (Muuga)'],
+            ['code' => 'LV', 'name' => 'Latvia', 'flag' => '🇱🇻', 'lat' => 56.879, 'lng' => 24.603, 'hub' => 'Freeport of Riga'],
+            ['code' => 'LT', 'name' => 'Lituania', 'flag' => '🇱🇹', 'lat' => 55.169, 'lng' => 23.881, 'hub' => 'Port of Klaipeda'],
+            ['code' => 'AX', 'name' => 'Åland Islands', 'flag' => '🇦🇽', 'lat' => 60.178, 'lng' => 19.915, 'hub' => 'Port of Mariehamn'],
+            ['code' => 'GL', 'name' => 'Greenland', 'flag' => '🇬🇱', 'lat' => 71.706, 'lng' => -42.604, 'hub' => 'Port of Nuuk'],
+            ['code' => 'PL', 'name' => 'Polandia', 'flag' => '🇵🇱', 'lat' => 51.919, 'lng' => 19.145, 'hub' => 'Baltic Hub (Gdansk) / Gdynia'],
+            ['code' => 'UA', 'name' => 'Ukraina', 'flag' => '🇺🇦', 'lat' => 48.379, 'lng' => 31.165, 'hub' => 'Port of Odesa / Chornomorsk'],
+            ['code' => 'CZ', 'name' => 'Republik Ceko', 'flag' => '🇨🇿', 'lat' => 49.817, 'lng' => 15.472, 'hub' => 'Prague Metrans Hub'],
+            ['code' => 'RO', 'name' => 'Rumania', 'flag' => '🇷🇴', 'lat' => 45.943, 'lng' => 24.966, 'hub' => 'Port of Constanta'],
+            ['code' => 'HU', 'name' => 'Hungaria', 'flag' => '🇭🇺', 'lat' => 47.162, 'lng' => 19.503, 'hub' => 'Budapest Mahart Container Terminal'],
+            ['code' => 'BG', 'name' => 'Bulgaria', 'flag' => '🇧🇬', 'lat' => 42.733, 'lng' => 25.485, 'hub' => 'Port of Varna / Burgas'],
+            ['code' => 'SK', 'name' => 'Slowakia', 'flag' => '🇸🇰', 'lat' => 48.669, 'lng' => 19.699, 'hub' => 'Bratislava Danube Port'],
+            ['code' => 'BY', 'name' => 'Belarusia', 'flag' => '🇧🇾', 'lat' => 53.709, 'lng' => 27.953, 'hub' => 'Brest Dry Port / Great Stone'],
+            ['code' => 'MD', 'name' => 'Moldova', 'flag' => '🇲🇩', 'lat' => 47.411, 'lng' => 28.369, 'hub' => 'Port of Giurgiulesti'],
+            ['code' => 'RU', 'name' => 'Rusia', 'flag' => '🇷🇺', 'lat' => 61.524, 'lng' => 105.318, 'hub' => 'Port of St. Petersburg / Vladivostok'],
+            ['code' => 'US', 'name' => 'Amerika Serikat', 'flag' => '🇺🇸', 'lat' => 37.09, 'lng' => -95.712, 'hub' => 'Port of LA / Long Beach / New York'],
+            ['code' => 'CA', 'name' => 'Kanada', 'flag' => '🇨🇦', 'lat' => 56.13, 'lng' => -106.346, 'hub' => 'Port of Vancouver / Montreal / Prince Rupert'],
+            ['code' => 'MX', 'name' => 'Meksiko', 'flag' => '🇲🇽', 'lat' => 23.634, 'lng' => -102.552, 'hub' => 'Port of Manzanillo / Veracruz'],
+            ['code' => 'PA', 'name' => 'Panama', 'flag' => '🇵🇦', 'lat' => 8.537, 'lng' => -80.782, 'hub' => 'Port of Balboa / Colon (Panama Canal)'],
+            ['code' => 'CR', 'name' => 'Kosta Rika', 'flag' => '🇨🇷', 'lat' => 9.748, 'lng' => -83.753, 'hub' => 'Port of Moin (Limon)'],
+            ['code' => 'GT', 'name' => 'Guatemala', 'flag' => '🇬🇹', 'lat' => 15.783, 'lng' => -90.23, 'hub' => 'Puerto Quetzal / Santo Tomas'],
+            ['code' => 'HN', 'name' => 'Honduras', 'flag' => '🇭🇳', 'lat' => 15.199, 'lng' => -86.241, 'hub' => 'Puerto Cortes'],
+            ['code' => 'SV', 'name' => 'El Salvador', 'flag' => '🇸🇻', 'lat' => 13.794, 'lng' => -88.896, 'hub' => 'Port of Acajutla'],
+            ['code' => 'NI', 'name' => 'Nikaragua', 'flag' => '🇳🇮', 'lat' => 12.865, 'lng' => -85.207, 'hub' => 'Puerto Corinto'],
+            ['code' => 'BZ', 'name' => 'Belize', 'flag' => '🇧🇿', 'lat' => 17.189, 'lng' => -88.497, 'hub' => 'Port of Belize'],
+            ['code' => 'CU', 'name' => 'Kuba', 'flag' => '🇨🇺', 'lat' => 21.521, 'lng' => -77.781, 'hub' => 'Port of Mariel / Havana'],
+            ['code' => 'DO', 'name' => 'Republik Dominika', 'flag' => '🇩🇴', 'lat' => 18.735, 'lng' => -70.162, 'hub' => 'Port of Caucedo'],
+            ['code' => 'JM', 'name' => 'Jamaika', 'flag' => '🇯🇲', 'lat' => 18.109, 'lng' => -77.297, 'hub' => 'Kingston Container Terminal'],
+            ['code' => 'HT', 'name' => 'Haiti', 'flag' => '🇭🇹', 'lat' => 18.971, 'lng' => -72.285, 'hub' => 'Port of Port-au-Prince'],
+            ['code' => 'BS', 'name' => 'Bahama', 'flag' => '🇧🇸', 'lat' => 25.034, 'lng' => -77.396, 'hub' => 'Freeport Container Port'],
+            ['code' => 'TT', 'name' => 'Trinidad & Tobago', 'flag' => '🇹🇹', 'lat' => 10.691, 'lng' => -61.222, 'hub' => 'Port of Port of Spain'],
+            ['code' => 'BB', 'name' => 'Barbados', 'flag' => '🇧🇧', 'lat' => 13.193, 'lng' => -59.543, 'hub' => 'Bridgetown Port'],
+            ['code' => 'LC', 'name' => 'Saint Lucia', 'flag' => '🇱🇨', 'lat' => 13.909, 'lng' => -60.978, 'hub' => 'Port Castries'],
+            ['code' => 'VC', 'name' => 'Saint Vincent & Grenadines', 'flag' => '🇻🇨', 'lat' => 12.984, 'lng' => -61.287, 'hub' => 'Kingstown Port'],
+            ['code' => 'GD', 'name' => 'Grenada', 'flag' => '🇬🇩', 'lat' => 12.116, 'lng' => -61.679, 'hub' => 'St. George Port'],
+            ['code' => 'AG', 'name' => 'Antigua & Barbuda', 'flag' => '🇦🇬', 'lat' => 17.06, 'lng' => -61.796, 'hub' => 'St. John Port (Deep Water)'],
+            ['code' => 'DM', 'name' => 'Dominika', 'flag' => '🇩🇲', 'lat' => 15.414, 'lng' => -61.37, 'hub' => 'Woodbridge Bay Port (Roseau)'],
+            ['code' => 'KN', 'name' => 'Saint Kitts & Nevis', 'flag' => '🇰🇳', 'lat' => 17.357, 'lng' => -62.782, 'hub' => 'Basseterre Deep Water Port'],
+            ['code' => 'PR', 'name' => 'Puerto Rico', 'flag' => '🇵🇷', 'lat' => 18.22, 'lng' => -66.59, 'hub' => 'Port of San Juan'],
+            ['code' => 'BR', 'name' => 'Brasil', 'flag' => '🇧🇷', 'lat' => -14.235, 'lng' => -51.925, 'hub' => 'Port of Santos / Paranagua'],
+            ['code' => 'AR', 'name' => 'Argentina', 'flag' => '🇦🇷', 'lat' => -38.416, 'lng' => -63.616, 'hub' => 'Port of Buenos Aires / Bahia Blanca'],
+            ['code' => 'CL', 'name' => 'Chili', 'flag' => '🇨🇱', 'lat' => -35.675, 'lng' => -71.542, 'hub' => 'Port of San Antonio / Valparaiso'],
+            ['code' => 'CO', 'name' => 'Kolombia', 'flag' => '🇨🇴', 'lat' => 4.57, 'lng' => -74.297, 'hub' => 'Port of Cartagena / Buenaventura'],
+            ['code' => 'PE', 'name' => 'Peru', 'flag' => '🇵🇪', 'lat' => -9.189, 'lng' => -75.015, 'hub' => 'Port of Callao / Chancay'],
+            ['code' => 'VE', 'name' => 'Venezuela', 'flag' => '🇻🇪', 'lat' => 6.423, 'lng' => -66.589, 'hub' => 'Puerto Cabello / La Guaira'],
+            ['code' => 'EC', 'name' => 'Ekuador', 'flag' => '🇪🇨', 'lat' => -1.831, 'lng' => -78.183, 'hub' => 'Port of Guayaquil / Posorja'],
+            ['code' => 'BO', 'name' => 'Bolivia', 'flag' => '🇧🇴', 'lat' => -16.29, 'lng' => -63.588, 'hub' => 'Puerto Aguirre / Santa Cruz'],
+            ['code' => 'PY', 'name' => 'Paraguay', 'flag' => '🇵🇾', 'lat' => -23.442, 'lng' => -58.443, 'hub' => 'Port of Asuncion (Villeta)'],
+            ['code' => 'UY', 'name' => 'Uruguay', 'flag' => '🇺🇾', 'lat' => -32.522, 'lng' => -55.765, 'hub' => 'Port of Montevideo'],
+            ['code' => 'GY', 'name' => 'Guyana', 'flag' => '🇬🇾', 'lat' => 4.86, 'lng' => -58.93, 'hub' => 'Port of Georgetown'],
+            ['code' => 'SR', 'name' => 'Suriname', 'flag' => '🇸🇷', 'lat' => 3.919, 'lng' => -56.027, 'hub' => 'Port of Paramaribo'],
+            ['code' => 'EG', 'name' => 'Mesir', 'flag' => '🇪🇬', 'lat' => 26.82, 'lng' => 30.802, 'hub' => 'Port Said / Alexandria (Suez Canal)'],
+            ['code' => 'MA', 'name' => 'Maroko', 'flag' => '🇲🇦', 'lat' => 31.791, 'lng' => -7.092, 'hub' => 'Tanger Med Port Complex / Casablanca'],
+            ['code' => 'DZ', 'name' => 'Aljazair', 'flag' => '🇩🇿', 'lat' => 28.033, 'lng' => 1.659, 'hub' => 'Port of Algiers / Oran'],
+            ['code' => 'TN', 'name' => 'Tunisia', 'flag' => '🇹🇳', 'lat' => 33.886, 'lng' => 9.537, 'hub' => 'Port of Rades (Tunis)'],
+            ['code' => 'LY', 'name' => 'Libya', 'flag' => '🇱🇾', 'lat' => 26.335, 'lng' => 17.228, 'hub' => 'Port of Tripoli / Misrata'],
+            ['code' => 'SD', 'name' => 'Sudan', 'flag' => '🇸🇩', 'lat' => 12.862, 'lng' => 30.217, 'hub' => 'Port Sudan'],
+            ['code' => 'SS', 'name' => 'Sudan Selatan', 'flag' => '🇸🇸', 'lat' => 6.877, 'lng' => 31.307, 'hub' => 'Juba River Port'],
+            ['code' => 'NG', 'name' => 'Nigeria', 'flag' => '🇳🇬', 'lat' => 9.082, 'lng' => 8.675, 'hub' => 'Lagos Port (Apapa) / Lekki Deep Sea'],
+            ['code' => 'GH', 'name' => 'Ghana', 'flag' => '🇬🇭', 'lat' => 7.946, 'lng' => -1.023, 'hub' => 'Port of Tema (MPS) / Takoradi'],
+            ['code' => 'CI', 'name' => 'Pantai Gading', 'flag' => '🇨🇮', 'lat' => 7.54, 'lng' => -5.547, 'hub' => 'Port of Abidjan / San Pedro'],
+            ['code' => 'SN', 'name' => 'Senegal', 'flag' => '🇸🇳', 'lat' => 14.497, 'lng' => -14.452, 'hub' => 'Port of Dakar'],
+            ['code' => 'CM', 'name' => 'Kamerun', 'flag' => '🇨🇲', 'lat' => 7.369, 'lng' => 12.354, 'hub' => 'Port of Kribi / Douala'],
+            ['code' => 'AO', 'name' => 'Angola', 'flag' => '🇦🇴', 'lat' => -11.202, 'lng' => 17.873, 'hub' => 'Port of Luanda / Lobito'],
+            ['code' => 'CD', 'name' => 'RD Kongo', 'flag' => '🇨🇩', 'lat' => -4.038, 'lng' => 21.758, 'hub' => 'Port of Matadi / Boma'],
+            ['code' => 'CG', 'name' => 'Kongo', 'flag' => '🇨🇬', 'lat' => -0.228, 'lng' => 15.827, 'hub' => 'Port of Pointe-Noire'],
+            ['code' => 'GA', 'name' => 'Gabon', 'flag' => '🇬🇦', 'lat' => -0.803, 'lng' => 11.609, 'hub' => 'Port of Owendo (Libreville)'],
+            ['code' => 'GN', 'name' => 'Guinea', 'flag' => '🇬🇳', 'lat' => 9.945, 'lng' => -9.696, 'hub' => 'Port of Conakry'],
+            ['code' => 'TG', 'name' => 'Togo', 'flag' => '🇹🇬', 'lat' => 8.619, 'lng' => 0.824, 'hub' => 'Port of Lome (LCT)'],
+            ['code' => 'BJ', 'name' => 'Benin', 'flag' => '🇧🇯', 'lat' => 9.307, 'lng' => 2.315, 'hub' => 'Port of Cotonou'],
+            ['code' => 'MR', 'name' => 'Mauritania', 'flag' => '🇲🇷', 'lat' => 21.007, 'lng' => -10.94, 'hub' => 'Port of Nouakchott (PANPA)'],
+            ['code' => 'ML', 'name' => 'Mali', 'flag' => '🇲🇱', 'lat' => 17.57, 'lng' => -3.996, 'hub' => 'Bamako Inland Freight Hub'],
+            ['code' => 'BF', 'name' => 'Burkina Faso', 'flag' => '🇧🇫', 'lat' => 12.238, 'lng' => -1.561, 'hub' => 'Ouagadougou Multimodal Port'],
+            ['code' => 'NE', 'name' => 'Niger', 'flag' => '🇳🇪', 'lat' => 17.607, 'lng' => 8.081, 'hub' => 'Niamey Inland Terminal'],
+            ['code' => 'TD', 'name' => 'Chad', 'flag' => '🇹🇩', 'lat' => 15.454, 'lng' => 18.732, 'hub' => 'N\'Djamena Logistics Hub'],
+            ['code' => 'CV', 'name' => 'Tanjung Verde', 'flag' => '🇨🇻', 'lat' => 16.538, 'lng' => -23.041, 'hub' => 'Port of Mindelo / Praia'],
+            ['code' => 'GM', 'name' => 'Gambia', 'flag' => '🇬🇲', 'lat' => 13.443, 'lng' => -15.31, 'hub' => 'Port of Banjul'],
+            ['code' => 'GW', 'name' => 'Guinea-Bissau', 'flag' => '🇬🇼', 'lat' => 11.803, 'lng' => -15.18, 'hub' => 'Port of Bissau'],
+            ['code' => 'LR', 'name' => 'Liberia', 'flag' => '🇱🇷', 'lat' => 6.428, 'lng' => -9.429, 'hub' => 'Freeport of Monrovia'],
+            ['code' => 'SL', 'name' => 'Sierra Leone', 'flag' => '🇸🇱', 'lat' => 8.46, 'lng' => -11.779, 'hub' => 'Queen Elizabeth II Quay (Freetown)'],
+            ['code' => 'GQ', 'name' => 'Guinea Khatulistiwa', 'flag' => '🇬🇶', 'lat' => 1.65, 'lng' => 10.267, 'hub' => 'Port of Malabo / Bata'],
+            ['code' => 'ST', 'name' => 'Sao Tome & Principe', 'flag' => '🇸🇹', 'lat' => 0.186, 'lng' => 6.613, 'hub' => 'Port of Sao Tome'],
+            ['code' => 'CF', 'name' => 'Republik Afrika Tengah', 'flag' => '🇨🇫', 'lat' => 6.611, 'lng' => 20.939, 'hub' => 'Bangui River Port'],
+            ['code' => 'ZA', 'name' => 'Afrika Selatan', 'flag' => '🇿🇦', 'lat' => -30.559, 'lng' => 22.937, 'hub' => 'Port of Durban / Cape Town / Ngqura'],
+            ['code' => 'KE', 'name' => 'Kenya', 'flag' => '🇰🇪', 'lat' => -0.023, 'lng' => 37.906, 'hub' => 'Port of Mombasa / Lamu'],
+            ['code' => 'TZ', 'name' => 'Tanzania', 'flag' => '🇹🇿', 'lat' => -6.369, 'lng' => 34.888, 'hub' => 'Dar es Salaam Port'],
+            ['code' => 'ET', 'name' => 'Ethiopia', 'flag' => '🇪🇹', 'lat' => 9.145, 'lng' => 40.489, 'hub' => 'Modjo Dry Port (Addis Ababa)'],
+            ['code' => 'UG', 'name' => 'Uganda', 'flag' => '🇺🇬', 'lat' => 1.373, 'lng' => 32.29, 'hub' => 'Kampala Inland Port / Port Bell'],
+            ['code' => 'MZ', 'name' => 'Mozambik', 'flag' => '🇲🇿', 'lat' => -18.665, 'lng' => 35.529, 'hub' => 'Port of Maputo / Beira'],
+            ['code' => 'MG', 'name' => 'Madagaskar', 'flag' => '🇲🇬', 'lat' => -18.766, 'lng' => 46.869, 'hub' => 'Port of Toamasina (Tamatave)'],
+            ['code' => 'MU', 'name' => 'Mauritius', 'flag' => '🇲🇺', 'lat' => -20.348, 'lng' => 57.552, 'hub' => 'Port Louis Harbor'],
+            ['code' => 'SC', 'name' => 'Seychelles', 'flag' => '🇸🇨', 'lat' => -4.679, 'lng' => 55.492, 'hub' => 'Port Victoria'],
+            ['code' => 'RW', 'name' => 'Rwanda', 'flag' => '🇷🇼', 'lat' => -1.94, 'lng' => 29.873, 'hub' => 'Kigali Logistics Platform (DP World)'],
+            ['code' => 'ZM', 'name' => 'Zambia', 'flag' => '🇿🇲', 'lat' => -13.133, 'lng' => 27.849, 'hub' => 'Lusaka Dry Port'],
+            ['code' => 'ZW', 'name' => 'Zimbabwe', 'flag' => '🇿🇼', 'lat' => -19.015, 'lng' => 29.154, 'hub' => 'Harare Dry Port'],
+            ['code' => 'BW', 'name' => 'Botswana', 'flag' => '🇧🇼', 'lat' => -22.328, 'lng' => 24.684, 'hub' => 'Gaborone Container Terminal (GABCON)'],
+            ['code' => 'NA', 'name' => 'Namibia', 'flag' => '🇳🇦', 'lat' => -22.957, 'lng' => 18.49, 'hub' => 'Port of Walvis Bay'],
+            ['code' => 'SO', 'name' => 'Somalia', 'flag' => '🇸🇴', 'lat' => 5.152, 'lng' => 46.199, 'hub' => 'Port of Mogadishu / Berbera'],
+            ['code' => 'DJ', 'name' => 'Jibuti', 'flag' => '🇩🇯', 'lat' => 11.825, 'lng' => 42.59, 'hub' => 'Port of Djibouti (Doraleh)'],
+            ['code' => 'ER', 'name' => 'Eritrea', 'flag' => '🇪🇷', 'lat' => 15.179, 'lng' => 39.782, 'hub' => 'Port of Massawa / Assab'],
+            ['code' => 'MW', 'name' => 'Malawi', 'flag' => '🇲🇼', 'lat' => -13.254, 'lng' => 34.301, 'hub' => 'Lilongwe Dry Port'],
+            ['code' => 'BI', 'name' => 'Burundi', 'flag' => '🇧🇮', 'lat' => -3.373, 'lng' => 29.918, 'hub' => 'Port of Bujumbura (Lake Tanganyika)'],
+            ['code' => 'KM', 'name' => 'Komoro', 'flag' => '🇰🇲', 'lat' => -11.875, 'lng' => 43.872, 'hub' => 'Port of Moroni'],
+            ['code' => 'SZ', 'name' => 'Eswatini', 'flag' => '🇸🇿', 'lat' => -26.522, 'lng' => 31.465, 'hub' => 'Matsapha Inland Dry Port'],
+            ['code' => 'LS', 'name' => 'Lesotho', 'flag' => '🇱🇸', 'lat' => -29.609, 'lng' => 28.233, 'hub' => 'Maseru Container Terminal'],
+            ['code' => 'AU', 'name' => 'Australia', 'flag' => '🇦🇺', 'lat' => -25.274, 'lng' => 133.775, 'hub' => 'Port Botany (Sydney) / Melbourne'],
+            ['code' => 'NZ', 'name' => 'Selandia Baru', 'flag' => '🇳🇿', 'lat' => -40.9, 'lng' => 174.885, 'hub' => 'Port of Tauranga / Auckland'],
+            ['code' => 'PG', 'name' => 'Papua Nugini', 'flag' => '🇵🇬', 'lat' => -6.314, 'lng' => 143.955, 'hub' => 'Port Moresby / Lae Port'],
+            ['code' => 'FJ', 'name' => 'Fiji', 'flag' => '🇫🇯', 'lat' => -17.713, 'lng' => 178.065, 'hub' => 'Port of Suva / Lautoka'],
+            ['code' => 'SB', 'name' => 'Kepulauan Solomon', 'flag' => '🇸🇧', 'lat' => -9.645, 'lng' => 160.156, 'hub' => 'Port of Honiara'],
+            ['code' => 'VU', 'name' => 'Vanuatu', 'flag' => '🇻🇺', 'lat' => -15.376, 'lng' => 166.959, 'hub' => 'Port Vila Harbor'],
+            ['code' => 'WS', 'name' => 'Samoa', 'flag' => '🇼🇸', 'lat' => -13.759, 'lng' => -172.104, 'hub' => 'Port of Apia'],
+            ['code' => 'TO', 'name' => 'Tonga', 'flag' => '🇹🇴', 'lat' => -21.178, 'lng' => -175.198, 'hub' => 'Queen Salote Wharf (Nukuʻalofa)'],
+            ['code' => 'KI', 'name' => 'Kiribati', 'flag' => '🇰🇮', 'lat' => -3.37, 'lng' => -168.734, 'hub' => 'Betio Port (Tarawa)'],
+            ['code' => 'FM', 'name' => 'Mikronesia', 'flag' => '🇫🇲', 'lat' => 7.425, 'lng' => 150.55, 'hub' => 'Pohnpei Port'],
+            ['code' => 'PW', 'name' => 'Palau', 'flag' => '🇵🇼', 'lat' => 7.514, 'lng' => 134.582, 'hub' => 'Malakal Port (Koror)'],
+            ['code' => 'MH', 'name' => 'Kepulauan Marshall', 'flag' => '🇲🇭', 'lat' => 7.131, 'lng' => 171.184, 'hub' => 'Majuro Port'],
+            ['code' => 'NR', 'name' => 'Nauru', 'flag' => '🇳🇷', 'lat' => -0.522, 'lng' => 166.931, 'hub' => 'Aiwo Port'],
+            ['code' => 'TV', 'name' => 'Tuvalu', 'flag' => '🇹🇻', 'lat' => -7.109, 'lng' => 177.649, 'hub' => 'Funafuti Port'],
+            ['code' => 'AS', 'name' => 'American Samoa', 'flag' => '🇦🇸', 'lat' => -14.271, 'lng' => -170.132, 'hub' => 'Port of Pago Pago'],
+            ['code' => 'AI', 'name' => 'Anguilla', 'flag' => '🇦🇮', 'lat' => 18.22, 'lng' => -63.068, 'hub' => 'Blowing Point Port'],
+            ['code' => 'AQ', 'name' => 'Antartika', 'flag' => '🇦🇶', 'lat' => -75.25, 'lng' => -0.071, 'hub' => 'McMurdo Logistics Station'],
         ];
     }
+
 
     /**
      * 9. Metadata Lengkap 160+ Mata Uang Dunia (ExchangeRate-API ISO 4217)

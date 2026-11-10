@@ -190,17 +190,17 @@
         </div>
     </div>
 
-    <!-- 75+ Global Maritime Weather Hubs Directory -->
+    <!-- 195+ Global Maritime Weather Hubs Directory -->
     @if(isset($allWeatherHubs))
     <div class="p-6 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-100 dark:border-slate-800 gap-3">
             <div>
                 <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <i data-lucide="cloud" class="w-4 h-4 text-cyan-500"></i>
-                    <span>Direktori 75+ Stasiun Cuaca Maritim & Terestrial Dunia</span>
+                    <span>Direktori Stasiun Cuaca Maritim & Terestrial Seluruh Dunia ({{ count($allWeatherHubs) }} Negara)</span>
                 </h2>
                 <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                    Data realtime meteorologi pelabuhan dan koridor samudra dari Kutub Utara hingga Kutub Selatan
+                    Data realtime meteorologi pelabuhan dan koridor samudra di 195+ negara dan wilayah maritim global
                 </p>
             </div>
             <div class="relative w-full sm:w-64">

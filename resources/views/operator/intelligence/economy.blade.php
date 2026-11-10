@@ -12,12 +12,20 @@
     {{-- Country Selector --}}
     <form method="GET" action="{{ route('operator.intelligence.economy') }}" class="flex items-center gap-2">
         <select name="country" onchange="this.form.submit()" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-[#0A1128] text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-sm">
-            <option value="ID" {{ $country === 'ID' ? 'selected' : '' }}>Indonesia (ID)</option>
-            <option value="SG" {{ $country === 'SG' ? 'selected' : '' }}>Singapura (SG)</option>
-            <option value="CN" {{ $country === 'CN' ? 'selected' : '' }}>Tiongkok (CN)</option>
-            <option value="US" {{ $country === 'US' ? 'selected' : '' }}>Amerika Serikat (US)</option>
-            <option value="AU" {{ $country === 'AU' ? 'selected' : '' }}>Australia (AU)</option>
-            <option value="NL" {{ $country === 'NL' ? 'selected' : '' }}>Belanda (NL)</option>
+            @if(isset($countriesList))
+                @foreach($countriesList as $c)
+                    <option value="{{ $c['code'] }}" {{ $country === $c['code'] ? 'selected' : '' }}>
+                        {{ $c['flag'] ?? '' }} {{ $c['name'] }} ({{ $c['code'] }})
+                    </option>
+                @endforeach
+            @else
+                <option value="ID" {{ $country === 'ID' ? 'selected' : '' }}>Indonesia (ID)</option>
+                <option value="SG" {{ $country === 'SG' ? 'selected' : '' }}>Singapura (SG)</option>
+                <option value="CN" {{ $country === 'CN' ? 'selected' : '' }}>Tiongkok (CN)</option>
+                <option value="US" {{ $country === 'US' ? 'selected' : '' }}>Amerika Serikat (US)</option>
+                <option value="AU" {{ $country === 'AU' ? 'selected' : '' }}>Australia (AU)</option>
+                <option value="NL" {{ $country === 'NL' ? 'selected' : '' }}>Belanda (NL)</option>
+            @endif
         </select>
     </form>
 </div>

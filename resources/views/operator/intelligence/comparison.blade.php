@@ -16,22 +16,38 @@
         <div class="flex-1 min-w-40">
             <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Negara A (Asal)</label>
             <select name="country_a" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
-                <option value="ID" {{ $countryA === 'ID' ? 'selected' : '' }}>Indonesia (ID)</option>
-                <option value="SG" {{ $countryA === 'SG' ? 'selected' : '' }}>Singapura (SG)</option>
-                <option value="CN" {{ $countryA === 'CN' ? 'selected' : '' }}>Tiongkok (CN)</option>
-                <option value="US" {{ $countryA === 'US' ? 'selected' : '' }}>Amerika Serikat (US)</option>
-                <option value="AU" {{ $countryA === 'AU' ? 'selected' : '' }}>Australia (AU)</option>
+                @if(isset($countriesList))
+                    @foreach($countriesList as $c)
+                        <option value="{{ $c['code'] }}" {{ $countryA === $c['code'] ? 'selected' : '' }}>
+                            {{ $c['flag'] ?? '' }} {{ $c['name'] }} ({{ $c['code'] }})
+                        </option>
+                    @endforeach
+                @else
+                    <option value="ID" {{ $countryA === 'ID' ? 'selected' : '' }}>Indonesia (ID)</option>
+                    <option value="SG" {{ $countryA === 'SG' ? 'selected' : '' }}>Singapura (SG)</option>
+                    <option value="CN" {{ $countryA === 'CN' ? 'selected' : '' }}>Tiongkok (CN)</option>
+                    <option value="US" {{ $countryA === 'US' ? 'selected' : '' }}>Amerika Serikat (US)</option>
+                    <option value="AU" {{ $countryA === 'AU' ? 'selected' : '' }}>Australia (AU)</option>
+                @endif
             </select>
         </div>
         <div class="flex-1 min-w-40">
             <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Negara B (Tujuan / Mitra)</label>
             <select name="country_b" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
-                <option value="SG" {{ $countryB === 'SG' ? 'selected' : '' }}>Singapura (SG)</option>
-                <option value="ID" {{ $countryB === 'ID' ? 'selected' : '' }}>Indonesia (ID)</option>
-                <option value="CN" {{ $countryB === 'CN' ? 'selected' : '' }}>Tiongkok (CN)</option>
-                <option value="US" {{ $countryB === 'US' ? 'selected' : '' }}>Amerika Serikat (US)</option>
-                <option value="AU" {{ $countryB === 'AU' ? 'selected' : '' }}>Australia (AU)</option>
-                <option value="NL" {{ $countryB === 'NL' ? 'selected' : '' }}>Belanda (NL)</option>
+                @if(isset($countriesList))
+                    @foreach($countriesList as $c)
+                        <option value="{{ $c['code'] }}" {{ $countryB === $c['code'] ? 'selected' : '' }}>
+                            {{ $c['flag'] ?? '' }} {{ $c['name'] }} ({{ $c['code'] }})
+                        </option>
+                    @endforeach
+                @else
+                    <option value="SG" {{ $countryB === 'SG' ? 'selected' : '' }}>Singapura (SG)</option>
+                    <option value="ID" {{ $countryB === 'ID' ? 'selected' : '' }}>Indonesia (ID)</option>
+                    <option value="CN" {{ $countryB === 'CN' ? 'selected' : '' }}>Tiongkok (CN)</option>
+                    <option value="US" {{ $countryB === 'US' ? 'selected' : '' }}>Amerika Serikat (US)</option>
+                    <option value="AU" {{ $countryB === 'AU' ? 'selected' : '' }}>Australia (AU)</option>
+                    <option value="NL" {{ $countryB === 'NL' ? 'selected' : '' }}>Belanda (NL)</option>
+                @endif
             </select>
         </div>
         <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold transition-colors">
