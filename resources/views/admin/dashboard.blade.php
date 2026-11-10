@@ -491,6 +491,19 @@
         // Guaranteed Absolute Route URLs direct from Laravel Blade (No 404s!)
         const WEATHER_PAGE_URL = "{{ route('admin.intelligence.weather') }}";
         const PORTS_PAGE_URL   = "{{ route('admin.intelligence.ports') }}";
+        const SHIPMENT_BASE_URL = "{{ url('admin/shipments') }}";
+
+        // Route URLs helper - 100% Safe across localhost, subfolders, and virtual hosts
+        function getAppUrl(path) {
+            const cleanPath = path.startsWith('/') ? path : '/' + path;
+            const pathname = window.location.pathname;
+            const publicIdx = pathname.indexOf('/public');
+            let basePath = '';
+            if (publicIdx !== -1) {
+                basePath = pathname.substring(0, publicIdx + 7);
+            }
+            return window.location.origin + basePath + cleanPath;
+        }
 
         // Global Route Tracker Preset Highway Routes
         const globalRoutes = [
@@ -649,11 +662,20 @@
             cargoLayerGroup.clearLayers();
             const latLngs = [];
 
-            shipments.forEach(s => {
-                if (!s.origin || !s.destination) return;
+            if (!Array.isArray(shipments)) return latLngs;
 
-                const originCoords = [parseFloat(s.origin.latitude), parseFloat(s.origin.longitude)];
-                const destCoords   = [parseFloat(s.destination.latitude), parseFloat(s.destination.longitude)];
+            shipments.forEach(s => {
+                if (!s || !s.origin || !s.destination) return;
+
+                const oLat = parseFloat(s.origin.latitude);
+                const oLng = parseFloat(s.origin.longitude);
+                const dLat = parseFloat(s.destination.latitude);
+                const dLng = parseFloat(s.destination.longitude);
+
+                if (isNaN(oLat) || isNaN(oLng) || isNaN(dLat) || isNaN(dLng)) return;
+
+                const originCoords = [oLat, oLng];
+                const destCoords   = [dLat, dLng];
                 latLngs.push(originCoords, destCoords);
 
                 // Origin marker
@@ -662,13 +684,13 @@
                 }).bindPopup(`
                     <div style="min-width:220px; font-family: Outfit, sans-serif;">
                         <div style="font-weight:700; font-size:13px; color:#059669; margin-bottom:4px;">🟢 Pelabuhan Asal</div>
-                        <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.origin.name}</div>
-                        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${s.origin.city}</div>
+                        <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.origin.name || 'Pelabuhan Asal'}</div>
+                        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${s.origin.city || ''}</div>
                         <div style="background:#F1F5F9; padding:6px 10px; border-radius:8px; font-size:11px; margin-bottom:8px;">
-                            No. Resi: <b>${s.shipment_number}</b><br>
-                            Status: <span style="color:#0284c7; font-weight:700;">${s.status}</span>
+                            No. Resi: <b>${s.shipment_number || '-'}</b><br>
+                            Status: <span style="color:#0284c7; font-weight:700;">${s.status || '-'}</span>
                         </div>
-                        <a href="${getAppUrl('admin/shipments/' + s.id)}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
+                        <a href="${SHIPMENT_BASE_URL}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
                             Lihat Detail Pengiriman →
                         </a>
                     </div>
@@ -680,36 +702,40 @@
                 }).bindPopup(`
                     <div style="min-width:220px; font-family: Outfit, sans-serif;">
                         <div style="font-weight:700; font-size:13px; color:#dc2626; margin-bottom:4px;">🔴 Pelabuhan Tujuan</div>
-                        <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.destination.name}</div>
-                        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${s.destination.city}</div>
+                        <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.destination.name || 'Pelabuhan Tujuan'}</div>
+                        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${s.destination.city || ''}</div>
                         <div style="background:#F1F5F9; padding:6px 10px; border-radius:8px; font-size:11px; margin-bottom:8px;">
-                            No. Resi: <b>${s.shipment_number}</b>
+                            No. Resi: <b>${s.shipment_number || '-'}</b>
                         </div>
-                        <a href="${getAppUrl('admin/shipments/' + s.id)}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
+                        <a href="${SHIPMENT_BASE_URL}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
                             Lihat Detail Pengiriman →
                         </a>
                     </div>
                 `).addTo(cargoLayerGroup);
 
                 // Current location
-                if (s.current_location) {
-                    const cur = [parseFloat(s.current_location.latitude), parseFloat(s.current_location.longitude)];
-                    latLngs.push(cur);
-                    L.circleMarker(cur, {
-                        radius: 8, fillColor: '#00A8E8', color: '#fff', weight: 2, fillOpacity: 0.95
-                    }).bindPopup(`
-                        <div style="min-width:220px; font-family: Outfit, sans-serif;">
-                            <div style="font-weight:700; font-size:13px; color:#0284c7; margin-bottom:4px;">🚢 Posisi Kargo Terkini</div>
-                            <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.current_location.name}</div>
-                            <div style="background:#F0FDF4; border:1px solid #BBF7D0; padding:6px 10px; border-radius:8px; font-size:11px; margin:8px 0;">
-                                Kargo: <b>${s.shipment_number}</b><br>
-                                Status: <b style="color:#166534;">${s.status}</b>
+                if (s.current_location && s.current_location.latitude && s.current_location.longitude) {
+                    const cLat = parseFloat(s.current_location.latitude);
+                    const cLng = parseFloat(s.current_location.longitude);
+                    if (!isNaN(cLat) && !isNaN(cLng)) {
+                        const cur = [cLat, cLng];
+                        latLngs.push(cur);
+                        L.circleMarker(cur, {
+                            radius: 8, fillColor: '#00A8E8', color: '#fff', weight: 2, fillOpacity: 0.95
+                        }).bindPopup(`
+                            <div style="min-width:220px; font-family: Outfit, sans-serif;">
+                                <div style="font-weight:700; font-size:13px; color:#0284c7; margin-bottom:4px;">🚢 Posisi Kargo Terkini</div>
+                                <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.current_location.name || 'Posisi Terkini'}</div>
+                                <div style="background:#F0FDF4; border:1px solid #BBF7D0; padding:6px 10px; border-radius:8px; font-size:11px; margin:8px 0;">
+                                    Kargo: <b>${s.shipment_number || '-'}</b><br>
+                                    Status: <b style="color:#166534;">${s.status || '-'}</b>
+                                </div>
+                                <a href="${SHIPMENT_BASE_URL}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
+                                    Lihat Detail Pengiriman →
+                                </a>
                             </div>
-                            <a href="${getAppUrl('admin/shipments/' + s.id)}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
-                                Lihat Detail Pengiriman →
-                            </a>
-                        </div>
-                    `).addTo(cargoLayerGroup);
+                        `).addTo(cargoLayerGroup);
+                    }
                 }
 
                 // Animated dashed polyline
@@ -969,22 +995,26 @@
             updateBanner(mode);
             updateLegend(mode);
 
-            if (mode === 'cargo') {
-                buildCargoLayer();
-                cargoLayerGroup.addTo(map);
-                map.flyTo([10, 110], 3, { duration: 1.2 });
-            } else if (mode === 'route') {
-                buildRouteLayer();
-                routeLayerGroup.addTo(map);
-                focusGlobalRoute(0);
-            } else if (mode === 'weather') {
-                buildWeatherLayer();
-                weatherLayerGroup.addTo(map);
-                map.flyTo([20, 20], 2.2, { duration: 1.2 });
-            } else if (mode === 'ports') {
-                buildPortsLayer();
-                portsLayerGroup.addTo(map);
-                map.flyTo([20, 20], 2.2, { duration: 1.2 });
+            try {
+                if (mode === 'cargo') {
+                    buildCargoLayer();
+                    cargoLayerGroup.addTo(map);
+                    map.flyTo([10, 110], 3, { duration: 1.2 });
+                } else if (mode === 'route') {
+                    buildRouteLayer();
+                    routeLayerGroup.addTo(map);
+                    focusGlobalRoute(0);
+                } else if (mode === 'weather') {
+                    buildWeatherLayer();
+                    weatherLayerGroup.addTo(map);
+                    map.flyTo([20, 20], 2.2, { duration: 1.2 });
+                } else if (mode === 'ports') {
+                    buildPortsLayer();
+                    portsLayerGroup.addTo(map);
+                    map.flyTo([20, 20], 2.2, { duration: 1.2 });
+                }
+            } catch (err) {
+                console.error("Error switching mode to " + mode + ":", err);
             }
         }
 
@@ -1079,19 +1109,23 @@
             });
         }
 
-        // ── INIT ────────────────────────────────────────────────
-        buildCargoLayer();
-        cargoLayerGroup.addTo(map);
-        updateModeButtons('cargo');
-        updateBanner('cargo');
-        updateLegend('cargo');
-
-        // Expose functions to window so onclick="" attributes can reach them
+        // Expose functions to window immediately so onclick="" attributes can always reach them
         window.switchMapMode    = switchMapMode;
         window.resetMapView     = resetMapView;
         window.focusCountry     = focusCountry;
         window.focusGlobalRoute = focusGlobalRoute;
         window.filterCountriesList = filterCountriesList;
+
+        // ── INIT ────────────────────────────────────────────────
+        try {
+            buildCargoLayer();
+            cargoLayerGroup.addTo(map);
+        } catch (e) {
+            console.error("Error initial building cargo layer:", e);
+        }
+        updateModeButtons('cargo');
+        updateBanner('cargo');
+        updateLegend('cargo');
     });
 </script>
 @endpush
