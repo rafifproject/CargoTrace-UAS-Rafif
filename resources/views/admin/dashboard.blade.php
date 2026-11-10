@@ -527,11 +527,13 @@
             center: [15, 20],
             zoom: 2,
             minZoom: 2,
-            maxZoom: 12
+            maxZoom: 19
         });
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+            attribution: '&copy; OpenStreetMap contributors | CargoTrace',
+            maxZoom: 19,
+            maxNativeZoom: 19
         }).addTo(map);
 
         // Data from PHP controller

@@ -145,11 +145,13 @@
             center: [15, 100],
             zoom: 3,
             minZoom: 2,
-            maxZoom: 12
+            maxZoom: 19
         });
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap kontributor | CargoTrace'
+            attribution: '&copy; OpenStreetMap kontributor | CargoTrace',
+            maxZoom: 19,
+            maxNativeZoom: 19
         }).addTo(map);
 
         const shipments = {!! json_encode($mapShipments) !!};
