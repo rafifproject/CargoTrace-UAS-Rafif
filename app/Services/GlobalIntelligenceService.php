@@ -448,7 +448,8 @@ class GlobalIntelligenceService
      */
     public function getGlobalPorts(): array
     {
-        return Cache::remember('arcgis_live_global_ports_v2', 43200, function () {
+        return Cache::remember('arcgis_live_global_ports_v4', 43200, function () {
+            $curated = $this->getBaselineCuratedPorts();
             try {
                 $endpoint = "https://services1.arcgis.com/cc7nIINtrZ67dyVJ/ArcGIS/rest/services/Transportation_Use/FeatureServer/2/query";
                 $response = Http::timeout(8)->retry(2, 200)->get($endpoint, [
@@ -462,7 +463,7 @@ class GlobalIntelligenceService
                 if ($response->successful()) {
                     $json = $response->json();
                     $features = $json['features'] ?? [];
-                    if (!empty($features) && count($features) >= 15) {
+                    if (!empty($features)) {
                         $countryNames = [
                             'ID' => 'Indonesia', 'SG' => 'Singapura', 'MY' => 'Malaysia', 'TH' => 'Thailand', 'VN' => 'Vietnam',
                             'PH' => 'Filipina', 'CN' => 'Tiongkok', 'JP' => 'Jepang', 'KR' => 'Korea Selatan', 'TW' => 'Taiwan',
@@ -494,7 +495,7 @@ class GlobalIntelligenceService
                             'LC' => 'Lake / Canal Port',
                         ];
 
-                        $arcgisPorts = [];
+                        $mergedPorts = $curated;
                         foreach ($features as $f) {
                             $attr = $f['attributes'] ?? [];
                             $name = trim($attr['PORT_NAME'] ?? '');
@@ -506,12 +507,24 @@ class GlobalIntelligenceService
                                 continue;
                             }
 
+                            // Hindari penumpukan berlebihan jika titik koordinat sangat berdekatan
+                            $tooClose = false;
+                            foreach ($mergedPorts as $existing) {
+                                if (abs($existing['lat'] - $lat) < 0.25 && abs($existing['lng'] - $lng) < 0.25) {
+                                    $tooClose = true;
+                                    break;
+                                }
+                            }
+                            if ($tooClose) {
+                                continue;
+                            }
+
                             $sizeKey = strtoupper(trim($attr['HARBORSIZE'] ?? 'S'));
                             $typeKey = strtoupper(trim($attr['HARBORTYPE'] ?? ''));
                             $capInfo = $sizeLabels[$sizeKey] ?? ['cap' => '2.5M TEU', 'type' => 'Commercial Port'];
                             $harborType = $typeLabels[$typeKey] ?? $capInfo['type'];
 
-                            $arcgisPorts[] = [
+                            $mergedPorts[] = [
                                 'code' => 'WPI-' . ($attr['INDEX_NO'] ?? rand(1000, 9999)),
                                 'name' => 'Port of ' . ucwords(strtolower($name)),
                                 'country' => $countryNames[$countryCode] ?? ($countryCode ?: 'International'),
@@ -525,16 +538,14 @@ class GlobalIntelligenceService
                             ];
                         }
 
-                        if (count($arcgisPorts) >= 20) {
-                            return $arcgisPorts;
-                        }
+                        return $mergedPorts;
                     }
                 }
             } catch (\Throwable $e) {
                 // Graceful fallback to baseline
             }
 
-            return $this->getBaselineCuratedPorts();
+            return $curated;
         });
     }
 
@@ -774,77 +785,86 @@ class GlobalIntelligenceService
 
     /**
      * 7. Global Weather Hubs (Titik Cuaca Maritim & Terestrial Dunia untuk Peta Cuaca Interaktif)
-     * Kurasi 42 negara/wilayah representatif dari Kutub Utara hingga Kutub Selatan (Ref: media_1794280421603_3a4f8e13.jpg)
+     * Sinkron 100% dengan seluruh negara di getCountriesMaster() plus stasiun maritim global
      */
     public function getGlobalWeatherHubs(): array
     {
         return [
-            // Kutub Utara & Skandinavia
+            // Skandinavia & Kutub Utara
             ['code' => 'GL', 'iso' => 'gl', 'country' => 'Greenland', 'region' => 'Arctic', 'city' => 'Nuuk / Greenland Sea', 'lat' => 72.000, 'lng' => -40.000, 'temp' => -29.1, 'condition' => 'Freezing Blizzard', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 88, 'wind' => 45.0, 'precipitation' => 12.0, 'risk' => 'High Risk / Storm', 'risk_score' => 92],
             ['code' => 'IS', 'iso' => 'is', 'country' => 'Iceland', 'region' => 'Europe', 'city' => 'Reykjavik / North Atlantic', 'lat' => 64.963, 'lng' => -19.020, 'temp' => -3.1, 'condition' => 'Cold Overcast', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 82, 'wind' => 32.0, 'precipitation' => 2.5, 'risk' => 'Medium Risk', 'risk_score' => 48],
             ['code' => 'NO', 'iso' => 'no', 'country' => 'Norway', 'region' => 'Europe', 'city' => 'Oslo / North Sea', 'lat' => 60.472, 'lng' => 8.468, 'temp' => 5.5, 'condition' => 'Chilly Rain', 'icon' => 'cloud-rain', 'icon_emoji' => '🌧️', 'humidity' => 84, 'wind' => 20.0, 'precipitation' => 3.2, 'risk' => 'Medium Risk', 'risk_score' => 35],
-            ['code' => 'SE', 'iso' => 'se', 'country' => 'Sweden', 'region' => 'Europe', 'city' => 'Stockholm / Baltic Sea', 'lat' => 62.000, 'lng' => 15.000, 'temp' => 6.8, 'condition' => 'Partly Cloudy', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 78, 'wind' => 18.0, 'precipitation' => 0.5, 'risk' => 'Low Risk', 'risk_score' => 22],
-            ['code' => 'FI', 'iso' => 'fi', 'country' => 'Finland', 'region' => 'Europe', 'city' => 'Helsinki / Baltic', 'lat' => 64.000, 'lng' => 26.000, 'temp' => 3.6, 'condition' => 'Light Flurries', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 80, 'wind' => 22.0, 'precipitation' => 1.8, 'risk' => 'Medium Risk', 'risk_score' => 38],
+            ['code' => 'SE', 'iso' => 'se', 'country' => 'Sweden', 'region' => 'Europe', 'city' => 'Port of Gothenburg / Baltic Sea', 'lat' => 60.128, 'lng' => 18.643, 'temp' => 6.8, 'condition' => 'Partly Cloudy', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 78, 'wind' => 18.0, 'precipitation' => 0.5, 'risk' => 'Low Risk', 'risk_score' => 22],
+            ['code' => 'FI', 'iso' => 'fi', 'country' => 'Finland', 'region' => 'Europe', 'city' => 'Helsinki / Baltic Basin', 'lat' => 64.000, 'lng' => 26.000, 'temp' => 3.6, 'condition' => 'Light Flurries', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 80, 'wind' => 22.0, 'precipitation' => 1.8, 'risk' => 'Medium Risk', 'risk_score' => 38],
+            ['code' => 'AX', 'iso' => 'ax', 'country' => 'Åland Islands', 'region' => 'Europe', 'city' => 'Port of Mariehamn', 'lat' => 60.178, 'lng' => 19.915, 'temp' => 4.2, 'condition' => 'Breezy Fog', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 83, 'wind' => 21.0, 'precipitation' => 0.4, 'risk' => 'Low Risk', 'risk_score' => 24],
+            ['code' => 'DK', 'iso' => 'dk', 'country' => 'Denmark', 'region' => 'Europe', 'city' => 'Port of Aarhus', 'lat' => 56.263, 'lng' => 9.501, 'temp' => 9.5, 'condition' => 'Chilly Rain', 'icon' => 'cloud-rain', 'icon_emoji' => '🌧️', 'humidity' => 81, 'wind' => 24.0, 'precipitation' => 2.1, 'risk' => 'Medium Risk', 'risk_score' => 36],
 
-            // Amerika Utara
-            ['code' => 'CA', 'iso' => 'ca', 'country' => 'Canada', 'region' => 'North America', 'city' => 'Vancouver / Pacific Coast', 'lat' => 54.000, 'lng' => -105.000, 'temp' => -1.8, 'condition' => 'Cold Mist', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 81, 'wind' => 16.0, 'precipitation' => 1.0, 'risk' => 'Medium Risk', 'risk_score' => 32],
-            ['code' => 'CA_E', 'iso' => 'ca', 'country' => 'Canada (East)', 'region' => 'North America', 'city' => 'Halifax / Atlantic Waters', 'lat' => 45.000, 'lng' => -63.000, 'temp' => 7.1, 'condition' => 'Rainy Gale', 'icon' => 'cloud-rain', 'icon_emoji' => '🌧️', 'humidity' => 86, 'wind' => 28.0, 'precipitation' => 4.2, 'risk' => 'Medium Risk', 'risk_score' => 46],
-            ['code' => 'US_NW', 'iso' => 'us', 'country' => 'United States (Northwest)', 'region' => 'North America', 'city' => 'Seattle / Puget Sound', 'lat' => 47.606, 'lng' => -122.332, 'temp' => 10.7, 'condition' => 'Pacific Showers', 'icon' => 'cloud-rain', 'icon_emoji' => '🌧️', 'humidity' => 82, 'wind' => 18.0, 'precipitation' => 3.5, 'risk' => 'Low Risk', 'risk_score' => 28],
-            ['code' => 'US', 'iso' => 'us', 'country' => 'United States (West)', 'region' => 'North America', 'city' => 'Los Angeles / Pacific', 'lat' => 34.052, 'lng' => -118.243, 'temp' => 20.8, 'condition' => 'Sunny & Warm', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 54, 'wind' => 11.5, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 14],
-            ['code' => 'US_E', 'iso' => 'us', 'country' => 'United States (East)', 'region' => 'North America', 'city' => 'New York / Atlantic Coast', 'lat' => 39.500, 'lng' => -76.000, 'temp' => 14.5, 'condition' => 'Clear Sky', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 52, 'wind' => 15.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
-            ['code' => 'US_S', 'iso' => 'us', 'country' => 'United States (South)', 'region' => 'North America', 'city' => 'Miami / Florida Strait', 'lat' => 25.761, 'lng' => -80.191, 'temp' => 27.2, 'condition' => 'Tropical Sunshine', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 68, 'wind' => 14.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 16],
-            ['code' => 'US_HI', 'iso' => 'us', 'country' => 'United States (Hawaii)', 'region' => 'Pacific', 'city' => 'Honolulu / Pacific Crossing', 'lat' => 21.306, 'lng' => -157.858, 'temp' => 26.8, 'condition' => 'Trade Winds', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 62, 'wind' => 20.0, 'precipitation' => 0.5, 'risk' => 'Low Risk', 'risk_score' => 15],
-            ['code' => 'MX', 'iso' => 'mx', 'country' => 'Mexico', 'region' => 'North America', 'city' => 'Manzanillo / Gulf of California', 'lat' => 23.634, 'lng' => -102.552, 'temp' => 24.5, 'condition' => 'Warm Breeze', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 58, 'wind' => 14.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
+            // Eropa Barat & Tengah
+            ['code' => 'GB', 'iso' => 'gb', 'country' => 'United Kingdom', 'region' => 'Europe', 'city' => 'Port of Felixstowe / North Sea', 'lat' => 55.378, 'lng' => -3.435, 'temp' => 11.8, 'condition' => 'Light Drizzle', 'icon' => 'cloud-rain', 'icon_emoji' => '🌧️', 'humidity' => 85, 'wind' => 29.0, 'precipitation' => 1.5, 'risk' => 'Medium Risk', 'risk_score' => 48],
+            ['code' => 'FR', 'iso' => 'fr', 'country' => 'France', 'region' => 'Europe', 'city' => 'Port of Le Havre / English Channel', 'lat' => 46.227, 'lng' => 2.213, 'temp' => 13.5, 'condition' => 'Scattered Clouds', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 72, 'wind' => 18.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 20],
+            ['code' => 'DE', 'iso' => 'de', 'country' => 'Germany', 'region' => 'Europe', 'city' => 'Port of Hamburg / Elbe River', 'lat' => 51.165, 'lng' => 10.451, 'temp' => 10.4, 'condition' => 'Breezy Fog', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 82, 'wind' => 25.0, 'precipitation' => 0.8, 'risk' => 'Medium Risk', 'risk_score' => 42],
+            ['code' => 'NL', 'iso' => 'nl', 'country' => 'Netherlands', 'region' => 'Europe', 'city' => 'Port of Rotterdam', 'lat' => 52.132, 'lng' => 5.291, 'temp' => 11.2, 'condition' => 'North Sea Mist', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 84, 'wind' => 23.5, 'precipitation' => 1.0, 'risk' => 'Medium Risk', 'risk_score' => 34],
+            ['code' => 'BE', 'iso' => 'be', 'country' => 'Belgium', 'region' => 'Europe', 'city' => 'Port of Antwerp-Bruges', 'lat' => 50.503, 'lng' => 4.469, 'temp' => 12.0, 'condition' => 'Overcast Breeze', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 80, 'wind' => 19.0, 'precipitation' => 0.2, 'risk' => 'Low Risk', 'risk_score' => 22],
+            ['code' => 'AT', 'iso' => 'at', 'country' => 'Austria', 'region' => 'Europe', 'city' => 'Vienna Container Terminal', 'lat' => 47.516, 'lng' => 14.550, 'temp' => 12.8, 'condition' => 'Crisp Alpine Air', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 64, 'wind' => 11.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 15],
+            ['code' => 'AD', 'iso' => 'ad', 'country' => 'Andorra', 'region' => 'Europe', 'city' => 'Andorra Inland Hub', 'lat' => 42.506, 'lng' => 1.521, 'temp' => 10.8, 'condition' => 'Sunny Mountain Breeze', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 55, 'wind' => 13.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 16],
 
-            // Karibia & Amerika Tengah
-            ['code' => 'PA', 'iso' => 'pa', 'country' => 'Panama', 'region' => 'Central America', 'city' => 'Balboa / Panama Canal', 'lat' => 8.537, 'lng' => -80.782, 'temp' => 29.8, 'condition' => 'Monsoon Rainstorm', 'icon' => 'cloud-rain', 'icon_emoji' => '⛈️', 'humidity' => 91, 'wind' => 24.0, 'precipitation' => 14.2, 'risk' => 'High Risk / Storm', 'risk_score' => 84],
-            ['code' => 'JM', 'iso' => 'jm', 'country' => 'Jamaica', 'region' => 'Caribbean', 'city' => 'Kingston / Caribbean Sea', 'lat' => 18.109, 'lng' => -77.297, 'temp' => 28.4, 'condition' => 'Sunny Sea Breeze', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 66, 'wind' => 17.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 19],
-
-            // Amerika Selatan
-            ['code' => 'CO', 'iso' => 'co', 'country' => 'Colombia', 'region' => 'South America', 'city' => 'Cartagena / Caribbean Bay', 'lat' => 4.570, 'lng' => -74.297, 'temp' => 27.5, 'condition' => 'Tropical Showers', 'icon' => 'cloud-rain', 'icon_emoji' => '🌧️', 'humidity' => 84, 'wind' => 14.0, 'precipitation' => 3.0, 'risk' => 'Medium Risk', 'risk_score' => 38],
-            ['code' => 'PE', 'iso' => 'pe', 'country' => 'Peru', 'region' => 'South America', 'city' => 'Callao / Humboldt Current', 'lat' => -9.189, 'lng' => -75.015, 'temp' => 20.3, 'condition' => 'Coastal Mist', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 76, 'wind' => 15.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 20],
-            ['code' => 'CL', 'iso' => 'cl', 'country' => 'Chile', 'region' => 'South America', 'city' => 'Valparaiso / Pacific Shore', 'lat' => -30.000, 'lng' => -71.500, 'temp' => 19.6, 'condition' => 'Mild & Clear', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 60, 'wind' => 16.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
-            ['code' => 'BR', 'iso' => 'br', 'country' => 'Brazil', 'region' => 'South America', 'city' => 'Santos / South Atlantic', 'lat' => -14.235, 'lng' => -51.925, 'temp' => 26.5, 'condition' => 'Humid Overcast', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 78, 'wind' => 15.0, 'precipitation' => 0.2, 'risk' => 'Low Risk', 'risk_score' => 23],
-            ['code' => 'AR', 'iso' => 'ar', 'country' => 'Argentina', 'region' => 'South America', 'city' => 'Buenos Aires / Rio de la Plata', 'lat' => -38.416, 'lng' => -63.616, 'temp' => 22.8, 'condition' => 'Sunny Temperate', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 58, 'wind' => 18.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 17],
-            ['code' => 'AR_S', 'iso' => 'ar', 'country' => 'Argentina (Patagonia)', 'region' => 'South America', 'city' => 'Tierra del Fuego / Drake', 'lat' => -54.000, 'lng' => -68.300, 'temp' => 2.3, 'condition' => 'Sleet & Gales', 'icon' => 'snow', 'icon_emoji' => '🌨️', 'humidity' => 89, 'wind' => 44.0, 'precipitation' => 7.8, 'risk' => 'High Risk / Storm', 'risk_score' => 79],
-
-            // Eropa
-            ['code' => 'GB', 'iso' => 'gb', 'country' => 'United Kingdom', 'region' => 'Europe', 'city' => 'London / North Sea', 'lat' => 54.500, 'lng' => -2.500, 'temp' => 11.8, 'condition' => 'Light Drizzle', 'icon' => 'cloud-rain', 'icon_emoji' => '🌧️', 'humidity' => 85, 'wind' => 29.0, 'precipitation' => 1.5, 'risk' => 'Medium Risk', 'risk_score' => 48],
-            ['code' => 'FR', 'iso' => 'fr', 'country' => 'France', 'region' => 'Europe', 'city' => 'Le Havre / English Channel', 'lat' => 46.500, 'lng' => 2.500, 'temp' => 13.5, 'condition' => 'Scattered Clouds', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 72, 'wind' => 18.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 20],
-            ['code' => 'ES', 'iso' => 'es', 'country' => 'Spain', 'region' => 'Europe', 'city' => 'Valencia / Balearic Sea', 'lat' => 40.000, 'lng' => -4.000, 'temp' => 18.2, 'condition' => 'Warm Mediterranean', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 56, 'wind' => 14.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 15],
-            ['code' => 'DE', 'iso' => 'de', 'country' => 'Germany', 'region' => 'Europe', 'city' => 'Hamburg / Baltic Basin', 'lat' => 51.500, 'lng' => 10.500, 'temp' => 10.4, 'condition' => 'Breezy Fog', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 82, 'wind' => 25.0, 'precipitation' => 0.8, 'risk' => 'Medium Risk', 'risk_score' => 42],
-            ['code' => 'IT', 'iso' => 'it', 'country' => 'Italy', 'region' => 'Europe', 'city' => 'Genoa / Mediterranean', 'lat' => 42.500, 'lng' => 12.500, 'temp' => 17.5, 'condition' => 'Calm Waters', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 62, 'wind' => 12.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 16],
-            ['code' => 'GR', 'iso' => 'gr', 'country' => 'Greece', 'region' => 'Europe', 'city' => 'Piraeus / Aegean Sea', 'lat' => 38.500, 'lng' => 23.500, 'temp' => 18.9, 'condition' => 'Sunny Archipelago', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 54, 'wind' => 15.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 15],
-            ['code' => 'RU', 'iso' => 'ru', 'country' => 'Russia', 'region' => 'Europe', 'city' => 'Moscow / Inland Basin', 'lat' => 55.755, 'lng' => 42.000, 'temp' => -5.0, 'condition' => 'Freezing Snow', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 85, 'wind' => 26.0, 'precipitation' => 4.5, 'risk' => 'High Risk / Storm', 'risk_score' => 78],
-            ['code' => 'TR', 'iso' => 'tr', 'country' => 'Turkey', 'region' => 'Europe/Asia', 'city' => 'Istanbul / Bosphorus', 'lat' => 39.000, 'lng' => 35.000, 'temp' => 15.3, 'condition' => 'Clear Straits', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 64, 'wind' => 18.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
-
-            // Timur Tengah & Afrika
-            ['code' => 'EG', 'iso' => 'eg', 'country' => 'Egypt', 'region' => 'Africa', 'city' => 'Port Said / Suez Transit', 'lat' => 26.820, 'lng' => 29.800, 'temp' => 24.6, 'condition' => 'Suez Sea Breeze', 'icon' => 'wind', 'icon_emoji' => '💨', 'humidity' => 60, 'wind' => 24.0, 'precipitation' => 0.0, 'risk' => 'Medium Risk', 'risk_score' => 38],
-            ['code' => 'SA', 'iso' => 'sa', 'country' => 'Saudi Arabia', 'region' => 'Middle East', 'city' => 'Jeddah / Red Sea', 'lat' => 24.000, 'lng' => 45.000, 'temp' => 31.8, 'condition' => 'Hot Desert Sun', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 42, 'wind' => 16.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 22],
-            ['code' => 'AE', 'iso' => 'ae', 'country' => 'United Arab Emirates', 'region' => 'Middle East', 'city' => 'Dubai / Persian Gulf', 'lat' => 24.000, 'lng' => 54.000, 'temp' => 33.1, 'condition' => 'Clear & Dry', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 45, 'wind' => 18.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 25],
-            ['code' => 'NG', 'iso' => 'ng', 'country' => 'Nigeria', 'region' => 'Africa', 'city' => 'Lagos / Gulf of Guinea', 'lat' => 9.082, 'lng' => 7.500, 'temp' => 29.5, 'condition' => 'Tropical Humid', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 82, 'wind' => 14.0, 'precipitation' => 1.5, 'risk' => 'Low Risk', 'risk_score' => 26],
-            ['code' => 'KE', 'iso' => 'ke', 'country' => 'Kenya', 'region' => 'Africa', 'city' => 'Mombasa / Indian Ocean', 'lat' => 0.500, 'lng' => 37.900, 'temp' => 27.7, 'condition' => 'Warm Trade Winds', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 72, 'wind' => 16.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 21],
-            ['code' => 'SC', 'iso' => 'sc', 'country' => 'Seychelles', 'region' => 'Africa', 'city' => 'Victoria / Mahé Island', 'lat' => -4.619, 'lng' => 55.451, 'temp' => 27.6, 'condition' => 'Partly Cloudy', 'icon' => 'sun', 'icon_emoji' => '⛅', 'humidity' => 74, 'wind' => 14.8, 'precipitation' => 0.0, 'risk' => 'Medium Risk', 'risk_score' => 31],
-            ['code' => 'ZA', 'iso' => 'za', 'country' => 'South Africa', 'region' => 'Africa', 'city' => 'Cape Town / Good Hope', 'lat' => -30.500, 'lng' => 25.000, 'temp' => 21.0, 'condition' => 'Cape Gales', 'icon' => 'wind', 'icon_emoji' => '💨', 'humidity' => 68, 'wind' => 28.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 25],
-
-            // Asia Selatan & Timur
-            ['code' => 'IN', 'iso' => 'in', 'country' => 'India', 'region' => 'South Asia', 'city' => 'Mumbai / JNPT Port', 'lat' => 20.593, 'lng' => 78.962, 'temp' => 28.5, 'condition' => 'Warm Coastline', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 68, 'wind' => 13.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 24],
-            ['code' => 'LK', 'iso' => 'lk', 'country' => 'Sri Lanka', 'region' => 'South Asia', 'city' => 'Colombo / Indian Ocean', 'lat' => 7.873, 'lng' => 80.771, 'temp' => 29.8, 'condition' => 'Monsoon Showers', 'icon' => 'cloud-rain', 'icon_emoji' => '🌧️', 'humidity' => 80, 'wind' => 16.0, 'precipitation' => 2.5, 'risk' => 'Low Risk', 'risk_score' => 28],
-            ['code' => 'CN', 'iso' => 'cn', 'country' => 'China', 'region' => 'East Asia', 'city' => 'Shanghai / East China Sea', 'lat' => 31.230, 'lng' => 115.000, 'temp' => 19.8, 'condition' => 'Overcast High', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 68, 'wind' => 22.0, 'precipitation' => 0.5, 'risk' => 'Medium Risk', 'risk_score' => 48],
-            ['code' => 'JP', 'iso' => 'jp', 'country' => 'Japan', 'region' => 'East Asia', 'city' => 'Tokyo / Pacific Coast', 'lat' => 36.204, 'lng' => 138.252, 'temp' => 17.2, 'condition' => 'Cool Coastal Sun', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 58, 'wind' => 14.2, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
-            ['code' => 'KR', 'iso' => 'kr', 'country' => 'South Korea', 'region' => 'East Asia', 'city' => 'Busan / Korea Strait', 'lat' => 36.000, 'lng' => 128.000, 'temp' => 16.5, 'condition' => 'Strong Gusts', 'icon' => 'wind', 'icon_emoji' => '💨', 'humidity' => 62, 'wind' => 28.5, 'precipitation' => 0.0, 'risk' => 'Medium Risk', 'risk_score' => 42],
+            // Eropa Selatan & Balkan
+            ['code' => 'AL', 'iso' => 'al', 'country' => 'Albania', 'region' => 'Europe', 'city' => 'Port of Durrës / Adriatic Coast', 'lat' => 41.153, 'lng' => 20.168, 'temp' => 17.8, 'condition' => 'Sunny Adriatic Sea Breeze', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 59, 'wind' => 13.5, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 16],
+            ['code' => 'ES', 'iso' => 'es', 'country' => 'Spain', 'region' => 'Europe', 'city' => 'Port of Valencia / Balearic Sea', 'lat' => 40.463, 'lng' => -3.749, 'temp' => 18.2, 'condition' => 'Warm Mediterranean', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 56, 'wind' => 14.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 15],
+            ['code' => 'IT', 'iso' => 'it', 'country' => 'Italy', 'region' => 'Europe', 'city' => 'Port of Genoa / Ligurian Coast', 'lat' => 41.871, 'lng' => 12.567, 'temp' => 17.5, 'condition' => 'Calm Waters', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 62, 'wind' => 12.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 16],
+            ['code' => 'GR', 'iso' => 'gr', 'country' => 'Greece', 'region' => 'Europe', 'city' => 'Port of Piraeus / Aegean Sea', 'lat' => 39.074, 'lng' => 21.824, 'temp' => 18.9, 'condition' => 'Sunny Archipelago', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 54, 'wind' => 15.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 15],
+            ['code' => 'TR', 'iso' => 'tr', 'country' => 'Turkey', 'region' => 'Europe/Asia', 'city' => 'Port of Ambarli / Bosphorus', 'lat' => 38.963, 'lng' => 35.243, 'temp' => 15.3, 'condition' => 'Clear Straits', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 64, 'wind' => 18.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
+            ['code' => 'RU', 'iso' => 'ru', 'country' => 'Russia', 'region' => 'Europe', 'city' => 'Moscow / Inland Logistic Basin', 'lat' => 55.755, 'lng' => 42.000, 'temp' => -5.0, 'condition' => 'Freezing Snow', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 85, 'wind' => 26.0, 'precipitation' => 4.5, 'risk' => 'High Risk / Storm', 'risk_score' => 78],
             ['code' => 'RU_E', 'iso' => 'ru', 'country' => 'Russia (Far East)', 'region' => 'Asia', 'city' => 'Vladivostok / Sea of Japan', 'lat' => 45.000, 'lng' => 133.000, 'temp' => -0.5, 'condition' => 'Icy Coastal Wind', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 72, 'wind' => 32.0, 'precipitation' => 1.2, 'risk' => 'Medium Risk', 'risk_score' => 45],
 
-            // Asia Tenggara (ASEAN)
-            ['code' => 'ID', 'iso' => 'id', 'country' => 'Indonesia', 'region' => 'Asia Tenggara', 'city' => 'Jakarta / Selat Sunda', 'lat' => -2.500, 'lng' => 118.000, 'temp' => 31.5, 'condition' => 'Partly Cloudy', 'icon' => 'sun', 'icon_emoji' => '⛅', 'humidity' => 76, 'wind' => 13.5, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 24],
-            ['code' => 'SG', 'iso' => 'sg', 'country' => 'Singapore', 'region' => 'Asia Tenggara', 'city' => 'Singapore / Strait', 'lat' => 1.352, 'lng' => 103.819, 'temp' => 30.0, 'condition' => 'Tropical Showers', 'icon' => 'cloud-rain', 'icon_emoji' => '🌧️', 'humidity' => 84, 'wind' => 16.0, 'precipitation' => 2.4, 'risk' => 'Medium Risk', 'risk_score' => 45],
-            ['code' => 'TH', 'iso' => 'th', 'country' => 'Thailand', 'region' => 'Asia Tenggara', 'city' => 'Bangkok / Gulf of Siam', 'lat' => 15.000, 'lng' => 101.000, 'temp' => 32.2, 'condition' => 'Sunny Hazy', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 70, 'wind' => 12.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 20],
-            ['code' => 'PH', 'iso' => 'ph', 'country' => 'Philippines', 'region' => 'Asia Tenggara', 'city' => 'Manila / Pacific Rim', 'lat' => 13.000, 'lng' => 122.000, 'temp' => 30.5, 'condition' => 'Warm Tropical', 'icon' => 'sun', 'icon_emoji' => '⛅', 'humidity' => 77, 'wind' => 14.0, 'precipitation' => 0.6, 'risk' => 'Low Risk', 'risk_score' => 24],
+            // Amerika Utara
+            ['code' => 'US', 'iso' => 'us', 'country' => 'United States', 'region' => 'North America', 'city' => 'Port of LA & Long Beach', 'lat' => 37.090, 'lng' => -95.712, 'temp' => 19.8, 'condition' => 'Clear Sky', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 52, 'wind' => 14.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 16],
+            ['code' => 'US_NW', 'iso' => 'us', 'country' => 'United States (Northwest)', 'region' => 'North America', 'city' => 'Seattle / Puget Sound', 'lat' => 47.606, 'lng' => -122.332, 'temp' => 10.7, 'condition' => 'Pacific Showers', 'icon' => 'cloud-rain', 'icon_emoji' => '🌧️', 'humidity' => 82, 'wind' => 18.0, 'precipitation' => 3.5, 'risk' => 'Low Risk', 'risk_score' => 28],
+            ['code' => 'US_HI', 'iso' => 'us', 'country' => 'United States (Hawaii)', 'region' => 'Pacific', 'city' => 'Honolulu / Pacific Crossroads', 'lat' => 21.306, 'lng' => -157.858, 'temp' => 26.8, 'condition' => 'Trade Winds', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 62, 'wind' => 20.0, 'precipitation' => 0.5, 'risk' => 'Low Risk', 'risk_score' => 15],
+            ['code' => 'CA', 'iso' => 'ca', 'country' => 'Canada', 'region' => 'North America', 'city' => 'Port of Vancouver / Pacific Coast', 'lat' => 56.130, 'lng' => -106.346, 'temp' => -1.8, 'condition' => 'Cold Mist', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 81, 'wind' => 16.0, 'precipitation' => 1.0, 'risk' => 'Medium Risk', 'risk_score' => 32],
+            ['code' => 'MX', 'iso' => 'mx', 'country' => 'Mexico', 'region' => 'North America', 'city' => 'Port of Manzanillo / Pacific Rim', 'lat' => 23.634, 'lng' => -102.552, 'temp' => 24.5, 'condition' => 'Warm Breeze', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 58, 'wind' => 14.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
 
-            // Oseania & Kutub Selatan
-            ['code' => 'AU', 'iso' => 'au', 'country' => 'Australia', 'region' => 'Oceania', 'city' => 'Sydney / Tasman Sea', 'lat' => -25.274, 'lng' => 133.775, 'temp' => 22.4, 'condition' => 'Ocean Breeze', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 64, 'wind' => 16.5, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 19],
-            ['code' => 'NZ', 'iso' => 'nz', 'country' => 'New Zealand', 'region' => 'Oceania', 'city' => 'Auckland / Pacific', 'lat' => -40.900, 'lng' => 174.885, 'temp' => 17.5, 'condition' => 'Island Breeze', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 68, 'wind' => 19.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
-            ['code' => 'AQ', 'iso' => 'aq', 'country' => 'Antarctica', 'region' => 'Antarctica', 'city' => 'McMurdo Station / Ross Sea', 'lat' => -77.846, 'lng' => 166.668, 'temp' => -29.0, 'condition' => 'Polar Whiteout', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 84, 'wind' => 52.0, 'precipitation' => 15.0, 'risk' => 'High Risk / Storm', 'risk_score' => 95],
+            // Karibia & Amerika Tengah
+            ['code' => 'PA', 'iso' => 'pa', 'country' => 'Panama', 'region' => 'Central America', 'city' => 'Port of Balboa / Panama Canal', 'lat' => 8.537, 'lng' => -80.782, 'temp' => 29.8, 'condition' => 'Monsoon Rainstorm', 'icon' => 'cloud-rain', 'icon_emoji' => '⛈️', 'humidity' => 91, 'wind' => 24.0, 'precipitation' => 14.2, 'risk' => 'High Risk / Storm', 'risk_score' => 84],
+            ['code' => 'AI', 'iso' => 'ai', 'country' => 'Anguilla', 'region' => 'Caribbean', 'city' => 'Blowing Point Port', 'lat' => 18.220, 'lng' => -63.068, 'temp' => 28.5, 'condition' => 'Sunny Sea Breeze', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 68, 'wind' => 16.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
+
+            // Amerika Selatan
+            ['code' => 'BR', 'iso' => 'br', 'country' => 'Brazil', 'region' => 'South America', 'city' => 'Port of Santos / South Atlantic', 'lat' => -14.235, 'lng' => -51.925, 'temp' => 26.5, 'condition' => 'Humid Overcast', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 78, 'wind' => 15.0, 'precipitation' => 0.2, 'risk' => 'Low Risk', 'risk_score' => 23],
+            ['code' => 'AR', 'iso' => 'ar', 'country' => 'Argentina', 'region' => 'South America', 'city' => 'Port of Buenos Aires / Rio de la Plata', 'lat' => -38.416, 'lng' => -63.616, 'temp' => 22.8, 'condition' => 'Sunny Temperate', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 58, 'wind' => 18.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 17],
+            ['code' => 'AR_S', 'iso' => 'ar', 'country' => 'Argentina (Patagonia)', 'region' => 'South America', 'city' => 'Tierra del Fuego / Drake Passage', 'lat' => -54.000, 'lng' => -68.300, 'temp' => 2.3, 'condition' => 'Sleet & Gales', 'icon' => 'snow', 'icon_emoji' => '🌨️', 'humidity' => 89, 'wind' => 44.0, 'precipitation' => 7.8, 'risk' => 'High Risk / Storm', 'risk_score' => 79],
+            ['code' => 'CL', 'iso' => 'cl', 'country' => 'Chile', 'region' => 'South America', 'city' => 'Port of San Antonio / Valparaiso', 'lat' => -35.675, 'lng' => -71.542, 'temp' => 19.6, 'condition' => 'Mild & Clear', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 60, 'wind' => 16.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
+
+            // Timur Tengah & Afrika
+            ['code' => 'EG', 'iso' => 'eg', 'country' => 'Egypt', 'region' => 'Africa', 'city' => 'Port Said (Suez Canal Transit)', 'lat' => 26.820, 'lng' => 30.802, 'temp' => 24.6, 'condition' => 'Suez Sea Breeze', 'icon' => 'wind', 'icon_emoji' => '💨', 'humidity' => 60, 'wind' => 24.0, 'precipitation' => 0.0, 'risk' => 'Medium Risk', 'risk_score' => 38],
+            ['code' => 'DZ', 'iso' => 'dz', 'country' => 'Algeria', 'region' => 'Africa', 'city' => 'Port of Algiers / Mediterranean', 'lat' => 28.033, 'lng' => 1.659, 'temp' => 21.4, 'condition' => 'Warm Mediterranean', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 58, 'wind' => 16.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 20],
+            ['code' => 'AO', 'iso' => 'ao', 'country' => 'Angola', 'region' => 'Africa', 'city' => 'Port of Luanda / South Atlantic', 'lat' => -11.202, 'lng' => 17.873, 'temp' => 27.8, 'condition' => 'Tropical Warmth', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 75, 'wind' => 13.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 22],
+            ['code' => 'SA', 'iso' => 'sa', 'country' => 'Saudi Arabia', 'region' => 'Middle East', 'city' => 'Jeddah Islamic Port / Red Sea', 'lat' => 23.885, 'lng' => 45.079, 'temp' => 31.8, 'condition' => 'Hot Desert Sun', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 42, 'wind' => 16.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 22],
+            ['code' => 'AE', 'iso' => 'ae', 'country' => 'United Arab Emirates', 'region' => 'Middle East', 'city' => 'Jebel Ali Port (Dubai)', 'lat' => 23.424, 'lng' => 53.847, 'temp' => 33.1, 'condition' => 'Clear & Dry', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 45, 'wind' => 18.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 25],
+            ['code' => 'QA', 'iso' => 'qa', 'country' => 'Qatar', 'region' => 'Middle East', 'city' => 'Hamad Port (Doha)', 'lat' => 25.354, 'lng' => 51.183, 'temp' => 32.5, 'condition' => 'Sunny & Arid', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 48, 'wind' => 17.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 24],
+            ['code' => 'AF', 'iso' => 'af', 'country' => 'Afghanistan', 'region' => 'Central Asia', 'city' => 'Kabul Dry Port', 'lat' => 33.939, 'lng' => 67.710, 'temp' => 14.5, 'condition' => 'Dry Mountain Sun', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 38, 'wind' => 12.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 20],
+            ['code' => 'SC', 'iso' => 'sc', 'country' => 'Seychelles', 'region' => 'Africa', 'city' => 'Port Victoria / Mahé Island', 'lat' => -4.679, 'lng' => 55.492, 'temp' => 27.6, 'condition' => 'Partly Cloudy', 'icon' => 'sun', 'icon_emoji' => '⛅', 'humidity' => 74, 'wind' => 14.8, 'precipitation' => 0.0, 'risk' => 'Medium Risk', 'risk_score' => 31],
+            ['code' => 'ZA', 'iso' => 'za', 'country' => 'South Africa', 'region' => 'Africa', 'city' => 'Port of Durban / Good Hope', 'lat' => -30.559, 'lng' => 22.937, 'temp' => 21.0, 'condition' => 'Cape Gales', 'icon' => 'wind', 'icon_emoji' => '💨', 'humidity' => 68, 'wind' => 28.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 25],
+
+            // Asia Selatan & Timur
+            ['code' => 'IN', 'iso' => 'in', 'country' => 'India', 'region' => 'South Asia', 'city' => 'Jawaharlal Nehru Port (JNPT Mumbai)', 'lat' => 20.593, 'lng' => 78.962, 'temp' => 28.5, 'condition' => 'Warm Coastline', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 68, 'wind' => 13.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 24],
+            ['code' => 'CN', 'iso' => 'cn', 'country' => 'China', 'region' => 'East Asia', 'city' => 'Port of Shanghai / East China Sea', 'lat' => 35.861, 'lng' => 104.195, 'temp' => 19.8, 'condition' => 'Overcast High', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 68, 'wind' => 22.0, 'precipitation' => 0.5, 'risk' => 'Medium Risk', 'risk_score' => 48],
+            ['code' => 'HK', 'iso' => 'hk', 'country' => 'Hong Kong', 'region' => 'East Asia', 'city' => 'Port of Hong Kong / Victoria Harbor', 'lat' => 22.319, 'lng' => 114.169, 'temp' => 24.2, 'condition' => 'Humid Maritime Breeze', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 76, 'wind' => 18.0, 'precipitation' => 0.2, 'risk' => 'Low Risk', 'risk_score' => 22],
+            ['code' => 'JP', 'iso' => 'jp', 'country' => 'Japan', 'region' => 'East Asia', 'city' => 'Port of Tokyo / Yokohama', 'lat' => 36.204, 'lng' => 138.252, 'temp' => 17.2, 'condition' => 'Cool Coastal Sun', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 58, 'wind' => 14.2, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
+            ['code' => 'KR', 'iso' => 'kr', 'country' => 'South Korea', 'region' => 'East Asia', 'city' => 'Port of Busan / Korea Strait', 'lat' => 35.907, 'lng' => 127.766, 'temp' => 16.5, 'condition' => 'Strong Gusts', 'icon' => 'wind', 'icon_emoji' => '💨', 'humidity' => 62, 'wind' => 28.5, 'precipitation' => 0.0, 'risk' => 'Medium Risk', 'risk_score' => 42],
+
+            // Asia Tenggara (ASEAN)
+            ['code' => 'ID', 'iso' => 'id', 'country' => 'Indonesia', 'region' => 'Asia Tenggara', 'city' => 'Pelabuhan Tanjung Priok / Jawa', 'lat' => -0.789, 'lng' => 113.921, 'temp' => 31.5, 'condition' => 'Partly Cloudy', 'icon' => 'sun', 'icon_emoji' => '⛅', 'humidity' => 76, 'wind' => 13.5, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 24],
+            ['code' => 'SG', 'iso' => 'sg', 'country' => 'Singapore', 'region' => 'Asia Tenggara', 'city' => 'Port of Singapore (Tuas & PSA)', 'lat' => 1.352, 'lng' => 103.819, 'temp' => 30.0, 'condition' => 'Tropical Showers', 'icon' => 'cloud-rain', 'icon_emoji' => '🌧️', 'humidity' => 84, 'wind' => 16.0, 'precipitation' => 2.4, 'risk' => 'Medium Risk', 'risk_score' => 45],
+            ['code' => 'MY', 'iso' => 'my', 'country' => 'Malaysia', 'region' => 'Asia Tenggara', 'city' => 'Port Klang / Malacca Strait', 'lat' => 4.210, 'lng' => 101.975, 'temp' => 30.8, 'condition' => 'Tropical Warmth', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 79, 'wind' => 14.0, 'precipitation' => 0.6, 'risk' => 'Low Risk', 'risk_score' => 23],
+            ['code' => 'TH', 'iso' => 'th', 'country' => 'Thailand', 'region' => 'Asia Tenggara', 'city' => 'Laem Chabang Port / Gulf of Siam', 'lat' => 15.870, 'lng' => 100.992, 'temp' => 32.2, 'condition' => 'Sunny Hazy', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 70, 'wind' => 12.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 20],
+            ['code' => 'PH', 'iso' => 'ph', 'country' => 'Philippines', 'region' => 'Asia Tenggara', 'city' => 'Port of Manila / Pacific Rim', 'lat' => 12.879, 'lng' => 121.774, 'temp' => 30.5, 'condition' => 'Warm Tropical', 'icon' => 'sun', 'icon_emoji' => '⛅', 'humidity' => 77, 'wind' => 14.0, 'precipitation' => 0.6, 'risk' => 'Low Risk', 'risk_score' => 24],
+            ['code' => 'VN', 'iso' => 'vn', 'country' => 'Vietnam', 'region' => 'Asia Tenggara', 'city' => 'Saigon Port (Cat Lai)', 'lat' => 14.058, 'lng' => 108.277, 'temp' => 29.8, 'condition' => 'Coastal Sunshine', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 75, 'wind' => 15.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 22],
+
+            // Oseania, Pasifik & Kutub Selatan
+            ['code' => 'AU', 'iso' => 'au', 'country' => 'Australia', 'region' => 'Oceania', 'city' => 'Port Botany (Sydney) / Tasman Sea', 'lat' => -25.274, 'lng' => 133.775, 'temp' => 22.4, 'condition' => 'Ocean Breeze', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 64, 'wind' => 16.5, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 19],
+            ['code' => 'NZ', 'iso' => 'nz', 'country' => 'New Zealand', 'region' => 'Oceania', 'city' => 'Port of Tauranga / Pacific Ocean', 'lat' => -40.900, 'lng' => 174.885, 'temp' => 17.5, 'condition' => 'Island Breeze', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 68, 'wind' => 19.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
+            ['code' => 'AS', 'iso' => 'as', 'country' => 'American Samoa', 'region' => 'Oceania', 'city' => 'Port of Pago Pago / South Pacific', 'lat' => -14.271, 'lng' => -170.132, 'temp' => 28.8, 'condition' => 'Warm Tropical Sea', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 78, 'wind' => 15.5, 'precipitation' => 0.4, 'risk' => 'Low Risk', 'risk_score' => 20],
+            ['code' => 'AQ', 'iso' => 'aq', 'country' => 'Antarctica', 'region' => 'Antarctica', 'city' => 'McMurdo Logistics Station / Ross Sea', 'lat' => -75.250, 'lng' => -0.071, 'temp' => -29.0, 'condition' => 'Polar Whiteout', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 84, 'wind' => 52.0, 'precipitation' => 15.0, 'risk' => 'High Risk / Storm', 'risk_score' => 95],
         ];
     }
 

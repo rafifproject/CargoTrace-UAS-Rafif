@@ -223,6 +223,10 @@
                     class="map-mode-btn active px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 flex items-center gap-1.5">
                     🧭 Pemantau CargoTrace
                 </button>
+                <button onclick="switchMapMode('route')" id="btn-route"
+                    class="map-mode-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 flex items-center gap-1.5">
+                    📍 Route Tracker
+                </button>
                 <button onclick="switchMapMode('weather')" id="btn-weather"
                     class="map-mode-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 flex items-center gap-1.5">
                     ⛅ Cuaca Langsung
@@ -246,6 +250,24 @@
                 <div id="map-mode-banner" class="px-4 py-2 text-xs font-semibold text-white flex items-center gap-2 transition-all duration-300" style="background:linear-gradient(90deg,#0A1128,#0e3a6e);">
                     <span id="banner-icon">🧭</span>
                     <span id="banner-text">Mode: Pemantau CargoTrace — Kargo Aktif & Jalur Pengiriman</span>
+                </div>
+                <!-- Route Tracker Quick Selector Bar (Visible only in Route Tracker mode) -->
+                <div id="route-selector-bar" class="hidden px-4 py-2 bg-sky-950 text-xs text-white flex items-center gap-2 border-b border-sky-800/60 overflow-x-auto">
+                    <span class="text-[11px] font-bold text-sky-300 flex-shrink-0 flex items-center gap-1">
+                        📍 Simulasi Rute:
+                    </span>
+                    <button onclick="focusGlobalRoute(0)" class="px-2.5 py-1 rounded-md bg-sky-800/80 hover:bg-sky-700 text-[11px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1">
+                        🌏 Trans-Pacific (Shanghai ➔ LA)
+                    </button>
+                    <button onclick="focusGlobalRoute(1)" class="px-2.5 py-1 rounded-md bg-sky-800/80 hover:bg-sky-700 text-[11px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1">
+                        🇪🇺 Asia-Europe (Singapore ➔ Rotterdam)
+                    </button>
+                    <button onclick="focusGlobalRoute(2)" class="px-2.5 py-1 rounded-md bg-sky-800/80 hover:bg-sky-700 text-[11px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1">
+                        🇦🇺 Nusantara-Oceania (Jakarta ➔ Sydney)
+                    </button>
+                    <button onclick="focusGlobalRoute(3)" class="px-2.5 py-1 rounded-md bg-sky-800/80 hover:bg-sky-700 text-[11px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1">
+                        🌊 Trans-Atlantic (Rotterdam ➔ New York)
+                    </button>
                 </div>
                 <!-- Leaflet Map -->
                 <div id="dashboard-map" class="flex-1 z-10" style="min-height:460px"></div>
@@ -466,20 +488,85 @@
         const weatherData  = {!! json_encode($weatherHubs) !!};
         const countriesData = {!! json_encode($countriesList) !!};
 
-        // Route URLs helper - 100% Safe across localhost:8000, virtual hosts (cargotrace.test), and subfolders (/CargoTrace/public/)
-        function getAppUrl(path) {
-            const pathname = window.location.pathname;
-            const publicIdx = pathname.indexOf('/public');
-            let basePath = '';
-            if (publicIdx !== -1) {
-                basePath = pathname.substring(0, publicIdx + 7);
+        // Guaranteed Absolute Route URLs direct from Laravel Blade (No 404s!)
+        const WEATHER_PAGE_URL = "{{ route('admin.intelligence.weather') }}";
+        const PORTS_PAGE_URL   = "{{ route('admin.intelligence.ports') }}";
+
+        // Global Route Tracker Preset Highway Routes
+        const globalRoutes = [
+            {
+                id: 'ROUTE-TP-01',
+                name: 'Trans-Pacific Express Corridor',
+                vessel: 'MV Pacific Pioneer (IMO 9812401)',
+                carrier: 'COSCO / Evergreen Marine',
+                origin: { name: 'Port of Shanghai (Yangshan)', country: 'China', iso: 'cn', lat: 31.23, lng: 121.47, departure: '06 Nov 2026, 08:30 UTC' },
+                waypoints: [
+                    { name: 'East China Sea Exit Gateway', note: 'Arus laut stabil 1.4 kts', lat: 29.80, lng: 127.50, weather: '22°C ⛅ Angin 14 kts' },
+                    { name: 'Tokyo Bay Outer Waypoint', note: 'Jalur padat kontainer Pasifik barat', lat: 34.60, lng: 140.80, weather: '17°C ☀️ Angin 16 kts' },
+                    { name: 'Mid-Pacific Ocean Crossing Hub', note: 'Deep ocean open waters transit zone', lat: 35.20, lng: -170.00, weather: '14°C 🌊 Gelombang 2.1m' }
+                ],
+                destination: { name: 'Port of Los Angeles (Pier 400)', country: 'United States', iso: 'us', lat: 33.74, lng: -118.26, eta: '18 Nov 2026, 14:00 UTC' },
+                distanceNM: '5,740 NM',
+                distanceKm: '10,630 km',
+                duration: '12 Hari',
+                status: 'UNDERWAY - ON SCHEDULE'
+            },
+            {
+                id: 'ROUTE-AE-02',
+                name: 'Asia-Europe Suez Megaship Corridor',
+                vessel: 'CMA CGM Palais Royal (IMO 9839181)',
+                carrier: 'Ocean Alliance / CMA CGM',
+                origin: { name: 'Port of Singapore (Tuas Terminal)', country: 'Singapore', iso: 'sg', lat: 1.26, lng: 103.82, departure: '04 Nov 2026, 12:00 UTC' },
+                waypoints: [
+                    { name: 'Selat Malaka Northern Traffic TSS', note: 'Zona pemisahan lalu lintas (TSS)', lat: 4.80, lng: 99.20, weather: '30°C 🌧️ Hujan Tropis' },
+                    { name: 'Sri Lanka South Waypoint Station', note: 'Indian Ocean deep passage', lat: 5.60, lng: 80.60, weather: '29°C ⛅ Angin 15 kts' },
+                    { name: 'Bab-el-Mandeb Strait Escort Point', note: 'Navigasi aman Teluk Aden', lat: 12.60, lng: 43.30, weather: '32°C ☀️ Jarak pandang baik' },
+                    { name: 'Suez Canal Convoy Entry Lock', note: 'Transit konvoi Terusan Suez terjadwal', lat: 28.50, lng: 33.30, weather: '25°C 💨 Angin 22 kts' }
+                ],
+                destination: { name: 'Port of Rotterdam (Maasvlakte 2)', country: 'Belanda', iso: 'nl', lat: 51.92, lng: 4.48, eta: '22 Nov 2026, 06:00 UTC' },
+                distanceNM: '8,350 NM',
+                distanceKm: '15,464 km',
+                duration: '18 Hari',
+                status: 'IN TRANSIT - SUEZ APPROACH'
+            },
+            {
+                id: 'ROUTE-NO-03',
+                name: 'Nusantara-Oceania Trade Highway',
+                vessel: 'KM Meratus Kalabahi (IMO 9452812)',
+                carrier: 'Meratus Line / ANL Maritime',
+                origin: { name: 'Pelabuhan Tanjung Priok (Jakarta)', country: 'Indonesia', iso: 'id', lat: -6.10, lng: 106.88, departure: '07 Nov 2026, 21:00 WIB' },
+                waypoints: [
+                    { name: 'Selat Lombok ALKI II Passage', note: 'Arus ALKI II 2.8 kts arah selatan', lat: -8.70, lng: 115.80, weather: '29°C ⛅ Laut tenang' },
+                    { name: 'Northwest Australia Offshore Hub', note: 'Jalur kargo benua selatan', lat: -18.50, lng: 118.00, weather: '26°C ☀️ Angin pasat' },
+                    { name: 'Great Australian Bight Waypoint', note: 'Perairan selatan benua Australia', lat: -36.00, lng: 130.00, weather: '18°C 🌊 Gelombang 1.8m' }
+                ],
+                destination: { name: 'Port Botany (Sydney)', country: 'Australia', iso: 'au', lat: -33.97, lng: 151.22, eta: '15 Nov 2026, 10:00 AEST' },
+                distanceNM: '3,620 NM',
+                distanceKm: '6,704 km',
+                duration: '8 Hari',
+                status: 'ON TRACK - ALKI TRANSIT'
+            },
+            {
+                id: 'ROUTE-TA-04',
+                name: 'Trans-Atlantic Northern Highway',
+                vessel: 'Atlantic Star (IMO 9670573)',
+                carrier: 'ACL / Grimaldi Lines',
+                origin: { name: 'Port of Rotterdam', country: 'Belanda', iso: 'nl', lat: 51.92, lng: 4.48, departure: '08 Nov 2026, 16:00 UTC' },
+                waypoints: [
+                    { name: 'English Channel Western Exit', note: 'Lalu lintas kapal kargo padat', lat: 49.80, lng: -3.50, weather: '12°C 🌧️ Angin 26 kts' },
+                    { name: 'North Atlantic Ocean Station #4', note: 'Mid-Atlantic crossing corridor', lat: 44.50, lng: -40.00, weather: '9°C ⛅ Ombak 3.0m' }
+                ],
+                destination: { name: 'Port of New York & New Jersey', country: 'United States', iso: 'us', lat: 40.68, lng: -74.04, eta: '15 Nov 2026, 08:00 EST' },
+                distanceNM: '3,380 NM',
+                distanceKm: '6,260 km',
+                duration: '7 Hari',
+                status: 'HIGH-SEAS CRUISE (20 KTS)'
             }
-            const cleanPath = path.startsWith('/') ? path : '/' + path;
-            return window.location.origin + basePath + cleanPath;
-        }
+        ];
 
         // Layer groups for each mode
         const cargoLayerGroup   = L.layerGroup();
+        const routeLayerGroup   = L.layerGroup();
         const weatherLayerGroup = L.layerGroup();
         const portsLayerGroup   = L.layerGroup();
 
@@ -491,7 +578,8 @@
                 btn.classList.remove(
                     'bg-cyan-600','text-white','border-cyan-600',
                     'bg-amber-500','border-amber-500',
-                    'bg-purple-600','border-purple-600'
+                    'bg-purple-600','border-purple-600',
+                    'bg-sky-600','border-sky-600'
                 );
                 btn.classList.add('border-slate-300','text-slate-500','bg-white');
                 btn.style.backgroundColor = '';
@@ -500,6 +588,7 @@
             });
             const activeMap = {
                 'cargo':   { id: 'btn-cargo',   bg:'#0e6ba8', border:'#0e6ba8' },
+                'route':   { id: 'btn-route',   bg:'#0284c7', border:'#0284c7' },
                 'weather': { id: 'btn-weather', bg:'#d97706', border:'#d97706' },
                 'ports':   { id: 'btn-ports',   bg:'#7c3aed', border:'#7c3aed' }
             };
@@ -515,14 +604,24 @@
         // ── BANNER UPDATE ───────────────────────────────────────
         const banners = {
             cargo:   { icon:'🧭', text:'Mode: Pemantau CargoTrace — Kargo Aktif & Jalur Pengiriman Global', bg:'linear-gradient(90deg,#0A1128,#0e3a6e)' },
-            weather: { icon:'⛅', text:'Mode: Cuaca Langsung — 75+ Titik Maritim Dunia & Evaluasi Risiko Badai', bg:'linear-gradient(90deg,#431407,#92400e)' },
-            ports:   { icon:'⚓', text:'Mode: Sebaran Pelabuhan — Data Pelabuhan Maritim Dunia (ArcGIS Live WPI FeatureServer)', bg:'linear-gradient(90deg,#2e1065,#5b21b6)' }
+            route:   { icon:'📍', text:'Mode: Route Tracker — Pelacakan Rute Maritim Global Interaktif & Titik Waypoint Antar Benua', bg:'linear-gradient(90deg,#0c4a6e,#0284c7)' },
+            weather: { icon:'⛅', text:'Mode: Cuaca Langsung — 60+ Titik Cuaca Maritim Terkalibrasi & Evaluasi Risiko Badai', bg:'linear-gradient(90deg,#431407,#92400e)' },
+            ports:   { icon:'⚓', text:'Mode: Sebaran Pelabuhan — Data Pelabuhan Maritim Dunia Merata Global (ArcGIS Live WPI FeatureServer)', bg:'linear-gradient(90deg,#2e1065,#5b21b6)' }
         };
         function updateBanner(mode) {
             const b = banners[mode];
             document.getElementById('banner-icon').textContent = b.icon;
             document.getElementById('banner-text').textContent = b.text;
             document.getElementById('map-mode-banner').style.background = b.bg;
+
+            const routeBar = document.getElementById('route-selector-bar');
+            if (routeBar) {
+                if (mode === 'route') {
+                    routeBar.classList.remove('hidden');
+                } else {
+                    routeBar.classList.add('hidden');
+                }
+            }
         }
 
         // ── LEGEND UPDATE ───────────────────────────────────────
@@ -530,6 +629,10 @@
             cargo:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Asal</span>
                       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>Tujuan</span>
                       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span>Posisi Terkini</span>`,
+            route:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block border border-white"></span>Pelabuhan Asal</span>
+                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block border border-white"></span>Waypoint Transit</span>
+                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block border border-white"></span>Pelabuhan Tujuan</span>
+                      <span class="flex items-center gap-1.5 text-slate-400">Klik tiap titik untuk rincian rute & estimasi navigasi</span>`,
             weather: `<span class="flex items-center gap-1.5"><span class="w-3.5 h-2.5 rounded bg-blue-600 inline-block border border-white"></span>Dingin (&lt;15°C)</span>
                       <span class="flex items-center gap-1.5"><span class="w-3.5 h-2.5 rounded bg-emerald-600 inline-block border border-white"></span>Sejuk (15–25°C)</span>
                       <span class="flex items-center gap-1.5"><span class="w-3.5 h-2.5 rounded bg-orange-600 inline-block border border-white"></span>Hangat (&gt;25°C)</span>
@@ -618,6 +721,142 @@
             return latLngs;
         }
 
+        // ── BUILD ROUTE TRACKER LAYER (Global Maritime Highways & Intercontinental Checkpoints) ──
+        let routePolylines = [];
+        function buildRouteLayer() {
+            routeLayerGroup.clearLayers();
+            routePolylines = [];
+
+            globalRoutes.forEach((r, rIdx) => {
+                const points = [
+                    [r.origin.lat, r.origin.lng],
+                    ...r.waypoints.map(wp => [wp.lat, wp.lng]),
+                    [r.destination.lat, r.destination.lng]
+                ];
+
+                // Route Polyline with glowing dashed line
+                const polyline = L.polyline(points, {
+                    color: '#0284c7',
+                    weight: 3.5,
+                    dashArray: '8, 8',
+                    opacity: 0.85
+                }).bindTooltip(`<b>${r.name}</b><br><span style="font-size:11px">${r.origin.name} ➔ ${r.destination.name}</span>`, { sticky: true });
+                polyline.addTo(routeLayerGroup);
+                routePolylines.push(polyline);
+
+                // 1. Origin Marker (🟢 Green Port Anchor)
+                const originIcon = L.divIcon({
+                    className: 'route-tracker-marker',
+                    html: `
+                        <div style="background:#10B981; color:#ffffff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; box-shadow:0 0 12px rgba(16,185,129,0.8); border:2.5px solid #ffffff; cursor:pointer;">
+                            ⚓
+                        </div>
+                    `,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15],
+                    popupAnchor: [0, -16]
+                });
+
+                const originMarker = L.marker([r.origin.lat, r.origin.lng], { icon: originIcon });
+                originMarker.bindPopup(`
+                    <div style="min-width:260px; font-family: Outfit, sans-serif; padding:4px 2px;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                            <span style="background:#10B981; color:#fff; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; letter-spacing:0.5px;">PELABUHAN ASAL (ORIGIN)</span>
+                            <span style="font-size:11px; color:#64748b; font-weight:600;">${r.id}</span>
+                        </div>
+                        <div style="font-weight:800; font-size:15px; color:#0f172a; line-height:1.2;">${r.origin.name}</div>
+                        <div style="font-size:12px; color:#475569; margin-top:2px;">Negara: <b>${r.origin.country}</b></div>
+                        <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:7px 10px; margin-top:10px; font-size:11px; line-height:1.5;">
+                            🚢 Kapal Kargo: <b>${r.vessel}</b><br>
+                            🏢 Operator: <b>${r.carrier}</b><br>
+                            🕒 Waktu Berangkat: <b>${r.origin.departure}</b>
+                        </div>
+                        <div style="margin-top:10px; padding-top:8px; border-top:1px solid #e2e8f0; font-size:11px; color:#0284c7; font-weight:700;">
+                            ➔ Rute Menuju: ${r.destination.name} (${r.distanceNM})
+                        </div>
+                    </div>
+                `, { maxWidth: 300 }).addTo(routeLayerGroup);
+
+                // 2. Waypoint Markers (🔵 Blue Pulsar Maritime Checkpoints)
+                r.waypoints.forEach((wp, wpIdx) => {
+                    const wpIcon = L.divIcon({
+                        className: 'route-tracker-marker',
+                        html: `
+                            <div style="background:#0284c7; color:#ffffff; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; box-shadow:0 0 10px rgba(2,132,199,0.7); border:2px solid #ffffff; cursor:pointer;">
+                                #${wpIdx + 1}
+                            </div>
+                        `,
+                        iconSize: [26, 26],
+                        iconAnchor: [13, 13],
+                        popupAnchor: [0, -14]
+                    });
+
+                    const wpMarker = L.marker([wp.lat, wp.lng], { icon: wpIcon });
+                    wpMarker.bindPopup(`
+                        <div style="min-width:250px; font-family: Outfit, sans-serif; padding:4px 2px;">
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                                <span style="background:#0284C7; color:#fff; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; letter-spacing:0.5px;">WAYPOINT CHECKPOINT #${wpIdx + 1}</span>
+                            </div>
+                            <div style="font-weight:800; font-size:14px; color:#0f172a; line-height:1.2;">${wp.name}</div>
+                            <div style="font-size:11px; color:#64748b; margin-top:2px;">Koridor: <b>${r.name}</b></div>
+                            <div style="background:#F0F9FF; border:1px solid #BAE6FD; border-radius:8px; padding:7px 10px; margin-top:10px; font-size:11px; color:#0369A1; line-height:1.5;">
+                                🌊 Kondisi Arus: <b>${wp.note}</b><br>
+                                ⛅ Cuaca Perairan: <b>${wp.weather}</b>
+                            </div>
+                            <div style="margin-top:8px; font-size:11px; color:#64748b;">
+                                Koordinat: <b>${wp.lat.toFixed(3)}, ${wp.lng.toFixed(3)}</b>
+                            </div>
+                        </div>
+                    `, { maxWidth: 290 }).addTo(routeLayerGroup);
+                });
+
+                // 3. Destination Marker (🔴 Red Destination Flag)
+                const destIcon = L.divIcon({
+                    className: 'route-tracker-marker',
+                    html: `
+                        <div style="background:#F43F5E; color:#ffffff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; box-shadow:0 0 12px rgba(244,63,94,0.8); border:2.5px solid #ffffff; cursor:pointer;">
+                            🏁
+                        </div>
+                    `,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15],
+                    popupAnchor: [0, -16]
+                });
+
+                const destMarker = L.marker([r.destination.lat, r.destination.lng], { icon: destIcon });
+                destMarker.bindPopup(`
+                    <div style="min-width:260px; font-family: Outfit, sans-serif; padding:4px 2px;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                            <span style="background:#F43F5E; color:#fff; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; letter-spacing:0.5px;">PELABUHAN TUJUAN (DESTINATION)</span>
+                            <span style="font-size:11px; color:#64748b; font-weight:600;">Terminal Bongkar</span>
+                        </div>
+                        <div style="font-weight:800; font-size:15px; color:#0f172a; line-height:1.2;">${r.destination.name}</div>
+                        <div style="font-size:12px; color:#475569; margin-top:2px;">Negara: <b>${r.destination.country}</b></div>
+                        <div style="background:#FFF1F2; border:1px solid #FECDD3; border-radius:8px; padding:7px 10px; margin-top:10px; font-size:11px; color:#9F1239; line-height:1.5;">
+                            🏁 Estimasi Sandar (ETA): <b>${r.destination.eta}</b><br>
+                            📏 Total Jarak Pelayaran: <b>${r.distanceNM} (~${r.distanceKm})</b><br>
+                            ⏱️ Estimasi Waktu Tempuh: <b>${r.duration}</b>
+                        </div>
+                        <div style="margin-top:8px; font-size:11px; color:#059669; font-weight:700;">
+                            Status Navigasi: ${r.status}
+                        </div>
+                    </div>
+                `, { maxWidth: 300 }).addTo(routeLayerGroup);
+            });
+        }
+
+        // Quick Focus to one of the Preset Global Routes
+        function focusGlobalRoute(index) {
+            if (!globalRoutes[index]) return;
+            const r = globalRoutes[index];
+            const allCoords = [
+                [r.origin.lat, r.origin.lng],
+                ...r.waypoints.map(wp => [wp.lat, wp.lng]),
+                [r.destination.lat, r.destination.lng]
+            ];
+            map.fitBounds(L.latLngBounds(allCoords).pad(0.18), { duration: 1.2 });
+        }
+
         // ── BUILD WEATHER LAYER (Weather Pill Badges with Live Temp & Icon: Ref media_1794280421603_3a4f8e13.jpg) ──
         function buildWeatherLayer() {
             weatherLayerGroup.clearLayers();
@@ -644,9 +883,12 @@
                     popupAnchor: [0, -18]
                 });
 
-                const weatherDetailUrl = getAppUrl('admin/intelligence/weather') + '?country=' + encodeURIComponent(w.country);
+                const weatherDetailUrl = WEATHER_PAGE_URL + '?country=' + encodeURIComponent(w.country);
 
                 const marker = L.marker([w.lat, w.lng], { icon: weatherDivIcon });
+                marker.countryCode = (w.code || '').toUpperCase();
+                marker.countryName = (w.country || '').toLowerCase();
+
                 marker.bindPopup(`
                     <div style="min-width:240px; font-family: Outfit, sans-serif; padding:4px 2px;">
                         <!-- Country & Region Header with Flag -->
@@ -674,7 +916,7 @@
                             <span>${w.condition}</span>
                         </div>
 
-                        <!-- View Full Profile Button (Guaranteed No 404!) -->
+                        <!-- View Full Profile Button (Guaranteed Absolute Route, No 404!) -->
                         <a href="${weatherDetailUrl}" style="display:block; text-align:center; background:#EDE9FE; color:#7C3AED; font-weight:700; padding:9px 14px; border-radius:10px; text-decoration:none; font-size:12px; transition:all 0.2s; box-shadow:0 1px 3px rgba(124,58,237,0.15);">
                             View Full Profile
                         </a>
@@ -685,7 +927,7 @@
             });
         }
 
-        // ── BUILD PORTS LAYER (ArcGIS FeatureServer Live Ports Web) ────────
+        // ── BUILD PORTS LAYER (ArcGIS FeatureServer Live Ports Web Merata Global) ────────
         function buildPortsLayer() {
             portsLayerGroup.clearLayers();
             portsData.forEach(p => {
@@ -707,7 +949,7 @@
                         <div style="background:#F1F5F9; color:#334155; border:1px solid #E2E8F0; padding:7px 10px; border-radius:10px; font-weight:600; font-size:11px; margin-bottom:11px;">
                             📦 Kapasitas: <b>${p.capacity}</b>
                         </div>
-                        <a href="${getAppUrl('admin/intelligence/ports')}" style="display:block; text-align:center; background:#EDE9FE; color:#7C3AED; font-weight:700; padding:8px 12px; border-radius:10px; text-decoration:none; font-size:12px; box-shadow:0 1px 3px rgba(124,58,237,0.15);">
+                        <a href="${PORTS_PAGE_URL}" style="display:block; text-align:center; background:#EDE9FE; color:#7C3AED; font-weight:700; padding:8px 12px; border-radius:10px; text-decoration:none; font-size:12px; box-shadow:0 1px 3px rgba(124,58,237,0.15);">
                             Cek Direktori Pelabuhan →
                         </a>
                     </div>
@@ -719,6 +961,7 @@
         function switchMapMode(mode) {
             currentMode = mode;
             map.removeLayer(cargoLayerGroup);
+            map.removeLayer(routeLayerGroup);
             map.removeLayer(weatherLayerGroup);
             map.removeLayer(portsLayerGroup);
 
@@ -730,14 +973,18 @@
                 buildCargoLayer();
                 cargoLayerGroup.addTo(map);
                 map.flyTo([10, 110], 3, { duration: 1.2 });
+            } else if (mode === 'route') {
+                buildRouteLayer();
+                routeLayerGroup.addTo(map);
+                focusGlobalRoute(0);
             } else if (mode === 'weather') {
                 buildWeatherLayer();
                 weatherLayerGroup.addTo(map);
-                map.flyTo([20, 40], 2.5, { duration: 1.2 });
+                map.flyTo([20, 20], 2.2, { duration: 1.2 });
             } else if (mode === 'ports') {
                 buildPortsLayer();
                 portsLayerGroup.addTo(map);
-                map.flyTo([20, 40], 2.5, { duration: 1.2 });
+                map.flyTo([20, 20], 2.2, { duration: 1.2 });
             }
         }
 
@@ -753,8 +1000,9 @@
         function focusCountry(el) {
             const lat  = parseFloat(el.dataset.lat);
             const lng  = parseFloat(el.dataset.lng);
-            const name = el.dataset.name;
-            const iso  = el.dataset.iso || el.dataset.code.toLowerCase().replace('_east','');
+            const name = (el.dataset.name || '').trim();
+            const code = (el.dataset.code || '').trim().toUpperCase();
+            const iso  = el.dataset.iso || code.toLowerCase().replace('_east','');
             const hub  = el.dataset.hub;
 
             map.flyTo([lat, lng], 5, { duration: 1.5 });
@@ -773,14 +1021,24 @@
             document.getElementById('selected-hub').textContent  = ' ' + hub;
             document.getElementById('selected-country-card').classList.remove('hidden');
 
-            // Auto open matching popup in active mode
+            // Auto open matching popup in active mode (Exact Identifier Match, never mistaken!)
             if (currentMode === 'weather') {
+                let found = false;
                 weatherLayerGroup.eachLayer(layer => {
-                    const lLatLng = layer.getLatLng();
-                    if (Math.abs(lLatLng.lat - lat) < 5 && Math.abs(lLatLng.lng - lng) < 5) {
+                    if (!found && layer.countryCode && (layer.countryCode === code || layer.countryName === name.toLowerCase())) {
                         layer.openPopup();
+                        found = true;
                     }
                 });
+                if (!found) {
+                    weatherLayerGroup.eachLayer(layer => {
+                        const lLatLng = layer.getLatLng();
+                        if (!found && Math.hypot(lLatLng.lat - lat, lLatLng.lng - lng) < 2) {
+                            layer.openPopup();
+                            found = true;
+                        }
+                    });
+                }
             } else if (currentMode === 'ports') {
                 let closestPort = null;
                 let minDist = 999999;
@@ -794,6 +1052,21 @@
                 });
                 if (closestPort && minDist < 12) {
                     closestPort.openPopup();
+                }
+            } else if (currentMode === 'route') {
+                let closestRouteMarker = null;
+                let minRDist = 999999;
+                routeLayerGroup.eachLayer(layer => {
+                    if (layer.getLatLng) {
+                        const dist = Math.hypot(layer.getLatLng().lat - lat, layer.getLatLng().lng - lng);
+                        if (dist < minRDist) {
+                            minRDist = dist;
+                            closestRouteMarker = layer;
+                        }
+                    }
+                });
+                if (closestRouteMarker && minRDist < 10) {
+                    closestRouteMarker.openPopup();
                 }
             }
         }
@@ -817,6 +1090,7 @@
         window.switchMapMode    = switchMapMode;
         window.resetMapView     = resetMapView;
         window.focusCountry     = focusCountry;
+        window.focusGlobalRoute = focusGlobalRoute;
         window.filterCountriesList = filterCountriesList;
     });
 </script>
