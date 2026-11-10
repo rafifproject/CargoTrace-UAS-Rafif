@@ -21,6 +21,45 @@
     #country-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     .country-item:hover { background: rgba(14,165,233,.07); }
     .leaflet-popup-content b { color: #0e6ba8; }
+
+    /* Custom Leaflet Weather Pill Badges (Matching Reference Image media_1794280421603_3a4f8e13.jpg) */
+    .weather-pill-marker {
+        background: transparent !important;
+        border: none !important;
+    }
+    .weather-pill-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #ffffff;
+        border-radius: 9px;
+        padding: 2px 6px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.28);
+        color: #ffffff;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 11px;
+        line-height: 1.1;
+        min-width: 46px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        cursor: pointer;
+    }
+    .weather-pill-box:hover {
+        transform: scale(1.15);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+        z-index: 99999 !important;
+    }
+    .weather-pill-blue {
+        background: linear-gradient(135deg, #2563EB, #1D4ED8);
+    }
+    .weather-pill-green {
+        background: linear-gradient(135deg, #059669, #047857);
+    }
+    .weather-pill-orange {
+        background: linear-gradient(135deg, #EA580C, #C2410C);
+    }
 </style>
 @endpush
 
@@ -478,9 +517,10 @@
             cargo:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Asal</span>
                       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>Tujuan</span>
                       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span>Posisi Terkini</span>`,
-            weather: `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Low Risk</span>
-                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>Medium Risk</span>
-                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>High Risk / Storm</span>`,
+            weather: `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>Dingin (&lt;15°C)</span>
+                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block"></span>Sejuk (15–25°C)</span>
+                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span>Hangat (&gt;25°C)</span>
+                      <span class="flex items-center gap-1.5 text-slate-400">Pill cuaca tiap negara (klik untuk detail)</span>`,
             ports:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block"></span>Pelabuhan Kontainer Global</span>
                       <span class="flex items-center gap-1.5 text-slate-400">Klik marker untuk melihat profil pelabuhan</span>`
         };
@@ -565,7 +605,7 @@
             return latLngs;
         }
 
-        // ── BUILD WEATHER LAYER ─────────────────────────────────
+        // ── BUILD WEATHER LAYER (Custom Leaflet Weather Pill Badges) ─────────
         const weatherRiskConfig = {
             'Low Risk':          { color: '#10B981', bg: '#ECFDF5', text: '#065F46', border: '#A7F3D0', icon: '🛡️' },
             'Medium Risk':       { color: '#F59E0B', bg: '#FEF3C7', text: '#92400E', border: '#FDE68A', icon: '⚠️' },
@@ -575,9 +615,29 @@
             weatherLayerGroup.clearLayers();
             weatherData.forEach(w => {
                 const conf = weatherRiskConfig[w.risk] || weatherRiskConfig['Medium Risk'];
-                L.circleMarker([w.lat, w.lng], {
-                    radius: 10, fillColor: conf.color, color: '#fff', weight: 2, fillOpacity: 0.88
-                }).bindPopup(`
+
+                // Weather Pill Badge color mapping (Blue = Cold <15°C, Green = Mild 15-25°C, Orange = Warm >25°C)
+                let pillClass = 'weather-pill-blue';
+                if (w.temp >= 15 && w.temp <= 25) {
+                    pillClass = 'weather-pill-green';
+                } else if (w.temp > 25) {
+                    pillClass = 'weather-pill-orange';
+                }
+
+                const weatherDivIcon = L.divIcon({
+                    className: 'weather-pill-marker',
+                    html: `
+                        <div class="weather-pill-box ${pillClass}">
+                            <span>${w.temp}°C</span>
+                            <span style="font-size:9px; margin-top:1px;">${w.icon_emoji || '☀️'}</span>
+                        </div>
+                    `,
+                    iconSize: [52, 34],
+                    iconAnchor: [26, 17],
+                    popupAnchor: [0, -18]
+                });
+
+                L.marker([w.lat, w.lng], { icon: weatherDivIcon }).bindPopup(`
                     <div style="min-width:240px; font-family: Outfit, sans-serif;">
                         <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
                             <img src="https://flagcdn.com/w40/${w.iso || 'id'}.png" alt="${w.country}"
