@@ -3,7 +3,7 @@
 @section('title', 'Warta & Berita Logistik Global')
 
 @section('content')
-<div class="space-y-6 max-w-5xl">
+<div class="space-y-6 w-full">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -49,7 +49,7 @@
         @forelse($news as $article)
             <div class="group p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start gap-4 hover:border-cyan-500/40 hover:shadow-md transition-all duration-300">
                 <!-- News Thumbnail Image -->
-                <div class="w-full sm:w-56 h-44 sm:h-36 rounded-xl overflow-hidden relative flex-shrink-0 bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+                <div class="w-full sm:w-64 md:w-72 h-48 sm:h-44 rounded-xl overflow-hidden relative flex-shrink-0 bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
                     <img src="{{ $article['image'] ?? 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=700&q=80' }}"
                          alt="{{ $article['headline'] }}"
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
