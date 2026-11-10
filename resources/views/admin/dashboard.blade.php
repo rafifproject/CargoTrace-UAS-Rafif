@@ -66,6 +66,56 @@
     .weather-pill-orange {
         background: linear-gradient(135deg, #C2410C, #EA580C);
     }
+
+    /* Custom Leaflet Vehicle Markers for Cargo Tracker */
+    .cargo-vehicle-marker {
+        background: transparent !important;
+        border: none !important;
+    }
+    .cargo-vehicle-badge {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45), 0 0 0 2.5px #ffffff;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+        cursor: pointer;
+    }
+    .cargo-vehicle-badge:hover {
+        transform: scale(1.25);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 0 3.5px #38BDF8;
+        z-index: 99999 !important;
+    }
+    .cargo-vehicle-pulse {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: inherit;
+        opacity: 0.65;
+        animation: cargoPulseRadar 2.2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+        z-index: -1;
+    }
+    @keyframes cargoPulseRadar {
+        0% { transform: scale(1); opacity: 0.7; }
+        60% { transform: scale(2.2); opacity: 0; }
+        100% { transform: scale(2.2); opacity: 0; }
+    }
+    .cargo-vehicle-ship {
+        background: linear-gradient(135deg, #0284c7, #0369a1);
+    }
+    .cargo-vehicle-plane {
+        background: linear-gradient(135deg, #0284c7, #2563eb);
+    }
+    .cargo-vehicle-truck {
+        background: linear-gradient(135deg, #059669, #047857);
+    }
+    .cargo-vehicle-train {
+        background: linear-gradient(135deg, #d97706, #b45309);
+    }
 </style>
 @endpush
 
@@ -275,7 +325,11 @@
                 <div id="map-legend" class="flex items-center gap-4 px-4 py-2 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-100 dark:border-slate-800/60 text-[11px] text-slate-500 dark:text-slate-400 flex-wrap">
                     <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Asal</span>
                     <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>Tujuan</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span>Posisi Terkini</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-cyan-600 inline-flex items-center justify-center text-[9px] text-white">🚢</span>Kapal</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-sky-500 inline-flex items-center justify-center text-[9px] text-white">✈️</span>Pesawat</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-emerald-600 inline-flex items-center justify-center text-[9px] text-white">🚛</span>Truk</span>
+                    <span class="flex items-center gap-1.5"><span class="w-5 h-0.5 bg-cyan-500 inline-block"></span>Jalur Ditempuh</span>
+                    <span class="flex items-center gap-1.5"><span class="w-5 h-0.5 border-b border-dashed border-cyan-400 inline-block"></span>Estimasi Rute</span>
                 </div>
             </div>
 
@@ -641,7 +695,11 @@
         const legends = {
             cargo:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Asal</span>
                       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>Tujuan</span>
-                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span>Posisi Terkini</span>`,
+                      <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-cyan-600 inline-flex items-center justify-center text-[9px] text-white">🚢</span>Kapal</span>
+                      <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-sky-500 inline-flex items-center justify-center text-[9px] text-white">✈️</span>Pesawat</span>
+                      <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-emerald-600 inline-flex items-center justify-center text-[9px] text-white">🚛</span>Truk</span>
+                      <span class="flex items-center gap-1.5"><span class="w-5 h-0.5 bg-cyan-500 inline-block"></span>Jalur Ditempuh</span>
+                      <span class="flex items-center gap-1.5"><span class="w-5 h-0.5 border-b border-dashed border-cyan-400 inline-block"></span>Estimasi Rute</span>`,
             route:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block border border-white"></span>Pelabuhan Asal</span>
                       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block border border-white"></span>Waypoint Transit</span>
                       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block border border-white"></span>Pelabuhan Tujuan</span>
@@ -655,6 +713,115 @@
         };
         function updateLegend(mode) {
             document.getElementById('map-legend').innerHTML = legends[mode];
+        }
+
+        // ── HELPER: CURVED PATH GENERATOR (Natural Geodesic Arc) ───
+        function createCurvedPath(p1, p2, numPoints = 20, curvature = 0.12) {
+            const lat1 = p1[0], lng1 = p1[1];
+            const lat2 = p2[0], lng2 = p2[1];
+
+            let dLng = lng2 - lng1;
+            if (dLng > 180) dLng -= 360;
+            if (dLng < -180) dLng += 360;
+
+            const dLat = lat2 - lat1;
+            const dist = Math.sqrt(dLat * dLat + dLng * dLng);
+
+            if (dist < 0.05) return [p1, p2];
+
+            const midLat = (lat1 + lat2) / 2;
+            const midLng = lng1 + dLng / 2;
+
+            // Normal vector perpendicular to trajectory
+            const nx = -dLng / dist;
+            const ny = dLat / dist;
+
+            // Arc elevation (natural great-circle bow)
+            const arcHeight = Math.min(12, Math.max(1.8, dist * curvature));
+            const sign = (dLng >= 0) ? 1 : -1;
+            const hemisphereFactor = midLat >= 0 ? 1 : -1;
+
+            const controlLat = midLat + nx * arcHeight * sign * (hemisphereFactor * 0.4 + 0.6);
+            let controlLng = midLng + ny * arcHeight * sign;
+
+            if (controlLng > 180) controlLng -= 360;
+            if (controlLng < -180) controlLng += 360;
+
+            const curve = [];
+            for (let i = 0; i <= numPoints; i++) {
+                const t = i / numPoints;
+                const inv = 1 - t;
+                const lat = inv * inv * lat1 + 2 * inv * t * controlLat + t * t * lat2;
+                let lng = inv * inv * lng1 + 2 * inv * t * controlLng + t * t * (lng1 + dLng);
+                if (lng > 180) lng -= 360;
+                if (lng < -180) lng += 360;
+                curve.push([lat, lng]);
+            }
+            return curve;
+        }
+
+        // ── HELPER: GET VEHICLE ICON & TYPE PER SHIPMENT ─────────
+        function getShipmentVehicle(s) {
+            const carrierName = (s.carrier?.name || '').toLowerCase();
+            const carrierCode = (s.carrier?.code || '').toUpperCase();
+            const originType  = (s.origin?.location_type || '').toUpperCase();
+            const destType    = (s.destination?.location_type || '').toUpperCase();
+            const originName  = (s.origin?.name || '').toLowerCase();
+            const destName    = (s.destination?.name || '').toLowerCase();
+            const cargo       = (s.cargo_type || '').toLowerCase();
+            const notes       = (s.notes || '').toLowerCase();
+
+            // 1. Pesawat Kargo Udara (Airplane)
+            if (originType === 'AIRPORT' || destType === 'AIRPORT' ||
+                originName.includes('bandara') || originName.includes('airport') ||
+                destName.includes('bandara') || destName.includes('airport') ||
+                carrierCode === 'FDX' || carrierName.includes('fedex') || carrierName.includes('express air') ||
+                cargo.includes('avionics') || cargo.includes('vaccine') || cargo.includes('pharmaceutical')) {
+                return {
+                    type: 'plane',
+                    label: 'Pesawat Kargo Udara (Air Cargo)',
+                    emoji: '✈️',
+                    badgeClass: 'cargo-vehicle-plane',
+                    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>`
+                };
+            }
+
+            // 2. Kereta Api Logistik (Freight Train)
+            if (cargo.includes('coal') || cargo.includes('ore') || cargo.includes('grain') ||
+                originName.includes('stasiun') || destName.includes('stasiun') ||
+                originName.includes('rail') || destName.includes('rail') ||
+                carrierName.includes('rail') || notes.includes('rail') || notes.includes('kereta')) {
+                return {
+                    type: 'train',
+                    label: 'Kereta Logistik (Freight Train)',
+                    emoji: '🚆',
+                    badgeClass: 'cargo-vehicle-train',
+                    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M12 2c-4 0-8 .5-8 4v9.5C4 17.43 5.57 19 7.5 19L6 20.5v.5h12v-.5L16.5 19c1.93 0 3.5-1.57 3.5-3.5V6c0-3.5-4-4-8-4zM7.5 17c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V7h12v4z"/></svg>`
+                };
+            }
+
+            // 3. Truk Kontainer Darat (Freight Truck)
+            if (originType === 'WAREHOUSE' || destType === 'WAREHOUSE' ||
+                originType === 'CUSTOMS_OFFICE' || destType === 'CUSTOMS_OFFICE' ||
+                originName.includes('gudang') || destName.includes('gudang') ||
+                carrierName.includes('truck') || notes.includes('truck') || notes.includes('darat')) {
+                return {
+                    type: 'truck',
+                    label: 'Truk Kontainer (Freight Truck)',
+                    emoji: '🚛',
+                    badgeClass: 'cargo-vehicle-truck',
+                    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>`
+                };
+            }
+
+            // 4. Default: Kapal Kontainer Laut (Cargo Vessel)
+            return {
+                type: 'ship',
+                label: 'Kapal Kontainer (Cargo Vessel)',
+                emoji: '🚢',
+                badgeClass: 'cargo-vehicle-ship',
+                svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.89-6.68c.08-.26.06-.54-.06-.78s-.32-.42-.58-.5L20 11.02V8c0-.55-.45-1-1-1h-2V4c0-.55-.45-1-1-1H8c-.55 0-1 .45-1 1v3H5c-.55 0-1 .45-1 1v3.02l-1.3.36c-.26.08-.46.26-.58.5s-.14.52-.06.78L3.95 19zM10 5h4v2h-4V5zm-3 4h10v2.24l-5 1.36-5-1.36V9z"/></svg>`
+            };
         }
 
         // ── BUILD CARGO LAYER ───────────────────────────────────
@@ -678,16 +845,19 @@
                 const destCoords   = [dLat, dLng];
                 latLngs.push(originCoords, destCoords);
 
-                // Origin marker
+                const vehicle = getShipmentVehicle(s);
+
+                // Origin marker (🟢 Green)
                 L.circleMarker(originCoords, {
                     radius: 7, fillColor: '#10B981', color: '#fff', weight: 2, fillOpacity: 1
                 }).bindPopup(`
                     <div style="min-width:220px; font-family: Outfit, sans-serif;">
-                        <div style="font-weight:700; font-size:13px; color:#059669; margin-bottom:4px;">🟢 Pelabuhan Asal</div>
-                        <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.origin.name || 'Pelabuhan Asal'}</div>
-                        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${s.origin.city || ''}</div>
+                        <div style="font-weight:700; font-size:12px; color:#059669; margin-bottom:4px;">🟢 Titik Asal (${s.origin.location_type || 'PORT'})</div>
+                        <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.origin.name || 'Lokasi Asal'}</div>
+                        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${s.origin.city || ''}${s.origin.country ? ', ' + s.origin.country : ''}</div>
                         <div style="background:#F1F5F9; padding:6px 10px; border-radius:8px; font-size:11px; margin-bottom:8px;">
                             No. Resi: <b>${s.shipment_number || '-'}</b><br>
+                            Armada: <b>${s.carrier?.name || '-'}</b><br>
                             Status: <span style="color:#0284c7; font-weight:700;">${s.status || '-'}</span>
                         </div>
                         <a href="${SHIPMENT_BASE_URL}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
@@ -696,16 +866,17 @@
                     </div>
                 `).addTo(cargoLayerGroup);
 
-                // Destination marker
+                // Destination marker (🔴 Red)
                 L.circleMarker(destCoords, {
                     radius: 7, fillColor: '#EF4444', color: '#fff', weight: 2, fillOpacity: 1
                 }).bindPopup(`
                     <div style="min-width:220px; font-family: Outfit, sans-serif;">
-                        <div style="font-weight:700; font-size:13px; color:#dc2626; margin-bottom:4px;">🔴 Pelabuhan Tujuan</div>
-                        <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.destination.name || 'Pelabuhan Tujuan'}</div>
-                        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${s.destination.city || ''}</div>
+                        <div style="font-weight:700; font-size:12px; color:#dc2626; margin-bottom:4px;">🔴 Titik Tujuan (${s.destination.location_type || 'PORT'})</div>
+                        <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.destination.name || 'Lokasi Tujuan'}</div>
+                        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${s.destination.city || ''}${s.destination.country ? ', ' + s.destination.country : ''}</div>
                         <div style="background:#F1F5F9; padding:6px 10px; border-radius:8px; font-size:11px; margin-bottom:8px;">
-                            No. Resi: <b>${s.shipment_number || '-'}</b>
+                            No. Resi: <b>${s.shipment_number || '-'}</b><br>
+                            Kargo: <b>${s.cargo_type || 'General Cargo'}</b>
                         </div>
                         <a href="${SHIPMENT_BASE_URL}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
                             Lihat Detail Pengiriman →
@@ -714,34 +885,90 @@
                 `).addTo(cargoLayerGroup);
 
                 // Current location
-                if (s.current_location && s.current_location.latitude && s.current_location.longitude) {
-                    const cLat = parseFloat(s.current_location.latitude);
-                    const cLng = parseFloat(s.current_location.longitude);
+                let hasCurrent = false;
+                let curCoords = null;
+                const curLoc = s.current_location || s.currentLocation;
+                if (curLoc && curLoc.latitude && curLoc.longitude) {
+                    const cLat = parseFloat(curLoc.latitude);
+                    const cLng = parseFloat(curLoc.longitude);
                     if (!isNaN(cLat) && !isNaN(cLng)) {
-                        const cur = [cLat, cLng];
-                        latLngs.push(cur);
-                        L.circleMarker(cur, {
-                            radius: 8, fillColor: '#00A8E8', color: '#fff', weight: 2, fillOpacity: 0.95
-                        }).bindPopup(`
-                            <div style="min-width:220px; font-family: Outfit, sans-serif;">
-                                <div style="font-weight:700; font-size:13px; color:#0284c7; margin-bottom:4px;">🚢 Posisi Kargo Terkini</div>
-                                <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.current_location.name || 'Posisi Terkini'}</div>
-                                <div style="background:#F0FDF4; border:1px solid #BBF7D0; padding:6px 10px; border-radius:8px; font-size:11px; margin:8px 0;">
-                                    Kargo: <b>${s.shipment_number || '-'}</b><br>
-                                    Status: <b style="color:#166534;">${s.status || '-'}</b>
-                                </div>
-                                <a href="${SHIPMENT_BASE_URL}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
-                                    Lihat Detail Pengiriman →
-                                </a>
-                            </div>
-                        `).addTo(cargoLayerGroup);
+                        curCoords = [cLat, cLng];
+                        hasCurrent = true;
+                        latLngs.push(curCoords);
                     }
                 }
 
-                // Animated dashed polyline
-                L.polyline([originCoords, destCoords], {
-                    color: '#00A8E8', weight: 2.5, dashArray: '6, 10', opacity: 0.75
-                }).addTo(cargoLayerGroup);
+                if (hasCurrent) {
+                    // 1. Lintasan Ditempuh: Asal -> Posisi Terkini (Lengkung solid bercahaya)
+                    const traveledCurve = createCurvedPath(originCoords, curCoords, 18, 0.12);
+                    L.polyline(traveledCurve, {
+                        color: '#0284c7',
+                        weight: 3.5,
+                        opacity: 0.9,
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    }).bindTooltip(`<b>${s.shipment_number}</b><br><span style="font-size:11px">${s.origin.name} ➔ ${curLoc.name || 'Posisi Terkini'} (Ditempuh)</span>`, { sticky: true }).addTo(cargoLayerGroup);
+
+                    // 2. Estimasi Lintasan Lanjutan: Posisi Terkini -> Tujuan (Lengkung putus-putus)
+                    const remainingCurve = createCurvedPath(curCoords, destCoords, 18, 0.12);
+                    L.polyline(remainingCurve, {
+                        color: '#38bdf8',
+                        weight: 2.5,
+                        dashArray: '6, 8',
+                        opacity: 0.8,
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    }).bindTooltip(`<b>${s.shipment_number}</b><br><span style="font-size:11px">${curLoc.name || 'Posisi Terkini'} ➔ ${s.destination.name} (Estimasi)</span>`, { sticky: true }).addTo(cargoLayerGroup);
+
+                    // 3. Custom Vehicle Marker dengan Icon Kendaraan Pengangkut
+                    const vehicleDivIcon = L.divIcon({
+                        className: 'cargo-vehicle-marker',
+                        html: `
+                            <div class="cargo-vehicle-badge ${vehicle.badgeClass}" title="${vehicle.label} &bull; ${s.shipment_number}">
+                                <div class="cargo-vehicle-pulse"></div>
+                                ${vehicle.svg}
+                            </div>
+                        `,
+                        iconSize: [34, 34],
+                        iconAnchor: [17, 17],
+                        popupAnchor: [0, -18]
+                    });
+
+                    L.marker(curCoords, { icon: vehicleDivIcon, zIndexOffset: 1000 }).bindPopup(`
+                        <div style="min-width:245px; font-family: Outfit, sans-serif;">
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
+                                <span style="font-size:18px;">${vehicle.emoji}</span>
+                                <div>
+                                    <div style="font-weight:700; font-size:12px; color:#0284c7;">${vehicle.label}</div>
+                                    <div style="font-size:10px; color:#64748b;">Posisi Kargo Terkini</div>
+                                </div>
+                            </div>
+                            <div style="font-weight:700; font-size:14px; color:#0f172a; margin-bottom:2px;">${curLoc.name || 'Posisi Terkini'}</div>
+                            <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${curLoc.city || ''}${curLoc.country ? ', ' + curLoc.country : ''}</div>
+                            <div style="background:#F0FDF4; border:1px solid #BBF7D0; padding:6px 10px; border-radius:8px; font-size:11px; margin-bottom:8px;">
+                                <div>No. Resi: <b>${s.shipment_number || '-'}</b></div>
+                                <div>Armada/Ekspedisi: <b>${s.carrier?.name || '-'}</b></div>
+                                <div>Jenis Kargo: <b>${s.cargo_type || 'General Cargo'}</b></div>
+                                <div>Status: <b style="color:#166534;">${s.status || '-'}</b></div>
+                            </div>
+                            <a href="${SHIPMENT_BASE_URL}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
+                                Lihat Detail Pengiriman →
+                            </a>
+                        </div>
+                    `).addTo(cargoLayerGroup);
+
+                } else {
+                    // Belum ada lokasi terkini terpisah, buat kurva langsung Asal ke Tujuan
+                    const directCurve = createCurvedPath(originCoords, destCoords, 24, 0.12);
+                    L.polyline(directCurve, {
+                        color: '#0284c7',
+                        weight: 2.5,
+                        dashArray: '6, 8',
+                        opacity: 0.75,
+                        lineCap: 'round',
+                        lineJoin: 'round'
+                    }).bindTooltip(`<b>${s.shipment_number}</b><br><span style="font-size:11px">${s.origin.name} ➔ ${s.destination.name}</span>`, { sticky: true }).addTo(cargoLayerGroup);
+                }
             });
 
             return latLngs;
