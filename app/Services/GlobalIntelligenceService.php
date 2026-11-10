@@ -238,7 +238,7 @@ class GlobalIntelligenceService
      */
     public function getLogisticsNews(string $category = 'all'): array
     {
-        $cacheKey = "live_logistics_news_{$category}";
+        $cacheKey = "live_logistics_news_v3_{$category}";
 
         return Cache::remember($cacheKey, 1800, function () use ($category) {
             $apiKey = config('services.gnews.key') ?: env('GNEWS_API_KEY');
@@ -267,6 +267,14 @@ class GlobalIntelligenceService
                         $json = $response->json();
                         $gnewsArticles = $json['articles'] ?? [];
 
+                        $defaultImages = [
+                            'shipping' => 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=700&q=80',
+                            'logistics' => 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=700&q=80',
+                            'economy' => 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=700&q=80',
+                            'customs' => 'https://images.unsplash.com/photo-1524522173746-f628baad3644?auto=format&fit=crop&w=700&q=80',
+                            'all' => 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=700&q=80',
+                        ];
+
                         foreach ($gnewsArticles as $art) {
                             $title = $art['title'] ?? '';
                             $desc = $art['description'] ?? '';
@@ -287,6 +295,7 @@ class GlobalIntelligenceService
                             };
 
                             $sentiment = $this->analyzeSentiment($title . ' ' . $desc);
+                            $imgUrl = !empty($art['image']) ? $art['image'] : ($defaultImages[$category] ?? $defaultImages['all']);
 
                             $articles[] = [
                                 'title' => $title,
@@ -299,7 +308,7 @@ class GlobalIntelligenceService
                                 'time' => $timeStr,
                                 'date' => $timeStr,
                                 'url' => $art['url'] ?? '#',
-                                'image' => $art['image'] ?? null,
+                                'image' => $imgUrl,
                                 'sentiment' => $sentiment,
                             ];
                         }
@@ -315,12 +324,13 @@ class GlobalIntelligenceService
                     [
                         'title' => 'Kapasitas Pelabuhan Singapura Meningkat 15% untuk Mendukung Arus Logistik Asia',
                         'headline' => 'Kapasitas Pelabuhan Singapura Meningkat 15% untuk Mendukung Arus Logistik Asia',
-                        'category' => 'Pelayaran',
+                        'category' => 'Perkapalan',
                         'category_raw' => 'shipping',
                         'source' => 'Maritime Executive Global',
                         'time' => '15 menit lalu',
                         'date' => '15 menit lalu',
                         'url' => '#',
+                        'image' => 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=700&q=80',
                         'description' => 'Ekspansi terminal otomatis di Tuas Port memperkuat konektivitas rute maritim Asia Tenggara dan menekan waktu tunggu kapal kargo kontainer.',
                         'text' => 'Ekspansi terminal otomatis di Tuas Port memperkuat konektivitas rute maritim Asia Tenggara dan menekan waktu tunggu kapal kargo kontainer.',
                     ],
@@ -330,9 +340,10 @@ class GlobalIntelligenceService
                         'category' => 'Logistik',
                         'category_raw' => 'logistics',
                         'source' => 'Global Freight Watch',
-                        'time' => '1 jam lalu',
-                        'date' => '1 jam lalu',
+                        'time' => '45 menit lalu',
+                        'date' => '45 menit lalu',
                         'url' => '#',
+                        'image' => 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=700&q=80',
                         'description' => 'Peringatan badai gelombang tinggi di perairan Selat Malaka memicu mitigasi rute alternatif untuk menghindari keterlambatan ETA barang.',
                         'text' => 'Peringatan badai gelombang tinggi di perairan Selat Malaka memicu mitigasi rute alternatif untuk menghindari keterlambatan ETA barang.',
                     ],
@@ -345,6 +356,7 @@ class GlobalIntelligenceService
                         'time' => '2 jam lalu',
                         'date' => '2 jam lalu',
                         'url' => '#',
+                        'image' => 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=700&q=80',
                         'description' => 'Stabilitas ekonomi kawasan Asia-Pasifik dan pemulihan manufaktur mendorong kenaikan volume peti kemas internasional.',
                         'text' => 'Stabilitas ekonomi kawasan Asia-Pasifik dan pemulihan manufaktur mendorong kenaikan volume peti kemas internasional.',
                     ],
@@ -357,18 +369,20 @@ class GlobalIntelligenceService
                         'time' => '3 jam lalu',
                         'date' => '3 jam lalu',
                         'url' => '#',
+                        'image' => 'https://images.unsplash.com/photo-1524522173746-f628baad3644?auto=format&fit=crop&w=700&q=80',
                         'description' => 'Implementasi single window kepabeanan elektronik berhasil mereduksi waktu clearance dokumen ekspor-impor hingga 40%.',
                         'text' => 'Implementasi single window kepabeanan elektronik berhasil mereduksi waktu clearance dokumen ekspor-impor hingga 40%.',
                     ],
                     [
                         'title' => 'Pelabuhan Rotterdam dan Shanghai Uji Coba Koridor Pengiriman Rendah Emisi Baru',
                         'headline' => 'Pelabuhan Rotterdam dan Shanghai Uji Coba Koridor Pengiriman Rendah Emisi Baru',
-                        'category' => 'Pelayaran',
+                        'category' => 'Perkapalan',
                         'category_raw' => 'shipping',
                         'source' => 'Clean Shipping Port',
-                        'time' => '5 jam lalu',
-                        'date' => '5 jam lalu',
+                        'time' => '4 jam lalu',
+                        'date' => '4 jam lalu',
                         'url' => '#',
+                        'image' => 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=700&q=80',
                         'description' => 'Inisiatif koridor pelayaran hijau internasional menggunakan kapal berbahan bakar metanol untuk rute Eropa-Asia.',
                         'text' => 'Inisiatif koridor pelayaran hijau internasional menggunakan kapal berbahan bakar metanol untuk rute Eropa-Asia.',
                     ],
@@ -381,8 +395,35 @@ class GlobalIntelligenceService
                         'time' => '6 jam lalu',
                         'date' => '6 jam lalu',
                         'url' => '#',
+                        'image' => 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=700&q=80',
                         'description' => 'Perusahaan ekspedisi global menerapkan penyesuaian tarif bunker untuk menjaga keseimbangan operasional armada kapal niaga.',
                         'text' => 'Perusahaan ekspedisi global menerapkan penyesuaian tarif bunker untuk menjaga keseimbangan operasional armada kapal niaga.',
+                    ],
+                    [
+                        'title' => 'Antrean Kapal Kontainer di Terusan Suez Menurun Seiring Penataan Konvoi Terjadwal',
+                        'headline' => 'Antrean Kapal Kontainer di Terusan Suez Menurun Seiring Penataan Konvoi Terjadwal',
+                        'category' => 'Perkapalan',
+                        'category_raw' => 'shipping',
+                        'source' => 'Suez Maritime Authority',
+                        'time' => '8 jam lalu',
+                        'date' => '8 jam lalu',
+                        'url' => '#',
+                        'image' => 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=700&q=80',
+                        'description' => 'Otoritas pelayaran Terusan Suez mengumumkan jadwal konvoi harian yang lebih optimal untuk mempercepat transit armada kargo Eropa-Asia.',
+                        'text' => 'Otoritas pelayaran Terusan Suez mengumumkan jadwal konvoi harian yang lebih optimal untuk mempercepat transit armada kargo Eropa-Asia.',
+                    ],
+                    [
+                        'title' => 'Lonjakan Ekspor Baterai Kendaraan Listrik Dorong Peningkatan Standar Muatan Berbahaya (IMDG)',
+                        'headline' => 'Lonjakan Ekspor Baterai Kendaraan Listrik Dorong Peningkatan Standar Muatan Berbahaya (IMDG)',
+                        'category' => 'Logistik',
+                        'category_raw' => 'logistics',
+                        'source' => 'Supply Chain Standard Hub',
+                        'time' => '10 jam lalu',
+                        'date' => '10 jam lalu',
+                        'url' => '#',
+                        'image' => 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=700&q=80',
+                        'description' => 'Pelabuhan-pelabuhan internasional memperketat sertifikasi penanganan kargo baterai litium untuk keselamatan kapal di samudera lepas.',
+                        'text' => 'Pelabuhan-pelabuhan internasional memperketat sertifikasi penanganan kargo baterai litium untuk keselamatan kapal di samudera lepas.',
                     ],
                 ];
 
