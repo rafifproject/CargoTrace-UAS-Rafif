@@ -194,6 +194,24 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('customer.intelligence.currency') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.intelligence.currency') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
+                                <i data-lucide="coins" class="w-4 h-4 {{ request()->routeIs('customer.intelligence.currency') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
+                                <span>Kurs Mata Uang</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('customer.intelligence.economy') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.intelligence.economy') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
+                                <i data-lucide="trending-up" class="w-4 h-4 {{ request()->routeIs('customer.intelligence.economy') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
+                                <span>Indikator Ekonomi</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('customer.intelligence.ports') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.intelligence.ports') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
+                                <i data-lucide="anchor" class="w-4 h-4 {{ request()->routeIs('customer.intelligence.ports') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
+                                <span>Direktori Pelabuhan</span>
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('customer.intelligence.news') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.intelligence.news') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
                                 <i data-lucide="newspaper" class="w-4 h-4 {{ request()->routeIs('customer.intelligence.news') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
                                 <span>Berita Logistik</span>

@@ -105,14 +105,15 @@ class CustomerShipmentController extends Controller
     {
         $user = $request->user();
         $myShipments = $user->shipments()->with(['origin', 'destination', 'currentLocation', 'carrier'])->get();
+        $allShipments = $myShipments;
 
         $selectedShipmentId = $request->input('shipment_id');
-        $mapShipments = $myShipments;
-        if ($selectedShipmentId) {
-            $mapShipments = $myShipments->where('id', $selectedShipmentId);
-        }
+        $mapShipments = $user->shipments()
+            ->with(['origin', 'destination', 'currentLocation', 'carrier', 'trackingEvents.location'])
+            ->when($selectedShipmentId, fn ($q) => $q->where('id', $selectedShipmentId))
+            ->get();
 
-        return view('customer.shipments.map', compact('mapShipments', 'myShipments', 'selectedShipmentId'));
+        return view('customer.shipments.map', compact('mapShipments', 'myShipments', 'allShipments', 'selectedShipmentId'));
     }
 }
 

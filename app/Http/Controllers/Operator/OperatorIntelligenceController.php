@@ -26,18 +26,35 @@ class OperatorIntelligenceController extends Controller
         $destLat   = (float) $request->input('lat2', -33.856);
         $destLng   = (float) $request->input('lng2', 151.209);
 
+        // Jika ada filter country dari klik peta atau direktori stasiun cuaca
+        $targetCountry  = $request->input('country');
+        $allWeatherHubs = $this->intelligenceService->getGlobalWeatherHubs();
+        $selectedHub    = null;
+
+        if ($targetCountry) {
+            foreach ($allWeatherHubs as $hub) {
+                if (strcasecmp($hub['country'], $targetCountry) === 0 || strcasecmp($hub['code'], $targetCountry) === 0) {
+                    $selectedHub = $hub;
+                    $originLat   = $hub['lat'];
+                    $originLng   = $hub['lng'];
+                    break;
+                }
+            }
+        }
+
         $originWeather = $this->intelligenceService->getWeather($originLat, $originLng);
         $destWeather   = $this->intelligenceService->getWeather($destLat, $destLng);
         $locations     = Location::where('status', 'ACTIVE')->get();
 
-        return view('operator.intelligence.weather', compact('originWeather', 'destWeather', 'locations'));
+        return view('operator.intelligence.weather', compact('originWeather', 'destWeather', 'locations', 'allWeatherHubs', 'selectedHub', 'targetCountry'));
     }
 
     /** Mockup 10: Informasi Mata Uang */
     public function currency(Request $request): View
     {
-        $base       = strtoupper($request->input('base', 'USD'));
-        $currencies = $this->intelligenceService->getCurrencies($base);
+        $base         = strtoupper($request->input('base', 'USD'));
+        $currencies   = $this->intelligenceService->getCurrencies($base);
+        $currencyMeta = $this->intelligenceService->getCurrenciesMetadata();
 
         $dates = [];
         $rates = [];
@@ -46,7 +63,7 @@ class OperatorIntelligenceController extends Controller
             $rates[] = 15750 + intval(sin($i / 3) * 120 + ($i * 3));
         }
 
-        return view('operator.intelligence.currency', compact('currencies', 'base', 'dates', 'rates'));
+        return view('operator.intelligence.currency', compact('currencies', 'base', 'dates', 'rates', 'currencyMeta'));
     }
 
     /** Halaman 11: Indikator Ekonomi */

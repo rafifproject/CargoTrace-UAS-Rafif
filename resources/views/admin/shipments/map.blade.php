@@ -747,8 +747,6 @@
                 resetCargoShipmentFocus();
             }
         });
-            }
-        });
 
         if (allBounds.length > 0) {
             map.fitBounds(L.latLngBounds(allBounds), { padding: [50, 50] });

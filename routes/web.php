@@ -172,11 +172,17 @@ Route::middleware(['auth', 'role:CUSTOMER'])->prefix('customer')->name('customer
     // 08. Informasi Pengecualian
     Route::get('/exceptions', [CustomerExceptionController::class, 'index'])->name('exceptions.index');
 
-    // 09, 10, 11. Layanan Informasi (Cuaca, Berita, Komparasi)
+    // 09-14. Layanan Intelijen & Informasi Global
     Route::prefix('intelligence')->name('intelligence.')->group(function () {
         Route::get('/weather', [CustomerIntelligenceController::class, 'weather'])->name('weather');
+        Route::get('/currency', [CustomerIntelligenceController::class, 'currency'])->name('currency');
+        Route::get('/economy', [CustomerIntelligenceController::class, 'economy'])->name('economy');
         Route::get('/news', [CustomerIntelligenceController::class, 'news'])->name('news');
+        Route::get('/ports', [CustomerIntelligenceController::class, 'ports'])->name('ports');
         Route::get('/comparison', [CustomerIntelligenceController::class, 'comparison'])->name('comparison');
+        Route::get('/risk', function () {
+            return redirect()->route('customer.intelligence.weather');
+        });
     });
 
     // 12. Notifikasi

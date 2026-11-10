@@ -370,19 +370,61 @@ function initDetailMap() {
     const dLat = {{ $shipment->destination?->latitude ?? 0 }};
     const dLng = {{ $shipment->destination?->longitude ?? 0 }};
 
-    const map = L.map('shipment-detail-map').setView([oLat, oLng], 4);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+    const map = L.map('shipment-detail-map', { maxZoom: 20 }).setView([oLat, oLng], 4);
 
-    L.circleMarker([oLat, oLng], { radius: 8, color: '#10b981', fillColor: '#10b981', fillOpacity: 1 }).addTo(map).bindPopup('<b>Asal:</b> {{ $shipment->origin?->name }}');
-    L.circleMarker([dLat, dLng], { radius: 8, color: '#f43f5e', fillColor: '#f43f5e', fillOpacity: 1 }).addTo(map).bindPopup('<b>Tujuan:</b> {{ $shipment->destination?->name }}');
-    L.polyline([[oLat, oLng], [dLat, dLng]], { color: '#06b6d4', weight: 3, dashArray: '6,6' }).addTo(map);
+    const googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: '&copy; Google Maps'
+    });
+    const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: '&copy; Google Maps Satelit'
+    });
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+    });
+
+    googleStreets.addTo(map);
+
+    L.control.layers({
+        "🗺️ Google Maps": googleStreets,
+        "🛰️ Satelit Hybrid": googleHybrid,
+        "🌍 OpenStreetMap": osm
+    }, null, { position: 'topright' }).addTo(map);
+
+    L.circleMarker([oLat, oLng], { radius: 8, color: '#ffffff', fillColor: '#10b981', fillOpacity: 1, weight: 2.5 })
+        .addTo(map).bindPopup('<b>🟢 Titik Asal:</b> {{ $shipment->origin?->name }}<br><span style="font-size:11px; color:#64748b;">{{ $shipment->origin?->city }}, {{ $shipment->origin?->country }}</span>');
+    L.circleMarker([dLat, dLng], { radius: 8, color: '#ffffff', fillColor: '#f43f5e', fillOpacity: 1, weight: 2.5 })
+        .addTo(map).bindPopup('<b>🔴 Titik Tujuan:</b> {{ $shipment->destination?->name }}<br><span style="font-size:11px; color:#64748b;">{{ $shipment->destination?->city }}, {{ $shipment->destination?->country }}</span>');
 
     @if($shipment->currentLocation)
         const cLat = {{ $shipment->currentLocation->latitude }};
         const cLng = {{ $shipment->currentLocation->longitude }};
-        L.circleMarker([cLat, cLng], { radius: 9, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 1 }).addTo(map).bindPopup('<b>Lokasi Terkini:</b> {{ $shipment->currentLocation->name }}').openPopup();
+
+        L.polyline([[oLat, oLng], [cLat, cLng]], { color: '#00F0FF', weight: 4.5, opacity: 0.95 }).addTo(map);
+        L.polyline([[cLat, cLng], [dLat, dLng]], { color: '#38BDF8', weight: 3.5, dashArray: '6, 8', opacity: 0.85 }).addTo(map);
+
+        const vIcon = L.divIcon({
+            className: 'cargo-v-icon',
+            html: `
+                <div style="background:#0284c7; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 0 14px rgba(0,240,255,0.9); border:2.5px solid #fff;">
+                    🚢
+                </div>
+            `,
+            iconSize: [34, 34],
+            iconAnchor: [17, 17]
+        });
+
+        L.marker([cLat, cLng], { icon: vIcon })
+            .addTo(map)
+            .bindPopup('<b>📍 Lokasi Terkini:</b> {{ $shipment->currentLocation->name }}<br><span style="font-size:11px; color:#0284c7; font-weight:700;">Status: {{ $shipment->status }}</span>')
+            .openPopup();
         map.fitBounds([[oLat, oLng], [dLat, dLng], [cLat, cLng]], { padding: [50, 50] });
     @else
+        L.polyline([[oLat, oLng], [dLat, dLng]], { color: '#00F0FF', weight: 3.5, dashArray: '6,6' }).addTo(map);
         map.fitBounds([[oLat, oLng], [dLat, dLng]], { padding: [50, 50] });
     @endif
 }

@@ -319,30 +319,65 @@
         const origin = [{{ $shipment->origin->latitude }}, {{ $shipment->origin->longitude }}];
         const dest = [{{ $shipment->destination->latitude }}, {{ $shipment->destination->longitude }}];
 
-        detailMap = L.map('detail-map').setView(origin, 3);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        detailMap = L.map('detail-map', { maxZoom: 20 }).setView(origin, 3);
+
+        const googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps'
+        });
+        const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps Satelit'
+        });
+        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
             attribution: '&copy; OpenStreetMap'
-        }).addTo(detailMap);
+        });
+
+        googleStreets.addTo(detailMap);
+
+        L.control.layers({
+            "🗺️ Google Maps": googleStreets,
+            "🛰️ Satelit Hybrid": googleHybrid,
+            "🌍 OpenStreetMap": osm
+        }, null, { position: 'topright' }).addTo(detailMap);
 
         // Origin Marker (Green)
-        L.circleMarker(origin, { radius: 8, fillColor: '#10B981', color: '#fff', weight: 2, fillOpacity: 1 })
-            .bindPopup(`<b>Asal:</b> {{ $shipment->origin->name }}<br>{{ $shipment->origin->city }}, {{ $shipment->origin->country }}`)
+        L.circleMarker(origin, { radius: 8, fillColor: '#10B981', color: '#fff', weight: 2.5, fillOpacity: 1 })
+            .bindPopup(`<b>🟢 Titik Asal:</b> {{ $shipment->origin->name }}<br><span style="font-size:11px; color:#64748b;">{{ $shipment->origin->city }}, {{ $shipment->origin->country }}</span>`)
             .addTo(detailMap);
 
         // Destination Marker (Red)
-        L.circleMarker(dest, { radius: 8, fillColor: '#EF4444', color: '#fff', weight: 2, fillOpacity: 1 })
-            .bindPopup(`<b>Tujuan:</b> {{ $shipment->destination->name }}<br>{{ $shipment->destination->city }}, {{ $shipment->destination->country }}`)
+        L.circleMarker(dest, { radius: 8, fillColor: '#EF4444', color: '#fff', weight: 2.5, fillOpacity: 1 })
+            .bindPopup(`<b>🔴 Titik Tujuan:</b> {{ $shipment->destination->name }}<br><span style="font-size:11px; color:#64748b;">{{ $shipment->destination->city }}, {{ $shipment->destination->country }}</span>`)
             .addTo(detailMap);
 
         @if($shipment->currentLocation)
             const current = [{{ $shipment->currentLocation->latitude }}, {{ $shipment->currentLocation->longitude }}];
-            L.circleMarker(current, { radius: 9, fillColor: '#00A8E8', color: '#fff', weight: 2, fillOpacity: 1 })
-                .bindPopup(`<b>Posisi Saat Ini:</b> {{ $shipment->currentLocation->name }}`)
-                .addTo(detailMap);
-            L.polyline([origin, current, dest], { color: '#00A8E8', weight: 3, dashArray: '6, 6' }).addTo(detailMap);
+            
+            L.polyline([origin, current], { color: '#00F0FF', weight: 4.5, opacity: 0.95 }).addTo(detailMap);
+            L.polyline([current, dest], { color: '#38BDF8', weight: 3.5, dashArray: '6, 8', opacity: 0.85 }).addTo(detailMap);
+
+            const vIcon = L.divIcon({
+                className: 'cargo-v-icon',
+                html: `
+                    <div style="background:#0284c7; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 0 14px rgba(0,240,255,0.9); border:2.5px solid #fff;">
+                        🚢
+                    </div>
+                `,
+                iconSize: [34, 34],
+                iconAnchor: [17, 17]
+            });
+
+            L.marker(current, { icon: vIcon })
+                .bindPopup(`<b>📍 Posisi Saat Ini:</b> {{ $shipment->currentLocation->name }}<br><span style="font-size:11px; color:#0284c7; font-weight:700;">Status: {{ $shipment->status }}</span>`)
+                .addTo(detailMap)
+                .openPopup();
             detailMap.fitBounds(L.latLngBounds([origin, current, dest]), { padding: [50, 50] });
         @else
-            L.polyline([origin, dest], { color: '#00A8E8', weight: 3, dashArray: '6, 6' }).addTo(detailMap);
+            L.polyline([origin, dest], { color: '#00F0FF', weight: 3.5, dashArray: '6, 6' }).addTo(detailMap);
             detailMap.fitBounds(L.latLngBounds([origin, dest]), { padding: [50, 50] });
         @endif
     }
