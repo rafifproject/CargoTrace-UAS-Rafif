@@ -300,6 +300,10 @@
                     class="map-mode-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 flex items-center gap-1.5">
                     ⚓ Sebaran Pelabuhan
                 </button>
+                <button onclick="switchMapMode('carriers')" id="btn-carriers"
+                    class="map-mode-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 flex items-center gap-1.5">
+                    🏢 Jaringan Ekspedisi (206)
+                </button>
                 <button onclick="resetMapView()" id="btn-reset"
                     class="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 flex items-center gap-1.5">
                     🔄 Reset
@@ -311,6 +315,28 @@
         <div class="flex flex-col lg:flex-row" style="min-height:520px">
             <!-- Left: Map + Status Banner -->
             <div class="flex-1 relative flex flex-col">
+                <!-- Quick Carrier Filter Bar -->
+                <div class="px-4 py-2 bg-slate-900/95 dark:bg-[#070D1E] text-xs text-white flex items-center justify-between gap-3 border-b border-slate-800 flex-wrap">
+                    <div class="flex items-center gap-2 flex-1 min-w-[280px]">
+                        <span class="text-[11px] font-bold text-amber-400 flex items-center gap-1.5 flex-shrink-0">
+                            🏢 Filter Ekspedisi:
+                        </span>
+                        <select id="carrier-map-filter" onchange="filterCargoByCarrier(this.value)" class="flex-1 max-w-md px-3 py-1 text-xs bg-slate-800 dark:bg-slate-950 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:ring-1 focus:ring-amber-500">
+                            <option value="">Semua Ekspedisi (206 Mitra Global)</option>
+                            @foreach($allCarriers as $carrier)
+                                <option value="{{ $carrier->id }}">
+                                    {{ $carrier->name }} ({{ $carrier->code }}) &bull; {{ $carrier->country }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div id="carrier-filter-badge" class="hidden text-[11px] text-amber-300 font-medium items-center gap-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span id="carrier-filter-text">Memfilter Armada</span>
+                        <button type="button" onclick="filterCargoByCarrier('')" class="underline text-slate-400 hover:text-white text-[10px] ml-1">Reset</button>
+                    </div>
+                </div>
+
                 <!-- Active Mode Banner -->
                 <div id="map-mode-banner" class="px-4 py-2 text-xs font-semibold text-white flex items-center gap-2 transition-all duration-300" style="background:linear-gradient(90deg,#0A1128,#0e3a6e);">
                     <span id="banner-icon">🧭</span>
@@ -368,6 +394,10 @@
                     <div class="text-slate-600 dark:text-slate-400">
                         <span class="font-semibold text-slate-700 dark:text-slate-300">Hub Utama:</span>
                         <span id="selected-hub" class="font-medium text-cyan-700 dark:text-cyan-400"></span>
+                    </div>
+                    <div id="selected-carrier-wrapper" class="text-slate-600 dark:text-slate-400 mt-1 pt-1 border-t border-cyan-100 dark:border-cyan-900/60 hidden">
+                        <span class="font-semibold text-slate-700 dark:text-slate-300">Ekspedisi:</span>
+                        <span id="selected-carrier" class="font-bold text-amber-700 dark:text-amber-400"></span>
                     </div>
                 </div>
                 <!-- Scrollable Country List -->
@@ -583,6 +613,7 @@
         const portsData    = {!! json_encode($globalPorts) !!};
         const weatherData  = {!! json_encode($weatherHubs) !!};
         const countriesData = {!! json_encode($countriesList) !!};
+        const carriersData = {!! json_encode($carriersMapData) !!};
 
         // Guaranteed Absolute Route URLs direct from Laravel Blade (No 404s!)
         const WEATHER_PAGE_URL = "{{ route('admin.intelligence.weather') }}";
@@ -674,10 +705,11 @@
         ];
 
         // Layer groups for each mode
-        const cargoLayerGroup   = L.layerGroup();
-        const routeLayerGroup   = L.layerGroup();
-        const weatherLayerGroup = L.layerGroup();
-        const portsLayerGroup   = L.layerGroup();
+        const cargoLayerGroup    = L.layerGroup();
+        const routeLayerGroup    = L.layerGroup();
+        const weatherLayerGroup  = L.layerGroup();
+        const portsLayerGroup    = L.layerGroup();
+        const carriersLayerGroup = L.layerGroup();
 
         let currentMode = 'cargo';
 
@@ -696,10 +728,11 @@
                 btn.style.borderColor = '';
             });
             const activeMap = {
-                'cargo':   { id: 'btn-cargo',   bg:'#0e6ba8', border:'#0e6ba8' },
-                'route':   { id: 'btn-route',   bg:'#0284c7', border:'#0284c7' },
-                'weather': { id: 'btn-weather', bg:'#d97706', border:'#d97706' },
-                'ports':   { id: 'btn-ports',   bg:'#7c3aed', border:'#7c3aed' }
+                'cargo':    { id: 'btn-cargo',    bg:'#0e6ba8', border:'#0e6ba8' },
+                'route':    { id: 'btn-route',    bg:'#0284c7', border:'#0284c7' },
+                'weather':  { id: 'btn-weather',  bg:'#d97706', border:'#d97706' },
+                'ports':    { id: 'btn-ports',    bg:'#7c3aed', border:'#7c3aed' },
+                'carriers': { id: 'btn-carriers', bg:'#b45309', border:'#b45309' }
             };
             if (activeMap[mode]) {
                 const btn = document.getElementById(activeMap[mode].id);
@@ -712,10 +745,11 @@
 
         // ── BANNER UPDATE ───────────────────────────────────────
         const banners = {
-            cargo:   { icon:'🧭', text:'Mode: Pemantau CargoTrace — Kargo Aktif & Jalur Pengiriman Global', bg:'linear-gradient(90deg,#0A1128,#0e3a6e)' },
-            route:   { icon:'📍', text:'Mode: Route Tracker — Pelacakan Rute Maritim Global Interaktif & Titik Waypoint Antar Benua', bg:'linear-gradient(90deg,#0c4a6e,#0284c7)' },
-            weather: { icon:'⛅', text:'Mode: Cuaca Langsung — 60+ Titik Cuaca Maritim Terkalibrasi & Evaluasi Risiko Badai', bg:'linear-gradient(90deg,#431407,#92400e)' },
-            ports:   { icon:'⚓', text:'Mode: Sebaran Pelabuhan — Data Pelabuhan Maritim Dunia Merata Global (ArcGIS Live WPI FeatureServer)', bg:'linear-gradient(90deg,#2e1065,#5b21b6)' }
+            cargo:    { icon:'🧭', text:'Mode: Pemantau CargoTrace — Kargo Aktif & Jalur Pengiriman Global', bg:'linear-gradient(90deg,#0A1128,#0e3a6e)' },
+            route:    { icon:'📍', text:'Mode: Route Tracker — Pelacakan Rute Maritim Global Interaktif & Titik Waypoint Antar Benua', bg:'linear-gradient(90deg,#0c4a6e,#0284c7)' },
+            weather:  { icon:'⛅', text:'Mode: Cuaca Langsung — 60+ Titik Cuaca Maritim Terkalibrasi & Evaluasi Risiko Badai', bg:'linear-gradient(90deg,#431407,#92400e)' },
+            ports:    { icon:'⚓', text:'Mode: Sebaran Pelabuhan — Data Pelabuhan Maritim Dunia Merata Global (ArcGIS Live WPI FeatureServer)', bg:'linear-gradient(90deg,#2e1065,#5b21b6)' },
+            carriers: { icon:'🏢', text:'Mode: Jaringan Ekspedisi Global — 206 Perusahaan Pengiriman, Pelayaran & Maskapai Kargo Resmi Dunia', bg:'linear-gradient(90deg,#78350F,#B45309)' }
         };
         function updateBanner(mode) {
             const b = banners[mode];
@@ -751,7 +785,9 @@
                       <span class="flex items-center gap-1.5"><span class="w-3.5 h-2.5 rounded bg-orange-600 inline-block border border-white"></span>Hangat (&gt;25°C)</span>
                       <span class="flex items-center gap-1.5 text-slate-400">Pill cuaca tiap negara (klik untuk detail profil)</span>`,
             ports:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block"></span>Pelabuhan ArcGIS Live WPI</span>
-                      <span class="flex items-center gap-1.5 text-slate-400">Klik marker untuk melihat profil pelabuhan</span>`
+                      <span class="flex items-center gap-1.5 text-slate-400">Klik marker untuk melihat profil pelabuhan</span>`,
+            carriers: `<span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded bg-amber-500 inline-flex items-center justify-center text-[10px] text-white">🏢</span>Markas Ekspedisi Resmi</span>
+                       <span class="flex items-center gap-1.5 text-slate-400">Klik marker untuk profil mitra & filter armada kargo di laut</span>`
         };
         function updateLegend(mode) {
             document.getElementById('map-legend').innerHTML = legends[mode];
@@ -1568,6 +1604,147 @@
             });
         }
 
+        // ── BUILD CARRIERS LAYER (206 Mitra Ekspedisi Resmi Seluruh Dunia) ───────
+        function buildCarriersLayer() {
+            carriersLayerGroup.clearLayers();
+            if (!Array.isArray(carriersData)) return;
+
+            carriersData.forEach(c => {
+                if (!c.lat || !c.lng || (c.lat === 0 && c.lng === 0)) return;
+
+                const carrierIcon = L.divIcon({
+                    className: 'carrier-hq-marker',
+                    html: `
+                        <div style="background:linear-gradient(135deg, #F59E0B, #B45309); width:30px; height:30px; border-radius:50%; border:2px solid #ffffff; box-shadow:0 3px 8px rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; color:#ffffff; font-size:14px; cursor:pointer; transition:transform 0.2s;"
+                             onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'"
+                             title="${c.name} (${c.code}) - ${c.country}">
+                            🏢
+                        </div>
+                    `,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15],
+                    popupAnchor: [0, -15]
+                });
+
+                const marker = L.marker([c.lat, c.lng], { icon: carrierIcon });
+                marker.countryCode = (c.iso || '').toUpperCase();
+                marker.countryName = (c.country || '').toLowerCase();
+                marker.carrierCode = (c.code || '').toUpperCase();
+                marker.carrierName = (c.name || '').toLowerCase();
+
+                marker.on('click', function() {
+                    syncSidebarWithCountry(c.iso, c.country, `Mitra Ekspedisi: ${c.name} (${c.code})`);
+                });
+
+                marker.bindPopup(`
+                    <div style="min-width:250px; font-family: Outfit, sans-serif; padding:4px 2px;">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                            <img src="https://flagcdn.com/w40/${c.iso || 'id'}.png" alt="${c.country}"
+                                 style="width:32px; height:22px; object-fit:cover; border-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,0.2); border:1px solid #e2e8f0; flex-shrink:0;">
+                            <div>
+                                <div style="font-weight:800; font-size:13.5px; color:#0f172a; line-height:1.2;">${c.name}</div>
+                                <div style="font-size:11px; color:#64748b;">${c.country} &bull; Kode: <b style="color:#D97706">${c.code}</b></div>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; background:#FFFBEB; color:#92400E; border:1px solid #FDE68A; padding:6px 10px; border-radius:10px; font-weight:700; font-size:11px; margin-bottom:8px;">
+                            <span>📦 Armada Terdaftar:</span>
+                            <span style="font-weight:800; color:#B45309;">${c.shipments_count || 0} Pengiriman</span>
+                        </div>
+                        <div style="background:#F8FAFC; color:#334155; border:1px solid #E2E8F0; padding:8px 10px; border-radius:10px; font-size:11px; margin-bottom:10px; line-height:1.4;">
+                            <div>📧 <b>Email:</b> ${c.contact_email}</div>
+                            ${c.contact_phone ? `<div>📞 <b>Telp:</b> ${c.contact_phone}</div>` : ''}
+                            ${c.website ? `<div>🌐 <a href="${c.website}" target="_blank" style="color:#0284c7; text-decoration:underline;">Situs Resmi Ekspedisi &rarr;</a></div>` : ''}
+                        </div>
+                        <button onclick="filterCargoByCarrier('${c.id}')" style="display:block; width:100%; text-align:center; background:#D97706; color:#ffffff; font-weight:700; padding:8px 12px; border-radius:10px; border:none; cursor:pointer; font-size:12px; box-shadow:0 1px 3px rgba(217,119,6,0.3); transition:all 0.2s;">
+                            🔍 Lacak Armada Kargo Ekspedisi Ini &rarr;
+                        </button>
+                    </div>
+                `, { maxWidth: 290 });
+
+                marker.addTo(carriersLayerGroup);
+            });
+        }
+
+        // ── FILTER CARGO BY CARRIER (Filter Cepat Armada Ekspedisi di Laut) ───
+        let activeCarrierFilter = null;
+        function filterCargoByCarrier(carrierId) {
+            activeCarrierFilter = carrierId ? parseInt(carrierId, 10) : null;
+            const filterSelect = document.getElementById('carrier-map-filter');
+            const filterBadge  = document.getElementById('carrier-filter-badge');
+            const filterText   = document.getElementById('carrier-filter-text');
+
+            if (filterSelect && filterSelect.value !== (carrierId || '')) {
+                filterSelect.value = carrierId || '';
+            }
+
+            if (currentMode !== 'cargo') {
+                switchMapMode('cargo');
+            }
+
+            if (!activeCarrierFilter) {
+                if (filterBadge) filterBadge.classList.add('hidden');
+                cargoShipmentItems.forEach(item => {
+                    if (item.originMarker) item.originMarker.setStyle({ opacity: 1, fillOpacity: 1 });
+                    if (item.destMarker) item.destMarker.setStyle({ opacity: 1, fillOpacity: 1 });
+                    if (item.traveledPoly) item.traveledPoly.setStyle({ opacity: 0.9, weight: 3.5, color: '#0284c7' });
+                    if (item.remainingPoly) item.remainingPoly.setStyle({ opacity: 0.8, weight: 2.5, color: '#38bdf8' });
+                    if (item.directPoly) item.directPoly.setStyle({ opacity: 0.75, weight: 2.5, color: '#0284c7' });
+                    if (item.vehicleMarker && item.vehicleMarker.getElement()) {
+                        item.vehicleMarker.getElement().classList.remove('marker-dimmed');
+                        item.vehicleMarker.getElement().querySelector('.cargo-real-vehicle-wrapper')?.classList.remove('vehicle-focused');
+                    }
+                });
+                return;
+            }
+
+            let matchCount = 0;
+            let matchedBounds = null;
+            let carrierObj = carriersData.find(c => c.id === activeCarrierFilter);
+            let carrierLabel = carrierObj ? `${carrierObj.name} (${carrierObj.code})` : 'Ekspedisi Terpilih';
+
+            cargoShipmentItems.forEach(item => {
+                const itemCarrierId = item.s.carrier_id || (item.s.carrier ? item.s.carrier.id : null);
+                const isMatch = itemCarrierId === activeCarrierFilter;
+
+                if (isMatch) {
+                    matchCount++;
+                    if (item.originMarker) item.originMarker.setStyle({ opacity: 1, fillOpacity: 1 });
+                    if (item.destMarker) item.destMarker.setStyle({ opacity: 1, fillOpacity: 1 });
+                    if (item.traveledPoly) item.traveledPoly.setStyle({ opacity: 1, weight: 5, color: '#00F0FF' });
+                    if (item.remainingPoly) item.remainingPoly.setStyle({ opacity: 0.95, weight: 3.5, color: '#38BDF8' });
+                    if (item.directPoly) item.directPoly.setStyle({ opacity: 1, weight: 4.5, color: '#00F0FF' });
+                    if (item.vehicleMarker && item.vehicleMarker.getElement()) {
+                        item.vehicleMarker.getElement().classList.remove('marker-dimmed');
+                        item.vehicleMarker.getElement().querySelector('.cargo-real-vehicle-wrapper')?.classList.add('vehicle-focused');
+                    }
+                    if (item.bounds) {
+                        matchedBounds = matchedBounds ? matchedBounds.extend(item.bounds) : L.latLngBounds(item.bounds.getSouthWest(), item.bounds.getNorthEast());
+                    }
+                } else {
+                    if (item.originMarker) item.originMarker.setStyle({ opacity: 0.15, fillOpacity: 0.15 });
+                    if (item.destMarker) item.destMarker.setStyle({ opacity: 0.15, fillOpacity: 0.15 });
+                    if (item.traveledPoly) item.traveledPoly.setStyle({ opacity: 0.1, weight: 1.5 });
+                    if (item.remainingPoly) item.remainingPoly.setStyle({ opacity: 0.1, weight: 1 });
+                    if (item.directPoly) item.directPoly.setStyle({ opacity: 0.1, weight: 1 });
+                    if (item.vehicleMarker && item.vehicleMarker.getElement()) {
+                        item.vehicleMarker.getElement().classList.add('marker-dimmed');
+                        item.vehicleMarker.getElement().querySelector('.cargo-real-vehicle-wrapper')?.classList.remove('vehicle-focused');
+                    }
+                }
+            });
+
+            if (filterBadge && filterText) {
+                filterText.textContent = `${matchCount} Armada: ${carrierLabel}`;
+                filterBadge.classList.remove('hidden');
+            }
+
+            if (matchedBounds) {
+                map.fitBounds(matchedBounds, { padding: [70, 70], maxZoom: 6 });
+            } else if (carrierObj && carrierObj.lat && carrierObj.lng) {
+                map.flyTo([carrierObj.lat, carrierObj.lng], 5, { duration: 1.2 });
+            }
+        }
+
         // ── TWO-WAY SYNC HELPER (Marker Klik -> Update Sidebar Negara) ────────
         function syncSidebarWithCountry(codeOrIso, countryName, hubName) {
             if (!codeOrIso && !countryName) return;
@@ -1579,6 +1756,8 @@
             const flagImg = document.getElementById('selected-flag-img');
             const nameEl = document.getElementById('selected-name');
             const hubEl = document.getElementById('selected-hub');
+            const carrierWrapper = document.getElementById('selected-carrier-wrapper');
+            const carrierEl = document.getElementById('selected-carrier');
 
             if (flagImg) {
                 flagImg.src = `https://flagcdn.com/w40/${isoClean || 'id'}.png`;
@@ -1586,6 +1765,20 @@
             }
             if (nameEl) nameEl.textContent = countryName || '';
             if (hubEl) hubEl.textContent = ' ' + (hubName || 'Pelabuhan & Hub Logistik');
+
+            // Cari ekspedisi resmi untuk negara ini
+            const matchedCarrier = carriersData.find(c => {
+                const cIso = (c.iso || '').toLowerCase().trim();
+                const cCountry = (c.country || '').toLowerCase().trim();
+                return cIso === isoClean || cCountry === nameClean || nameClean.includes(cCountry);
+            });
+            if (matchedCarrier && carrierWrapper && carrierEl) {
+                carrierEl.textContent = `${matchedCarrier.name} (${matchedCarrier.code})`;
+                carrierWrapper.classList.remove('hidden');
+            } else if (carrierWrapper) {
+                carrierWrapper.classList.add('hidden');
+            }
+
             if (card) card.classList.remove('hidden');
 
             // 2. Sorot & Auto-Scroll item di daftar negara
@@ -1614,6 +1807,7 @@
             map.removeLayer(routeLayerGroup);
             map.removeLayer(weatherLayerGroup);
             map.removeLayer(portsLayerGroup);
+            map.removeLayer(carriersLayerGroup);
 
             updateModeButtons(mode);
             updateBanner(mode);
@@ -1635,6 +1829,10 @@
                 } else if (mode === 'ports') {
                     buildPortsLayer();
                     portsLayerGroup.addTo(map);
+                    map.flyTo([20, 20], 2.2, { duration: 1.2 });
+                } else if (mode === 'carriers') {
+                    buildCarriersLayer();
+                    carriersLayerGroup.addTo(map);
                     map.flyTo([20, 20], 2.2, { duration: 1.2 });
                 }
             } catch (err) {
@@ -1764,6 +1962,40 @@
                 if (closestRouteMarker && minRDist < 10) {
                     setTimeout(() => closestRouteMarker.openPopup(), 400);
                 }
+            } else if (currentMode === 'carriers') {
+                let found = false;
+                const countryCodeUpper = code.toUpperCase();
+                const countryNameLower = name.toLowerCase();
+
+                carriersLayerGroup.eachLayer(layer => {
+                    if (!found && layer.countryCode && (layer.countryCode === countryCodeUpper || layer.countryName === countryNameLower)) {
+                        setTimeout(() => layer.openPopup(), 400);
+                        found = true;
+                    }
+                });
+
+                if (!found) {
+                    setTimeout(() => {
+                        L.popup({ maxWidth: 280 })
+                            .setLatLng([lat, lng])
+                            .setContent(`
+                                <div style="min-width:240px; font-family: Outfit, sans-serif; padding:4px 2px;">
+                                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                                        <img src="https://flagcdn.com/w40/${iso}.png" alt="${name}"
+                                             style="width:28px; height:18px; object-fit:cover; border-radius:3px; border:1px solid #e2e8f0;">
+                                        <div>
+                                            <div style="font-weight:800; font-size:13px; color:#0f172a;">${name}</div>
+                                            <div style="font-size:11px; color:#64748b;">Perwakilan Logistik Nasional</div>
+                                        </div>
+                                    </div>
+                                    <div style="background:#FFFBEB; color:#92400E; border:1px solid #FDE68A; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:600;">
+                                        🏢 Mitra Resmi Terdaftar dalam Jaringan CargoTrace
+                                    </div>
+                                </div>
+                            `)
+                            .openOn(map);
+                    }, 400);
+                }
             } else if (currentMode === 'cargo') {
                 // Berikan info transit kargo untuk negara yang dipilih
                 setTimeout(() => {
@@ -1805,6 +2037,7 @@
         window.filterCountriesList = filterCountriesList;
         window.focusCargoShipment  = focusCargoShipment;
         window.resetShipmentFocus  = resetCargoShipmentFocus;
+        window.filterCargoByCarrier = filterCargoByCarrier;
 
         // Klik di area peta kosong mengembalikan fokus rute ke normal
         map.on('click', function(e) {

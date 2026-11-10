@@ -63,10 +63,48 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Global Intelligence Data for 3-Mode Interactive Map
+        // Global Intelligence Data for 5-Mode Interactive Map
         $globalPorts    = $intelligenceService->getGlobalPorts();
         $weatherHubs    = $intelligenceService->getGlobalWeatherHubs();
         $countriesList  = $intelligenceService->getCountriesMaster();
+
+        // Seluruh 206 Ekspedisi Aktif dengan info pengiriman & koordinat markas untuk Peta Ekspedisi
+        $allCarriers = Carrier::withCount('shipments')
+            ->where('status', Carrier::STATUS_ACTIVE)
+            ->orderBy('name', 'asc')
+            ->get();
+
+        $countryMap = [];
+        foreach ($countriesList as $c) {
+            $countryMap[strtolower($c['name'])] = $c;
+            $countryMap[strtolower($c['code'])] = $c;
+            $iso = strtolower(str_replace('_EAST', '', $c['code']));
+            $countryMap[$iso] = $c;
+        }
+
+        $carriersMapData = $allCarriers->map(function ($carrier) use ($countryMap) {
+            $cLower = strtolower(trim($carrier->country));
+            $countryInfo = $countryMap[$cLower] ?? null;
+            $lat = $countryInfo['lat'] ?? 0.0;
+            $lng = $countryInfo['lng'] ?? 0.0;
+            $iso = $countryInfo ? strtolower(str_replace('_EAST', '', $countryInfo['code'])) : 'un';
+            $flag = $countryInfo['flag'] ?? '🌐';
+
+            return [
+                'id'              => $carrier->id,
+                'code'            => $carrier->code,
+                'name'            => $carrier->name,
+                'country'         => $carrier->country,
+                'contact_email'   => $carrier->contact_email,
+                'contact_phone'   => $carrier->contact_phone,
+                'website'         => $carrier->website,
+                'shipments_count' => $carrier->shipments_count,
+                'lat'             => $lat,
+                'lng'             => $lng,
+                'iso'             => $iso,
+                'flag'            => $flag,
+            ];
+        });
 
         return view('admin.dashboard', compact(
             'totalShipments',
@@ -80,6 +118,8 @@ class DashboardController extends Controller
             'mapShipments',
             'recentActivities',
             'carriers',
+            'allCarriers',
+            'carriersMapData',
             'globalPorts',
             'weatherHubs',
             'countriesList'

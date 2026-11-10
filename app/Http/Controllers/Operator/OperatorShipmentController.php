@@ -325,13 +325,16 @@ class OperatorShipmentController extends Controller
     public function map(Request $request): View
     {
         $selectedShipmentId = $request->input('shipment_id');
+        $selectedCarrierId  = $request->input('carrier_id');
         $allShipments = Shipment::with(['origin', 'destination', 'currentLocation', 'carrier'])->get();
+        $carriers = Carrier::where('status', Carrier::STATUS_ACTIVE)->orderBy('name', 'asc')->get();
 
         $mapShipments = Shipment::with(['origin', 'destination', 'currentLocation', 'carrier', 'trackingEvents.location'])
             ->when($selectedShipmentId, fn ($q) => $q->where('id', $selectedShipmentId))
+            ->when($selectedCarrierId, fn ($q) => $q->where('carrier_id', $selectedCarrierId))
             ->get();
 
-        return view('operator.shipments.map', compact('mapShipments', 'allShipments', 'selectedShipmentId'));
+        return view('operator.shipments.map', compact('mapShipments', 'allShipments', 'carriers', 'selectedShipmentId', 'selectedCarrierId'));
     }
 }
 

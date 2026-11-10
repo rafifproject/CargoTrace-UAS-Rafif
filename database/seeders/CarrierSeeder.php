@@ -42,3 +42,4 @@ class CarrierSeeder extends Seeder
         $this->command?->info("Berhasil mengimpor " . count($carriers) . " ekspedisi global dari seluruh 195+ negara dunia.");
     }
 }
+
