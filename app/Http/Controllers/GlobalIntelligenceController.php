@@ -57,6 +57,13 @@ class GlobalIntelligenceController extends Controller
         $currencies = $this->intelligenceService->getCurrencies($base);
         $currencyMeta = $this->intelligenceService->getCurrencyMeta();
 
+        // Pastikan setiap kode mata uang dari live feed memiliki metadata lengkap
+        foreach (array_keys($currencies['rates'] ?? []) as $code) {
+            if (!isset($currencyMeta[$code])) {
+                $currencyMeta[$code] = $this->intelligenceService->getCurrencyMetaFor($code);
+            }
+        }
+
         // 30 days trend simulation for USD/IDR
         $dates = [];
         $rates = [];

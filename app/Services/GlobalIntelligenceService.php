@@ -967,11 +967,12 @@ class GlobalIntelligenceService
 
     /**
      * 9. Metadata Lengkap 160+ Mata Uang Dunia (ExchangeRate-API ISO 4217)
-     * Memetakan kode mata uang ke nama mata uang, negara asal, dan kode bendera ISO
+     * Memetakan seluruh kode mata uang ke nama mata uang lengkap, negara asal, kode bendera ISO, dan simbol mata uang
      */
     public function getCurrencyMeta(): array
     {
         return [
+            // Utama, Asia-Pasifik, & Global
             'USD' => ['name' => 'Dolar Amerika Serikat', 'country' => 'Amerika Serikat', 'flag' => 'us', 'symbol' => '$'],
             'EUR' => ['name' => 'Euro Uni Eropa', 'country' => 'Uni Eropa', 'flag' => 'eu', 'symbol' => '€'],
             'IDR' => ['name' => 'Rupiah Indonesia', 'country' => 'Indonesia', 'flag' => 'id', 'symbol' => 'Rp'],
@@ -979,6 +980,7 @@ class GlobalIntelligenceService
             'JPY' => ['name' => 'Yen Jepang', 'country' => 'Jepang', 'flag' => 'jp', 'symbol' => '¥'],
             'SGD' => ['name' => 'Dolar Singapura', 'country' => 'Singapura', 'flag' => 'sg', 'symbol' => 'S$'],
             'CNY' => ['name' => 'Yuan Renminbi Tiongkok', 'country' => 'Tiongkok', 'flag' => 'cn', 'symbol' => '¥'],
+            'CNH' => ['name' => 'Yuan Tiongkok (Offshore)', 'country' => 'Tiongkok', 'flag' => 'cn', 'symbol' => '¥'],
             'AUD' => ['name' => 'Dolar Australia', 'country' => 'Australia', 'flag' => 'au', 'symbol' => 'A$'],
             'CAD' => ['name' => 'Dolar Kanada', 'country' => 'Kanada', 'flag' => 'ca', 'symbol' => 'CA$'],
             'CHF' => ['name' => 'Franc Swiss', 'country' => 'Swiss', 'flag' => 'ch', 'symbol' => 'CHF'],
@@ -1009,6 +1011,7 @@ class GlobalIntelligenceService
             'EGP' => ['name' => 'Pound Mesir', 'country' => 'Mesir', 'flag' => 'eg', 'symbol' => 'E£'],
             'ILS' => ['name' => 'Shekel Baru Israel', 'country' => 'Israel', 'flag' => 'il', 'symbol' => '₪'],
             'CLP' => ['name' => 'Peso Chili', 'country' => 'Chili', 'flag' => 'cl', 'symbol' => '$'],
+            'CLF' => ['name' => 'Unidad de Fomento Chili', 'country' => 'Chili', 'flag' => 'cl', 'symbol' => 'UF'],
             'COP' => ['name' => 'Peso Kolombia', 'country' => 'Kolombia', 'flag' => 'co', 'symbol' => '$'],
             'PEN' => ['name' => 'Sol Peru', 'country' => 'Peru', 'flag' => 'pe', 'symbol' => 'S/.'],
             'ARS' => ['name' => 'Peso Argentina', 'country' => 'Argentina', 'flag' => 'ar', 'symbol' => '$'],
@@ -1027,10 +1030,11 @@ class GlobalIntelligenceService
             'MUR' => ['name' => 'Rupee Mauritius', 'country' => 'Mauritius', 'flag' => 'mu', 'symbol' => '₨'],
             'FJD' => ['name' => 'Dolar Fiji', 'country' => 'Fiji', 'flag' => 'fj', 'symbol' => 'FJ$'],
             'PGK' => ['name' => 'Kina Papua Nugini', 'country' => 'Papua Nugini', 'flag' => 'pg', 'symbol' => 'K'],
-            'BND' => ['name' => 'Dolar Brunei', 'country' => 'Brunei', 'flag' => 'bn', 'symbol' => 'B$'],
+            'BND' => ['name' => 'Dolar Brunei', 'country' => 'Brunei Darussalam', 'flag' => 'bn', 'symbol' => 'B$'],
             'JOD' => ['name' => 'Dinar Yordania', 'country' => 'Yordania', 'flag' => 'jo', 'symbol' => 'JD'],
             'LBP' => ['name' => 'Pound Lebanon', 'country' => 'Lebanon', 'flag' => 'lb', 'symbol' => 'L£'],
             'IQD' => ['name' => 'Dinar Irak', 'country' => 'Irak', 'flag' => 'iq', 'symbol' => 'IQD'],
+            'IRR' => ['name' => 'Rial Iran', 'country' => 'Iran', 'flag' => 'ir', 'symbol' => '﷼'],
             'KZT' => ['name' => 'Tenge Kazakhstan', 'country' => 'Kazakhstan', 'flag' => 'kz', 'symbol' => '₸'],
             'UAH' => ['name' => 'Hryvnia Ukraina', 'country' => 'Ukraina', 'flag' => 'ua', 'symbol' => '₴'],
             'UYU' => ['name' => 'Peso Uruguay', 'country' => 'Uruguay', 'flag' => 'uy', 'symbol' => '$U'],
@@ -1043,6 +1047,10 @@ class GlobalIntelligenceService
             'BBD' => ['name' => 'Dolar Barbados', 'country' => 'Barbados', 'flag' => 'bb', 'symbol' => 'Bds$'],
             'XOF' => ['name' => 'Franc CFA Afrika Barat', 'country' => 'Afrika Barat (BCEAO)', 'flag' => 'sn', 'symbol' => 'CFA'],
             'XAF' => ['name' => 'Franc CFA Afrika Tengah', 'country' => 'Afrika Tengah (BEAC)', 'flag' => 'cm', 'symbol' => 'FCFA'],
+            'XCD' => ['name' => 'Dolar Karibia Timur', 'country' => 'Karibia Timur (OECS)', 'flag' => 'ag', 'symbol' => 'EC$'],
+            'XCG' => ['name' => 'Guilder Karibia', 'country' => 'Curaçao & Sint Maarten', 'flag' => 'cw', 'symbol' => 'Cg.'],
+            'XDR' => ['name' => 'Hak Penarikan Khusus (SDR)', 'country' => 'IMF (Dana Moneter Internasional)', 'flag' => 'un', 'symbol' => 'SDR'],
+            'XPF' => ['name' => 'Franc CFP Pasifik', 'country' => 'Polinesia & Kaledonia Baru', 'flag' => 'pf', 'symbol' => '₣'],
             'DZD' => ['name' => 'Dinar Aljazair', 'country' => 'Aljazair', 'flag' => 'dz', 'symbol' => 'DA'],
             'TND' => ['name' => 'Dinar Tunisia', 'country' => 'Tunisia', 'flag' => 'tn', 'symbol' => 'DT'],
             'UGX' => ['name' => 'Shilling Uganda', 'country' => 'Uganda', 'flag' => 'ug', 'symbol' => 'USh'],
@@ -1060,6 +1068,97 @@ class GlobalIntelligenceService
             'KHR' => ['name' => 'Riel Kamboja', 'country' => 'Kamboja', 'flag' => 'kh', 'symbol' => '៛'],
             'LAK' => ['name' => 'Kip Laos', 'country' => 'Laos', 'flag' => 'la', 'symbol' => '₭'],
             'MOP' => ['name' => 'Pataca Makau', 'country' => 'Makau', 'flag' => 'mo', 'symbol' => 'MOP$'],
+            'AFN' => ['name' => 'Afghani Afganistan', 'country' => 'Afganistan', 'flag' => 'af', 'symbol' => '؋'],
+            'ALL' => ['name' => 'Lek Albania', 'country' => 'Albania', 'flag' => 'al', 'symbol' => 'L'],
+            'ANG' => ['name' => 'Guilder Antillen Belanda', 'country' => 'Curaçao & Sint Maarten', 'flag' => 'cw', 'symbol' => 'NAƒ'],
+            'AOA' => ['name' => 'Kwanza Angola', 'country' => 'Angola', 'flag' => 'ao', 'symbol' => 'Kz'],
+            'AWG' => ['name' => 'Florin Aruba', 'country' => 'Aruba', 'flag' => 'aw', 'symbol' => 'Afl.'],
+            'BIF' => ['name' => 'Franc Burundi', 'country' => 'Burundi', 'flag' => 'bi', 'symbol' => 'FBu'],
+            'BMD' => ['name' => 'Dolar Bermuda', 'country' => 'Bermuda', 'flag' => 'bm', 'symbol' => 'BD$'],
+            'BOB' => ['name' => 'Boliviano Bolivia', 'country' => 'Bolivia', 'flag' => 'bo', 'symbol' => 'Bs.'],
+            'BTN' => ['name' => 'Ngultrum Bhutan', 'country' => 'Bhutan', 'flag' => 'bt', 'symbol' => 'Nu.'],
+            'BWP' => ['name' => 'Pula Botswana', 'country' => 'Botswana', 'flag' => 'bw', 'symbol' => 'P'],
+            'BYN' => ['name' => 'Rubel Belarusia', 'country' => 'Belarusia', 'flag' => 'by', 'symbol' => 'Br'],
+            'BZD' => ['name' => 'Dolar Belize', 'country' => 'Belize', 'flag' => 'bz', 'symbol' => 'BZ$'],
+            'CDF' => ['name' => 'Franc Kongo', 'country' => 'Republik Demokratik Kongo', 'flag' => 'cd', 'symbol' => 'FC'],
+            'CUP' => ['name' => 'Peso Kuba', 'country' => 'Kuba', 'flag' => 'cu', 'symbol' => '₱'],
+            'CVE' => ['name' => 'Escudo Tanjung Verde', 'country' => 'Tanjung Verde', 'flag' => 'cv', 'symbol' => '$'],
+            'DJF' => ['name' => 'Franc Jibuti', 'country' => 'Jibuti', 'flag' => 'dj', 'symbol' => 'Fdj'],
+            'ERN' => ['name' => 'Nakfa Eritrea', 'country' => 'Eritrea', 'flag' => 'er', 'symbol' => 'Nfk'],
+            'FKP' => ['name' => 'Pound Kepulauan Falkland', 'country' => 'Kepulauan Falkland', 'flag' => 'fk', 'symbol' => '£'],
+            'FOK' => ['name' => 'Krona Kepulauan Faroe', 'country' => 'Kepulauan Faroe', 'flag' => 'fo', 'symbol' => 'kr'],
+            'GGP' => ['name' => 'Pound Guernsey', 'country' => 'Guernsey', 'flag' => 'gg', 'symbol' => '£'],
+            'GIP' => ['name' => 'Pound Gibraltar', 'country' => 'Gibraltar', 'flag' => 'gi', 'symbol' => '£'],
+            'GMD' => ['name' => 'Dalasi Gambia', 'country' => 'Gambia', 'flag' => 'gm', 'symbol' => 'D'],
+            'GNF' => ['name' => 'Franc Guinea', 'country' => 'Guinea', 'flag' => 'gn', 'symbol' => 'FG'],
+            'GTQ' => ['name' => 'Quetzal Guatemala', 'country' => 'Guatemala', 'flag' => 'gt', 'symbol' => 'Q'],
+            'GYD' => ['name' => 'Dolar Guyana', 'country' => 'Guyana', 'flag' => 'gy', 'symbol' => 'G$'],
+            'HNL' => ['name' => 'Lempira Honduras', 'country' => 'Honduras', 'flag' => 'hn', 'symbol' => 'L'],
+            'HRK' => ['name' => 'Kuna Kroasia', 'country' => 'Kroasia', 'flag' => 'hr', 'symbol' => 'kn'],
+            'HTG' => ['name' => 'Gourde Haiti', 'country' => 'Haiti', 'flag' => 'ht', 'symbol' => 'G'],
+            'IMP' => ['name' => 'Pound Isle of Man', 'country' => 'Pulau Man', 'flag' => 'im', 'symbol' => '£'],
+            'JEP' => ['name' => 'Pound Jersey', 'country' => 'Jersey', 'flag' => 'je', 'symbol' => '£'],
+            'KGS' => ['name' => 'Som Kirgizstan', 'country' => 'Kirgizstan', 'flag' => 'kg', 'symbol' => 'с'],
+            'KID' => ['name' => 'Dolar Kiribati', 'country' => 'Kiribati', 'flag' => 'ki', 'symbol' => '$'],
+            'KMF' => ['name' => 'Franc Komoro', 'country' => 'Komoro', 'flag' => 'km', 'symbol' => 'CF'],
+            'KYD' => ['name' => 'Dolar Kepulauan Cayman', 'country' => 'Kepulauan Cayman', 'flag' => 'ky', 'symbol' => 'CI$'],
+            'LRD' => ['name' => 'Dolar Liberia', 'country' => 'Liberia', 'flag' => 'lr', 'symbol' => 'L$'],
+            'LSL' => ['name' => 'Loti Lesotho', 'country' => 'Lesotho', 'flag' => 'ls', 'symbol' => 'L'],
+            'LYD' => ['name' => 'Dinar Libya', 'country' => 'Libya', 'flag' => 'ly', 'symbol' => 'LD'],
+            'MDL' => ['name' => 'Leu Moldova', 'country' => 'Moldova', 'flag' => 'md', 'symbol' => 'L'],
+            'MGA' => ['name' => 'Ariary Madagaskar', 'country' => 'Madagaskar', 'flag' => 'mg', 'symbol' => 'Ar'],
+            'MKD' => ['name' => 'Denar Makedonia Utara', 'country' => 'Makedonia Utara', 'flag' => 'mk', 'symbol' => 'ден'],
+            'MRU' => ['name' => 'Ouguiya Mauritania', 'country' => 'Mauritania', 'flag' => 'mr', 'symbol' => 'UM'],
+            'MVR' => ['name' => 'Rufiyaa Maladewa', 'country' => 'Maladewa', 'flag' => 'mv', 'symbol' => 'Rf'],
+            'MWK' => ['name' => 'Kwacha Malawi', 'country' => 'Malawi', 'flag' => 'mw', 'symbol' => 'MK'],
+            'MZN' => ['name' => 'Metical Mozambik', 'country' => 'Mozambik', 'flag' => 'mz', 'symbol' => 'MT'],
+            'NAD' => ['name' => 'Dolar Namibia', 'country' => 'Namibia', 'flag' => 'na', 'symbol' => 'N$'],
+            'NIO' => ['name' => 'Cordoba Nikaragua', 'country' => 'Nikaragua', 'flag' => 'ni', 'symbol' => 'C$'],
+            'PYG' => ['name' => 'Guarani Paraguay', 'country' => 'Paraguay', 'flag' => 'py', 'symbol' => '₲'],
+            'RWF' => ['name' => 'Franc Rwanda', 'country' => 'Rwanda', 'flag' => 'rw', 'symbol' => 'FRw'],
+            'SBD' => ['name' => 'Dolar Kepulauan Solomon', 'country' => 'Kepulauan Solomon', 'flag' => 'sb', 'symbol' => 'SI$'],
+            'SDG' => ['name' => 'Pound Sudan', 'country' => 'Sudan', 'flag' => 'sd', 'symbol' => 'SDG'],
+            'SHP' => ['name' => 'Pound Saint Helena', 'country' => 'Saint Helena', 'flag' => 'sh', 'symbol' => '£'],
+            'SLE' => ['name' => 'Leone Sierra Leone (Baru)', 'country' => 'Sierra Leone', 'flag' => 'sl', 'symbol' => 'Le'],
+            'SLL' => ['name' => 'Leone Sierra Leone (Lama)', 'country' => 'Sierra Leone', 'flag' => 'sl', 'symbol' => 'Le'],
+            'SOS' => ['name' => 'Shilling Somalia', 'country' => 'Somalia', 'flag' => 'so', 'symbol' => 'S'],
+            'SRD' => ['name' => 'Dolar Suriname', 'country' => 'Suriname', 'flag' => 'sr', 'symbol' => 'Sr$'],
+            'SSP' => ['name' => 'Pound Sudan Selatan', 'country' => 'Sudan Selatan', 'flag' => 'ss', 'symbol' => '£'],
+            'STN' => ['name' => 'Dobra Sao Tome', 'country' => 'Sao Tome & Principe', 'flag' => 'st', 'symbol' => 'Db'],
+            'SYP' => ['name' => 'Pound Suriah', 'country' => 'Suriah', 'flag' => 'sy', 'symbol' => '£S'],
+            'SZL' => ['name' => 'Lilangeni Eswatini', 'country' => 'Eswatini', 'flag' => 'sz', 'symbol' => 'L'],
+            'TJS' => ['name' => 'Somoni Tajikistan', 'country' => 'Tajikistan', 'flag' => 'tj', 'symbol' => 'ЅМ'],
+            'TMT' => ['name' => 'Manat Turkmenistan', 'country' => 'Turkmenistan', 'flag' => 'tm', 'symbol' => 'T'],
+            'TOP' => ['name' => 'Paʻanga Tonga', 'country' => 'Tonga', 'flag' => 'to', 'symbol' => 'T$'],
+            'TVD' => ['name' => 'Dolar Tuvalu', 'country' => 'Tuvalu', 'flag' => 'tv', 'symbol' => '$'],
+            'UZS' => ['name' => 'Som Uzbekistan', 'country' => 'Uzbekistan', 'flag' => 'uz', 'symbol' => 'soʻm'],
+            'VES' => ['name' => 'Bolivar Venezuela', 'country' => 'Venezuela', 'flag' => 've', 'symbol' => 'Bs.'],
+            'VUV' => ['name' => 'Vatu Vanuatu', 'country' => 'Vanuatu', 'flag' => 'vu', 'symbol' => 'VT'],
+            'WST' => ['name' => 'Tala Samoa', 'country' => 'Samoa', 'flag' => 'ws', 'symbol' => 'WS$'],
+            'YER' => ['name' => 'Rial Yaman', 'country' => 'Yaman', 'flag' => 'ye', 'symbol' => '﷼'],
+            'ZMW' => ['name' => 'Kwacha Zambia', 'country' => 'Zambia', 'flag' => 'zm', 'symbol' => 'ZK'],
+            'ZWG' => ['name' => 'Emas Zimbabwe (ZiG)', 'country' => 'Zimbabwe', 'flag' => 'zw', 'symbol' => 'ZiG'],
+            'ZWL' => ['name' => 'Dolar Zimbabwe (Lama)', 'country' => 'Zimbabwe', 'flag' => 'zw', 'symbol' => 'Z$'],
+        ];
+    }
+
+    /**
+     * Dapatkan metadata mata uang spesifik dengan auto-fallback yang informatif
+     */
+    public function getCurrencyMetaFor(string $code): array
+    {
+        $all = $this->getCurrencyMeta();
+        $code = strtoupper(trim($code));
+
+        if (isset($all[$code])) {
+            return $all[$code];
+        }
+
+        return [
+            'name' => "Mata Uang {$code}",
+            'country' => "Wilayah Internasional ({$code})",
+            'flag' => strtolower(substr($code, 0, 2)),
+            'symbol' => $code,
         ];
     }
 }

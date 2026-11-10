@@ -46,7 +46,9 @@
                                 @foreach($currencies['rates'] as $cCode => $cRate)
                                     @php
                                         $meta = $currencyMeta[$cCode] ?? null;
-                                        $label = $cCode . ($meta ? ' - ' . $meta['name'] : '');
+                                        $currName = $meta['name'] ?? $cCode;
+                                        $countryName = $meta['country'] ?? '';
+                                        $label = $cCode . ' - ' . $currName . ($countryName ? " ({$countryName})" : '');
                                     @endphp
                                     <option value="{{ $cCode }}" {{ $cCode === 'USD' ? 'selected' : '' }}>
                                         {{ $label }}
@@ -61,7 +63,9 @@
                                 @foreach($currencies['rates'] as $cCode => $cRate)
                                     @php
                                         $meta = $currencyMeta[$cCode] ?? null;
-                                        $label = $cCode . ($meta ? ' - ' . $meta['name'] : '');
+                                        $currName = $meta['name'] ?? $cCode;
+                                        $countryName = $meta['country'] ?? '';
+                                        $label = $cCode . ' - ' . $currName . ($countryName ? " ({$countryName})" : '');
                                     @endphp
                                     <option value="{{ $cCode }}" {{ $cCode === 'IDR' ? 'selected' : '' }}>
                                         {{ $label }}
@@ -149,38 +153,47 @@
                     $flagIso = $meta['flag'] ?? strtolower(substr($cur, 0, 2));
                     $currName = $meta['name'] ?? $cur;
                     $countryName = $meta['country'] ?? 'Global';
+                    $symbol = $meta['symbol'] ?? $cur;
                     $formattedRate = is_numeric($rate) ? ($rate > 100 ? number_format($rate, 2, ',', '.') : number_format($rate, 4, ',', '.')) : $rate;
                 @endphp
-                <div class="currency-card p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-cyan-500/40 hover:shadow-xs transition-all duration-150 flex flex-col justify-between text-left"
+                <div class="currency-card p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-cyan-500/50 hover:shadow-md transition-all duration-150 flex flex-col justify-between text-left"
                      data-code="{{ strtolower($cur) }}"
                      data-name="{{ strtolower($currName) }}"
                      data-country="{{ strtolower($countryName) }}">
                     <!-- Card Header: Flag & Code -->
-                    <div class="flex items-center justify-between mb-1.5">
+                    <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-2 min-w-0">
-                            <div class="w-5 h-3.5 rounded overflow-hidden shadow-2xs border border-slate-300 dark:border-slate-700 flex-shrink-0 bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+                            <div class="w-6 h-4 rounded overflow-hidden shadow-2xs border border-slate-300 dark:border-slate-700 flex-shrink-0 bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
                                 <img src="https://flagcdn.com/w40/{{ $flagIso }}.png"
                                      alt="{{ $countryName }}"
                                      class="w-full h-full object-cover"
-                                     onerror="this.style.display='none';">
+                                     onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden'); this.nextElementSibling.classList.add('flex');">
+                                <span class="text-[8px] font-bold text-slate-500 uppercase hidden items-center justify-center w-full h-full">{{ substr($cur, 0, 2) }}</span>
                             </div>
                             <span class="text-xs font-black text-slate-900 dark:text-white tracking-wider truncate">{{ $cur }}</span>
                         </div>
-                        <span class="text-[9px] font-mono text-cyan-600 dark:text-cyan-400 font-semibold bg-cyan-50 dark:bg-cyan-950/40 px-1.5 py-0.5 rounded">
-                            {{ $base }}
+                        <span class="text-[10px] font-mono text-cyan-600 dark:text-cyan-400 font-bold bg-cyan-50 dark:bg-cyan-950/40 px-1.5 py-0.5 rounded border border-cyan-500/20" title="Simbol: {{ $symbol }}">
+                            {{ $symbol }}
                         </span>
                     </div>
 
-                    <!-- Currency Full Name -->
-                    <p class="text-[10px] text-slate-500 dark:text-slate-400 truncate mb-2 font-medium" title="{{ $currName }} ({{ $countryName }})">
-                        {{ $currName }}
-                    </p>
+                    <!-- Currency Full Name & Country -->
+                    <div class="mb-2 min-w-0">
+                        <p class="text-[11px] font-bold text-slate-900 dark:text-slate-100 truncate leading-tight" title="{{ $currName }} ({{ $countryName }})">
+                            {{ $currName }}
+                        </p>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5" title="{{ $countryName }}">
+                            {{ $countryName }}
+                        </p>
+                    </div>
 
                     <!-- Exchange Rate Value -->
                     <div class="pt-2 border-t border-slate-200/60 dark:border-slate-800">
-                        <span class="text-[9px] text-slate-400 block font-semibold uppercase">Nilai Tukar:</span>
-                        <div class="text-sm font-black text-slate-900 dark:text-white font-mono tracking-tight mt-0.5 truncate">
-                            {{ $formattedRate }}
+                        <div class="flex items-center justify-between text-[9px] text-slate-400 font-semibold uppercase mb-0.5">
+                            <span>1 {{ $base }} =</span>
+                        </div>
+                        <div class="text-sm font-black text-slate-900 dark:text-white font-mono tracking-tight truncate">
+                            {{ $formattedRate }} <span class="text-[10px] font-sans font-semibold text-cyan-600 dark:text-cyan-400">{{ $cur }}</span>
                         </div>
                     </div>
                 </div>
