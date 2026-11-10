@@ -7,13 +7,14 @@ use App\Models\Location;
 use App\Models\Shipment;
 use App\Models\ShipmentException;
 use App\Models\TrackingEvent;
+use App\Services\GlobalIntelligenceService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, GlobalIntelligenceService $intelligenceService): View
     {
         // KPI Counts
         $totalShipments = Shipment::count();
@@ -62,6 +63,11 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // Global Intelligence Data for 3-Mode Interactive Map
+        $globalPorts    = $intelligenceService->getGlobalPorts();
+        $weatherHubs    = $intelligenceService->getGlobalWeatherHubs();
+        $countriesList  = $intelligenceService->getCountriesMaster();
+
         return view('admin.dashboard', compact(
             'totalShipments',
             'inTransit',
@@ -73,7 +79,10 @@ class DashboardController extends Controller
             'trendValues',
             'mapShipments',
             'recentActivities',
-            'carriers'
+            'carriers',
+            'globalPorts',
+            'weatherHubs',
+            'countriesList'
         ));
     }
 }
