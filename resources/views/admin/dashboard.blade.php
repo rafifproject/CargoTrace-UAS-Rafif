@@ -114,6 +114,23 @@
         border-radius: 50%;
         display: inline-block;
     }
+    /* Highlight & Focus Styles on Click */
+    .cargo-real-vehicle-wrapper.vehicle-focused {
+        filter: drop-shadow(0 0 16px rgba(0, 240, 255, 0.95)) drop-shadow(0 8px 20px rgba(0, 0, 0, 0.7)) !important;
+        transform: scale(1.3) !important;
+        z-index: 99999 !important;
+    }
+    .cargo-vehicle-tag.tag-focused {
+        background: rgba(2, 132, 199, 0.95) !important;
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.9) !important;
+        font-weight: 800 !important;
+    }
+    .cargo-real-vehicle-marker.marker-dimmed {
+        opacity: 0.2 !important;
+        filter: grayscale(80%) !important;
+        transition: opacity 0.3s ease, filter 0.3s ease;
+    }
 </style>
 @endpush
 
@@ -945,9 +962,219 @@
             };
         }
 
+        // ── HELPER: GET SHIPMENT ESTIMATED TIME OF ARRIVAL (ETA) ─
+        function getShipmentETA(s) {
+            const rawEta = s.estimated_time_arrival || s.expected_arrival;
+            if (!rawEta) {
+                return {
+                    formatted: 'Menunggu Jadwal Navigasi',
+                    countdown: 'Jadwal diperbarui berkala',
+                    statusHtml: '<span style="color:#64748b;">Jadwal Terjadwal</span>',
+                    delayMin: 0
+                };
+            }
+
+            const etaDate = new Date(rawEta);
+            const isValid = !isNaN(etaDate.getTime());
+            let formatted = rawEta;
+            let countdown = '';
+
+            if (isValid) {
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                const d = etaDate.getDate();
+                const m = months[etaDate.getMonth()];
+                const y = etaDate.getFullYear();
+                const hh = String(etaDate.getHours()).padStart(2, '0');
+                const mm = String(etaDate.getMinutes()).padStart(2, '0');
+                formatted = `${d} ${m} ${y}, ${hh}:${mm} WIB`;
+
+                const now = new Date();
+                const diffMs = etaDate.getTime() - now.getTime();
+                if (diffMs > 0) {
+                    const totalHours = Math.floor(diffMs / (1000 * 60 * 60));
+                    const days = Math.floor(totalHours / 24);
+                    const hours = totalHours % 24;
+                    if (days > 0) {
+                        countdown = `⏳ Sisa ~${days} hari ${hours} jam lagi`;
+                    } else {
+                        countdown = `⏳ Sisa ~${hours} jam lagi`;
+                    }
+                } else {
+                    countdown = '🏁 Tiba di tujuan / proses sandar';
+                }
+            }
+
+            const delayMin = parseInt(s.delay_minutes) || 0;
+            let statusHtml = '';
+            if (delayMin > 0) {
+                const dHours = Math.floor(delayMin / 60);
+                statusHtml = `<span style="color:#ef4444; font-weight:800;">⚠️ Terlambat (+${dHours} jam)</span>`;
+            } else {
+                statusHtml = `<span style="color:#10b981; font-weight:800;">✅ Tepat Waktu (On Schedule)</span>`;
+            }
+
+            return { formatted, countdown, statusHtml, delayMin };
+        }
+
+        // ── HELPER: POPUP CONTENT WITH RICH ROUTE & ETA ─────────
+        function generateShipmentPopupContent(s, vehicle, eta, curLoc) {
+            return `
+                <div style="min-width:280px; font-family: Outfit, sans-serif; padding:4px 2px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:22px;">${vehicle.emoji}</span>
+                            <div>
+                                <div style="font-weight:800; font-size:14px; color:#0284c7;">${s.shipment_number}</div>
+                                <div style="font-size:10px; color:#64748b;">${vehicle.label}</div>
+                            </div>
+                        </div>
+                        <span style="font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; background:#e0f2fe; color:#0369a1;">
+                            ${s.status}
+                        </span>
+                    </div>
+
+                    <!-- ETA Box (Estimasi Perkiraan Sampai Tujuan) -->
+                    <div style="background:linear-gradient(135deg, #0f172a, #1e293b); color:#ffffff; padding:10px 12px; border-radius:10px; margin-bottom:10px; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+                        <div style="font-size:10px; text-transform:uppercase; font-weight:800; color:#38bdf8; letter-spacing:0.5px; display:flex; align-items:center; gap:5px; margin-bottom:3px;">
+                            <span>⏱️ Estimasi Tiba di Tujuan (ETA):</span>
+                        </div>
+                        <div style="font-weight:800; font-size:15px; color:#ffffff; letter-spacing:0.3px;">
+                            ${eta.formatted}
+                        </div>
+                        <div style="font-size:11px; color:#cbd5e1; margin-top:4px; display:flex; align-items:center; justify-content:space-between;">
+                            <span>${eta.countdown}</span>
+                            <span>${eta.statusHtml}</span>
+                        </div>
+                    </div>
+
+                    <!-- Titik Awal hingga Akhir -->
+                    <div style="background:#F8FAFC; border:1px solid #E2E8F0; padding:8px 10px; border-radius:8px; font-size:11px; margin-bottom:10px;">
+                        <div style="margin-bottom:6px;">
+                            <span style="color:#059669; font-weight:800;">🟢 Titik Asal:</span>
+                            <div style="font-weight:700; color:#0f172a;">${s.origin.name}</div>
+                            <div style="font-size:10px; color:#64748b;">${s.origin.city}, ${s.origin.country}</div>
+                        </div>
+                        <div style="border-top:1px dashed #cbd5e1; padding-top:6px; margin-top:6px;">
+                            <span style="color:#dc2626; font-weight:800;">🔴 Titik Tujuan:</span>
+                            <div style="font-weight:700; color:#0f172a;">${s.destination.name}</div>
+                            <div style="font-size:10px; color:#64748b;">${s.destination.city}, ${s.destination.country}</div>
+                        </div>
+                        ${curLoc ? `
+                        <div style="border-top:1px dashed #cbd5e1; padding-top:6px; margin-top:6px;">
+                            <span style="color:#0284c7; font-weight:800;">📍 Posisi Terkini:</span>
+                            <div style="font-weight:700; color:#0f172a;">${curLoc.name}</div>
+                        </div>` : ''}
+                    </div>
+
+                    <!-- Armada & Muatan -->
+                    <div style="font-size:11px; color:#475569; margin-bottom:10px; line-height:1.4;">
+                        Armada: <b>${s.carrier?.name || '-'}</b><br>
+                        Muatan: <b>${s.cargo_type || 'General Cargo'}</b> (${parseFloat(s.weight || 0).toLocaleString()} kg)
+                    </div>
+
+                    <!-- Tombol Aksi -->
+                    <div style="display:flex; gap:6px;">
+                        <a href="${SHIPMENT_BASE_URL}/${s.id}" style="flex:1; text-align:center; background:#0284c7; color:#fff; font-weight:700; padding:7px 10px; border-radius:8px; text-decoration:none; font-size:11px; box-shadow:0 2px 4px rgba(2,132,199,0.3);">
+                            Lihat Detail Pengiriman →
+                        </a>
+                        <button type="button" onclick="window.resetShipmentFocus()" style="background:#f1f5f9; color:#475569; font-weight:700; padding:7px 10px; border-radius:8px; border:1px solid #cbd5e1; font-size:11px; cursor:pointer;" title="Kembalikan semua rute">
+                            🔄 Reset
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
         // ── BUILD CARGO LAYER ───────────────────────────────────
+        let cargoShipmentItems = [];
+        let activeCargoId = null;
+
+        function focusCargoShipment(targetId, targetLatLng) {
+            activeCargoId = targetId;
+
+            cargoShipmentItems.forEach(it => {
+                if (it.id === targetId) {
+                    // Menonjolkan jalur yang dipilih
+                    it.traveledPoly?.setStyle({ color: '#00F0FF', weight: 6.5, opacity: 1 });
+                    it.remainingPoly?.setStyle({ color: '#38BDF8', weight: 5, opacity: 1, dashArray: '8, 8' });
+                    it.directPoly?.setStyle({ color: '#00F0FF', weight: 5.5, opacity: 1 });
+
+                    // Menonjolkan titik asal dan akhir
+                    it.originMarker?.setRadius(11).setStyle({ fillColor: '#10B981', color: '#ffffff', weight: 3.5, fillOpacity: 1 });
+                    it.destMarker?.setRadius(11).setStyle({ fillColor: '#EF4444', color: '#ffffff', weight: 3.5, fillOpacity: 1 });
+
+                    // Menonjolkan icon kendaraan kargo
+                    if (it.vehicleMarker) {
+                        it.vehicleMarker.setZIndexOffset(10000);
+                        const el = it.vehicleMarker.getElement();
+                        if (el) {
+                            el.classList.remove('marker-dimmed');
+                            const wrap = el.querySelector('.cargo-real-vehicle-wrapper');
+                            if (wrap) wrap.classList.add('vehicle-focused');
+                            const tag = el.querySelector('.cargo-vehicle-tag');
+                            if (tag) tag.classList.add('tag-focused');
+                        }
+                        it.vehicleMarker.openPopup();
+                    } else if (it.traveledPoly) {
+                        it.traveledPoly.openPopup(targetLatLng || it.bounds.getCenter());
+                    } else if (it.directPoly) {
+                        it.directPoly.openPopup(targetLatLng || it.bounds.getCenter());
+                    }
+
+                    // Zoom / Fit bounds ke seluruh lintasan rute kargo tersebut
+                    map.fitBounds(it.bounds, { padding: [60, 60], maxZoom: 13, duration: 1 });
+                } else {
+                    // Meredupkan kargo lain agar rute terpilih benar-benar menonjol
+                    it.traveledPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.15 });
+                    it.remainingPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.12, dashArray: '4, 6' });
+                    it.directPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.15 });
+                    it.originMarker?.setRadius(5).setStyle({ opacity: 0.25, fillOpacity: 0.25 });
+                    it.destMarker?.setRadius(5).setStyle({ opacity: 0.25, fillOpacity: 0.25 });
+
+                    if (it.vehicleMarker) {
+                        it.vehicleMarker.setZIndexOffset(100);
+                        const el = it.vehicleMarker.getElement();
+                        if (el) {
+                            el.classList.add('marker-dimmed');
+                            const wrap = el.querySelector('.cargo-real-vehicle-wrapper');
+                            if (wrap) wrap.classList.remove('vehicle-focused');
+                            const tag = el.querySelector('.cargo-vehicle-tag');
+                            if (tag) tag.classList.remove('tag-focused');
+                        }
+                    }
+                }
+            });
+        }
+
+        function resetCargoShipmentFocus() {
+            activeCargoId = null;
+            cargoShipmentItems.forEach(it => {
+                it.traveledPoly?.setStyle({ color: '#0284c7', weight: 3.5, opacity: 0.9 });
+                it.remainingPoly?.setStyle({ color: '#38bdf8', weight: 2.5, opacity: 0.8, dashArray: '6, 8' });
+                it.directPoly?.setStyle({ color: '#0284c7', weight: 2.5, opacity: 0.75, dashArray: '6, 8' });
+
+                it.originMarker?.setRadius(7).setStyle({ fillColor: '#10B981', color: '#fff', weight: 2, fillOpacity: 1, opacity: 1 });
+                it.destMarker?.setRadius(7).setStyle({ fillColor: '#EF4444', color: '#fff', weight: 2, fillOpacity: 1, opacity: 1 });
+
+                if (it.vehicleMarker) {
+                    it.vehicleMarker.setZIndexOffset(1000);
+                    const el = it.vehicleMarker.getElement();
+                    if (el) {
+                        el.classList.remove('marker-dimmed');
+                        const wrap = el.querySelector('.cargo-real-vehicle-wrapper');
+                        if (wrap) wrap.classList.remove('vehicle-focused');
+                        const tag = el.querySelector('.cargo-vehicle-tag');
+                        if (tag) tag.classList.remove('tag-focused');
+                    }
+                }
+            });
+            map.closePopup();
+        }
+
         function buildCargoLayer() {
             cargoLayerGroup.clearLayers();
+            cargoShipmentItems = [];
+            activeCargoId = null;
             const latLngs = [];
 
             if (!Array.isArray(shipments)) return latLngs;
@@ -967,48 +1194,11 @@
                 latLngs.push(originCoords, destCoords);
 
                 const vehicle = getShipmentVehicle(s);
+                const eta     = getShipmentETA(s);
 
-                // Origin marker (🟢 Green)
-                L.circleMarker(originCoords, {
-                    radius: 7, fillColor: '#10B981', color: '#fff', weight: 2, fillOpacity: 1
-                }).bindPopup(`
-                    <div style="min-width:220px; font-family: Outfit, sans-serif;">
-                        <div style="font-weight:700; font-size:12px; color:#059669; margin-bottom:4px;">🟢 Titik Asal (${s.origin.location_type || 'PORT'})</div>
-                        <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.origin.name || 'Lokasi Asal'}</div>
-                        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${s.origin.city || ''}${s.origin.country ? ', ' + s.origin.country : ''}</div>
-                        <div style="background:#F1F5F9; padding:6px 10px; border-radius:8px; font-size:11px; margin-bottom:8px;">
-                            No. Resi: <b>${s.shipment_number || '-'}</b><br>
-                            Armada: <b>${s.carrier?.name || '-'}</b><br>
-                            Status: <span style="color:#0284c7; font-weight:700;">${s.status || '-'}</span>
-                        </div>
-                        <a href="${SHIPMENT_BASE_URL}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
-                            Lihat Detail Pengiriman →
-                        </a>
-                    </div>
-                `).addTo(cargoLayerGroup);
-
-                // Destination marker (🔴 Red)
-                L.circleMarker(destCoords, {
-                    radius: 7, fillColor: '#EF4444', color: '#fff', weight: 2, fillOpacity: 1
-                }).bindPopup(`
-                    <div style="min-width:220px; font-family: Outfit, sans-serif;">
-                        <div style="font-weight:700; font-size:12px; color:#dc2626; margin-bottom:4px;">🔴 Titik Tujuan (${s.destination.location_type || 'PORT'})</div>
-                        <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.destination.name || 'Lokasi Tujuan'}</div>
-                        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${s.destination.city || ''}${s.destination.country ? ', ' + s.destination.country : ''}</div>
-                        <div style="background:#F1F5F9; padding:6px 10px; border-radius:8px; font-size:11px; margin-bottom:8px;">
-                            No. Resi: <b>${s.shipment_number || '-'}</b><br>
-                            Kargo: <b>${s.cargo_type || 'General Cargo'}</b>
-                        </div>
-                        <a href="${SHIPMENT_BASE_URL}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
-                            Lihat Detail Pengiriman →
-                        </a>
-                    </div>
-                `).addTo(cargoLayerGroup);
-
-                // Current location
+                const curLoc = s.current_location || s.currentLocation;
                 let hasCurrent = false;
                 let curCoords = null;
-                const curLoc = s.current_location || s.currentLocation;
                 if (curLoc && curLoc.latitude && curLoc.longitude) {
                     const cLat = parseFloat(curLoc.latitude);
                     const cLng = parseFloat(curLoc.longitude);
@@ -1019,29 +1209,52 @@
                     }
                 }
 
+                const popupHtml = generateShipmentPopupContent(s, vehicle, eta, curLoc);
+
+                // Origin marker (🟢 Green)
+                const originMarker = L.circleMarker(originCoords, {
+                    radius: 7, fillColor: '#10B981', color: '#fff', weight: 2, fillOpacity: 1
+                }).bindPopup(popupHtml).addTo(cargoLayerGroup);
+                originMarker.on('click', () => focusCargoShipment(s.id, originCoords));
+
+                // Destination marker (🔴 Red)
+                const destMarker = L.circleMarker(destCoords, {
+                    radius: 7, fillColor: '#EF4444', color: '#fff', weight: 2, fillOpacity: 1
+                }).bindPopup(popupHtml).addTo(cargoLayerGroup);
+                destMarker.on('click', () => focusCargoShipment(s.id, destCoords));
+
+                let traveledPoly = null;
+                let remainingPoly = null;
+                let directPoly = null;
+                let vehicleMarker = null;
+
                 if (hasCurrent) {
                     // 1. Lintasan Ditempuh: Asal -> Posisi Terkini (Lengkung solid bercahaya)
                     const traveledCurve = createCurvedPath(originCoords, curCoords, 18, 0.12);
-                    L.polyline(traveledCurve, {
+                    traveledPoly = L.polyline(traveledCurve, {
                         color: '#0284c7',
                         weight: 3.5,
                         opacity: 0.9,
                         lineCap: 'round',
-                        lineJoin: 'round'
-                    }).bindTooltip(`<b>${s.shipment_number}</b><br><span style="font-size:11px">${s.origin.name} ➔ ${curLoc.name || 'Posisi Terkini'} (Ditempuh)</span>`, { sticky: true }).addTo(cargoLayerGroup);
+                        lineJoin: 'round',
+                        cursor: 'pointer'
+                    }).bindPopup(popupHtml).addTo(cargoLayerGroup);
+                    traveledPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
                     // 2. Estimasi Lintasan Lanjutan: Posisi Terkini -> Tujuan (Lengkung putus-putus)
                     const remainingCurve = createCurvedPath(curCoords, destCoords, 18, 0.12);
-                    L.polyline(remainingCurve, {
+                    remainingPoly = L.polyline(remainingCurve, {
                         color: '#38bdf8',
                         weight: 2.5,
                         dashArray: '6, 8',
                         opacity: 0.8,
                         lineCap: 'round',
-                        lineJoin: 'round'
-                    }).bindTooltip(`<b>${s.shipment_number}</b><br><span style="font-size:11px">${curLoc.name || 'Posisi Terkini'} ➔ ${s.destination.name} (Estimasi)</span>`, { sticky: true }).addTo(cargoLayerGroup);
+                        lineJoin: 'round',
+                        cursor: 'pointer'
+                    }).bindPopup(popupHtml).addTo(cargoLayerGroup);
+                    remainingPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
-                    // 3. Real Vehicle Visual Marker (Tanpa Bulatan - Gambar Kendaraan Nyata Berotasi Sesuai Arah)
+                    // 3. Real Vehicle Visual Marker (Tanpa Bulatan - Dynamic Bearing)
                     const heading = calculateBearing(curCoords, destCoords);
                     const vehicleDivIcon = L.divIcon({
                         className: 'cargo-real-vehicle-marker',
@@ -1059,41 +1272,45 @@
                         popupAnchor: [0, -((vehicle.iconH || 68) / 2 + 5)]
                     });
 
-                    L.marker(curCoords, { icon: vehicleDivIcon, zIndexOffset: 1000 }).bindPopup(`
-                        <div style="min-width:245px; font-family: Outfit, sans-serif;">
-                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
-                                <span style="font-size:18px;">${vehicle.emoji}</span>
-                                <div>
-                                    <div style="font-weight:700; font-size:12px; color:#0284c7;">${vehicle.label}</div>
-                                    <div style="font-size:10px; color:#64748b;">Posisi Kargo Terkini</div>
-                                </div>
-                            </div>
-                            <div style="font-weight:700; font-size:14px; color:#0f172a; margin-bottom:2px;">${curLoc.name || 'Posisi Terkini'}</div>
-                            <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${curLoc.city || ''}${curLoc.country ? ', ' + curLoc.country : ''}</div>
-                            <div style="background:#F0FDF4; border:1px solid #BBF7D0; padding:6px 10px; border-radius:8px; font-size:11px; margin-bottom:8px;">
-                                <div>No. Resi: <b>${s.shipment_number || '-'}</b></div>
-                                <div>Armada/Ekspedisi: <b>${s.carrier?.name || '-'}</b></div>
-                                <div>Jenis Kargo: <b>${s.cargo_type || 'General Cargo'}</b></div>
-                                <div>Status: <b style="color:#166534;">${s.status || '-'}</b></div>
-                            </div>
-                            <a href="${SHIPMENT_BASE_URL}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
-                                Lihat Detail Pengiriman →
-                            </a>
-                        </div>
-                    `).addTo(cargoLayerGroup);
+                    vehicleMarker = L.marker(curCoords, { icon: vehicleDivIcon, zIndexOffset: 1000 })
+                        .bindPopup(popupHtml)
+                        .addTo(cargoLayerGroup);
+                    vehicleMarker.on('click', () => focusCargoShipment(s.id, curCoords));
 
                 } else {
                     // Belum ada lokasi terkini terpisah, buat kurva langsung Asal ke Tujuan
                     const directCurve = createCurvedPath(originCoords, destCoords, 24, 0.12);
-                    L.polyline(directCurve, {
+                    directPoly = L.polyline(directCurve, {
                         color: '#0284c7',
                         weight: 2.5,
                         dashArray: '6, 8',
                         opacity: 0.75,
                         lineCap: 'round',
-                        lineJoin: 'round'
-                    }).bindTooltip(`<b>${s.shipment_number}</b><br><span style="font-size:11px">${s.origin.name} ➔ ${s.destination.name}</span>`, { sticky: true }).addTo(cargoLayerGroup);
+                        lineJoin: 'round',
+                        cursor: 'pointer'
+                    }).bindPopup(popupHtml).addTo(cargoLayerGroup);
+                    directPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
                 }
+
+                // Bounds untuk zoom fokus rute
+                const routePoints = [originCoords, destCoords];
+                if (curCoords) routePoints.push(curCoords);
+                const bounds = L.latLngBounds(routePoints);
+
+                cargoShipmentItems.push({
+                    id: s.id,
+                    s,
+                    vehicle,
+                    eta,
+                    originMarker,
+                    destMarker,
+                    traveledPoly,
+                    remainingPoly,
+                    directPoly,
+                    vehicleMarker,
+                    curCoords,
+                    bounds
+                });
             });
 
             return latLngs;
@@ -1467,6 +1684,15 @@
         window.focusCountry     = focusCountry;
         window.focusGlobalRoute = focusGlobalRoute;
         window.filterCountriesList = filterCountriesList;
+        window.focusCargoShipment  = focusCargoShipment;
+        window.resetShipmentFocus  = resetCargoShipmentFocus;
+
+        // Klik di area peta kosong mengembalikan fokus rute ke normal
+        map.on('click', function(e) {
+            if (activeCargoId) {
+                resetCargoShipmentFocus();
+            }
+        });
 
         // ── INIT ────────────────────────────────────────────────
         try {
