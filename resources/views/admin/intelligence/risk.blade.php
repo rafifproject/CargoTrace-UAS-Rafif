@@ -57,7 +57,7 @@
             <!-- Mathematical Method Explanation -->
             <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
                 <strong class="text-slate-700 dark:text-slate-300 block mb-0.5">Penjelasan Metodologi:</strong>
-                {{ $risk['formula_explanation'] }} Indeks ini dihitung secara transparan dan objektif tanpa klaim estimasi fiktif.
+                {{ $risk['formula_explanation'] ?? ($risk['formula'] ?? 'Perhitungan indeks risiko komposit menggabungkan 4 parameter terverifikasi: Cuaca (35%), Kurs (25%), Inflasi (20%), dan Sentimen Berita (20%).') }} Indeks ini dihitung secara transparan dan objektif tanpa klaim estimasi fiktif.
             </div>
         </div>
     </div>

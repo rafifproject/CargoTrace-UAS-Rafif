@@ -810,6 +810,7 @@ class GlobalIntelligenceService
 
         return [
             'overall_score' => $overallScore,
+            'score' => $overallScore,
             'level' => $level,
             'color' => $color,
             'breakdown' => [
@@ -819,6 +820,7 @@ class GlobalIntelligenceService
                 ['name' => 'Sentimen Berita Logistik (Lexicon)', 'score' => $newsSentimentRisk, 'weight' => '20%'],
             ],
             'formula' => '35% Cuaca + 25% Kurs + 20% Inflasi + 20% Sentimen Berita',
+            'formula_explanation' => 'Perhitungan indeks risiko komposit menggabungkan 4 parameter terverifikasi: Risiko Cuaca Maritim (bobot 35%), Volatilitas Nilai Tukar Valas (bobot 25%), Tekanan Inflasi Makroekonomi (bobot 20%), dan Analisis Sentimen Berita Logistik Global (bobot 20%).',
             'is_live' => true,
             'last_updated' => now()->format('d M Y, H:i') . ' WIB',
         ];
