@@ -224,30 +224,38 @@
                         class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-cyan-500">
                 </div>
                 <!-- Country Selected Card -->
-                <div id="selected-country-card" class="hidden mx-3 mt-3 p-3 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-700/50 text-xs">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span id="selected-flag" class="text-xl">🌍</span>
+                <div id="selected-country-card" class="hidden mx-3 mt-3 p-3 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 text-xs shadow-xs">
+                    <div class="flex items-center gap-2.5 mb-1.5">
+                        <img id="selected-flag-img" src="" alt="" class="w-7 h-5 object-cover rounded shadow-xs border border-slate-200 dark:border-slate-700">
                         <span id="selected-name" class="font-bold text-slate-800 dark:text-white text-sm"></span>
                     </div>
-                    <div class="text-slate-500 dark:text-slate-400">
+                    <div class="text-slate-600 dark:text-slate-400">
                         <span class="font-semibold text-slate-700 dark:text-slate-300">Hub Utama:</span>
-                        <span id="selected-hub"></span>
+                        <span id="selected-hub" class="font-medium text-cyan-700 dark:text-cyan-400"></span>
                     </div>
                 </div>
                 <!-- Scrollable Country List -->
                 <div class="flex-1 overflow-y-auto" style="max-height:400px">
                     <ul id="country-list" class="divide-y divide-slate-100 dark:divide-slate-800">
                         @foreach($countriesList as $country)
+                        @php $isoLower = strtolower(str_replace('_EAST', '', $country['code'])); @endphp
                         <li class="country-item px-4 py-2.5 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors"
                             data-name="{{ $country['name'] }}"
                             data-code="{{ $country['code'] }}"
                             data-lat="{{ $country['lat'] }}"
                             data-lng="{{ $country['lng'] }}"
                             data-flag="{{ $country['flag'] }}"
+                            data-iso="{{ $isoLower }}"
                             data-hub="{{ $country['hub'] }}"
                             onclick="focusCountry(this)">
-                            <span class="text-xl leading-none">{{ $country['flag'] }}</span>
-                            <span class="text-xs font-medium text-slate-700 dark:text-slate-200">{{ $country['name'] }}</span>
+                            <div class="w-6 h-4 rounded overflow-hidden shadow-xs border border-slate-200 dark:border-slate-700 flex-shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                <img src="https://flagcdn.com/w40/{{ $isoLower }}.png"
+                                     alt="{{ $country['name'] }}"
+                                     class="w-full h-full object-cover"
+                                     onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
+                                <span class="text-xs hidden">{{ $country['flag'] }}</span>
+                            </div>
+                            <span class="text-xs font-medium text-slate-700 dark:text-slate-200 truncate">{{ $country['name'] }}</span>
                         </li>
                         @endforeach
                     </ul>
@@ -413,6 +421,11 @@
         const weatherData  = {!! json_encode($weatherHubs) !!};
         const countriesData = {!! json_encode($countriesList) !!};
 
+        // Route URLs injected via PHP (works across localhost:8000, virtual hosts, and subfolders)
+        const routeWeather      = "{{ url('admin/intelligence/weather') }}";
+        const routePorts        = "{{ url('admin/intelligence/ports') }}";
+        const routeShipmentBase = "{{ url('admin/shipments') }}";
+
         // Layer groups for each mode
         const cargoLayerGroup   = L.layerGroup();
         const weatherLayerGroup = L.layerGroup();
@@ -426,10 +439,9 @@
                 btn.classList.remove(
                     'bg-cyan-600','text-white','border-cyan-600',
                     'bg-amber-500','border-amber-500',
-                    'bg-blue-600','border-blue-600'
+                    'bg-purple-600','border-purple-600'
                 );
                 btn.classList.add('border-slate-300','text-slate-500','bg-white');
-                // dark support
                 btn.style.backgroundColor = '';
                 btn.style.color = '';
                 btn.style.borderColor = '';
@@ -437,7 +449,7 @@
             const activeMap = {
                 'cargo':   { id: 'btn-cargo',   bg:'#0e6ba8', border:'#0e6ba8' },
                 'weather': { id: 'btn-weather', bg:'#d97706', border:'#d97706' },
-                'ports':   { id: 'btn-ports',   bg:'#059669', border:'#059669' }
+                'ports':   { id: 'btn-ports',   bg:'#7c3aed', border:'#7c3aed' }
             };
             if (activeMap[mode]) {
                 const btn = document.getElementById(activeMap[mode].id);
@@ -451,8 +463,8 @@
         // ── BANNER UPDATE ───────────────────────────────────────
         const banners = {
             cargo:   { icon:'🧭', text:'Mode: Pemantau CargoTrace — Rute & Kargo Aktif', bg:'linear-gradient(90deg,#0A1128,#0e3a6e)' },
-            weather: { icon:'⛅', text:'Mode: Cuaca Langsung — Kondisi Maritim Global', bg:'linear-gradient(90deg,#431407,#92400e)' },
-            ports:   { icon:'⚓', text:'Mode: Sebaran Pelabuhan — Direktori Port Global', bg:'linear-gradient(90deg,#052e16,#065f46)' }
+            weather: { icon:'⛅', text:'Mode: Cuaca Langsung — Kondisi Maritim & Risiko Badai', bg:'linear-gradient(90deg,#431407,#92400e)' },
+            ports:   { icon:'⚓', text:'Mode: Sebaran Pelabuhan — 120+ Titik Pelabuhan Kontainer Dunia', bg:'linear-gradient(90deg,#2e1065,#5b21b6)' }
         };
         function updateBanner(mode) {
             const b = banners[mode];
@@ -466,11 +478,11 @@
             cargo:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Asal</span>
                       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>Tujuan</span>
                       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span>Posisi Terkini</span>`,
-            weather: `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Aman</span>
-                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>Waspada</span>
-                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>Bahaya / Storm</span>`,
-            ports:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>Pelabuhan Global</span>
-                      <span class="flex items-center gap-1.5">Klik marker untuk detail</span>`
+            weather: `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Low Risk</span>
+                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>Medium Risk</span>
+                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>High Risk / Storm</span>`,
+            ports:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block"></span>Pelabuhan Kontainer Global</span>
+                      <span class="flex items-center gap-1.5 text-slate-400">Klik marker untuk melihat profil pelabuhan</span>`
         };
         function updateLegend(mode) {
             document.getElementById('map-legend').innerHTML = legends[mode];
@@ -492,12 +504,17 @@
                 L.circleMarker(originCoords, {
                     radius: 7, fillColor: '#10B981', color: '#fff', weight: 2, fillOpacity: 1
                 }).bindPopup(`
-                    <div style="min-width:200px">
-                        <b class="text-emerald-600">🟢 Pelabuhan Asal</b><br>
-                        <b>${s.origin.name}</b> — ${s.origin.city}<br>
-                        <span style="font-size:11px;color:#64748b">No. Resi: <b>${s.shipment_number}</b></span><br>
-                        <span style="font-size:11px">Status: <b>${s.status}</b></span><br>
-                        <a href="/admin/shipments/${s.id}" style="color:#0ea5e9;font-size:11px;font-weight:600">📦 Lihat Detail Pengiriman →</a>
+                    <div style="min-width:220px; font-family: Outfit, sans-serif;">
+                        <div style="font-weight:700; font-size:13px; color:#059669; margin-bottom:4px;">🟢 Pelabuhan Asal</div>
+                        <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.origin.name}</div>
+                        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${s.origin.city}</div>
+                        <div style="background:#F1F5F9; padding:6px 10px; border-radius:8px; font-size:11px; margin-bottom:8px;">
+                            No. Resi: <b>${s.shipment_number}</b><br>
+                            Status: <span style="color:#0284c7; font-weight:700;">${s.status}</span>
+                        </div>
+                        <a href="${routeShipmentBase}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
+                            Lihat Detail Pengiriman →
+                        </a>
                     </div>
                 `).addTo(cargoLayerGroup);
 
@@ -505,11 +522,16 @@
                 L.circleMarker(destCoords, {
                     radius: 7, fillColor: '#EF4444', color: '#fff', weight: 2, fillOpacity: 1
                 }).bindPopup(`
-                    <div style="min-width:200px">
-                        <b class="text-rose-600">🔴 Pelabuhan Tujuan</b><br>
-                        <b>${s.destination.name}</b> — ${s.destination.city}<br>
-                        <span style="font-size:11px;color:#64748b">No. Resi: <b>${s.shipment_number}</b></span><br>
-                        <a href="/admin/shipments/${s.id}" style="color:#0ea5e9;font-size:11px;font-weight:600">📦 Lihat Detail Pengiriman →</a>
+                    <div style="min-width:220px; font-family: Outfit, sans-serif;">
+                        <div style="font-weight:700; font-size:13px; color:#dc2626; margin-bottom:4px;">🔴 Pelabuhan Tujuan</div>
+                        <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.destination.name}</div>
+                        <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${s.destination.city}</div>
+                        <div style="background:#F1F5F9; padding:6px 10px; border-radius:8px; font-size:11px; margin-bottom:8px;">
+                            No. Resi: <b>${s.shipment_number}</b>
+                        </div>
+                        <a href="${routeShipmentBase}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
+                            Lihat Detail Pengiriman →
+                        </a>
                     </div>
                 `).addTo(cargoLayerGroup);
 
@@ -518,13 +540,18 @@
                     const cur = [parseFloat(s.current_location.latitude), parseFloat(s.current_location.longitude)];
                     latLngs.push(cur);
                     L.circleMarker(cur, {
-                        radius: 8, fillColor: '#00A8E8', color: '#fff', weight: 2, fillOpacity: 0.9
+                        radius: 8, fillColor: '#00A8E8', color: '#fff', weight: 2, fillOpacity: 0.95
                     }).bindPopup(`
-                        <div style="min-width:200px">
-                            <b style="color:#0ea5e9">🚢 Posisi Terkini</b><br>
-                            ${s.current_location.name}<br>
-                            <span style="font-size:11px">Kargo: <b>${s.shipment_number}</b> | Status: <b>${s.status}</b></span><br>
-                            <a href="/admin/shipments/${s.id}" style="color:#0ea5e9;font-size:11px;font-weight:600">📦 Lihat Detail Pengiriman →</a>
+                        <div style="min-width:220px; font-family: Outfit, sans-serif;">
+                            <div style="font-weight:700; font-size:13px; color:#0284c7; margin-bottom:4px;">🚢 Posisi Kargo Terkini</div>
+                            <div style="font-weight:700; font-size:14px; color:#0f172a;">${s.current_location.name}</div>
+                            <div style="background:#F0FDF4; border:1px solid #BBF7D0; padding:6px 10px; border-radius:8px; font-size:11px; margin:8px 0;">
+                                Kargo: <b>${s.shipment_number}</b><br>
+                                Status: <b style="color:#166534;">${s.status}</b>
+                            </div>
+                            <a href="${routeShipmentBase}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
+                                Lihat Detail Pengiriman →
+                            </a>
                         </div>
                     `).addTo(cargoLayerGroup);
                 }
@@ -539,43 +566,67 @@
         }
 
         // ── BUILD WEATHER LAYER ─────────────────────────────────
-        const riskColors = { 'Aman': '#10B981', 'Waspada': '#F59E0B', 'Bahaya / Storm': '#EF4444' };
+        const weatherRiskConfig = {
+            'Low Risk':          { color: '#10B981', bg: '#ECFDF5', text: '#065F46', border: '#A7F3D0', icon: '🛡️' },
+            'Medium Risk':       { color: '#F59E0B', bg: '#FEF3C7', text: '#92400E', border: '#FDE68A', icon: '⚠️' },
+            'High Risk / Storm': { color: '#EF4444', bg: '#FEE2E2', text: '#991B1B', border: '#FECACA', icon: '⛈️' }
+        };
         function buildWeatherLayer() {
             weatherLayerGroup.clearLayers();
             weatherData.forEach(w => {
-                const color = riskColors[w.risk] || '#94A3B8';
+                const conf = weatherRiskConfig[w.risk] || weatherRiskConfig['Medium Risk'];
                 L.circleMarker([w.lat, w.lng], {
-                    radius: 11, fillColor: color, color: '#fff', weight: 2, fillOpacity: 0.85
+                    radius: 10, fillColor: conf.color, color: '#fff', weight: 2, fillOpacity: 0.88
                 }).bindPopup(`
-                    <div style="min-width:220px">
-                        <b>${w.flag} ${w.country}</b> — ${w.city}<br>
-                        <hr style="margin:4px 0;border-color:#e2e8f0">
-                        🌡️ Suhu: <b>${w.temp}°C</b> &nbsp;|&nbsp; ${w.condition}<br>
-                        💧 Kelembaban: <b>${w.humidity}%</b><br>
-                        💨 Angin: <b>${w.wind} km/h</b><br>
-                        🌧️ Presipitasi: <b>${w.precipitation} mm</b><br>
-                        <span style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:9999px;background:${color};color:#fff;font-size:10px;font-weight:700">${w.risk}</span><br>
-                        <a href="/admin/intelligence/weather" style="color:#0ea5e9;font-size:11px;font-weight:600">⛅ Cek Detail Cuaca Lengkap →</a>
+                    <div style="min-width:240px; font-family: Outfit, sans-serif;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                            <img src="https://flagcdn.com/w40/${w.iso || 'id'}.png" alt="${w.country}"
+                                 style="width:26px; height:18px; object-fit:cover; border-radius:3px; box-shadow:0 1px 2px rgba(0,0,0,0.12); border:1px solid #e2e8f0;">
+                            <div>
+                                <div style="font-weight:700; font-size:14px; color:#0f172a; line-height:1.2;">${w.country}</div>
+                                <div style="font-size:11px; color:#64748b;">${w.region || 'Maritim Global'} • ${w.city}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; background:${conf.bg}; color:${conf.text}; border:1px solid ${conf.border}; padding:6px 12px; border-radius:10px; font-weight:700; font-size:12px; margin:8px 0 6px 0;">
+                            <span>${conf.icon} ${w.risk}</span>
+                            <span>${w.risk_score || 30} / 100</span>
+                        </div>
+                        <div style="display:flex; align-items:center; background:#EEF2FF; color:#3730A3; border:1px solid #E0E7FF; padding:6px 12px; border-radius:10px; font-weight:600; font-size:12px; margin-bottom:10px;">
+                            <span>🌡️ ${w.temp}°C &nbsp;|&nbsp; ${w.condition}</span>
+                        </div>
+                        <a href="${routeWeather}" style="display:block; text-align:center; background:#6366F1; color:#ffffff; font-weight:600; padding:8px 12px; border-radius:10px; text-decoration:none; font-size:12px; box-shadow:0 2px 6px rgba(99,102,241,0.3);">
+                            Lihat Detail Cuaca Lengkap →
+                        </a>
                     </div>
                 `).addTo(weatherLayerGroup);
             });
         }
 
-        // ── BUILD PORTS LAYER ───────────────────────────────────
+        // ── BUILD PORTS LAYER (Vibrant Purple Seaport Web) ────────
         function buildPortsLayer() {
             portsLayerGroup.clearLayers();
             portsData.forEach(p => {
                 L.circleMarker([p.lat, p.lng], {
-                    radius: 6, fillColor: '#3B82F6', color: '#fff', weight: 2, fillOpacity: 0.9
+                    radius: 5.5, fillColor: '#8B5CF6', color: '#ffffff', weight: 1.5, fillOpacity: 0.92
                 }).bindPopup(`
-                    <div style="min-width:220px">
-                        <b>⚓ ${p.name}</b><br>
-                        <span style="font-size:11px;color:#64748b">${p.country} — ${p.city}</span><br>
-                        <hr style="margin:4px 0;border-color:#e2e8f0">
-                        📋 Kode WPI: <b>${p.code}</b><br>
-                        📦 Kapasitas: <b>${p.capacity}</b><br>
-                        🏭 Tipe: <b>${p.type}</b><br>
-                        <a href="/admin/intelligence/ports" style="color:#0ea5e9;font-size:11px;font-weight:600">⚓ Cek Direktori Pelabuhan →</a>
+                    <div style="min-width:240px; font-family: Outfit, sans-serif;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                            <img src="https://flagcdn.com/w40/${p.iso || 'id'}.png" alt="${p.country}"
+                                 style="width:26px; height:18px; object-fit:cover; border-radius:3px; box-shadow:0 1px 2px rgba(0,0,0,0.12); border:1px solid #e2e8f0;">
+                            <div>
+                                <div style="font-weight:700; font-size:13px; color:#0f172a; line-height:1.2;">${p.name}</div>
+                                <div style="font-size:11px; color:#64748b;">${p.country} • ${p.city}</div>
+                            </div>
+                        </div>
+                        <div style="background:#F3E8FF; color:#6B21A8; border:1px solid #E9D5FF; padding:6px 10px; border-radius:10px; font-weight:600; font-size:11px; margin:6px 0;">
+                            ⚓ Kode WPI: <b>${p.code}</b> &nbsp;|&nbsp; ${p.type}
+                        </div>
+                        <div style="background:#F1F5F9; color:#334155; border:1px solid #E2E8F0; padding:6px 10px; border-radius:10px; font-weight:600; font-size:11px; margin-bottom:10px;">
+                            📦 Kapasitas: <b>${p.capacity}</b>
+                        </div>
+                        <a href="${routePorts}" style="display:block; text-align:center; background:#8B5CF6; color:#ffffff; font-weight:600; padding:8px 12px; border-radius:10px; text-decoration:none; font-size:12px; box-shadow:0 2px 6px rgba(139,92,246,0.3);">
+                            Cek Direktori Pelabuhan →
+                        </a>
                     </div>
                 `).addTo(portsLayerGroup);
             });
@@ -599,11 +650,11 @@
             } else if (mode === 'weather') {
                 buildWeatherLayer();
                 weatherLayerGroup.addTo(map);
-                map.flyTo([20, 60], 2, { duration: 1.2 });
+                map.flyTo([20, 40], 2.5, { duration: 1.2 });
             } else if (mode === 'ports') {
                 buildPortsLayer();
                 portsLayerGroup.addTo(map);
-                map.flyTo([20, 60], 2, { duration: 1.2 });
+                map.flyTo([20, 40], 2.5, { duration: 1.2 });
             }
         }
 
@@ -620,22 +671,48 @@
             const lat  = parseFloat(el.dataset.lat);
             const lng  = parseFloat(el.dataset.lng);
             const name = el.dataset.name;
-            const flag = el.dataset.flag;
+            const iso  = el.dataset.iso || el.dataset.code.toLowerCase().replace('_east','');
             const hub  = el.dataset.hub;
 
             map.flyTo([lat, lng], 5, { duration: 1.5 });
 
             // Highlight list item
             document.querySelectorAll('.country-item').forEach(li => {
-                li.classList.remove('bg-cyan-50','dark:bg-cyan-900/20','border-l-2','border-cyan-500');
+                li.classList.remove('bg-cyan-50','border-l-2','border-cyan-500');
             });
             el.classList.add('bg-cyan-50', 'border-l-2', 'border-cyan-500');
 
-            // Update country card
-            document.getElementById('selected-flag').textContent = flag;
+            // Update country card with real flag image
+            const flagImg = document.getElementById('selected-flag-img');
+            flagImg.src = `https://flagcdn.com/w40/${iso}.png`;
+            flagImg.alt = name;
             document.getElementById('selected-name').textContent = name;
             document.getElementById('selected-hub').textContent  = ' ' + hub;
             document.getElementById('selected-country-card').classList.remove('hidden');
+
+            // Auto open matching popup in active mode
+            if (currentMode === 'weather') {
+                weatherLayerGroup.eachLayer(layer => {
+                    const lLatLng = layer.getLatLng();
+                    if (Math.abs(lLatLng.lat - lat) < 5 && Math.abs(lLatLng.lng - lng) < 5) {
+                        layer.openPopup();
+                    }
+                });
+            } else if (currentMode === 'ports') {
+                let closestPort = null;
+                let minDist = 999999;
+                portsLayerGroup.eachLayer(layer => {
+                    const pLatLng = layer.getLatLng();
+                    const dist = Math.hypot(pLatLng.lat - lat, pLatLng.lng - lng);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closestPort = layer;
+                    }
+                });
+                if (closestPort && minDist < 12) {
+                    closestPort.openPopup();
+                }
+            }
         }
 
         // ── FILTER COUNTRY LIST ─────────────────────────────────
