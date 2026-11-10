@@ -26,6 +26,46 @@
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         padding: 4px;
     }
+
+    /* Custom Leaflet Weather Pill Badges (Ref: media_1794280421603_3a4f8e13.jpg) */
+    .weather-pill-marker {
+        background: transparent !important;
+        border: none !important;
+    }
+    .weather-pill-box {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #ffffff;
+        border-radius: 9px;
+        padding: 2px 6px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        color: #ffffff;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 11px;
+        line-height: 1.1;
+        min-width: 48px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        cursor: pointer;
+        user-select: none;
+    }
+    .weather-pill-box:hover {
+        transform: scale(1.18);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.45);
+        z-index: 99999 !important;
+    }
+    .weather-pill-blue {
+        background: linear-gradient(135deg, #1E40AF, #2563EB);
+    }
+    .weather-pill-green {
+        background: linear-gradient(135deg, #047857, #059669);
+    }
+    .weather-pill-orange {
+        background: linear-gradient(135deg, #C2410C, #EA580C);
+    }
 </style>
 @endpush
 
@@ -490,10 +530,10 @@
             cargo:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Asal</span>
                       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>Tujuan</span>
                       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span>Posisi Terkini</span>`,
-            weather: `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Rendah (Low Risk)</span>
-                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>Waspada (Medium Risk)</span>
-                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>Tinggi / Badai (High Risk)</span>
-                      <span class="flex items-center gap-1.5 text-slate-400">Klik titik untuk detail & profil cuaca</span>`,
+            weather: `<span class="flex items-center gap-1.5"><span class="w-3.5 h-2.5 rounded bg-blue-600 inline-block border border-white"></span>Dingin (&lt;15°C)</span>
+                      <span class="flex items-center gap-1.5"><span class="w-3.5 h-2.5 rounded bg-emerald-600 inline-block border border-white"></span>Sejuk (15–25°C)</span>
+                      <span class="flex items-center gap-1.5"><span class="w-3.5 h-2.5 rounded bg-orange-600 inline-block border border-white"></span>Hangat (&gt;25°C)</span>
+                      <span class="flex items-center gap-1.5 text-slate-400">Pill cuaca tiap negara (klik untuk detail profil)</span>`,
             ports:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block"></span>Pelabuhan ArcGIS Live WPI</span>
                       <span class="flex items-center gap-1.5 text-slate-400">Klik marker untuk melihat profil pelabuhan</span>`
         };
@@ -578,36 +618,36 @@
             return latLngs;
         }
 
-        // ── BUILD WEATHER LAYER (Clean Circles Matching Reference Image media_1794279089804_c304a84b.jpg) ──
+        // ── BUILD WEATHER LAYER (Weather Pill Badges with Live Temp & Icon: Ref media_1794280421603_3a4f8e13.jpg) ──
         function buildWeatherLayer() {
             weatherLayerGroup.clearLayers();
             weatherData.forEach(w => {
-                // Color by risk: Low = Green, Medium = Orange/Amber, High = Red
-                let markerColor = '#10B981'; // Green
-                let riskText = 'Low Risk';
-                let riskScore = w.risk_score || 20;
-
-                if (w.risk === 'High Risk / Storm' || (w.risk_score && w.risk_score >= 65)) {
-                    markerColor = '#EF4444'; // Red
-                    riskText = 'High Risk / Storm';
-                } else if (w.risk === 'Medium Risk' || (w.risk_score && w.risk_score >= 30)) {
-                    markerColor = '#F59E0B'; // Orange/Amber
-                    riskText = 'Medium Risk';
+                // Color mapping: Blue (<15°C), Green (15-25°C), Orange (>25°C)
+                let pillClass = 'weather-pill-blue';
+                if (w.temp >= 15 && w.temp <= 25) {
+                    pillClass = 'weather-pill-green';
+                } else if (w.temp > 25) {
+                    pillClass = 'weather-pill-orange';
                 }
 
-                // Elegant Circle Marker: No overlapping cards!
-                const circleMarker = L.circleMarker([w.lat, w.lng], {
-                    radius: 7.5,
-                    fillColor: markerColor,
-                    color: '#ffffff',
-                    weight: 1.5,
-                    fillOpacity: 0.88
+                // Custom Leaflet DivIcon showing exact temperature & weather emoji
+                const weatherDivIcon = L.divIcon({
+                    className: 'weather-pill-marker',
+                    html: `
+                        <div class="weather-pill-box ${pillClass}">
+                            <span>${w.temp}°C</span>
+                            <span style="font-size:10px; margin-top:1px;">${w.icon_emoji || '☀️'}</span>
+                        </div>
+                    `,
+                    iconSize: [52, 34],
+                    iconAnchor: [26, 17],
+                    popupAnchor: [0, -18]
                 });
 
-                // Popup matching exact reference design (media_1794279089804_c304a84b.jpg)
                 const weatherDetailUrl = getAppUrl('admin/intelligence/weather') + '?country=' + encodeURIComponent(w.country);
 
-                circleMarker.bindPopup(`
+                const marker = L.marker([w.lat, w.lng], { icon: weatherDivIcon });
+                marker.bindPopup(`
                     <div style="min-width:240px; font-family: Outfit, sans-serif; padding:4px 2px;">
                         <!-- Country & Region Header with Flag -->
                         <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
@@ -615,16 +655,16 @@
                                  style="width:30px; height:20px; object-fit:cover; border-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,0.18); border:1px solid #e2e8f0; flex-shrink:0;">
                             <div>
                                 <div style="font-weight:800; font-size:15px; color:#0f172a; line-height:1.2;">${w.country}</div>
-                                <div style="font-size:11px; color:#64748b; font-weight:500;">${w.region || 'Global'}</div>
+                                <div style="font-size:11px; color:#64748b; font-weight:500;">${w.region || 'Global'} &bull; ${w.city}</div>
                             </div>
                         </div>
 
                         <!-- Risk Pill Box -->
                         <div style="display:flex; align-items:center; justify-content:space-between; background:#FEF3C7; color:#B45309; border:1px solid #FDE68A; padding:7px 12px; border-radius:10px; font-weight:700; font-size:12px; margin-bottom:8px;">
                             <span style="display:flex; align-items:center; gap:6px;">
-                                <span>🛡️</span> ${riskText}
+                                <span>🛡️</span> ${w.risk || 'Medium Risk'}
                             </span>
-                            <span style="font-weight:800; color:#D97706;">${riskScore} / 100</span>
+                            <span style="font-weight:800; color:#D97706;">${w.risk_score || 31} / 100</span>
                         </div>
 
                         <!-- Weather Info Box -->
@@ -641,7 +681,7 @@
                     </div>
                 `, { maxWidth: 280 });
 
-                circleMarker.addTo(weatherLayerGroup);
+                marker.addTo(weatherLayerGroup);
             });
         }
 
