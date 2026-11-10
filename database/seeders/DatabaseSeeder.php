@@ -82,23 +82,9 @@ class DatabaseSeeder extends Seeder
             'last_login_at' => Carbon::now()->subDays(2),
         ]);
 
-        // 3. Global Carriers
-        $carriersData = [
-            ['code' => 'MSK', 'name' => 'Maersk Line', 'country' => 'Denmark', 'contact_email' => 'info@maersk.com', 'contact_phone' => '+45 33 63 33 63', 'website' => 'https://www.maersk.com'],
-            ['code' => 'MSC', 'name' => 'Mediterranean Shipping Company (MSC)', 'country' => 'Swiss', 'contact_email' => 'info@msc.com', 'contact_phone' => '+41 22 703 8888', 'website' => 'https://www.msc.com'],
-            ['code' => 'CMA', 'name' => 'CMA CGM Group', 'country' => 'Prancis', 'contact_email' => 'contact@cmacgm.com', 'contact_phone' => '+33 4 88 91 90 00', 'website' => 'https://www.cma-cgm.com'],
-            ['code' => 'COS', 'name' => 'COSCO Shipping Lines', 'country' => 'Tiongkok', 'contact_email' => 'csd@coscon.com', 'contact_phone' => '+86 21 6596 6666', 'website' => 'https://lines.coscoshipping.com'],
-            ['code' => 'HPL', 'name' => 'Hapag-Lloyd', 'country' => 'Jerman', 'contact_email' => 'info@hlag.com', 'contact_phone' => '+49 40 3001 0', 'website' => 'https://www.hapag-lloyd.com'],
-            ['code' => 'ONE', 'name' => 'Ocean Network Express (ONE)', 'country' => 'Jepang', 'contact_email' => 'contact@one-line.com', 'contact_phone' => '+65 6899 9000', 'website' => 'https://www.one-line.com'],
-            ['code' => 'EVG', 'name' => 'Evergreen Marine Corp', 'country' => 'Taiwan', 'contact_email' => 'biz@evergreen-marine.com', 'contact_phone' => '+886 2 2501 1111', 'website' => 'https://www.evergreen-marine.com'],
-            ['code' => 'DHL', 'name' => 'DHL Global Forwarding', 'country' => 'Jerman', 'contact_email' => 'contact@dhl.com', 'contact_phone' => '+49 228 1820', 'website' => 'https://www.dhl.com'],
-            ['code' => 'FDX', 'name' => 'FedEx Express Global', 'country' => 'Amerika Serikat', 'contact_email' => 'support@fedex.com', 'contact_phone' => '+1 800 463 3339', 'website' => 'https://www.fedex.com'],
-        ];
-
-        $carriers = [];
-        foreach ($carriersData as $c) {
-            $carriers[$c['code']] = Carrier::firstOrCreate(['code' => $c['code']], array_merge($c, ['status' => Carrier::STATUS_ACTIVE]));
-        }
+        // 3. Global Carriers (205+ Countries Dataset)
+        $this->call(CarrierSeeder::class);
+        $carriers = Carrier::all()->keyBy('code');
 
         // 4. World Port Index Global Dataset (35+ Major Ports & Cargo Hubs across All Continents)
         $locationsData = [

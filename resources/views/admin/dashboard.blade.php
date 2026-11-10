@@ -1484,6 +1484,11 @@
                 marker.countryCode = (w.code || '').toUpperCase();
                 marker.countryName = (w.country || '').toLowerCase();
 
+                // Two-way synchronization saat marker cuaca di peta di-klik
+                marker.on('click', function() {
+                    syncSidebarWithCountry(w.code || w.iso, w.country, `${w.city} (${w.temp}°C, ${w.condition})`);
+                });
+
                 marker.bindPopup(`
                     <div style="min-width:240px; font-family: Outfit, sans-serif; padding:4px 2px;">
                         <!-- Country & Region Header with Flag -->
@@ -1496,12 +1501,12 @@
                             </div>
                         </div>
 
-                        <!-- Risk Pill Box -->
-                        <div style="display:flex; align-items:center; justify-content:space-between; background:#FEF3C7; color:#B45309; border:1px solid #FDE68A; padding:7px 12px; border-radius:10px; font-weight:700; font-size:12px; margin-bottom:8px;">
+                        <!-- Weather & Marine Operation Status -->
+                        <div style="display:flex; align-items:center; justify-content:space-between; background:#F0FDFA; color:#0F766E; border:1px solid #CCFBF1; padding:7px 12px; border-radius:10px; font-weight:700; font-size:12px; margin-bottom:8px;">
                             <span style="display:flex; align-items:center; gap:6px;">
-                                <span>🛡️</span> ${w.risk || 'Medium Risk'}
+                                <span>🌊</span> Operasional Maritim
                             </span>
-                            <span style="font-weight:800; color:#D97706;">${w.risk_score || 31} / 100</span>
+                            <span style="font-weight:800; color:#0D9488;">Aktif Normal</span>
                         </div>
 
                         <!-- Weather Info Box -->
@@ -1511,9 +1516,9 @@
                             <span>${w.condition}</span>
                         </div>
 
-                        <!-- View Full Profile Button (Guaranteed Absolute Route, No 404!) -->
+                        <!-- View Full Profile Button -->
                         <a href="${weatherDetailUrl}" style="display:block; text-align:center; background:#EDE9FE; color:#7C3AED; font-weight:700; padding:9px 14px; border-radius:10px; text-decoration:none; font-size:12px; transition:all 0.2s; box-shadow:0 1px 3px rgba(124,58,237,0.15);">
-                            View Full Profile
+                            Cek Profil Cuaca Lengkap →
                         </a>
                     </div>
                 `, { maxWidth: 280 });
@@ -1532,6 +1537,12 @@
                 marker.countryCode = (p.iso || '').toUpperCase();
                 marker.countryName = (p.country || '').toLowerCase();
                 marker.portName = (p.name || '').toLowerCase();
+
+                // Two-way synchronization saat marker pelabuhan di-klik: sinkronkan sidebar
+                marker.on('click', function() {
+                    syncSidebarWithCountry(p.iso, p.country, p.name);
+                });
+
                 marker.bindPopup(`
                     <div style="min-width:240px; font-family: Outfit, sans-serif; padding:4px 2px;">
                         <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
@@ -1555,6 +1566,45 @@
                 `, { maxWidth: 280 });
                 marker.addTo(portsLayerGroup);
             });
+        }
+
+        // ── TWO-WAY SYNC HELPER (Marker Klik -> Update Sidebar Negara) ────────
+        function syncSidebarWithCountry(codeOrIso, countryName, hubName) {
+            if (!codeOrIso && !countryName) return;
+            const isoClean = (codeOrIso || '').toLowerCase().replace('_east', '').trim();
+            const nameClean = (countryName || '').toLowerCase().trim();
+
+            // 1. Update Card Selected Country
+            const card = document.getElementById('selected-country-card');
+            const flagImg = document.getElementById('selected-flag-img');
+            const nameEl = document.getElementById('selected-name');
+            const hubEl = document.getElementById('selected-hub');
+
+            if (flagImg) {
+                flagImg.src = `https://flagcdn.com/w40/${isoClean || 'id'}.png`;
+                flagImg.alt = countryName || '';
+            }
+            if (nameEl) nameEl.textContent = countryName || '';
+            if (hubEl) hubEl.textContent = ' ' + (hubName || 'Pelabuhan & Hub Logistik');
+            if (card) card.classList.remove('hidden');
+
+            // 2. Sorot & Auto-Scroll item di daftar negara
+            let targetLi = null;
+            document.querySelectorAll('.country-item').forEach(li => {
+                li.classList.remove('bg-cyan-50', 'border-l-2', 'border-cyan-500');
+                const liCode = (li.dataset.code || '').toLowerCase().replace('_east', '').trim();
+                const liIso  = (li.dataset.iso || '').toLowerCase().trim();
+                const liName = (li.dataset.name || '').toLowerCase().trim();
+
+                if (!targetLi && (liIso === isoClean || liCode === isoClean || liName === nameClean || nameClean.includes(liName) || liName.includes(nameClean))) {
+                    targetLi = li;
+                }
+            });
+
+            if (targetLi) {
+                targetLi.classList.add('bg-cyan-50', 'border-l-2', 'border-cyan-500');
+                targetLi.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         }
 
         // ── SWITCH MODE ─────────────────────────────────────────
@@ -1609,7 +1659,10 @@
             const iso  = el.dataset.iso || code.toLowerCase().replace('_east','');
             const hub  = el.dataset.hub;
 
-            map.flyTo([lat, lng], 5, { duration: 1.5 });
+            // Tutup popup aktif sebelumnya agar tidak tertinggal negara sebelumnya
+            map.closePopup();
+
+            map.flyTo([lat, lng], 5.5, { duration: 1.2 });
 
             // Highlight list item
             document.querySelectorAll('.country-item').forEach(li => {
@@ -1630,7 +1683,7 @@
                 let found = false;
                 weatherLayerGroup.eachLayer(layer => {
                     if (!found && layer.countryCode && (layer.countryCode === code || layer.countryName === name.toLowerCase())) {
-                        layer.openPopup();
+                        setTimeout(() => layer.openPopup(), 400);
                         found = true;
                     }
                 });
@@ -1638,7 +1691,7 @@
                     weatherLayerGroup.eachLayer(layer => {
                         const lLatLng = layer.getLatLng();
                         if (!found && Math.hypot(lLatLng.lat - lat, lLatLng.lng - lng) < 2) {
-                            layer.openPopup();
+                            setTimeout(() => layer.openPopup(), 400);
                             found = true;
                         }
                     });
@@ -1652,36 +1705,49 @@
                 // 1. Exact match by countryCode (ISO) or countryName
                 portsLayerGroup.eachLayer(layer => {
                     if (!found && layer.countryCode && (layer.countryCode === countryCodeUpper || layer.countryName === countryNameLower)) {
-                        layer.openPopup();
+                        setTimeout(() => layer.openPopup(), 400);
                         found = true;
                     }
                 });
 
-                // 2. Exact match by Hub Name
+                // 2. Match by Hub Name
                 if (!found && hubLower) {
                     portsLayerGroup.eachLayer(layer => {
                         if (!found && layer.portName && (layer.portName.includes(hubLower) || hubLower.includes(layer.portName))) {
-                            layer.openPopup();
+                            setTimeout(() => layer.openPopup(), 400);
                             found = true;
                         }
                     });
                 }
 
-                // 3. Fallback: only if VERY close (distance < 1.5 degrees, NEVER cross borders!)
+                // 3. Jika pelabuhan spesifik belum tercatat di koordinat berbeda, buat popup terarah khusus negara ini
                 if (!found) {
-                    let closestPort = null;
-                    let minDist = 999999;
-                    portsLayerGroup.eachLayer(layer => {
-                        const pLatLng = layer.getLatLng();
-                        const dist = Math.hypot(pLatLng.lat - lat, pLatLng.lng - lng);
-                        if (dist < minDist) {
-                            minDist = dist;
-                            closestPort = layer;
-                        }
-                    });
-                    if (closestPort && minDist < 1.5) {
-                        closestPort.openPopup();
-                    }
+                    setTimeout(() => {
+                        L.popup({ maxWidth: 280 })
+                            .setLatLng([lat, lng])
+                            .setContent(`
+                                <div style="min-width:240px; font-family: Outfit, sans-serif; padding:4px 2px;">
+                                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                                        <img src="https://flagcdn.com/w40/${iso}.png" alt="${name}"
+                                             style="width:30px; height:20px; object-fit:cover; border-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,0.18); border:1px solid #e2e8f0; flex-shrink:0;">
+                                        <div>
+                                            <div style="font-weight:800; font-size:14px; color:#0f172a; line-height:1.2;">${hub || (name + ' Gateway')}</div>
+                                            <div style="font-size:11px; color:#64748b;">${name} &bull; Hub Logistik Nasional</div>
+                                        </div>
+                                    </div>
+                                    <div style="background:#F3E8FF; color:#6B21A8; border:1px solid #E9D5FF; padding:7px 10px; border-radius:10px; font-weight:700; font-size:11px; margin-bottom:7px;">
+                                        ⚓ Hub Kode: <b>${code}HUB</b> &nbsp;|&nbsp; Simpul Maritim Nasional
+                                    </div>
+                                    <div style="background:#F1F5F9; color:#334155; border:1px solid #E2E8F0; padding:7px 10px; border-radius:10px; font-weight:600; font-size:11px; margin-bottom:11px;">
+                                        📦 Status: <b>Aktif Terintegrasi di CargoTrace</b>
+                                    </div>
+                                    <a href="${PORTS_PAGE_URL}" style="display:block; text-align:center; background:#EDE9FE; color:#7C3AED; font-weight:700; padding:8px 12px; border-radius:10px; text-decoration:none; font-size:12px; box-shadow:0 1px 3px rgba(124,58,237,0.15);">
+                                        Cek Direktori Pelabuhan →
+                                    </a>
+                                </div>
+                            `)
+                            .openOn(map);
+                    }, 400);
                 }
             } else if (currentMode === 'route') {
                 let closestRouteMarker = null;
@@ -1696,8 +1762,30 @@
                     }
                 });
                 if (closestRouteMarker && minRDist < 10) {
-                    closestRouteMarker.openPopup();
+                    setTimeout(() => closestRouteMarker.openPopup(), 400);
                 }
+            } else if (currentMode === 'cargo') {
+                // Berikan info transit kargo untuk negara yang dipilih
+                setTimeout(() => {
+                    L.popup({ maxWidth: 280 })
+                        .setLatLng([lat, lng])
+                        .setContent(`
+                            <div style="min-width:230px; font-family: Outfit, sans-serif; padding:4px 2px;">
+                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                                    <img src="https://flagcdn.com/w40/${iso}.png" alt="${name}"
+                                         style="width:28px; height:18px; object-fit:cover; border-radius:3px; border:1px solid #e2e8f0;">
+                                    <div>
+                                        <div style="font-weight:800; font-size:13px; color:#0f172a;">${name}</div>
+                                        <div style="font-size:11px; color:#64748b;">${hub}</div>
+                                    </div>
+                                </div>
+                                <div style="background:#ECFEFF; color:#0E7490; border:1px solid #CFFAFE; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:600;">
+                                    🚢 Jalur pelayaran & simpul kargo aktif
+                                </div>
+                            </div>
+                        `)
+                        .openOn(map);
+                }, 400);
             }
         }
 

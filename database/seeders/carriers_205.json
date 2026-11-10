@@ -1,0 +1,1855 @@
+[
+    {
+        "code": "SMD",
+        "name": "Samudera Indonesia Lines",
+        "country": "Indonesia",
+        "contact_email": "info@samudera.id",
+        "contact_phone": "+62 21 5347612",
+        "website": "https://www.samudera.id",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MISC",
+        "name": "MISC Berhad Marine",
+        "country": "Malaysia",
+        "contact_email": "corpcomm@miscbhd.com",
+        "contact_phone": "+60 3 2264 0888",
+        "website": "https://www.misc.com.my",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "PIL",
+        "name": "Pacific International Lines (PIL)",
+        "country": "Singapura",
+        "contact_email": "contact@pilship.com",
+        "contact_phone": "+65 6221 8133",
+        "website": "https://www.pilship.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "RCL",
+        "name": "Regional Container Lines",
+        "country": "Thailand",
+        "contact_email": "rcl@rclgroup.com",
+        "contact_phone": "+66 2 296 1088",
+        "website": "https://www.rclgroup.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "VNL",
+        "name": "Vinalines Maritime Corp",
+        "country": "Vietnam",
+        "contact_email": "info@vinalines.com.vn",
+        "contact_phone": "+84 24 3577 0825",
+        "website": "https://vinalines.com.vn",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "2GO",
+        "name": "2GO Group Freight Logistics",
+        "country": "Filipina",
+        "contact_email": "customer@2go.com.ph",
+        "contact_phone": "+63 2 8528 7000",
+        "website": "https://www.2go.com.ph",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MMCAR",
+        "name": "Myanmar National Freight Lines",
+        "country": "Myanmar",
+        "contact_email": "cargo@myanmar-logistics.com",
+        "contact_phone": "+1 800 218 6067",
+        "website": "https://www.myanmar-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "KHCAR",
+        "name": "Kamboja National Freight Lines",
+        "country": "Kamboja",
+        "contact_email": "cargo@kamboja-logistics.com",
+        "contact_phone": "+1 800 995 2395",
+        "website": "https://www.kamboja-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "LACAR",
+        "name": "Laos National Freight Lines",
+        "country": "Laos",
+        "contact_email": "cargo@laos-logistics.com",
+        "contact_phone": "+1 800 742 4320",
+        "website": "https://www.laos-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BNCAR",
+        "name": "Brunei Darussalam National Freight Lines",
+        "country": "Brunei Darussalam",
+        "contact_email": "cargo@bruneidarussalam-logistics.com",
+        "contact_phone": "+1 800 840 1786",
+        "website": "https://www.bruneidarussalam-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "TLCAR",
+        "name": "Timor Leste National Freight Lines",
+        "country": "Timor Leste",
+        "contact_email": "cargo@timorleste-logistics.com",
+        "contact_phone": "+1 800 634 9106",
+        "website": "https://www.timorleste-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "COS",
+        "name": "COSCO Shipping Lines",
+        "country": "Tiongkok",
+        "contact_email": "csd@coscon.com",
+        "contact_phone": "+86 21 6596 6666",
+        "website": "https://lines.coscoshipping.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ONE",
+        "name": "Ocean Network Express (ONE)",
+        "country": "Jepang",
+        "contact_email": "contact@one-line.com",
+        "contact_phone": "+65 6899 9000",
+        "website": "https://www.one-line.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "HMM",
+        "name": "HMM (Hyundai Merchant Marine)",
+        "country": "Korea Selatan",
+        "contact_email": "contact@hmm21.com",
+        "contact_phone": "+82 2 3706 5114",
+        "website": "https://www.hmm21.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "EVG",
+        "name": "Evergreen Marine Corp",
+        "country": "Taiwan",
+        "contact_email": "biz@evergreen-marine.com",
+        "contact_phone": "+886 2 2501 1111",
+        "website": "https://www.evergreen-marine.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "OOCL",
+        "name": "Orient Overseas Container Line",
+        "country": "Hong Kong",
+        "contact_email": "hkghome@oocl.com",
+        "contact_phone": "+852 2833 3888",
+        "website": "https://www.oocl.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MOCAR",
+        "name": "Makau National Freight Lines",
+        "country": "Makau",
+        "contact_email": "cargo@makau-logistics.com",
+        "contact_phone": "+1 800 288 8671",
+        "website": "https://www.makau-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MNCAR",
+        "name": "Mongolia National Freight Lines",
+        "country": "Mongolia",
+        "contact_email": "cargo@mongolia-logistics.com",
+        "contact_phone": "+1 800 871 8869",
+        "website": "https://www.mongolia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "KPCAR",
+        "name": "Korea Utara National Freight Lines",
+        "country": "Korea Utara",
+        "contact_email": "cargo@koreautara-logistics.com",
+        "contact_phone": "+1 800 783 7908",
+        "website": "https://www.koreautara-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SCI",
+        "name": "Shipping Corporation of India",
+        "country": "India",
+        "contact_email": "customer@sci.co.in",
+        "contact_phone": "+91 22 2202 6666",
+        "website": "https://www.shipindia.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "PNSC",
+        "name": "Pakistan National Shipping Corp",
+        "country": "Pakistan",
+        "contact_email": "pnsc@pnsc.com.pk",
+        "contact_phone": "+92 21 9920 3980",
+        "website": "https://www.pnsc.com.pk",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BSCI",
+        "name": "Bangladesh Shipping Corporation",
+        "country": "Bangladesh",
+        "contact_email": "info@bsc.gov.bd",
+        "contact_phone": "+880 31 724832",
+        "website": "https://www.bsc.gov.bd",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CSCL",
+        "name": "Ceylon Shipping Corporation",
+        "country": "Sri Lanka",
+        "contact_email": "cscl@cscl.lk",
+        "contact_phone": "+94 11 249 7800",
+        "website": "https://www.cscl.lk",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "NPCAR",
+        "name": "Nepal National Freight Lines",
+        "country": "Nepal",
+        "contact_email": "cargo@nepal-logistics.com",
+        "contact_phone": "+1 800 751 7706",
+        "website": "https://www.nepal-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BTCAR",
+        "name": "Bhutan National Freight Lines",
+        "country": "Bhutan",
+        "contact_email": "cargo@bhutan-logistics.com",
+        "contact_phone": "+1 800 754 9192",
+        "website": "https://www.bhutan-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MVCAR",
+        "name": "Maladewa National Freight Lines",
+        "country": "Maladewa",
+        "contact_email": "cargo@maladewa-logistics.com",
+        "contact_phone": "+1 800 628 3395",
+        "website": "https://www.maladewa-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "AFCAR",
+        "name": "Afganistan National Freight Lines",
+        "country": "Afganistan",
+        "contact_email": "cargo@afganistan-logistics.com",
+        "contact_phone": "+1 800 897 4362",
+        "website": "https://www.afganistan-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "KTZ",
+        "name": "KTZ Express Logistics Kazakhstan",
+        "country": "Kazakhstan",
+        "contact_email": "info@ktze.kz",
+        "contact_phone": "+7 7172 61 11 00",
+        "website": "https://www.ktze.kz",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "UZCAR",
+        "name": "Uzbekistan National Freight Lines",
+        "country": "Uzbekistan",
+        "contact_email": "cargo@uzbekistan-logistics.com",
+        "contact_phone": "+1 800 223 2420",
+        "website": "https://www.uzbekistan-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "TMCAR",
+        "name": "Turkmenistan National Freight Lines",
+        "country": "Turkmenistan",
+        "contact_email": "cargo@turkmenistan-logistics.com",
+        "contact_phone": "+1 800 272 2567",
+        "website": "https://www.turkmenistan-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "KGCAR",
+        "name": "Kirgizstan National Freight Lines",
+        "country": "Kirgizstan",
+        "contact_email": "cargo@kirgizstan-logistics.com",
+        "contact_phone": "+1 800 793 2308",
+        "website": "https://www.kirgizstan-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "TJCAR",
+        "name": "Tajikistan National Freight Lines",
+        "country": "Tajikistan",
+        "contact_email": "cargo@tajikistan-logistics.com",
+        "contact_phone": "+1 800 332 1401",
+        "website": "https://www.tajikistan-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ASCO",
+        "name": "Azerbaijan Caspian Shipping (ASCO)",
+        "country": "Azerbaijan",
+        "contact_email": "asco@asco.az",
+        "contact_phone": "+994 12 404 3700",
+        "website": "https://www.asco.az",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "AMCAR",
+        "name": "Armenia National Freight Lines",
+        "country": "Armenia",
+        "contact_email": "cargo@armenia-logistics.com",
+        "contact_phone": "+1 800 318 9626",
+        "website": "https://www.armenia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "GEOA",
+        "name": "Georgian Maritime Logistics",
+        "country": "Georgia",
+        "contact_email": "info@mta.gov.ge",
+        "contact_phone": "+995 422 27 49 25",
+        "website": "https://www.mta.gov.ge",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BAHRI",
+        "name": "Bahri National Shipping Co.",
+        "country": "Arab Saudi",
+        "contact_email": "contact@bahri.sa",
+        "contact_phone": "+966 11 478 5454",
+        "website": "https://www.bahri.sa",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "DPW",
+        "name": "DP World Logistics & Ports",
+        "country": "Uni Emirat Arab",
+        "contact_email": "info@dpworld.com",
+        "contact_phone": "+971 4 881 1110",
+        "website": "https://www.dpworld.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MILD",
+        "name": "Milaha Maritime Logistics Qatar",
+        "country": "Qatar",
+        "contact_email": "contact@milaha.com",
+        "contact_phone": "+974 4494 9666",
+        "website": "https://www.milaha.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "UASC",
+        "name": "United Arab Shipping Kuwait",
+        "country": "Kuwait",
+        "contact_email": "info@uasc.net",
+        "contact_phone": "+965 2484 8044",
+        "website": "https://www.uasc.net",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ASYAD",
+        "name": "ASYAD Group Marine Oman",
+        "country": "Oman",
+        "contact_email": "info@asyad.om",
+        "contact_phone": "+968 2458 0000",
+        "website": "https://www.asyad.om",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BHCAR",
+        "name": "Bahrain National Freight Lines",
+        "country": "Bahrain",
+        "contact_email": "cargo@bahrain-logistics.com",
+        "contact_phone": "+1 800 191 7171",
+        "website": "https://www.bahrain-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "IQCAR",
+        "name": "Irak National Freight Lines",
+        "country": "Irak",
+        "contact_email": "cargo@irak-logistics.com",
+        "contact_phone": "+1 800 187 1889",
+        "website": "https://www.irak-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "IRISL",
+        "name": "Islamic Republic of Iran Shipping",
+        "country": "Iran",
+        "contact_email": "info@irisl.net",
+        "contact_phone": "+98 21 23841",
+        "website": "https://www.irisl.net",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "JOCAR",
+        "name": "Yordania National Freight Lines",
+        "country": "Yordania",
+        "contact_email": "cargo@yordania-logistics.com",
+        "contact_phone": "+1 800 113 2567",
+        "website": "https://www.yordania-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "LBCAR",
+        "name": "Lebanon National Freight Lines",
+        "country": "Lebanon",
+        "contact_email": "cargo@lebanon-logistics.com",
+        "contact_phone": "+1 800 587 1170",
+        "website": "https://www.lebanon-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ZIM",
+        "name": "ZIM Integrated Shipping",
+        "country": "Israel",
+        "contact_email": "inquiries@zim.com",
+        "contact_phone": "+972 4 865 2111",
+        "website": "https://www.zim.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "PSCAR",
+        "name": "Palestina National Freight Lines",
+        "country": "Palestina",
+        "contact_email": "cargo@palestina-logistics.com",
+        "contact_phone": "+1 800 210 7834",
+        "website": "https://www.palestina-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "YECAR",
+        "name": "Yaman National Freight Lines",
+        "country": "Yaman",
+        "contact_email": "cargo@yaman-logistics.com",
+        "contact_phone": "+1 800 312 1783",
+        "website": "https://www.yaman-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SYCAR",
+        "name": "Suriah National Freight Lines",
+        "country": "Suriah",
+        "contact_email": "cargo@suriah-logistics.com",
+        "contact_phone": "+1 800 728 6833",
+        "website": "https://www.suriah-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CYPR",
+        "name": "Cyprus Maritime Agency Logistics",
+        "country": "Siprus",
+        "contact_email": "maritime@dms.gov.cy",
+        "contact_phone": "+357 25 848100",
+        "website": "https://www.dms.gov.cy",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "PNO",
+        "name": "P&O Maritime Logistics",
+        "country": "Inggris Raya",
+        "contact_email": "cargo@pomaritime.com",
+        "contact_phone": "+44 20 7801 4000",
+        "website": "https://www.pomaritime.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CMA",
+        "name": "CMA CGM Group",
+        "country": "Prancis",
+        "contact_email": "contact@cmacgm.com",
+        "contact_phone": "+33 4 88 91 90 00",
+        "website": "https://www.cma-cgm.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "HPL",
+        "name": "Hapag-Lloyd Global",
+        "country": "Jerman",
+        "contact_email": "info@hlag.com",
+        "contact_phone": "+49 40 3001 0",
+        "website": "https://www.hapag-lloyd.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "WEC",
+        "name": "WEC Lines Netherlands",
+        "country": "Belanda",
+        "contact_email": "office@weclines.com",
+        "contact_phone": "+31 10 491 3350",
+        "website": "https://www.weclines.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "EXM",
+        "name": "Exmar Marine Logistics",
+        "country": "Belgia",
+        "contact_email": "corporate@exmar.be",
+        "contact_phone": "+32 3 247 5611",
+        "website": "https://www.exmar.be",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MSC",
+        "name": "Mediterranean Shipping Company (MSC)",
+        "country": "Swiss",
+        "contact_email": "info@msc.com",
+        "contact_phone": "+41 22 703 8888",
+        "website": "https://www.msc.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "GWL",
+        "name": "Gebrüder Weiss Logistics Austria",
+        "country": "Austria",
+        "contact_email": "service@gw-world.com",
+        "contact_phone": "+43 5574 696 0",
+        "website": "https://www.gw-world.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "IRL",
+        "name": "Irish Continental Freight",
+        "country": "Irlandia",
+        "contact_email": "info@icg.ie",
+        "contact_phone": "+353 1 607 5700",
+        "website": "https://www.icg.ie",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CLUX",
+        "name": "Cargolux Airlines Logistics",
+        "country": "Luksemburg",
+        "contact_email": "info@cargolux.com",
+        "contact_phone": "+352 4211 1",
+        "website": "https://www.cargolux.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MCCAR",
+        "name": "Monako National Freight Lines",
+        "country": "Monako",
+        "contact_email": "cargo@monako-logistics.com",
+        "contact_phone": "+1 800 295 7328",
+        "website": "https://www.monako-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "LICAR",
+        "name": "Liechtenstein National Freight Lines",
+        "country": "Liechtenstein",
+        "contact_email": "cargo@liechtenstein-logistics.com",
+        "contact_phone": "+1 800 760 6055",
+        "website": "https://www.liechtenstein-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "GMD",
+        "name": "Grimaldi Group Maritime",
+        "country": "Italia",
+        "contact_email": "info@grimaldi.napoli.it",
+        "contact_phone": "+39 081 496 444",
+        "website": "https://www.grimaldi.napoli.it",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BALE",
+        "name": "Baleària Shipping & Cargo",
+        "country": "Spanyol",
+        "contact_email": "cargo@balearia.com",
+        "contact_phone": "+34 91 266 0215",
+        "website": "https://www.balearia.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "TRAN",
+        "name": "Transinsular Shipping Portugal",
+        "country": "Portugal",
+        "contact_email": "geral@transinsular.pt",
+        "contact_phone": "+351 21 323 1500",
+        "website": "https://www.transinsular.pt",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ATTICA",
+        "name": "Attica Group Maritime Greece",
+        "country": "Yunani",
+        "contact_email": "cargo@attica-group.com",
+        "contact_phone": "+30 210 891 9000",
+        "website": "https://www.attica-group.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ARKAS",
+        "name": "Arkas Container Line",
+        "country": "Turki",
+        "contact_email": "arkasline@arkasline.com.tr",
+        "contact_phone": "+90 232 477 7777",
+        "website": "https://www.arkasline.com.tr",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "JADRO",
+        "name": "Jadroplov Shipping Croatia",
+        "country": "Kroasia",
+        "contact_email": "jadroplov@jadroplov.hr",
+        "contact_phone": "+385 21 302 777",
+        "website": "https://www.jadroplov.hr",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ALBC",
+        "name": "Posta Shqiptare Cargo & Marine",
+        "country": "Albania",
+        "contact_email": "cargo@postashqiptare.al",
+        "contact_phone": "+355 4 222 2315",
+        "website": "https://www.postashqiptare.al",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "RSCAR",
+        "name": "Serbia National Freight Lines",
+        "country": "Serbia",
+        "contact_email": "cargo@serbia-logistics.com",
+        "contact_phone": "+1 800 866 7010",
+        "website": "https://www.serbia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BACAR",
+        "name": "Bosnia & Herzegovina National Freight Lines",
+        "country": "Bosnia & Herzegovina",
+        "contact_email": "cargo@bosniaherzegovina-logistics.com",
+        "contact_phone": "+1 800 644 6319",
+        "website": "https://www.bosniaherzegovina-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SICAR",
+        "name": "Slovenia National Freight Lines",
+        "country": "Slovenia",
+        "contact_email": "cargo@slovenia-logistics.com",
+        "contact_phone": "+1 800 679 6730",
+        "website": "https://www.slovenia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MKCAR",
+        "name": "Makedonia Utara National Freight Lines",
+        "country": "Makedonia Utara",
+        "contact_email": "cargo@makedoniautara-logistics.com",
+        "contact_phone": "+1 800 560 6784",
+        "website": "https://www.makedoniautara-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MECAR",
+        "name": "Montenegro National Freight Lines",
+        "country": "Montenegro",
+        "contact_email": "cargo@montenegro-logistics.com",
+        "contact_phone": "+1 800 512 4304",
+        "website": "https://www.montenegro-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "XKCAR",
+        "name": "Kosovo National Freight Lines",
+        "country": "Kosovo",
+        "contact_email": "cargo@kosovo-logistics.com",
+        "contact_phone": "+1 800 175 8511",
+        "website": "https://www.kosovo-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MLTA",
+        "name": "Malta Motorways of the Sea",
+        "country": "Malta",
+        "contact_email": "cargo@mms.com.mt",
+        "contact_phone": "+356 2229 6000",
+        "website": "https://www.mms.com.mt",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SMCAR",
+        "name": "San Marino National Freight Lines",
+        "country": "San Marino",
+        "contact_email": "cargo@sanmarino-logistics.com",
+        "contact_phone": "+1 800 145 3142",
+        "website": "https://www.sanmarino-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "VACAR",
+        "name": "Vatikan National Freight Lines",
+        "country": "Vatikan",
+        "contact_email": "cargo@vatikan-logistics.com",
+        "contact_phone": "+1 800 361 6075",
+        "website": "https://www.vatikan-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ADCAR",
+        "name": "Andorra National Freight Lines",
+        "country": "Andorra",
+        "contact_email": "cargo@andorra-logistics.com",
+        "contact_phone": "+1 800 513 9762",
+        "website": "https://www.andorra-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "STENA",
+        "name": "Stena Line Freight Logistics",
+        "country": "Swedia",
+        "contact_email": "info@stenaline.com",
+        "contact_phone": "+46 31 85 80 00",
+        "website": "https://www.stenalinefreight.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "WWL",
+        "name": "Wallenius Wilhelmsen Ocean",
+        "country": "Norwegia",
+        "contact_email": "customer@walwil.com",
+        "contact_phone": "+47 67 58 40 00",
+        "website": "https://www.walleniuswilhelmsen.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MSK",
+        "name": "Maersk Line",
+        "country": "Denmark",
+        "contact_email": "info@maersk.com",
+        "contact_phone": "+45 33 63 33 63",
+        "website": "https://www.maersk.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "FINN",
+        "name": "Finnlines Freight Logistics",
+        "country": "Finlandia",
+        "contact_email": "cargo@finnlines.com",
+        "contact_phone": "+358 10 34350",
+        "website": "https://www.finnlines.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "EIM",
+        "name": "Eimskip Shipping Iceland",
+        "country": "Islandia",
+        "contact_email": "eimskip@eimskip.is",
+        "contact_phone": "+354 525 7000",
+        "website": "https://www.eimskip.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "EECAR",
+        "name": "Estonia National Freight Lines",
+        "country": "Estonia",
+        "contact_email": "cargo@estonia-logistics.com",
+        "contact_phone": "+1 800 418 8332",
+        "website": "https://www.estonia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "LVCAR",
+        "name": "Latvia National Freight Lines",
+        "country": "Latvia",
+        "contact_email": "cargo@latvia-logistics.com",
+        "contact_phone": "+1 800 192 1765",
+        "website": "https://www.latvia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "LTCAR",
+        "name": "Lituania National Freight Lines",
+        "country": "Lituania",
+        "contact_email": "cargo@lituania-logistics.com",
+        "contact_phone": "+1 800 811 5372",
+        "website": "https://www.lituania-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "AXCAR",
+        "name": "Åland Islands National Freight Lines",
+        "country": "Åland Islands",
+        "contact_email": "cargo@landislands-logistics.com",
+        "contact_phone": "+1 800 205 4501",
+        "website": "https://www.landislands-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "RAL",
+        "name": "Royal Arctic Line Greenland",
+        "country": "Greenland",
+        "contact_email": "ral@ral.gl",
+        "contact_phone": "+299 34 91 00",
+        "website": "https://www.ral.gl",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CHL",
+        "name": "Chipolbrok Poland Lines",
+        "country": "Polandia",
+        "contact_email": "chipolbrok@chipolbrok.com.pl",
+        "contact_phone": "+48 58 621 7301",
+        "website": "https://www.chipolbrok.com.pl",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "UDP",
+        "name": "Ukrainian Danube Shipping Co.",
+        "country": "Ukraina",
+        "contact_email": "office@udp.one",
+        "contact_phone": "+380 4841 67000",
+        "website": "https://udp.one",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CZCAR",
+        "name": "Republik Ceko National Freight Lines",
+        "country": "Republik Ceko",
+        "contact_email": "cargo@republikceko-logistics.com",
+        "contact_phone": "+1 800 410 1813",
+        "website": "https://www.republikceko-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "NAVROM",
+        "name": "Navrom Galati Maritime Romania",
+        "country": "Rumania",
+        "contact_email": "office@navrom.ro",
+        "contact_phone": "+40 236 460 380",
+        "website": "https://www.navrom.ro",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "HUCAR",
+        "name": "Hungaria National Freight Lines",
+        "country": "Hungaria",
+        "contact_email": "cargo@hungaria-logistics.com",
+        "contact_phone": "+1 800 399 7214",
+        "website": "https://www.hungaria-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "NAVIB",
+        "name": "Navibulgar Shipping Bulgaria",
+        "country": "Bulgaria",
+        "contact_email": "office@navbul.com",
+        "contact_phone": "+359 52 683 200",
+        "website": "https://www.navbul.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SKCAR",
+        "name": "Slowakia National Freight Lines",
+        "country": "Slowakia",
+        "contact_email": "cargo@slowakia-logistics.com",
+        "contact_phone": "+1 800 271 4639",
+        "website": "https://www.slowakia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BYCAR",
+        "name": "Belarusia National Freight Lines",
+        "country": "Belarusia",
+        "contact_email": "cargo@belarusia-logistics.com",
+        "contact_phone": "+1 800 767 1481",
+        "website": "https://www.belarusia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MDCAR",
+        "name": "Moldova National Freight Lines",
+        "country": "Moldova",
+        "contact_email": "cargo@moldova-logistics.com",
+        "contact_phone": "+1 800 298 7448",
+        "website": "https://www.moldova-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "FESCO",
+        "name": "FESCO Transportation Group",
+        "country": "Rusia",
+        "contact_email": "fesco@fesco.com",
+        "contact_phone": "+7 495 780 6000",
+        "website": "https://www.fesco.ru",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "FDX",
+        "name": "FedEx Express Global",
+        "country": "Amerika Serikat",
+        "contact_email": "support@fedex.com",
+        "contact_phone": "+1 800 463 3339",
+        "website": "https://www.fedex.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CPCK",
+        "name": "CPKC Rail & Marine Logistics",
+        "country": "Kanada",
+        "contact_email": "service@cpkc.com",
+        "contact_phone": "+1 403 319 7000",
+        "website": "https://www.cpkc.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "TMM",
+        "name": "Grupo TMM Logistics Mexico",
+        "country": "Meksiko",
+        "contact_email": "informacion@grupotmm.com",
+        "contact_phone": "+52 55 5629 8866",
+        "website": "https://www.grupotmm.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "PANC",
+        "name": "Panama Canal Logistics Authority",
+        "country": "Panama",
+        "contact_email": "cargo@pancanal.com",
+        "contact_phone": "+507 272 1111",
+        "website": "https://www.pancanal.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CRCL",
+        "name": "Costa Rica National Cargo Line",
+        "country": "Kosta Rika",
+        "contact_email": "info@corbana.cr",
+        "contact_phone": "+506 2202 0200",
+        "website": "https://www.corbana.cr",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "GTCAR",
+        "name": "Guatemala National Freight Lines",
+        "country": "Guatemala",
+        "contact_email": "cargo@guatemala-logistics.com",
+        "contact_phone": "+1 800 243 3237",
+        "website": "https://www.guatemala-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "HNCAR",
+        "name": "Honduras National Freight Lines",
+        "country": "Honduras",
+        "contact_email": "cargo@honduras-logistics.com",
+        "contact_phone": "+1 800 476 2333",
+        "website": "https://www.honduras-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SVCAR",
+        "name": "El Salvador National Freight Lines",
+        "country": "El Salvador",
+        "contact_email": "cargo@elsalvador-logistics.com",
+        "contact_phone": "+1 800 505 3158",
+        "website": "https://www.elsalvador-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "NICAR",
+        "name": "Nikaragua National Freight Lines",
+        "country": "Nikaragua",
+        "contact_email": "cargo@nikaragua-logistics.com",
+        "contact_phone": "+1 800 337 9475",
+        "website": "https://www.nikaragua-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BZCAR",
+        "name": "Belize National Freight Lines",
+        "country": "Belize",
+        "contact_email": "cargo@belize-logistics.com",
+        "contact_phone": "+1 800 748 1084",
+        "website": "https://www.belize-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CUCAR",
+        "name": "Kuba National Freight Lines",
+        "country": "Kuba",
+        "contact_email": "cargo@kuba-logistics.com",
+        "contact_phone": "+1 800 263 1578",
+        "website": "https://www.kuba-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "DOCAR",
+        "name": "Republik Dominika National Freight Lines",
+        "country": "Republik Dominika",
+        "contact_email": "cargo@republikdominika-logistics.com",
+        "contact_phone": "+1 800 175 8171",
+        "website": "https://www.republikdominika-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "JMCAR",
+        "name": "Jamaika National Freight Lines",
+        "country": "Jamaika",
+        "contact_email": "cargo@jamaika-logistics.com",
+        "contact_phone": "+1 800 896 6919",
+        "website": "https://www.jamaika-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "HTCAR",
+        "name": "Haiti National Freight Lines",
+        "country": "Haiti",
+        "contact_email": "cargo@haiti-logistics.com",
+        "contact_phone": "+1 800 676 4700",
+        "website": "https://www.haiti-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BSCAR",
+        "name": "Bahama National Freight Lines",
+        "country": "Bahama",
+        "contact_email": "cargo@bahama-logistics.com",
+        "contact_phone": "+1 800 325 3372",
+        "website": "https://www.bahama-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "TTCAR",
+        "name": "Trinidad & Tobago National Freight Lines",
+        "country": "Trinidad & Tobago",
+        "contact_email": "cargo@trinidadtobago-logistics.com",
+        "contact_phone": "+1 800 537 9031",
+        "website": "https://www.trinidadtobago-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BBCAR",
+        "name": "Barbados National Freight Lines",
+        "country": "Barbados",
+        "contact_email": "cargo@barbados-logistics.com",
+        "contact_phone": "+1 800 608 6818",
+        "website": "https://www.barbados-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "LCCAR",
+        "name": "Saint Lucia National Freight Lines",
+        "country": "Saint Lucia",
+        "contact_email": "cargo@saintlucia-logistics.com",
+        "contact_phone": "+1 800 981 9597",
+        "website": "https://www.saintlucia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "VCCAR",
+        "name": "Saint Vincent & Grenadines National Freight Lines",
+        "country": "Saint Vincent & Grenadines",
+        "contact_email": "cargo@saintvincentgrenadines-logistics.com",
+        "contact_phone": "+1 800 467 1031",
+        "website": "https://www.saintvincentgrenadines-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "GDCAR",
+        "name": "Grenada National Freight Lines",
+        "country": "Grenada",
+        "contact_email": "cargo@grenada-logistics.com",
+        "contact_phone": "+1 800 575 3138",
+        "website": "https://www.grenada-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "AGCAR",
+        "name": "Antigua & Barbuda National Freight Lines",
+        "country": "Antigua & Barbuda",
+        "contact_email": "cargo@antiguabarbuda-logistics.com",
+        "contact_phone": "+1 800 130 5819",
+        "website": "https://www.antiguabarbuda-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "DMCAR",
+        "name": "Dominika National Freight Lines",
+        "country": "Dominika",
+        "contact_email": "cargo@dominika-logistics.com",
+        "contact_phone": "+1 800 999 6617",
+        "website": "https://www.dominika-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "KNCAR",
+        "name": "Saint Kitts & Nevis National Freight Lines",
+        "country": "Saint Kitts & Nevis",
+        "contact_email": "cargo@saintkittsnevis-logistics.com",
+        "contact_phone": "+1 800 682 8591",
+        "website": "https://www.saintkittsnevis-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "PRCAR",
+        "name": "Puerto Rico National Freight Lines",
+        "country": "Puerto Rico",
+        "contact_email": "cargo@puertorico-logistics.com",
+        "contact_phone": "+1 800 696 1453",
+        "website": "https://www.puertorico-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ALIAN",
+        "name": "Aliança Navegação e Logística",
+        "country": "Brasil",
+        "contact_email": "alianca@alianca.com.br",
+        "contact_phone": "+55 11 5185 5500",
+        "website": "https://www.alianca.com.br",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MARU",
+        "name": "Maruba Maritime Argentina",
+        "country": "Argentina",
+        "contact_email": "maruba@maruba.com.ar",
+        "contact_phone": "+54 11 4311 0041",
+        "website": "https://www.maruba.com.ar",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CSAV",
+        "name": "CSAV Chile Sud Americana",
+        "country": "Chili",
+        "contact_email": "contact@csav.com",
+        "contact_phone": "+56 32 220 3000",
+        "website": "https://www.csav.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "FMG",
+        "name": "Flota Grancolombiana Logistics",
+        "country": "Kolombia",
+        "contact_email": "contacto@fmg.com.co",
+        "contact_phone": "+57 1 341 0000",
+        "website": "https://www.fmg.com.co",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CPV",
+        "name": "Consorcio Naviero Peruano",
+        "country": "Peru",
+        "contact_email": "info@cnp.com.pe",
+        "contact_phone": "+51 1 429 8890",
+        "website": "https://www.cnp.com.pe",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "VECAR",
+        "name": "Venezuela National Freight Lines",
+        "country": "Venezuela",
+        "contact_email": "cargo@venezuela-logistics.com",
+        "contact_phone": "+1 800 855 8530",
+        "website": "https://www.venezuela-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ECCAR",
+        "name": "Ekuador National Freight Lines",
+        "country": "Ekuador",
+        "contact_email": "cargo@ekuador-logistics.com",
+        "contact_phone": "+1 800 439 7043",
+        "website": "https://www.ekuador-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BOCAR",
+        "name": "Bolivia National Freight Lines",
+        "country": "Bolivia",
+        "contact_email": "cargo@bolivia-logistics.com",
+        "contact_phone": "+1 800 195 3553",
+        "website": "https://www.bolivia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "PYCAR",
+        "name": "Paraguay National Freight Lines",
+        "country": "Paraguay",
+        "contact_email": "cargo@paraguay-logistics.com",
+        "contact_phone": "+1 800 406 9255",
+        "website": "https://www.paraguay-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "UYCAR",
+        "name": "Uruguay National Freight Lines",
+        "country": "Uruguay",
+        "contact_email": "cargo@uruguay-logistics.com",
+        "contact_phone": "+1 800 199 9423",
+        "website": "https://www.uruguay-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "GYCAR",
+        "name": "Guyana National Freight Lines",
+        "country": "Guyana",
+        "contact_email": "cargo@guyana-logistics.com",
+        "contact_phone": "+1 800 645 3838",
+        "website": "https://www.guyana-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SRCAR",
+        "name": "Suriname National Freight Lines",
+        "country": "Suriname",
+        "contact_email": "cargo@suriname-logistics.com",
+        "contact_phone": "+1 800 980 1711",
+        "website": "https://www.suriname-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "EGL",
+        "name": "Egyptian Global Logistics",
+        "country": "Mesir",
+        "contact_email": "info@egl-egypt.com",
+        "contact_phone": "+20 3 481 0700",
+        "website": "https://www.egl-egypt.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "COMAN",
+        "name": "Comanav Maritime Morocco",
+        "country": "Maroko",
+        "contact_email": "contact@comanav.ma",
+        "contact_phone": "+212 522 31 01 20",
+        "website": "https://www.comanav.ma",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CNAN",
+        "name": "CNAN Med Maritime Algeria",
+        "country": "Aljazair",
+        "contact_email": "contact@cnanmed.dz",
+        "contact_phone": "+213 21 71 39 30",
+        "website": "https://www.cnanmed.dz",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CTN",
+        "name": "Compagnie Tunisienne de Navigation",
+        "country": "Tunisia",
+        "contact_email": "ctn@ctn.com.tn",
+        "contact_phone": "+216 71 345 355",
+        "website": "https://www.ctn.com.tn",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "LYCAR",
+        "name": "Libya National Freight Lines",
+        "country": "Libya",
+        "contact_email": "cargo@libya-logistics.com",
+        "contact_phone": "+1 800 910 9035",
+        "website": "https://www.libya-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SDCAR",
+        "name": "Sudan National Freight Lines",
+        "country": "Sudan",
+        "contact_email": "cargo@sudan-logistics.com",
+        "contact_phone": "+1 800 401 6482",
+        "website": "https://www.sudan-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SSCAR",
+        "name": "Sudan Selatan National Freight Lines",
+        "country": "Sudan Selatan",
+        "contact_email": "cargo@sudanselatan-logistics.com",
+        "contact_phone": "+1 800 582 7324",
+        "website": "https://www.sudanselatan-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SNCL",
+        "name": "Sifax National Cargo Nigeria",
+        "country": "Nigeria",
+        "contact_email": "info@sifaxgroup.com",
+        "contact_phone": "+234 1 730 4000",
+        "website": "https://www.sifaxgroup.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BSL",
+        "name": "Black Star Line Ghana Maritime",
+        "country": "Ghana",
+        "contact_email": "info@blackstarline.gov.gh",
+        "contact_phone": "+233 30 266 4951",
+        "website": "https://www.blackstarline.gov.gh",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SITRAM",
+        "name": "SITRAM Maritime Côte d'Ivoire",
+        "country": "Pantai Gading",
+        "contact_email": "contact@sitram.ci",
+        "contact_phone": "+225 27 21 25 24",
+        "website": "https://www.sitram.ci",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SNCAR",
+        "name": "Senegal National Freight Lines",
+        "country": "Senegal",
+        "contact_email": "cargo@senegal-logistics.com",
+        "contact_phone": "+1 800 427 8435",
+        "website": "https://www.senegal-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CMCAR",
+        "name": "Kamerun National Freight Lines",
+        "country": "Kamerun",
+        "contact_email": "cargo@kamerun-logistics.com",
+        "contact_phone": "+1 800 972 9549",
+        "website": "https://www.kamerun-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "AOCAR",
+        "name": "Angola National Freight Lines",
+        "country": "Angola",
+        "contact_email": "cargo@angola-logistics.com",
+        "contact_phone": "+1 800 242 9740",
+        "website": "https://www.angola-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CDCAR",
+        "name": "RD Kongo National Freight Lines",
+        "country": "RD Kongo",
+        "contact_email": "cargo@rdkongo-logistics.com",
+        "contact_phone": "+1 800 964 3838",
+        "website": "https://www.rdkongo-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CGCAR",
+        "name": "Kongo National Freight Lines",
+        "country": "Kongo",
+        "contact_email": "cargo@kongo-logistics.com",
+        "contact_phone": "+1 800 309 8758",
+        "website": "https://www.kongo-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "GACAR",
+        "name": "Gabon National Freight Lines",
+        "country": "Gabon",
+        "contact_email": "cargo@gabon-logistics.com",
+        "contact_phone": "+1 800 993 8889",
+        "website": "https://www.gabon-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "GNCAR",
+        "name": "Guinea National Freight Lines",
+        "country": "Guinea",
+        "contact_email": "cargo@guinea-logistics.com",
+        "contact_phone": "+1 800 634 9052",
+        "website": "https://www.guinea-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "TGCAR",
+        "name": "Togo National Freight Lines",
+        "country": "Togo",
+        "contact_email": "cargo@togo-logistics.com",
+        "contact_phone": "+1 800 458 6131",
+        "website": "https://www.togo-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BJCAR",
+        "name": "Benin National Freight Lines",
+        "country": "Benin",
+        "contact_email": "cargo@benin-logistics.com",
+        "contact_phone": "+1 800 773 7314",
+        "website": "https://www.benin-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MRCAR",
+        "name": "Mauritania National Freight Lines",
+        "country": "Mauritania",
+        "contact_email": "cargo@mauritania-logistics.com",
+        "contact_phone": "+1 800 455 9391",
+        "website": "https://www.mauritania-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MLCAR",
+        "name": "Mali National Freight Lines",
+        "country": "Mali",
+        "contact_email": "cargo@mali-logistics.com",
+        "contact_phone": "+1 800 323 8623",
+        "website": "https://www.mali-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BFCAR",
+        "name": "Burkina Faso National Freight Lines",
+        "country": "Burkina Faso",
+        "contact_email": "cargo@burkinafaso-logistics.com",
+        "contact_phone": "+1 800 618 4082",
+        "website": "https://www.burkinafaso-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "NECAR",
+        "name": "Niger National Freight Lines",
+        "country": "Niger",
+        "contact_email": "cargo@niger-logistics.com",
+        "contact_phone": "+1 800 165 2844",
+        "website": "https://www.niger-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "TDCAR",
+        "name": "Chad National Freight Lines",
+        "country": "Chad",
+        "contact_email": "cargo@chad-logistics.com",
+        "contact_phone": "+1 800 262 4260",
+        "website": "https://www.chad-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CVCAR",
+        "name": "Tanjung Verde National Freight Lines",
+        "country": "Tanjung Verde",
+        "contact_email": "cargo@tanjungverde-logistics.com",
+        "contact_phone": "+1 800 559 5289",
+        "website": "https://www.tanjungverde-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "GMCAR",
+        "name": "Gambia National Freight Lines",
+        "country": "Gambia",
+        "contact_email": "cargo@gambia-logistics.com",
+        "contact_phone": "+1 800 570 7042",
+        "website": "https://www.gambia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "GWCAR",
+        "name": "Guinea-Bissau National Freight Lines",
+        "country": "Guinea-Bissau",
+        "contact_email": "cargo@guineabissau-logistics.com",
+        "contact_phone": "+1 800 656 1356",
+        "website": "https://www.guineabissau-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "LRCAR",
+        "name": "Liberia National Freight Lines",
+        "country": "Liberia",
+        "contact_email": "cargo@liberia-logistics.com",
+        "contact_phone": "+1 800 408 1567",
+        "website": "https://www.liberia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SLCAR",
+        "name": "Sierra Leone National Freight Lines",
+        "country": "Sierra Leone",
+        "contact_email": "cargo@sierraleone-logistics.com",
+        "contact_phone": "+1 800 570 9413",
+        "website": "https://www.sierraleone-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "GQCAR",
+        "name": "Guinea Khatulistiwa National Freight Lines",
+        "country": "Guinea Khatulistiwa",
+        "contact_email": "cargo@guineakhatulistiwa-logistics.com",
+        "contact_phone": "+1 800 666 4104",
+        "website": "https://www.guineakhatulistiwa-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "STCAR",
+        "name": "Sao Tome & Principe National Freight Lines",
+        "country": "Sao Tome & Principe",
+        "contact_email": "cargo@saotomeprincipe-logistics.com",
+        "contact_phone": "+1 800 744 1178",
+        "website": "https://www.saotomeprincipe-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "CFCAR",
+        "name": "Republik Afrika Tengah National Freight Lines",
+        "country": "Republik Afrika Tengah",
+        "contact_email": "cargo@republikafrikatengah-logistics.com",
+        "contact_phone": "+1 800 212 5872",
+        "website": "https://www.republikafrikatengah-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "GRND",
+        "name": "Grindrod Shipping South Africa",
+        "country": "Afrika Selatan",
+        "contact_email": "shipping@grindrod.com",
+        "contact_phone": "+27 31 304 1451",
+        "website": "https://www.grindrod.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "KNOC",
+        "name": "Kenya National Shipping Line",
+        "country": "Kenya",
+        "contact_email": "info@knsl.co.ke",
+        "contact_phone": "+254 41 222 5505",
+        "website": "https://www.knsl.co.ke",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "TACO",
+        "name": "Tanzania Shipping Agencies Corp",
+        "country": "Tanzania",
+        "contact_email": "dg@tasac.go.tz",
+        "contact_phone": "+255 22 212 7314",
+        "website": "https://www.tasac.go.tz",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ESLSE",
+        "name": "Ethiopian Shipping & Logistics",
+        "country": "Ethiopia",
+        "contact_email": "info@eslse.et",
+        "contact_phone": "+251 11 551 8280",
+        "website": "https://www.eslse.et",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "UGCAR",
+        "name": "Uganda National Freight Lines",
+        "country": "Uganda",
+        "contact_email": "cargo@uganda-logistics.com",
+        "contact_phone": "+1 800 475 5270",
+        "website": "https://www.uganda-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MZCAR",
+        "name": "Mozambik National Freight Lines",
+        "country": "Mozambik",
+        "contact_email": "cargo@mozambik-logistics.com",
+        "contact_phone": "+1 800 549 7502",
+        "website": "https://www.mozambik-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MGCAR",
+        "name": "Madagaskar National Freight Lines",
+        "country": "Madagaskar",
+        "contact_email": "cargo@madagaskar-logistics.com",
+        "contact_phone": "+1 800 472 9763",
+        "website": "https://www.madagaskar-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MUCAR",
+        "name": "Mauritius National Freight Lines",
+        "country": "Mauritius",
+        "contact_email": "cargo@mauritius-logistics.com",
+        "contact_phone": "+1 800 813 5755",
+        "website": "https://www.mauritius-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SCCAR",
+        "name": "Seychelles National Freight Lines",
+        "country": "Seychelles",
+        "contact_email": "cargo@seychelles-logistics.com",
+        "contact_phone": "+1 800 684 6290",
+        "website": "https://www.seychelles-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "RWCAR",
+        "name": "Rwanda National Freight Lines",
+        "country": "Rwanda",
+        "contact_email": "cargo@rwanda-logistics.com",
+        "contact_phone": "+1 800 923 7889",
+        "website": "https://www.rwanda-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ZMCAR",
+        "name": "Zambia National Freight Lines",
+        "country": "Zambia",
+        "contact_email": "cargo@zambia-logistics.com",
+        "contact_phone": "+1 800 265 4201",
+        "website": "https://www.zambia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ZWCAR",
+        "name": "Zimbabwe National Freight Lines",
+        "country": "Zimbabwe",
+        "contact_email": "cargo@zimbabwe-logistics.com",
+        "contact_phone": "+1 800 423 1715",
+        "website": "https://www.zimbabwe-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BWCAR",
+        "name": "Botswana National Freight Lines",
+        "country": "Botswana",
+        "contact_email": "cargo@botswana-logistics.com",
+        "contact_phone": "+1 800 465 8373",
+        "website": "https://www.botswana-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "NACAR",
+        "name": "Namibia National Freight Lines",
+        "country": "Namibia",
+        "contact_email": "cargo@namibia-logistics.com",
+        "contact_phone": "+1 800 928 7314",
+        "website": "https://www.namibia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SOCAR",
+        "name": "Somalia National Freight Lines",
+        "country": "Somalia",
+        "contact_email": "cargo@somalia-logistics.com",
+        "contact_phone": "+1 800 301 4834",
+        "website": "https://www.somalia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "DJCAR",
+        "name": "Jibuti National Freight Lines",
+        "country": "Jibuti",
+        "contact_email": "cargo@jibuti-logistics.com",
+        "contact_phone": "+1 800 336 7460",
+        "website": "https://www.jibuti-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ERCAR",
+        "name": "Eritrea National Freight Lines",
+        "country": "Eritrea",
+        "contact_email": "cargo@eritrea-logistics.com",
+        "contact_phone": "+1 800 549 5268",
+        "website": "https://www.eritrea-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MWCAR",
+        "name": "Malawi National Freight Lines",
+        "country": "Malawi",
+        "contact_email": "cargo@malawi-logistics.com",
+        "contact_phone": "+1 800 763 5283",
+        "website": "https://www.malawi-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "BICAR",
+        "name": "Burundi National Freight Lines",
+        "country": "Burundi",
+        "contact_email": "cargo@burundi-logistics.com",
+        "contact_phone": "+1 800 259 1019",
+        "website": "https://www.burundi-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "KMCAR",
+        "name": "Komoro National Freight Lines",
+        "country": "Komoro",
+        "contact_email": "cargo@komoro-logistics.com",
+        "contact_phone": "+1 800 950 4830",
+        "website": "https://www.komoro-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SZCAR",
+        "name": "Eswatini National Freight Lines",
+        "country": "Eswatini",
+        "contact_email": "cargo@eswatini-logistics.com",
+        "contact_phone": "+1 800 681 6956",
+        "website": "https://www.eswatini-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "LSCAR",
+        "name": "Lesotho National Freight Lines",
+        "country": "Lesotho",
+        "contact_email": "cargo@lesotho-logistics.com",
+        "contact_phone": "+1 800 577 2246",
+        "website": "https://www.lesotho-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "TOLL",
+        "name": "Toll Group Logistics Australia",
+        "country": "Australia",
+        "contact_email": "contact@tollgroup.com",
+        "contact_phone": "+61 3 9694 2888",
+        "website": "https://www.tollgroup.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "PFNZ",
+        "name": "Pacific Forum Line New Zealand",
+        "country": "Selandia Baru",
+        "contact_email": "info@pacificforumline.com",
+        "contact_phone": "+64 9 308 3939",
+        "website": "https://www.pacificforumline.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "PNGM",
+        "name": "Consortium PNG Cargo Line",
+        "country": "Papua Nugini",
+        "contact_email": "shipping@pngports.com.pg",
+        "contact_phone": "+675 308 4200",
+        "website": "https://www.pngports.com.pg",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "FIJI",
+        "name": "Fiji National Shipping Services",
+        "country": "Fiji",
+        "contact_email": "fijiports@fijiports.com.fj",
+        "contact_phone": "+679 331 2700",
+        "website": "https://www.fijiports.com.fj",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SBCAR",
+        "name": "Kepulauan Solomon National Freight Lines",
+        "country": "Kepulauan Solomon",
+        "contact_email": "cargo@kepulauansolomon-logistics.com",
+        "contact_phone": "+1 800 813 7509",
+        "website": "https://www.kepulauansolomon-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "VUCAR",
+        "name": "Vanuatu National Freight Lines",
+        "country": "Vanuatu",
+        "contact_email": "cargo@vanuatu-logistics.com",
+        "contact_phone": "+1 800 204 9459",
+        "website": "https://www.vanuatu-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "SAMC",
+        "name": "Samoa Shipping Corporation",
+        "country": "Samoa",
+        "contact_email": "info@samoashipping.com",
+        "contact_phone": "+685 20935",
+        "website": "https://www.samoashipping.com",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "TONG",
+        "name": "Friendly Islands Shipping Tonga",
+        "country": "Tonga",
+        "contact_email": "fisc@kalianet.to",
+        "contact_phone": "+676 28318",
+        "website": "https://www.friendlyislandsshipping.to",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "KICAR",
+        "name": "Kiribati National Freight Lines",
+        "country": "Kiribati",
+        "contact_email": "cargo@kiribati-logistics.com",
+        "contact_phone": "+1 800 860 1172",
+        "website": "https://www.kiribati-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "FMCAR",
+        "name": "Mikronesia National Freight Lines",
+        "country": "Mikronesia",
+        "contact_email": "cargo@mikronesia-logistics.com",
+        "contact_phone": "+1 800 629 3570",
+        "website": "https://www.mikronesia-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "PWCAR",
+        "name": "Palau National Freight Lines",
+        "country": "Palau",
+        "contact_email": "cargo@palau-logistics.com",
+        "contact_phone": "+1 800 962 4395",
+        "website": "https://www.palau-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "MHCAR",
+        "name": "Kepulauan Marshall National Freight Lines",
+        "country": "Kepulauan Marshall",
+        "contact_email": "cargo@kepulauanmarshall-logistics.com",
+        "contact_phone": "+1 800 237 5513",
+        "website": "https://www.kepulauanmarshall-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "NRCAR",
+        "name": "Nauru National Freight Lines",
+        "country": "Nauru",
+        "contact_email": "cargo@nauru-logistics.com",
+        "contact_phone": "+1 800 363 9660",
+        "website": "https://www.nauru-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "TVCAR",
+        "name": "Tuvalu National Freight Lines",
+        "country": "Tuvalu",
+        "contact_email": "cargo@tuvalu-logistics.com",
+        "contact_phone": "+1 800 917 4315",
+        "website": "https://www.tuvalu-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "ASCAR",
+        "name": "American Samoa National Freight Lines",
+        "country": "American Samoa",
+        "contact_email": "cargo@americansamoa-logistics.com",
+        "contact_phone": "+1 800 541 1582",
+        "website": "https://www.americansamoa-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "AICAR",
+        "name": "Anguilla National Freight Lines",
+        "country": "Anguilla",
+        "contact_email": "cargo@anguilla-logistics.com",
+        "contact_phone": "+1 800 920 9203",
+        "website": "https://www.anguilla-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "AQCAR",
+        "name": "Antartika National Freight Lines",
+        "country": "Antartika",
+        "contact_email": "cargo@antartika-logistics.com",
+        "contact_phone": "+1 800 332 8466",
+        "website": "https://www.antartika-freight.org",
+        "status": "ACTIVE"
+    },
+    {
+        "code": "DHL",
+        "name": "DHL Global Forwarding",
+        "country": "Jerman",
+        "contact_email": "contact@dhl.com",
+        "contact_phone": "+49 228 1820",
+        "website": "https://www.dhl.com"
+    }
+]

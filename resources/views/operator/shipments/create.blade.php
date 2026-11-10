@@ -42,13 +42,21 @@
                         @error('customer_id')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Ekspedisi <span class="text-rose-500">*</span></label>
-                        <select name="carrier_id" class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('carrier_id') border-rose-400 @enderror">
-                            <option value="">— Pilih Ekspedisi —</option>
-                            @foreach($carriers as $c)
-                                <option value="{{ $c->id }}" {{ old('carrier_id') == $c->id ? 'selected' : '' }}>{{ $c->name }} ({{ $c->code }})</option>
-                            @endforeach
-                        </select>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">Ekspedisi (205+ Negara) <span class="text-rose-500">*</span></label>
+                            <span class="text-[11px] text-cyan-600 dark:text-cyan-400 font-medium">Tersedia {{ count($carriers) }} Mitra</span>
+                        </div>
+                        <div class="space-y-1.5">
+                            <input type="text" id="carrier_quick_filter" placeholder="Cari nama ekspedisi, kode, atau negara..." onkeyup="filterCarrierOptions(this.value)" class="w-full px-3 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-cyan-500">
+                            <select id="carrier_select" name="carrier_id" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('carrier_id') border-rose-400 @enderror">
+                                <option value="">— Pilih Ekspedisi Resmi Global —</option>
+                                @foreach($carriers as $c)
+                                    <option value="{{ $c->id }}" data-search="{{ strtolower($c->name . ' ' . $c->code . ' ' . $c->country) }}" {{ old('carrier_id') == $c->id ? 'selected' : '' }}>
+                                        {{ $c->name }} ({{ $c->code }}) — {{ $c->country }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         @error('carrier_id')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div>
@@ -217,6 +225,27 @@ function updateMap() {
     } else if (oLat) {
         originMarker = L.circleMarker([oLat, oLng], { radius: 8, color: '#10b981', fillColor: '#10b981', fillOpacity: 1 }).addTo(routeMap);
         routeMap.setView([oLat, oLng], 5);
+    }
+}
+
+function filterCarrierOptions(term) {
+    const q = (term || '').toLowerCase().trim();
+    const select = document.getElementById('carrier_select');
+    if (!select) return;
+
+    let hasFirstMatch = false;
+    for (let i = 1; i < select.options.length; i++) {
+        const opt = select.options[i];
+        const searchVal = opt.getAttribute('data-search') || opt.text.toLowerCase();
+        if (!q || searchVal.includes(q)) {
+            opt.style.display = '';
+            if (!hasFirstMatch && q) {
+                // Jangan paksa auto select agar user tetap punya kontrol, hanya sediakan opsi
+                hasFirstMatch = true;
+            }
+        } else {
+            opt.style.display = 'none';
+        }
     }
 }
 
