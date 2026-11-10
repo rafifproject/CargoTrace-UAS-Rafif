@@ -1526,9 +1526,13 @@
         function buildPortsLayer() {
             portsLayerGroup.clearLayers();
             portsData.forEach(p => {
-                L.circleMarker([p.lat, p.lng], {
+                const marker = L.circleMarker([p.lat, p.lng], {
                     radius: 6, fillColor: '#8B5CF6', color: '#ffffff', weight: 1.5, fillOpacity: 0.92
-                }).bindPopup(`
+                });
+                marker.countryCode = (p.iso || '').toUpperCase();
+                marker.countryName = (p.country || '').toLowerCase();
+                marker.portName = (p.name || '').toLowerCase();
+                marker.bindPopup(`
                     <div style="min-width:240px; font-family: Outfit, sans-serif; padding:4px 2px;">
                         <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
                             <img src="https://flagcdn.com/w40/${p.iso || 'id'}.png" alt="${p.country}"
@@ -1548,7 +1552,8 @@
                             Cek Direktori Pelabuhan →
                         </a>
                     </div>
-                `, { maxWidth: 280 }).addTo(portsLayerGroup);
+                `, { maxWidth: 280 });
+                marker.addTo(portsLayerGroup);
             });
         }
 
@@ -1639,18 +1644,44 @@
                     });
                 }
             } else if (currentMode === 'ports') {
-                let closestPort = null;
-                let minDist = 999999;
+                let found = false;
+                const countryCodeUpper = code.toUpperCase();
+                const countryNameLower = name.toLowerCase();
+                const hubLower = (hub || '').toLowerCase();
+
+                // 1. Exact match by countryCode (ISO) or countryName
                 portsLayerGroup.eachLayer(layer => {
-                    const pLatLng = layer.getLatLng();
-                    const dist = Math.hypot(pLatLng.lat - lat, pLatLng.lng - lng);
-                    if (dist < minDist) {
-                        minDist = dist;
-                        closestPort = layer;
+                    if (!found && layer.countryCode && (layer.countryCode === countryCodeUpper || layer.countryName === countryNameLower)) {
+                        layer.openPopup();
+                        found = true;
                     }
                 });
-                if (closestPort && minDist < 12) {
-                    closestPort.openPopup();
+
+                // 2. Exact match by Hub Name
+                if (!found && hubLower) {
+                    portsLayerGroup.eachLayer(layer => {
+                        if (!found && layer.portName && (layer.portName.includes(hubLower) || hubLower.includes(layer.portName))) {
+                            layer.openPopup();
+                            found = true;
+                        }
+                    });
+                }
+
+                // 3. Fallback: only if VERY close (distance < 1.5 degrees, NEVER cross borders!)
+                if (!found) {
+                    let closestPort = null;
+                    let minDist = 999999;
+                    portsLayerGroup.eachLayer(layer => {
+                        const pLatLng = layer.getLatLng();
+                        const dist = Math.hypot(pLatLng.lat - lat, pLatLng.lng - lng);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            closestPort = layer;
+                        }
+                    });
+                    if (closestPort && minDist < 1.5) {
+                        closestPort.openPopup();
+                    }
                 }
             } else if (currentMode === 'route') {
                 let closestRouteMarker = null;

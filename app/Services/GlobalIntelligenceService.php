@@ -489,7 +489,7 @@ class GlobalIntelligenceService
      */
     public function getGlobalPorts(): array
     {
-        return Cache::remember('arcgis_live_global_ports_v4', 43200, function () {
+        return Cache::remember('arcgis_live_global_ports_v6', 43200, function () {
             $curated = $this->getBaselineCuratedPorts();
             try {
                 $endpoint = "https://services1.arcgis.com/cc7nIINtrZ67dyVJ/ArcGIS/rest/services/Transportation_Use/FeatureServer/2/query";
@@ -517,6 +517,7 @@ class GlobalIntelligenceService
                             'IT' => 'Italia', 'GR' => 'Yunani', 'TR' => 'Turki', 'AU' => 'Australia', 'NZ' => 'Selandia Baru',
                             'DK' => 'Denmark', 'SE' => 'Swedia', 'NO' => 'Norwegia', 'FI' => 'Finlandia', 'PL' => 'Polandia',
                             'RU' => 'Rusia', 'BS' => 'Bahama', 'JM' => 'Jamaika', 'DO' => 'Dominika', 'CR' => 'Kosta Rika',
+                            'AL' => 'Albania',
                         ];
 
                         $sizeLabels = [
@@ -579,11 +580,61 @@ class GlobalIntelligenceService
                             ];
                         }
 
+                        // Pastikan setiap negara di master list memiliki representasi pelabuhan / hub
+                        $existingCountryCodes = [];
+                        foreach ($mergedPorts as $p) {
+                            if (!empty($p['iso'])) {
+                                $existingCountryCodes[strtolower($p['iso'])] = true;
+                            }
+                        }
+                        foreach ($this->getCountriesMaster() as $c) {
+                            $cIso = strtolower(str_replace('_EAST', '', $c['code']));
+                            if (!isset($existingCountryCodes[$cIso])) {
+                                $mergedPorts[] = [
+                                    'code' => strtoupper($c['code']) . 'HUB',
+                                    'name' => $c['hub'],
+                                    'country' => $c['name'],
+                                    'iso' => $cIso,
+                                    'city' => $c['name'],
+                                    'lat' => $c['lat'],
+                                    'lng' => $c['lng'],
+                                    'capacity' => 'Hub Nasional',
+                                    'type' => 'Pelabuhan & Hub Logistik Utama',
+                                ];
+                                $existingCountryCodes[$cIso] = true;
+                            }
+                        }
+
                         return $mergedPorts;
                     }
                 }
             } catch (\Throwable $e) {
                 // Graceful fallback to baseline
+            }
+
+            // Pastikan curated fallback juga mengkover seluruh negara
+            $existingCountryCodes = [];
+            foreach ($curated as $p) {
+                if (!empty($p['iso'])) {
+                    $existingCountryCodes[strtolower($p['iso'])] = true;
+                }
+            }
+            foreach ($this->getCountriesMaster() as $c) {
+                $cIso = strtolower(str_replace('_EAST', '', $c['code']));
+                if (!isset($existingCountryCodes[$cIso])) {
+                    $curated[] = [
+                        'code' => strtoupper($c['code']) . 'HUB',
+                        'name' => $c['hub'],
+                        'country' => $c['name'],
+                        'iso' => $cIso,
+                        'city' => $c['name'],
+                        'lat' => $c['lat'],
+                        'lng' => $c['lng'],
+                        'capacity' => 'Hub Nasional',
+                        'type' => 'Pelabuhan & Hub Logistik Utama',
+                    ];
+                    $existingCountryCodes[$cIso] = true;
+                }
             }
 
             return $curated;
@@ -681,6 +732,7 @@ class GlobalIntelligenceService
             ['code' => 'FRLEH', 'name' => 'Port of Le Havre (Haropa)', 'country' => 'Prancis', 'iso' => 'fr', 'city' => 'Le Havre', 'lat' => 49.494, 'lng' => 0.107, 'capacity' => '3.1M TEU', 'type' => 'Atlantic Gateway'],
             ['code' => 'FRMRS', 'name' => 'Marseille Fos Port', 'country' => 'Prancis', 'iso' => 'fr', 'city' => 'Marseille', 'lat' => 43.296, 'lng' => 5.369, 'capacity' => '1.5M TEU', 'type' => 'Mediterranean Hub'],
             ['code' => 'GRPIR', 'name' => 'Port of Piraeus (COSCO)', 'country' => 'Yunani', 'iso' => 'gr', 'city' => 'Athens', 'lat' => 37.942, 'lng' => 23.646, 'capacity' => '5.0M TEU', 'type' => 'Silk Road Gateway'],
+            ['code' => 'ALDRS', 'name' => 'Port of Durrës', 'country' => 'Albania', 'iso' => 'al', 'city' => 'Durrës', 'lat' => 41.312, 'lng' => 19.454, 'capacity' => '1.5M TEU', 'type' => 'Adriatic Gateway'],
             ['code' => 'TRAMB', 'name' => 'Port of Ambarli', 'country' => 'Turki', 'iso' => 'tr', 'city' => 'Istanbul', 'lat' => 40.970, 'lng' => 28.694, 'capacity' => '3.1M TEU', 'type' => 'Marmara Gateway'],
             ['code' => 'TRMER', 'name' => 'Mersin International Port', 'country' => 'Turki', 'iso' => 'tr', 'city' => 'Mersin', 'lat' => 36.800, 'lng' => 34.633, 'capacity' => '2.0M TEU', 'type' => 'Eastern Med Hub'],
             ['code' => 'DKAAR', 'name' => 'Port of Aarhus', 'country' => 'Denmark', 'iso' => 'dk', 'city' => 'Aarhus', 'lat' => 56.162, 'lng' => 10.203, 'capacity' => '0.7M TEU', 'type' => 'Scandinavian Hub'],
@@ -919,7 +971,7 @@ class GlobalIntelligenceService
         return [
             ['code' => 'AF', 'name' => 'Afghanistan', 'flag' => '🇦🇫', 'lat' => 33.939, 'lng' => 67.710, 'hub' => 'Kabul Dry Port'],
             ['code' => 'AX', 'name' => 'Åland Islands', 'flag' => '🇦🇽', 'lat' => 60.178, 'lng' => 19.915, 'hub' => 'Port of Mariehamn'],
-            ['code' => 'AL', 'name' => 'Albania', 'flag' => '🇦🇱', 'lat' => 41.153, 'lng' => 20.168, 'hub' => 'Port of Durrës'],
+            ['code' => 'AL', 'name' => 'Albania', 'flag' => '🇦🇱', 'lat' => 41.312, 'lng' => 19.454, 'hub' => 'Port of Durrës'],
             ['code' => 'DZ', 'name' => 'Algeria', 'flag' => '🇩🇿', 'lat' => 28.033, 'lng' => 1.659, 'hub' => 'Port of Algiers'],
             ['code' => 'AS', 'name' => 'American Samoa', 'flag' => '🇦🇸', 'lat' => -14.271, 'lng' => -170.132, 'hub' => 'Port of Pago Pago'],
             ['code' => 'AD', 'name' => 'Andorra', 'flag' => '🇦🇩', 'lat' => 42.506, 'lng' => 1.521, 'hub' => 'Andorra Inland Hub'],
