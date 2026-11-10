@@ -4,54 +4,52 @@
 
 @push('styles')
 <style>
-    /* Custom Leaflet Vehicle Markers for Cargo Tracker */
-    .cargo-vehicle-marker {
+    /* Realistic Vehicle Markers for Cargo Tracker (No Circles - Pure Real Vehicle Visuals) */
+    .cargo-real-vehicle-marker {
         background: transparent !important;
         border: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
     }
-    .cargo-vehicle-badge {
-        position: relative;
+    .cargo-real-vehicle-wrapper {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45), 0 0 0 2.5px #ffffff;
-        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
-        cursor: pointer;
+        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
     }
-    .cargo-vehicle-badge:hover {
-        transform: scale(1.25);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 0 3.5px #38BDF8;
+    .cargo-real-vehicle-marker:hover .cargo-real-vehicle-wrapper {
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px rgba(56, 189, 248, 0.8));
+        transform: scale(1.22) !important;
         z-index: 99999 !important;
     }
-    .cargo-vehicle-pulse {
-        position: absolute;
-        inset: 0;
+    .cargo-vehicle-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 4px;
+        padding: 2px 7px;
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 6px;
+        color: #ffffff;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 10px;
+        line-height: 1.2;
+        white-space: nowrap;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+        pointer-events: none;
+    }
+    .cargo-tag-dot {
+        width: 6px;
+        height: 6px;
         border-radius: 50%;
-        background: inherit;
-        opacity: 0.65;
-        animation: cargoPulseRadar 2.2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
-        z-index: -1;
-    }
-    @keyframes cargoPulseRadar {
-        0% { transform: scale(1); opacity: 0.7; }
-        60% { transform: scale(2.2); opacity: 0; }
-        100% { transform: scale(2.2); opacity: 0; }
-    }
-    .cargo-vehicle-ship {
-        background: linear-gradient(135deg, #0284c7, #0369a1);
-    }
-    .cargo-vehicle-plane {
-        background: linear-gradient(135deg, #0284c7, #2563eb);
-    }
-    .cargo-vehicle-truck {
-        background: linear-gradient(135deg, #059669, #047857);
-    }
-    .cargo-vehicle-train {
-        background: linear-gradient(135deg, #d97706, #b45309);
+        display: inline-block;
     }
 </style>
 @endpush
@@ -200,7 +198,18 @@
             return curve;
         }
 
-        // ── HELPER: GET VEHICLE ICON & TYPE PER SHIPMENT ─────────
+        // ── HELPER: CALCULATE BEARING (Arah Menuju Tujuan) ──────
+        function calculateBearing(p1, p2) {
+            const lat1 = p1[0] * Math.PI / 180;
+            const lat2 = p2[0] * Math.PI / 180;
+            const dLng = (p2[1] - p1[1]) * Math.PI / 180;
+            const y = Math.sin(dLng) * Math.cos(lat2);
+            const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(dLng);
+            const brng = Math.atan2(y, x) * 180 / Math.PI;
+            return Math.round((brng + 360) % 360);
+        }
+
+        // ── HELPER: GET REAL VEHICLE VISUAL PER SHIPMENT ─────────
         function getShipmentVehicle(s) {
             const carrierName = (s.carrier?.name || '').toLowerCase();
             const carrierCode = (s.carrier?.code || '').toUpperCase();
@@ -211,7 +220,7 @@
             const cargo       = (s.cargo_type || '').toLowerCase();
             const notes       = (s.notes || '').toLowerCase();
 
-            // 1. Pesawat Kargo Udara (Airplane)
+            // 1. Pesawat Kargo Udara (Real Jet Freighter Top-Down)
             if (originType === 'AIRPORT' || destType === 'AIRPORT' ||
                 originName.includes('bandara') || originName.includes('airport') ||
                 destName.includes('bandara') || destName.includes('airport') ||
@@ -221,26 +230,35 @@
                     type: 'plane',
                     label: 'Pesawat Kargo Udara (Air Cargo)',
                     emoji: '✈️',
-                    badgeClass: 'cargo-vehicle-plane',
-                    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>`
+                    accentColor: '#38bdf8',
+                    iconW: 46,
+                    iconH: 60,
+                    realSvg: `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="44" height="44" style="filter: drop-shadow(0 8px 12px rgba(0,0,0,0.6));">
+                            <!-- Aircraft Silhouette & Shadow -->
+                            <path d="M32 2 C30 2, 28 6, 28 14 L28 24 L2 35 L2 40 L28 34 L28 50 L18 56 L18 60 L32 58 L46 60 L46 56 L36 50 L36 34 L62 40 L62 35 L36 24 L36 14 C36 6, 34 2, 32 2 Z" fill="#0f172a" opacity="0.3" transform="translate(1.5, 3)"/>
+                            <!-- Main Fuselage and Swept Wings -->
+                            <path d="M32 2 C30 2, 28 6, 28 14 L28 24 L2 35 L2 40 L28 34 L28 50 L18 56 L18 60 L32 58 L46 60 L46 56 L36 50 L36 34 L62 40 L62 35 L36 24 L36 14 C36 6, 34 2, 32 2 Z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/>
+                            <!-- Fuselage Highlight Spine -->
+                            <path d="M32 4 C31 4, 29.5 8, 29.5 16 L29.5 54 L34.5 54 L34.5 16 C34.5 8, 33 4, 32 4 Z" fill="#ffffff"/>
+                            <!-- Cockpit Glass Window -->
+                            <path d="M30 6 Q32 4.5 34 6 L33.5 8.5 Q32 7.5 30.5 8.5 Z" fill="#0284c7"/>
+                            <!-- Livery Speed Strip (Cyan & Navy) -->
+                            <path d="M12 34 L26 31 L26 33 L12 36 Z" fill="#0284c7"/>
+                            <path d="M52 34 L38 31 L38 33 L52 36 Z" fill="#0284c7"/>
+                            <!-- Jet Turbines (Twin Engines) -->
+                            <rect x="14" y="27" width="4.5" height="11" rx="2" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+                            <ellipse cx="16.2" cy="28" rx="1.6" ry="1.2" fill="#38bdf8"/>
+                            <rect x="45.5" y="27" width="4.5" height="11" rx="2" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+                            <ellipse cx="47.8" cy="28" rx="1.6" ry="1.2" fill="#38bdf8"/>
+                            <!-- Tail Fin Stripe (Orange Express Accent) -->
+                            <path d="M30 52 L34 52 L33 58 L31 58 Z" fill="#ea580c"/>
+                        </svg>
+                    `
                 };
             }
 
-            // 2. Kereta Api Logistik (Freight Train)
-            if (cargo.includes('coal') || cargo.includes('ore') || cargo.includes('grain') ||
-                originName.includes('stasiun') || destName.includes('stasiun') ||
-                originName.includes('rail') || destName.includes('rail') ||
-                carrierName.includes('rail') || notes.includes('rail') || notes.includes('kereta')) {
-                return {
-                    type: 'train',
-                    label: 'Kereta Logistik (Freight Train)',
-                    emoji: '🚆',
-                    badgeClass: 'cargo-vehicle-train',
-                    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M12 2c-4 0-8 .5-8 4v9.5C4 17.43 5.57 19 7.5 19L6 20.5v.5h12v-.5L16.5 19c1.93 0 3.5-1.57 3.5-3.5V6c0-3.5-4-4-8-4zM7.5 17c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V7h12v4z"/></svg>`
-                };
-            }
-
-            // 3. Truk Kontainer Darat (Freight Truck)
+            // 2. Truk Kontainer Logistik (Real Semi-Trailer Truck Top-Down)
             if (originType === 'WAREHOUSE' || destType === 'WAREHOUSE' ||
                 originType === 'CUSTOMS_OFFICE' || destType === 'CUSTOMS_OFFICE' ||
                 originName.includes('gudang') || destName.includes('gudang') ||
@@ -249,18 +267,88 @@
                     type: 'truck',
                     label: 'Truk Kontainer (Freight Truck)',
                     emoji: '🚛',
-                    badgeClass: 'cargo-vehicle-truck',
-                    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>`
+                    accentColor: '#10b981',
+                    iconW: 38,
+                    iconH: 68,
+                    realSvg: `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 76" width="26" height="54" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.55));">
+                            <!-- Chassis Shadow -->
+                            <rect x="7" y="4" width="22" height="68" rx="4" fill="#0f172a" opacity="0.35" transform="translate(1, 2)"/>
+                            <!-- Trailer Chassis -->
+                            <rect x="7" y="22" width="22" height="48" rx="2" fill="#1e293b"/>
+                            <!-- 40ft Shipping Container -->
+                            <rect x="8" y="23" width="20" height="46" rx="2" fill="#059669" stroke="#047857" stroke-width="0.9"/>
+                            <!-- Corrugated Ridges (Panel Kontainer Nyata) -->
+                            <line x1="8" y1="28" x2="28" y2="28" stroke="#047857" stroke-width="1.2"/>
+                            <line x1="8" y1="33" x2="28" y2="33" stroke="#047857" stroke-width="1.2"/>
+                            <line x1="8" y1="38" x2="28" y2="38" stroke="#047857" stroke-width="1.2"/>
+                            <line x1="8" y1="43" x2="28" y2="43" stroke="#047857" stroke-width="1.2"/>
+                            <line x1="8" y1="48" x2="28" y2="48" stroke="#047857" stroke-width="1.2"/>
+                            <line x1="8" y1="53" x2="28" y2="53" stroke="#047857" stroke-width="1.2"/>
+                            <line x1="8" y1="58" x2="28" y2="58" stroke="#047857" stroke-width="1.2"/>
+                            <line x1="8" y1="63" x2="28" y2="63" stroke="#047857" stroke-width="1.2"/>
+                            <!-- Container Castings -->
+                            <rect x="8.5" y="23.5" width="2.5" height="2.5" fill="#f8fafc"/>
+                            <rect x="25" y="23.5" width="2.5" height="2.5" fill="#f8fafc"/>
+                            <rect x="8.5" y="66" width="2.5" height="2.5" fill="#f8fafc"/>
+                            <rect x="25" y="66" width="2.5" height="2.5" fill="#f8fafc"/>
+                            <!-- Tractor Cab Front -->
+                            <rect x="8" y="4" width="20" height="17" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="1"/>
+                            <!-- Windshield -->
+                            <path d="M10 7 Q18 5 26 7 L25 10 Q18 8.5 11 10 Z" fill="#0284c7"/>
+                            <!-- Side Mirrors -->
+                            <rect x="5.5" y="7" width="2.5" height="4" rx="1" fill="#334155"/>
+                            <rect x="28" y="7" width="2.5" height="4" rx="1" fill="#334155"/>
+                            <!-- Wheels -->
+                            <rect x="6" y="14" width="2" height="5" rx="0.5" fill="#0f172a"/>
+                            <rect x="28" y="14" width="2" height="5" rx="0.5" fill="#0f172a"/>
+                            <rect x="6" y="58" width="2" height="8" rx="0.5" fill="#0f172a"/>
+                            <rect x="28" y="58" width="2" height="8" rx="0.5" fill="#0f172a"/>
+                        </svg>
+                    `
                 };
             }
 
-            // 4. Default: Kapal Kontainer Laut (Cargo Vessel)
+            // 3. Default: Kapal Kontainer Samudera (Real Cargo Container Vessel Top-Down)
             return {
                 type: 'ship',
-                label: 'Kapal Kontainer (Cargo Vessel)',
+                label: 'Kapal Kontainer Samudera (Cargo Vessel)',
                 emoji: '🚢',
-                badgeClass: 'cargo-vehicle-ship',
-                svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.89-6.68c.08-.26.06-.54-.06-.78s-.32-.42-.58-.5L20 11.02V8c0-.55-.45-1-1-1h-2V4c0-.55-.45-1-1-1H8c-.55 0-1 .45-1 1v3H5c-.55 0-1 .45-1 1v3.02l-1.3.36c-.26.08-.46.26-.58.5s-.14.52-.06.78L3.95 19zM10 5h4v2h-4V5zm-3 4h10v2.24l-5 1.36-5-1.36V9z"/></svg>`
+                accentColor: '#38bdf8',
+                iconW: 38,
+                iconH: 72,
+                realSvg: `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 78" width="28" height="58" style="filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));">
+                        <!-- Hull Shadow -->
+                        <path d="M19 2 C27 12, 33 24, 33 48 C33 66, 30 74, 19 75 C8 74, 5 66, 5 48 C5 24, 11 12, 19 2 Z" fill="#0f172a" opacity="0.35" transform="translate(1.5, 2.5)"/>
+                        <!-- Main Hull (Dark Navy Blue Maritime Steel) -->
+                        <path d="M19 2 C27 12, 33 24, 33 48 C33 66, 30 74, 19 75 C8 74, 5 66, 5 48 C5 24, 11 12, 19 2 Z" fill="#0f172a" stroke="#475569" stroke-width="1.2"/>
+                        <!-- Red Waterline Bow Bulb Accent -->
+                        <path d="M19 2 C22 7, 25 12, 25 17 L13 17 C13 12, 16 7, 19 2 Z" fill="#e11d48"/>
+                        <circle cx="19" cy="9" r="1.5" fill="#ffffff"/>
+                        <!-- Cargo Bay Background Deck -->
+                        <rect x="9" y="19" width="20" height="38" rx="2" fill="#1e293b"/>
+                        <!-- Real Stacked ISO Containers (Color-coded) -->
+                        <rect x="10" y="20" width="8.5" height="5" rx="0.5" fill="#0284c7" stroke="#0369a1" stroke-width="0.5"/>
+                        <rect x="19.5" y="20" width="8.5" height="5" rx="0.5" fill="#e11d48" stroke="#be123c" stroke-width="0.5"/>
+                        <rect x="10" y="26" width="8.5" height="5" rx="0.5" fill="#ea580c" stroke="#c2410c" stroke-width="0.5"/>
+                        <rect x="19.5" y="26" width="8.5" height="5" rx="0.5" fill="#059669" stroke="#047857" stroke-width="0.5"/>
+                        <rect x="10" y="32" width="8.5" height="5" rx="0.5" fill="#eab308" stroke="#ca8a04" stroke-width="0.5"/>
+                        <rect x="19.5" y="32" width="8.5" height="5" rx="0.5" fill="#0284c7" stroke="#0369a1" stroke-width="0.5"/>
+                        <rect x="10" y="38" width="8.5" height="5" rx="0.5" fill="#059669" stroke="#047857" stroke-width="0.5"/>
+                        <rect x="19.5" y="38" width="8.5" height="5" rx="0.5" fill="#ea580c" stroke="#c2410c" stroke-width="0.5"/>
+                        <rect x="10" y="44" width="8.5" height="5" rx="0.5" fill="#e11d48" stroke="#be123c" stroke-width="0.5"/>
+                        <rect x="19.5" y="44" width="8.5" height="5" rx="0.5" fill="#eab308" stroke="#ca8a04" stroke-width="0.5"/>
+                        <rect x="10" y="50" width="8.5" height="5" rx="0.5" fill="#0284c7" stroke="#0369a1" stroke-width="0.5"/>
+                        <rect x="19.5" y="50" width="8.5" height="5" rx="0.5" fill="#059669" stroke="#047857" stroke-width="0.5"/>
+                        <!-- Superstructure / Wheelhouse (Bridge) -->
+                        <rect x="10" y="58" width="18" height="9" rx="1.5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.8"/>
+                        <rect x="12" y="59.5" width="14" height="2" rx="0.5" fill="#0284c7"/>
+                        <!-- Funnel & Radar Mast -->
+                        <circle cx="19" cy="63" r="1.5" fill="#0f172a"/>
+                        <rect x="17.5" y="68" width="3" height="3" rx="0.8" fill="#e11d48"/>
+                    </svg>
+                `
             };
         }
 
@@ -333,18 +421,22 @@
                         lineJoin: 'round'
                     }).bindTooltip(`<b>${s.shipment_number}</b><br><span style="font-size:11px">Posisi Saat Ini ➔ Tujuan (Estimasi)</span>`, { sticky: true }).addTo(map);
 
-                    // Marker Kendaraan Kargo
+                    // Marker Kendaraan Kargo Realistis (Tanpa Bulatan - Dynamic Bearing)
+                    const heading = calculateBearing(curPt, destPt);
                     const vehicleDivIcon = L.divIcon({
-                        className: 'cargo-vehicle-marker',
+                        className: 'cargo-real-vehicle-marker',
                         html: `
-                            <div class="cargo-vehicle-badge ${vehicle.badgeClass}" title="${vehicle.label} &bull; ${s.shipment_number}">
-                                <div class="cargo-vehicle-pulse"></div>
-                                ${vehicle.svg}
+                            <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${heading}deg);" title="${vehicle.label} &bull; ${s.shipment_number}">
+                                ${vehicle.realSvg}
+                            </div>
+                            <div class="cargo-vehicle-tag">
+                                <span class="cargo-tag-dot" style="background:${vehicle.accentColor};"></span>
+                                <span>${s.shipment_number}</span>
                             </div>
                         `,
-                        iconSize: [34, 34],
-                        iconAnchor: [17, 17],
-                        popupAnchor: [0, -18]
+                        iconSize: [vehicle.iconW || 44, vehicle.iconH || 68],
+                        iconAnchor: [(vehicle.iconW || 44) / 2, (vehicle.iconH || 68) / 2],
+                        popupAnchor: [0, -((vehicle.iconH || 68) / 2 + 5)]
                     });
 
                     L.marker(curPt, { icon: vehicleDivIcon, zIndexOffset: 1000 }).bindPopup(`
