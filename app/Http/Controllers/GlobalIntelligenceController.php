@@ -133,15 +133,5 @@ class GlobalIntelligenceController extends Controller
 
         return view('admin.intelligence.comparison', compact('dataA', 'dataB', 'countryA', 'countryB'));
     }
-
-    /**
-     * 19. Intelijen Risiko Rantai Pasok (Supply Chain Risk Intelligence)
-     */
-    public function risk(): View
-    {
-        $risk = $this->intelligenceService->calculateSupplyChainRisk();
-
-        return view('admin.intelligence.risk', compact('risk'));
-    }
 }
 

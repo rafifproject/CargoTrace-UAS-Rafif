@@ -97,7 +97,6 @@ Route::middleware(['auth', 'role:ADMINISTRATOR'])->prefix('admin')->name('admin.
         Route::get('/news', [GlobalIntelligenceController::class, 'news'])->name('news');
         Route::get('/ports', [GlobalIntelligenceController::class, 'ports'])->name('ports');
         Route::get('/comparison', [GlobalIntelligenceController::class, 'comparison'])->name('comparison');
-        Route::get('/risk', [GlobalIntelligenceController::class, 'risk'])->name('risk');
     });
 });
 
@@ -136,7 +135,6 @@ Route::middleware(['auth', 'role:LOGISTICS_OPERATOR'])->prefix('operator')->name
         Route::get('/news', [OperatorIntelligenceController::class, 'news'])->name('news');
         Route::get('/ports', [OperatorIntelligenceController::class, 'ports'])->name('ports');
         Route::get('/comparison', [OperatorIntelligenceController::class, 'comparison'])->name('comparison');
-        Route::get('/risk', [OperatorIntelligenceController::class, 'risk'])->name('risk');
     });
 
     // 15. Pusat Notifikasi

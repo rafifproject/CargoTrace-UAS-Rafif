@@ -250,12 +250,6 @@
                                 <span>Perbandingan Negara</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="{{ route('admin.intelligence.risk') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('admin.intelligence.risk') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
-                                <i data-lucide="shield-alert" class="w-4 h-4 {{ request()->routeIs('admin.intelligence.risk') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Intelijen Risiko</span>
-                            </a>
-                        </li>
                     </ul>
                 </div>
 

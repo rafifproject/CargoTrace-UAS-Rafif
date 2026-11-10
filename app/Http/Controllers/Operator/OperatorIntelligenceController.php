@@ -98,13 +98,5 @@ class OperatorIntelligenceController extends Controller
 
         return view('operator.intelligence.comparison', compact('dataA', 'dataB', 'countryA', 'countryB'));
     }
-
-    /** Mockup 12: Intelijen Risiko */
-    public function risk(): View
-    {
-        $risk = $this->intelligenceService->calculateSupplyChainRisk();
-
-        return view('operator.intelligence.risk', compact('risk'));
-    }
 }
 
