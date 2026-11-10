@@ -66,7 +66,7 @@ class GlobalIntelligenceService
         $cacheKey = "live_currency_rates_{$base}";
 
         return Cache::remember($cacheKey, 1800, function () use ($base) {
-            $apiKey = config('services.exchangerate.key') ?: env('EXCHANGERATE_API_KEY');
+            $apiKey = config('services.exchangerate.key') ?: (env('EXCHANGERATE_API_KEY') ?: '330c60a9a65051e6dd635c85');
 
             // 1. Try v6 API with key if available
             if (!empty($apiKey)) {
@@ -451,10 +451,10 @@ class GlobalIntelligenceService
         return Cache::remember('arcgis_live_global_ports_v2', 43200, function () {
             try {
                 $endpoint = "https://services1.arcgis.com/cc7nIINtrZ67dyVJ/ArcGIS/rest/services/Transportation_Use/FeatureServer/2/query";
-                $response = Http::timeout(10)->retry(2, 200)->get($endpoint, [
+                $response = Http::timeout(8)->retry(2, 200)->get($endpoint, [
                     'where' => '1=1',
-                    'outFields' => '*',
-                    'returnGeometry' => 'true',
+                    'outFields' => 'PORT_NAME,COUNTRY,LATITUDE,LONGITUDE,HARBORSIZE,HARBORTYPE,INDEX_NO',
+                    'returnGeometry' => 'false',
                     'f' => 'json',
                     'resultRecordCount' => 300,
                 ]);
@@ -462,7 +462,7 @@ class GlobalIntelligenceService
                 if ($response->successful()) {
                     $json = $response->json();
                     $features = $json['features'] ?? [];
-                    if (!empty($features) && count($features) >= 10) {
+                    if (!empty($features) && count($features) >= 15) {
                         $countryNames = [
                             'ID' => 'Indonesia', 'SG' => 'Singapura', 'MY' => 'Malaysia', 'TH' => 'Thailand', 'VN' => 'Vietnam',
                             'PH' => 'Filipina', 'CN' => 'Tiongkok', 'JP' => 'Jepang', 'KR' => 'Korea Selatan', 'TW' => 'Taiwan',
@@ -475,8 +475,6 @@ class GlobalIntelligenceService
                             'IT' => 'Italia', 'GR' => 'Yunani', 'TR' => 'Turki', 'AU' => 'Australia', 'NZ' => 'Selandia Baru',
                             'DK' => 'Denmark', 'SE' => 'Swedia', 'NO' => 'Norwegia', 'FI' => 'Finlandia', 'PL' => 'Polandia',
                             'RU' => 'Rusia', 'BS' => 'Bahama', 'JM' => 'Jamaika', 'DO' => 'Dominika', 'CR' => 'Kosta Rika',
-                            'EC' => 'Ekuador', 'GH' => 'Ghana', 'CI' => 'Pantai Gading', 'SN' => 'Senegal', 'DJ' => 'Djibouti',
-                            'MU' => 'Mauritius', 'SC' => 'Seychelles', 'FJ' => 'Fiji', 'PG' => 'Papua Nugini', 'BN' => 'Brunei'
                         ];
 
                         $sizeLabels = [
@@ -499,10 +497,10 @@ class GlobalIntelligenceService
                         $arcgisPorts = [];
                         foreach ($features as $f) {
                             $attr = $f['attributes'] ?? [];
-                            $name = trim($attr['PORT_NAME'] ?? $attr['port_name'] ?? '');
-                            $lat  = (float) ($attr['LATITUDE'] ?? $attr['latitude'] ?? ($f['geometry']['y'] ?? 0));
-                            $lng  = (float) ($attr['LONGITUDE'] ?? $attr['longitude'] ?? ($f['geometry']['x'] ?? 0));
-                            $countryCode = strtoupper(trim($attr['COUNTRY'] ?? $attr['country'] ?? ''));
+                            $name = trim($attr['PORT_NAME'] ?? '');
+                            $lat  = (float) ($attr['LATITUDE'] ?? 0);
+                            $lng  = (float) ($attr['LONGITUDE'] ?? 0);
+                            $countryCode = strtoupper(trim($attr['COUNTRY'] ?? ''));
 
                             if (!$name || ($lat == 0 && $lng == 0)) {
                                 continue;
@@ -513,14 +511,12 @@ class GlobalIntelligenceService
                             $capInfo = $sizeLabels[$sizeKey] ?? ['cap' => '2.5M TEU', 'type' => 'Commercial Port'];
                             $harborType = $typeLabels[$typeKey] ?? $capInfo['type'];
 
-                            $cleanName = ucwords(strtolower($name));
-
                             $arcgisPorts[] = [
                                 'code' => 'WPI-' . ($attr['INDEX_NO'] ?? rand(1000, 9999)),
-                                'name' => 'Port of ' . $cleanName,
+                                'name' => 'Port of ' . ucwords(strtolower($name)),
                                 'country' => $countryNames[$countryCode] ?? ($countryCode ?: 'International'),
                                 'iso' => strtolower($countryCode),
-                                'city' => $cleanName,
+                                'city' => ucwords(strtolower($name)),
                                 'lat' => $lat,
                                 'lng' => $lng,
                                 'capacity' => $capInfo['cap'],
@@ -529,7 +525,7 @@ class GlobalIntelligenceService
                             ];
                         }
 
-                        if (count($arcgisPorts) >= 15) {
+                        if (count($arcgisPorts) >= 20) {
                             return $arcgisPorts;
                         }
                     }
@@ -1050,7 +1046,6 @@ class GlobalIntelligenceService
             'KHR' => ['name' => 'Riel Kamboja', 'country' => 'Kamboja', 'flag' => 'kh', 'symbol' => '៛'],
             'LAK' => ['name' => 'Kip Laos', 'country' => 'Laos', 'flag' => 'la', 'symbol' => '₭'],
             'MOP' => ['name' => 'Pataca Makau', 'country' => 'Makau', 'flag' => 'mo', 'symbol' => 'MOP$'],
-            'BND' => ['name' => 'Dolar Brunei', 'country' => 'Brunei', 'flag' => 'bn', 'symbol' => 'B$'],
         ];
     }
 }
