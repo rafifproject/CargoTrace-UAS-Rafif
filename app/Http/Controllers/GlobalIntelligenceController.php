@@ -24,12 +24,28 @@ class GlobalIntelligenceController extends Controller
         $destLat = (float) $request->input('lat2', -33.856);
         $destLng = (float) $request->input('lng2', 151.209);
 
+        // Jika ada filter country dari klik peta
+        $targetCountry = $request->input('country');
+        $allWeatherHubs = $this->intelligenceService->getGlobalWeatherHubs();
+        $selectedHub = null;
+
+        if ($targetCountry) {
+            foreach ($allWeatherHubs as $hub) {
+                if (strcasecmp($hub['country'], $targetCountry) === 0 || strcasecmp($hub['code'], $targetCountry) === 0) {
+                    $selectedHub = $hub;
+                    $originLat = $hub['lat'];
+                    $originLng = $hub['lng'];
+                    break;
+                }
+            }
+        }
+
         $originWeather = $this->intelligenceService->getWeather($originLat, $originLng);
         $destWeather = $this->intelligenceService->getWeather($destLat, $destLng);
 
         $locations = Location::where('status', 'ACTIVE')->get();
 
-        return view('admin.intelligence.weather', compact('originWeather', 'destWeather', 'locations'));
+        return view('admin.intelligence.weather', compact('originWeather', 'destWeather', 'locations', 'allWeatherHubs', 'selectedHub', 'targetCountry'));
     }
 
     /**
@@ -39,6 +55,7 @@ class GlobalIntelligenceController extends Controller
     {
         $base = strtoupper($request->input('base', 'USD'));
         $currencies = $this->intelligenceService->getCurrencies($base);
+        $currencyMeta = $this->intelligenceService->getCurrencyMeta();
 
         // 30 days trend simulation for USD/IDR
         $dates = [];
@@ -48,7 +65,7 @@ class GlobalIntelligenceController extends Controller
             $rates[] = 15750 + intval(sin($i / 3) * 120 + ($i * 3));
         }
 
-        return view('admin.intelligence.currency', compact('currencies', 'base', 'dates', 'rates'));
+        return view('admin.intelligence.currency', compact('currencies', 'base', 'currencyMeta', 'dates', 'rates'));
     }
 
     /**

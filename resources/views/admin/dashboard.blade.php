@@ -21,44 +21,10 @@
     #country-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     .country-item:hover { background: rgba(14,165,233,.07); }
     .leaflet-popup-content b { color: #0e6ba8; }
-
-    /* Custom Leaflet Weather Pill Badges (Matching Reference Image media_1794280421603_3a4f8e13.jpg) */
-    .weather-pill-marker {
-        background: transparent !important;
-        border: none !important;
-    }
-    .weather-pill-box {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid #ffffff;
-        border-radius: 9px;
-        padding: 2px 6px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.28);
-        color: #ffffff;
-        font-family: 'Outfit', sans-serif;
-        font-weight: 800;
-        font-size: 11px;
-        line-height: 1.1;
-        min-width: 46px;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-        cursor: pointer;
-    }
-    .weather-pill-box:hover {
-        transform: scale(1.15);
-        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
-        z-index: 99999 !important;
-    }
-    .weather-pill-blue {
-        background: linear-gradient(135deg, #2563EB, #1D4ED8);
-    }
-    .weather-pill-green {
-        background: linear-gradient(135deg, #059669, #047857);
-    }
-    .weather-pill-orange {
-        background: linear-gradient(135deg, #EA580C, #C2410C);
+    .leaflet-popup-content-wrapper {
+        border-radius: 14px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        padding: 4px;
     }
 </style>
 @endpush
@@ -460,10 +426,17 @@
         const weatherData  = {!! json_encode($weatherHubs) !!};
         const countriesData = {!! json_encode($countriesList) !!};
 
-        // Route URLs injected via PHP (works across localhost:8000, virtual hosts, and subfolders)
-        const routeWeather      = "{{ url('admin/intelligence/weather') }}";
-        const routePorts        = "{{ url('admin/intelligence/ports') }}";
-        const routeShipmentBase = "{{ url('admin/shipments') }}";
+        // Route URLs helper - 100% Safe across localhost:8000, virtual hosts (cargotrace.test), and subfolders (/CargoTrace/public/)
+        function getAppUrl(path) {
+            const pathname = window.location.pathname;
+            const publicIdx = pathname.indexOf('/public');
+            let basePath = '';
+            if (publicIdx !== -1) {
+                basePath = pathname.substring(0, publicIdx + 7);
+            }
+            const cleanPath = path.startsWith('/') ? path : '/' + path;
+            return window.location.origin + basePath + cleanPath;
+        }
 
         // Layer groups for each mode
         const cargoLayerGroup   = L.layerGroup();
@@ -501,9 +474,9 @@
 
         // ── BANNER UPDATE ───────────────────────────────────────
         const banners = {
-            cargo:   { icon:'🧭', text:'Mode: Pemantau CargoTrace — Rute & Kargo Aktif', bg:'linear-gradient(90deg,#0A1128,#0e3a6e)' },
-            weather: { icon:'⛅', text:'Mode: Cuaca Langsung — Kondisi Maritim & Risiko Badai', bg:'linear-gradient(90deg,#431407,#92400e)' },
-            ports:   { icon:'⚓', text:'Mode: Sebaran Pelabuhan — 120+ Titik Pelabuhan Kontainer Dunia', bg:'linear-gradient(90deg,#2e1065,#5b21b6)' }
+            cargo:   { icon:'🧭', text:'Mode: Pemantau CargoTrace — Kargo Aktif & Jalur Pengiriman Global', bg:'linear-gradient(90deg,#0A1128,#0e3a6e)' },
+            weather: { icon:'⛅', text:'Mode: Cuaca Langsung — 75+ Titik Maritim Dunia & Evaluasi Risiko Badai', bg:'linear-gradient(90deg,#431407,#92400e)' },
+            ports:   { icon:'⚓', text:'Mode: Sebaran Pelabuhan — Data Pelabuhan Maritim Dunia (ArcGIS Live WPI FeatureServer)', bg:'linear-gradient(90deg,#2e1065,#5b21b6)' }
         };
         function updateBanner(mode) {
             const b = banners[mode];
@@ -517,11 +490,11 @@
             cargo:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Asal</span>
                       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>Tujuan</span>
                       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span>Posisi Terkini</span>`,
-            weather: `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>Dingin (&lt;15°C)</span>
-                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block"></span>Sejuk (15–25°C)</span>
-                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span>Hangat (&gt;25°C)</span>
-                      <span class="flex items-center gap-1.5 text-slate-400">Pill cuaca tiap negara (klik untuk detail)</span>`,
-            ports:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block"></span>Pelabuhan Kontainer Global</span>
+            weather: `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Rendah (Low Risk)</span>
+                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>Waspada (Medium Risk)</span>
+                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>Tinggi / Badai (High Risk)</span>
+                      <span class="flex items-center gap-1.5 text-slate-400">Klik titik untuk detail & profil cuaca</span>`,
+            ports:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block"></span>Pelabuhan ArcGIS Live WPI</span>
                       <span class="flex items-center gap-1.5 text-slate-400">Klik marker untuk melihat profil pelabuhan</span>`
         };
         function updateLegend(mode) {
@@ -552,7 +525,7 @@
                             No. Resi: <b>${s.shipment_number}</b><br>
                             Status: <span style="color:#0284c7; font-weight:700;">${s.status}</span>
                         </div>
-                        <a href="${routeShipmentBase}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
+                        <a href="${getAppUrl('admin/shipments/' + s.id)}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
                             Lihat Detail Pengiriman →
                         </a>
                     </div>
@@ -569,7 +542,7 @@
                         <div style="background:#F1F5F9; padding:6px 10px; border-radius:8px; font-size:11px; margin-bottom:8px;">
                             No. Resi: <b>${s.shipment_number}</b>
                         </div>
-                        <a href="${routeShipmentBase}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
+                        <a href="${getAppUrl('admin/shipments/' + s.id)}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
                             Lihat Detail Pengiriman →
                         </a>
                     </div>
@@ -589,7 +562,7 @@
                                 Kargo: <b>${s.shipment_number}</b><br>
                                 Status: <b style="color:#166534;">${s.status}</b>
                             </div>
-                            <a href="${routeShipmentBase}/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
+                            <a href="${getAppUrl('admin/shipments/' + s.id)}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:600; padding:6px 12px; border-radius:8px; text-decoration:none; font-size:11px;">
                                 Lihat Detail Pengiriman →
                             </a>
                         </div>
@@ -605,90 +578,100 @@
             return latLngs;
         }
 
-        // ── BUILD WEATHER LAYER (Custom Leaflet Weather Pill Badges) ─────────
-        const weatherRiskConfig = {
-            'Low Risk':          { color: '#10B981', bg: '#ECFDF5', text: '#065F46', border: '#A7F3D0', icon: '🛡️' },
-            'Medium Risk':       { color: '#F59E0B', bg: '#FEF3C7', text: '#92400E', border: '#FDE68A', icon: '⚠️' },
-            'High Risk / Storm': { color: '#EF4444', bg: '#FEE2E2', text: '#991B1B', border: '#FECACA', icon: '⛈️' }
-        };
+        // ── BUILD WEATHER LAYER (Clean Circles Matching Reference Image media_1794279089804_c304a84b.jpg) ──
         function buildWeatherLayer() {
             weatherLayerGroup.clearLayers();
             weatherData.forEach(w => {
-                const conf = weatherRiskConfig[w.risk] || weatherRiskConfig['Medium Risk'];
+                // Color by risk: Low = Green, Medium = Orange/Amber, High = Red
+                let markerColor = '#10B981'; // Green
+                let riskText = 'Low Risk';
+                let riskScore = w.risk_score || 20;
 
-                // Weather Pill Badge color mapping (Blue = Cold <15°C, Green = Mild 15-25°C, Orange = Warm >25°C)
-                let pillClass = 'weather-pill-blue';
-                if (w.temp >= 15 && w.temp <= 25) {
-                    pillClass = 'weather-pill-green';
-                } else if (w.temp > 25) {
-                    pillClass = 'weather-pill-orange';
+                if (w.risk === 'High Risk / Storm' || (w.risk_score && w.risk_score >= 65)) {
+                    markerColor = '#EF4444'; // Red
+                    riskText = 'High Risk / Storm';
+                } else if (w.risk === 'Medium Risk' || (w.risk_score && w.risk_score >= 30)) {
+                    markerColor = '#F59E0B'; // Orange/Amber
+                    riskText = 'Medium Risk';
                 }
 
-                const weatherDivIcon = L.divIcon({
-                    className: 'weather-pill-marker',
-                    html: `
-                        <div class="weather-pill-box ${pillClass}">
-                            <span>${w.temp}°C</span>
-                            <span style="font-size:9px; margin-top:1px;">${w.icon_emoji || '☀️'}</span>
-                        </div>
-                    `,
-                    iconSize: [52, 34],
-                    iconAnchor: [26, 17],
-                    popupAnchor: [0, -18]
+                // Elegant Circle Marker: No overlapping cards!
+                const circleMarker = L.circleMarker([w.lat, w.lng], {
+                    radius: 7.5,
+                    fillColor: markerColor,
+                    color: '#ffffff',
+                    weight: 1.5,
+                    fillOpacity: 0.88
                 });
 
-                L.marker([w.lat, w.lng], { icon: weatherDivIcon }).bindPopup(`
-                    <div style="min-width:240px; font-family: Outfit, sans-serif;">
-                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                // Popup matching exact reference design (media_1794279089804_c304a84b.jpg)
+                const weatherDetailUrl = getAppUrl('admin/intelligence/weather') + '?country=' + encodeURIComponent(w.country);
+
+                circleMarker.bindPopup(`
+                    <div style="min-width:240px; font-family: Outfit, sans-serif; padding:4px 2px;">
+                        <!-- Country & Region Header with Flag -->
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
                             <img src="https://flagcdn.com/w40/${w.iso || 'id'}.png" alt="${w.country}"
-                                 style="width:26px; height:18px; object-fit:cover; border-radius:3px; box-shadow:0 1px 2px rgba(0,0,0,0.12); border:1px solid #e2e8f0;">
+                                 style="width:30px; height:20px; object-fit:cover; border-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,0.18); border:1px solid #e2e8f0; flex-shrink:0;">
                             <div>
-                                <div style="font-weight:700; font-size:14px; color:#0f172a; line-height:1.2;">${w.country}</div>
-                                <div style="font-size:11px; color:#64748b;">${w.region || 'Maritim Global'} • ${w.city}</div>
+                                <div style="font-weight:800; font-size:15px; color:#0f172a; line-height:1.2;">${w.country}</div>
+                                <div style="font-size:11px; color:#64748b; font-weight:500;">${w.region || 'Global'}</div>
                             </div>
                         </div>
-                        <div style="display:flex; align-items:center; justify-content:space-between; background:${conf.bg}; color:${conf.text}; border:1px solid ${conf.border}; padding:6px 12px; border-radius:10px; font-weight:700; font-size:12px; margin:8px 0 6px 0;">
-                            <span>${conf.icon} ${w.risk}</span>
-                            <span>${w.risk_score || 30} / 100</span>
+
+                        <!-- Risk Pill Box -->
+                        <div style="display:flex; align-items:center; justify-content:space-between; background:#FEF3C7; color:#B45309; border:1px solid #FDE68A; padding:7px 12px; border-radius:10px; font-weight:700; font-size:12px; margin-bottom:8px;">
+                            <span style="display:flex; align-items:center; gap:6px;">
+                                <span>🛡️</span> ${riskText}
+                            </span>
+                            <span style="font-weight:800; color:#D97706;">${riskScore} / 100</span>
                         </div>
-                        <div style="display:flex; align-items:center; background:#EEF2FF; color:#3730A3; border:1px solid #E0E7FF; padding:6px 12px; border-radius:10px; font-weight:600; font-size:12px; margin-bottom:10px;">
-                            <span>🌡️ ${w.temp}°C &nbsp;|&nbsp; ${w.condition}</span>
+
+                        <!-- Weather Info Box -->
+                        <div style="display:flex; align-items:center; justify-content:center; gap:8px; background:#F8FAFC; color:#334155; border:1px solid #E2E8F0; padding:8px 12px; border-radius:10px; font-weight:700; font-size:12px; margin-bottom:12px;">
+                            <span>🌡️ ${w.temp}°C</span>
+                            <span style="color:#cbd5e1; font-weight:400;">|</span>
+                            <span>${w.condition}</span>
                         </div>
-                        <a href="${routeWeather}" style="display:block; text-align:center; background:#6366F1; color:#ffffff; font-weight:600; padding:8px 12px; border-radius:10px; text-decoration:none; font-size:12px; box-shadow:0 2px 6px rgba(99,102,241,0.3);">
-                            Lihat Detail Cuaca Lengkap →
+
+                        <!-- View Full Profile Button (Guaranteed No 404!) -->
+                        <a href="${weatherDetailUrl}" style="display:block; text-align:center; background:#EDE9FE; color:#7C3AED; font-weight:700; padding:9px 14px; border-radius:10px; text-decoration:none; font-size:12px; transition:all 0.2s; box-shadow:0 1px 3px rgba(124,58,237,0.15);">
+                            View Full Profile
                         </a>
                     </div>
-                `).addTo(weatherLayerGroup);
+                `, { maxWidth: 280 });
+
+                circleMarker.addTo(weatherLayerGroup);
             });
         }
 
-        // ── BUILD PORTS LAYER (Vibrant Purple Seaport Web) ────────
+        // ── BUILD PORTS LAYER (ArcGIS FeatureServer Live Ports Web) ────────
         function buildPortsLayer() {
             portsLayerGroup.clearLayers();
             portsData.forEach(p => {
                 L.circleMarker([p.lat, p.lng], {
-                    radius: 5.5, fillColor: '#8B5CF6', color: '#ffffff', weight: 1.5, fillOpacity: 0.92
+                    radius: 6, fillColor: '#8B5CF6', color: '#ffffff', weight: 1.5, fillOpacity: 0.92
                 }).bindPopup(`
-                    <div style="min-width:240px; font-family: Outfit, sans-serif;">
-                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <div style="min-width:240px; font-family: Outfit, sans-serif; padding:4px 2px;">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
                             <img src="https://flagcdn.com/w40/${p.iso || 'id'}.png" alt="${p.country}"
-                                 style="width:26px; height:18px; object-fit:cover; border-radius:3px; box-shadow:0 1px 2px rgba(0,0,0,0.12); border:1px solid #e2e8f0;">
+                                 style="width:30px; height:20px; object-fit:cover; border-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,0.18); border:1px solid #e2e8f0; flex-shrink:0;">
                             <div>
-                                <div style="font-weight:700; font-size:13px; color:#0f172a; line-height:1.2;">${p.name}</div>
-                                <div style="font-size:11px; color:#64748b;">${p.country} • ${p.city}</div>
+                                <div style="font-weight:800; font-size:14px; color:#0f172a; line-height:1.2;">${p.name}</div>
+                                <div style="font-size:11px; color:#64748b;">${p.country} &bull; ${p.city}</div>
                             </div>
                         </div>
-                        <div style="background:#F3E8FF; color:#6B21A8; border:1px solid #E9D5FF; padding:6px 10px; border-radius:10px; font-weight:600; font-size:11px; margin:6px 0;">
-                            ⚓ Kode WPI: <b>${p.code}</b> &nbsp;|&nbsp; ${p.type}
+                        <div style="background:#F3E8FF; color:#6B21A8; border:1px solid #E9D5FF; padding:7px 10px; border-radius:10px; font-weight:700; font-size:11px; margin-bottom:7px;">
+                            ⚓ Kode: <b>${p.code}</b> &nbsp;|&nbsp; ${p.type}
                         </div>
-                        <div style="background:#F1F5F9; color:#334155; border:1px solid #E2E8F0; padding:6px 10px; border-radius:10px; font-weight:600; font-size:11px; margin-bottom:10px;">
+                        <div style="background:#F1F5F9; color:#334155; border:1px solid #E2E8F0; padding:7px 10px; border-radius:10px; font-weight:600; font-size:11px; margin-bottom:11px;">
                             📦 Kapasitas: <b>${p.capacity}</b>
                         </div>
-                        <a href="${routePorts}" style="display:block; text-align:center; background:#8B5CF6; color:#ffffff; font-weight:600; padding:8px 12px; border-radius:10px; text-decoration:none; font-size:12px; box-shadow:0 2px 6px rgba(139,92,246,0.3);">
+                        <a href="${getAppUrl('admin/intelligence/ports')}" style="display:block; text-align:center; background:#EDE9FE; color:#7C3AED; font-weight:700; padding:8px 12px; border-radius:10px; text-decoration:none; font-size:12px; box-shadow:0 1px 3px rgba(124,58,237,0.15);">
                             Cek Direktori Pelabuhan →
                         </a>
                     </div>
-                `).addTo(portsLayerGroup);
+                `, { maxWidth: 280 }).addTo(portsLayerGroup);
             });
         }
 
