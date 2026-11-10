@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'exchangerate' => [
+        'key' => env('EXCHANGERATE_API_KEY'),
+    ],
+
+    'gnews' => [
+        'key' => env('GNEWS_API_KEY'),
+    ],
+
 ];

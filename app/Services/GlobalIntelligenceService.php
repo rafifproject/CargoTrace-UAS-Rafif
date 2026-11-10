@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
@@ -57,7 +58,7 @@ class GlobalIntelligenceService
 
     /**
      * 2. ExchangeRate API: Real-Time Foreign Exchange Rates
-     * Live fetch from open.er-api.com
+     * Live fetch from v6.exchangerate-api.com with fallback to open.er-api.com
      */
     public function getCurrencies(string $base = 'USD'): array
     {
@@ -65,6 +66,34 @@ class GlobalIntelligenceService
         $cacheKey = "live_currency_rates_{$base}";
 
         return Cache::remember($cacheKey, 1800, function () use ($base) {
+            $apiKey = config('services.exchangerate.key') ?: env('EXCHANGERATE_API_KEY');
+
+            // 1. Try v6 API with key if available
+            if (!empty($apiKey)) {
+                try {
+                    $response = Http::timeout(6)->retry(2, 200)
+                        ->get("https://v6.exchangerate-api.com/v6/{$apiKey}/latest/{$base}");
+
+                    if ($response->successful()) {
+                        $json = $response->json();
+                        if (($json['result'] ?? '') === 'success') {
+                            $rates = $json['conversion_rates'] ?? $json['rates'] ?? [];
+                            return [
+                                'is_live' => true,
+                                'base' => $base,
+                                'rates' => $rates,
+                                'last_update' => $json['time_last_update_utc'] ?? now()->toIso8601String(),
+                                'fetched_at' => now()->format('d M Y, H:i') . ' WIB',
+                                'provider' => 'ExchangeRate-API v6 (Live Pro Key)',
+                            ];
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // Fall through to open.er-api
+                }
+            }
+
+            // 2. Fallback to open.er-api.com
             try {
                 $response = Http::timeout(6)->retry(2, 200)->get("https://open.er-api.com/v6/latest/{$base}");
 
@@ -77,6 +106,7 @@ class GlobalIntelligenceService
                             'rates' => $json['rates'] ?? [],
                             'last_update' => $json['time_last_update_utc'] ?? now()->toIso8601String(),
                             'fetched_at' => now()->format('d M Y, H:i') . ' WIB',
+                            'provider' => 'ExchangeRate-API Open',
                         ];
                     }
                 }
@@ -97,6 +127,7 @@ class GlobalIntelligenceService
                     'JPY' => 154.60,
                 ],
                 'fetched_at' => now()->format('d M Y, H:i') . ' (Baseline)',
+                'provider' => 'Offline Baseline Cache',
             ];
         });
     }
@@ -202,72 +233,168 @@ class GlobalIntelligenceService
     }
 
     /**
-     * 4. News Intelligence with PHP Lexicon-Based Sentiment Analysis
-     * Live and curated global trade news analyzed by PHP sentiment engine
+     * 4. News Intelligence with GNews API & PHP Lexicon-Based Sentiment Analysis
+     * Live global trade & shipping news from GNews API analyzed by PHP sentiment engine
      */
     public function getLogisticsNews(string $category = 'all'): array
     {
         $cacheKey = "live_logistics_news_{$category}";
 
-        return Cache::remember($cacheKey, 3600, function () use ($category) {
-            $articles = [
-                [
-                    'title' => 'Kapasitas Pelabuhan Singapura Meningkat 15% untuk Mendukung Arus Logistik Asia',
-                    'category' => 'Pelayaran',
-                    'category_raw' => 'shipping',
-                    'source' => 'Maritime Executive Global',
-                    'time' => '15 menit lalu',
-                    'description' => 'Ekspansi terminal otomatis di Tuas Port memperkuat konektivitas rute maritim Asia Tenggara dan menekan waktu tunggu kapal kargo kontainer.',
-                ],
-                [
-                    'title' => 'Gangguan Cuaca Muson di Asia Tenggara Berpotensi Memperlambat Perjalanan Kapal Feeder',
-                    'category' => 'Logistik',
-                    'category_raw' => 'logistics',
-                    'source' => 'Global Freight Watch',
-                    'time' => '1 jam lalu',
-                    'description' => 'Peringatan badai gelombang tinggi di perairan Selat Malaka memicu mitigasi rute alternatif untuk menghindari keterlambatan ETA barang.',
-                ],
-                [
-                    'title' => 'Permintaan Pengiriman Kargo Global Diproyeksikan Naik pada Kuartal Mendatang',
-                    'category' => 'Ekonomi',
-                    'category_raw' => 'economy',
-                    'source' => 'World Trade Insights',
-                    'time' => '2 jam lalu',
-                    'description' => 'Stabilitas ekonomi kawasan Asia-Pasifik dan pemulihan manufaktur mendorong kenaikan volume peti kemas internasional.',
-                ],
-                [
-                    'title' => 'Digitalisasi Kepabeanan Jalur Hijau Mempercepat Waktu Dwelling Time Peti Kemas',
-                    'category' => 'Kepabeanan',
-                    'category_raw' => 'customs',
-                    'source' => 'Customs & Port International',
-                    'time' => '3 jam lalu',
-                    'description' => 'Implementasi single window kepabeanan elektronik berhasil mereduksi waktu clearance dokumen ekspor-impor hingga 40%.',
-                ],
-                [
-                    'title' => 'Pelabuhan Rotterdam dan Shanghai Uji Coba Koridor Pengiriman Rendah Emisi Baru',
-                    'category' => 'Pelayaran',
-                    'category_raw' => 'shipping',
-                    'source' => 'Clean Shipping Port',
-                    'time' => '5 jam lalu',
-                    'description' => 'Inisiatif koridor pelayaran hijau internasional menggunakan kapal berbahan bakar metanol untuk rute Eropa-Asia.',
-                ],
-                [
-                    'title' => 'Fluktuasi Harga Bunker Minyak Mempengaruhi Penetapan Surcharge Ekspedisi Kontainer',
-                    'category' => 'Ekonomi',
-                    'category_raw' => 'economy',
-                    'source' => 'Bunker World News',
-                    'time' => '6 jam lalu',
-                    'description' => 'Perusahaan ekspedisi global menerapkan penyesuaian tarif bunker untuk menjaga keseimbangan operasional armada kapal niaga.',
-                ],
-            ];
+        return Cache::remember($cacheKey, 1800, function () use ($category) {
+            $apiKey = config('services.gnews.key') ?: env('GNEWS_API_KEY');
+            $articles = [];
 
-            if ($category !== 'all') {
-                $articles = array_values(array_filter($articles, fn ($a) => ($a['category_raw'] ?? '') === $category));
+            // 1. Fetch live articles from GNews API if key is present
+            if (!empty($apiKey)) {
+                try {
+                    $queryMap = [
+                        'shipping' => 'maritime OR shipping OR "container ship" OR port',
+                        'logistics' => 'logistics OR freight OR cargo OR "supply chain"',
+                        'economy' => 'trade OR tariffs OR inflation OR commodities',
+                        'customs' => 'customs OR "port clearance" OR "trade regulation"',
+                        'all' => 'logistics OR shipping OR maritime OR cargo OR "supply chain"',
+                    ];
+                    $q = $queryMap[$category] ?? $queryMap['all'];
+
+                    $response = Http::timeout(7)->retry(2, 200)->get('https://gnews.io/api/v4/search', [
+                        'q' => $q,
+                        'apikey' => $apiKey,
+                        'lang' => 'en',
+                        'max' => 10,
+                    ]);
+
+                    if ($response->successful()) {
+                        $json = $response->json();
+                        $gnewsArticles = $json['articles'] ?? [];
+
+                        foreach ($gnewsArticles as $art) {
+                            $title = $art['title'] ?? '';
+                            $desc = $art['description'] ?? '';
+                            $publishedAt = $art['publishedAt'] ?? now()->toIso8601String();
+
+                            try {
+                                $timeStr = Carbon::parse($publishedAt)->locale('id')->diffForHumans();
+                            } catch (\Throwable $te) {
+                                $timeStr = 'Hari ini';
+                            }
+
+                            $categoryLabel = match($category) {
+                                'shipping' => 'Perkapalan',
+                                'logistics' => 'Logistik',
+                                'economy' => 'Ekonomi',
+                                'customs' => 'Kepabeanan',
+                                default => 'Logistik Global',
+                            };
+
+                            $sentiment = $this->analyzeSentiment($title . ' ' . $desc);
+
+                            $articles[] = [
+                                'title' => $title,
+                                'headline' => $title,
+                                'description' => $desc,
+                                'text' => $desc,
+                                'category' => $categoryLabel,
+                                'category_raw' => $category,
+                                'source' => $art['source']['name'] ?? 'GNews Live',
+                                'time' => $timeStr,
+                                'date' => $timeStr,
+                                'url' => $art['url'] ?? '#',
+                                'image' => $art['image'] ?? null,
+                                'sentiment' => $sentiment,
+                            ];
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // Fall through to curated fallback
+                }
             }
 
-            // PHP Lexicon Sentiment Engine (sesuai spesifikasi PDF halaman 6-8)
-            foreach ($articles as &$item) {
-                $item['sentiment'] = $this->analyzeSentiment($item['title'] . ' ' . $item['description']);
+            // 2. Curated baseline fallback if GNews key is missing, rate-limited, or failed
+            if (empty($articles)) {
+                $curated = [
+                    [
+                        'title' => 'Kapasitas Pelabuhan Singapura Meningkat 15% untuk Mendukung Arus Logistik Asia',
+                        'headline' => 'Kapasitas Pelabuhan Singapura Meningkat 15% untuk Mendukung Arus Logistik Asia',
+                        'category' => 'Pelayaran',
+                        'category_raw' => 'shipping',
+                        'source' => 'Maritime Executive Global',
+                        'time' => '15 menit lalu',
+                        'date' => '15 menit lalu',
+                        'url' => '#',
+                        'description' => 'Ekspansi terminal otomatis di Tuas Port memperkuat konektivitas rute maritim Asia Tenggara dan menekan waktu tunggu kapal kargo kontainer.',
+                        'text' => 'Ekspansi terminal otomatis di Tuas Port memperkuat konektivitas rute maritim Asia Tenggara dan menekan waktu tunggu kapal kargo kontainer.',
+                    ],
+                    [
+                        'title' => 'Gangguan Cuaca Muson di Asia Tenggara Berpotensi Memperlambat Perjalanan Kapal Feeder',
+                        'headline' => 'Gangguan Cuaca Muson di Asia Tenggara Berpotensi Memperlambat Perjalanan Kapal Feeder',
+                        'category' => 'Logistik',
+                        'category_raw' => 'logistics',
+                        'source' => 'Global Freight Watch',
+                        'time' => '1 jam lalu',
+                        'date' => '1 jam lalu',
+                        'url' => '#',
+                        'description' => 'Peringatan badai gelombang tinggi di perairan Selat Malaka memicu mitigasi rute alternatif untuk menghindari keterlambatan ETA barang.',
+                        'text' => 'Peringatan badai gelombang tinggi di perairan Selat Malaka memicu mitigasi rute alternatif untuk menghindari keterlambatan ETA barang.',
+                    ],
+                    [
+                        'title' => 'Permintaan Pengiriman Kargo Global Diproyeksikan Naik pada Kuartal Mendatang',
+                        'headline' => 'Permintaan Pengiriman Kargo Global Diproyeksikan Naik pada Kuartal Mendatang',
+                        'category' => 'Ekonomi',
+                        'category_raw' => 'economy',
+                        'source' => 'World Trade Insights',
+                        'time' => '2 jam lalu',
+                        'date' => '2 jam lalu',
+                        'url' => '#',
+                        'description' => 'Stabilitas ekonomi kawasan Asia-Pasifik dan pemulihan manufaktur mendorong kenaikan volume peti kemas internasional.',
+                        'text' => 'Stabilitas ekonomi kawasan Asia-Pasifik dan pemulihan manufaktur mendorong kenaikan volume peti kemas internasional.',
+                    ],
+                    [
+                        'title' => 'Digitalisasi Kepabeanan Jalur Hijau Mempercepat Waktu Dwelling Time Peti Kemas',
+                        'headline' => 'Digitalisasi Kepabeanan Jalur Hijau Mempercepat Waktu Dwelling Time Peti Kemas',
+                        'category' => 'Kepabeanan',
+                        'category_raw' => 'customs',
+                        'source' => 'Customs & Port International',
+                        'time' => '3 jam lalu',
+                        'date' => '3 jam lalu',
+                        'url' => '#',
+                        'description' => 'Implementasi single window kepabeanan elektronik berhasil mereduksi waktu clearance dokumen ekspor-impor hingga 40%.',
+                        'text' => 'Implementasi single window kepabeanan elektronik berhasil mereduksi waktu clearance dokumen ekspor-impor hingga 40%.',
+                    ],
+                    [
+                        'title' => 'Pelabuhan Rotterdam dan Shanghai Uji Coba Koridor Pengiriman Rendah Emisi Baru',
+                        'headline' => 'Pelabuhan Rotterdam dan Shanghai Uji Coba Koridor Pengiriman Rendah Emisi Baru',
+                        'category' => 'Pelayaran',
+                        'category_raw' => 'shipping',
+                        'source' => 'Clean Shipping Port',
+                        'time' => '5 jam lalu',
+                        'date' => '5 jam lalu',
+                        'url' => '#',
+                        'description' => 'Inisiatif koridor pelayaran hijau internasional menggunakan kapal berbahan bakar metanol untuk rute Eropa-Asia.',
+                        'text' => 'Inisiatif koridor pelayaran hijau internasional menggunakan kapal berbahan bakar metanol untuk rute Eropa-Asia.',
+                    ],
+                    [
+                        'title' => 'Fluktuasi Harga Bunker Minyak Mempengaruhi Penetapan Surcharge Ekspedisi Kontainer',
+                        'headline' => 'Fluktuasi Harga Bunker Minyak Mempengaruhi Penetapan Surcharge Ekspedisi Kontainer',
+                        'category' => 'Ekonomi',
+                        'category_raw' => 'economy',
+                        'source' => 'Bunker World News',
+                        'time' => '6 jam lalu',
+                        'date' => '6 jam lalu',
+                        'url' => '#',
+                        'description' => 'Perusahaan ekspedisi global menerapkan penyesuaian tarif bunker untuk menjaga keseimbangan operasional armada kapal niaga.',
+                        'text' => 'Perusahaan ekspedisi global menerapkan penyesuaian tarif bunker untuk menjaga keseimbangan operasional armada kapal niaga.',
+                    ],
+                ];
+
+                if ($category !== 'all') {
+                    $curated = array_values(array_filter($curated, fn ($a) => ($a['category_raw'] ?? '') === $category));
+                }
+
+                foreach ($curated as &$item) {
+                    $item['sentiment'] = $this->analyzeSentiment($item['title'] . ' ' . $item['description']);
+                }
+
+                $articles = $curated;
             }
 
             return $articles;
@@ -276,11 +403,18 @@ class GlobalIntelligenceService
 
     /**
      * Lexicon-Based Sentiment Analysis in PHP (PDF Halaman 6-8)
+     * Supports both Indonesian and English maritime/logistics terms
      */
     public function analyzeSentiment(string $text): array
     {
-        $positiveWords = ['meningkat', 'pertumbuhan', 'naik', 'mendukung', 'efisiensi', 'mempercepat', 'stabilitas', 'sukses', 'aman', 'lancar', 'inovasi'];
-        $negativeWords = ['gangguan', 'memperlambat', 'keterlambatan', 'hambatan', 'badai', 'krisis', 'rusak', 'sanksi', 'tertunda', 'fluktuasi', 'konflik'];
+        $positiveWords = [
+            'meningkat', 'pertumbuhan', 'naik', 'mendukung', 'efisiensi', 'mempercepat', 'stabilitas', 'sukses', 'aman', 'lancar', 'inovasi',
+            'increase', 'growth', 'boost', 'expand', 'surge', 'stable', 'positive', 'gain', 'support', 'efficiency', 'improve', 'resilient', 'record', 'profit', 'optimism', 'deal', 'agreement', 'advance'
+        ];
+        $negativeWords = [
+            'gangguan', 'memperlambat', 'keterlambatan', 'hambatan', 'badai', 'krisis', 'rusak', 'sanksi', 'tertunda', 'fluktuasi', 'konflik',
+            'delay', 'disrupt', 'crisis', 'attack', 'strike', 'storm', 'risk', 'threat', 'fall', 'drop', 'slide', 'sanction', 'conflict', 'loss', 'decline', 'collapse', 'inflation', 'hazard', 'warning'
+        ];
 
         $lower = strtolower($text);
         $positiveScore = 0;
