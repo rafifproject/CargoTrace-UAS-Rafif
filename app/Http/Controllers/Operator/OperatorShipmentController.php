@@ -334,7 +334,9 @@ class OperatorShipmentController extends Controller
             ->when($selectedCarrierId, fn ($q) => $q->where('carrier_id', $selectedCarrierId))
             ->get();
 
-        return view('operator.shipments.map', compact('mapShipments', 'allShipments', 'carriers', 'selectedShipmentId', 'selectedCarrierId'));
+        $routeHubs = Location::where('status', Location::STATUS_ACTIVE)->orderBy('name', 'asc')->get();
+
+        return view('operator.shipments.map', compact('mapShipments', 'allShipments', 'carriers', 'selectedShipmentId', 'selectedCarrierId', 'routeHubs'));
     }
 }
 
