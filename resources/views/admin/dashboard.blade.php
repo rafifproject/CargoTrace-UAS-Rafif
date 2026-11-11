@@ -530,7 +530,7 @@
     </div>
 
     <!-- Modal Detail Analisis Rute (View Analytics Modal) -->
-    <div id="route-analytics-modal" class="fixed inset-0 z-[99999] hidden overflow-y-auto bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div id="route-analytics-modal" onclick="if (event.target === this) closeRouteAnalyticsModal()" class="fixed inset-0 z-[99999] hidden overflow-y-auto bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4" style="display: none;">
         <div class="relative w-full max-w-2xl bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200">
             <!-- Modal Header -->
             <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
@@ -749,6 +749,25 @@
             "🌍 OpenStreetMap": osm
         };
         L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
+
+        // Ensure popup buttons can be clicked reliably inside Leaflet without event interference
+        map.on('popupopen', function(e) {
+            const popupEl = e.popup ? e.popup.getElement() : null;
+            if (popupEl) {
+                L.DomEvent.disableClickPropagation(popupEl);
+                const btn = popupEl.querySelector('#btn-view-route-analytics');
+                if (btn) {
+                    L.DomEvent.disableClickPropagation(btn);
+                    btn.onclick = function(ev) {
+                        if (ev) {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                        }
+                        openRouteAnalyticsModal();
+                    };
+                }
+            }
+        });
 
         // Data from PHP controller
         const shipments    = {!! json_encode($mapShipments) !!};
@@ -1812,6 +1831,7 @@
                 riskLabel,
                 riskBgColor
             };
+            window.lastAnalyzedRoute = lastAnalyzedRoute;
 
             // Fit Bounds
             map.fitBounds(L.latLngBounds([p1, p2]).pad(0.25), { duration: 1.0 });
@@ -1840,9 +1860,9 @@
                     <div style="font-size:10px; color:#0369a1; font-weight:700; margin-bottom:10px;">
                         ${modeIcon} Est. ${timeStr} &bull; ${Math.round(distKm)} km
                     </div>
-                    <button onclick="openRouteAnalyticsModal()" style="width:100%; background:#7C3AED; color:#ffffff; border:none; padding:7px 12px; border-radius:10px; font-weight:700; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 6px rgba(124,58,237,0.35); transition:background 0.2s;">
-                        <svg style="width:13px; height:13px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-                        <span>View Analytics</span>
+                    <button type="button" id="btn-view-route-analytics" onclick="event.stopPropagation(); window.openRouteAnalyticsModal();" style="width:100%; background:#7C3AED; color:#ffffff; border:none; padding:8px 12px; border-radius:10px; font-weight:700; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 6px rgba(124,58,237,0.35); transition:background 0.2s; pointer-events:auto !important; position:relative; z-index:999;">
+                        <svg style="width:13px; height:13px; pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                        <span style="pointer-events:none;">View Analytics</span>
                     </button>
                 </div>
             `;
@@ -1913,39 +1933,62 @@
         }
 
         function openRouteAnalyticsModal() {
-            if (!lastAnalyzedRoute) return;
-            const r = lastAnalyzedRoute;
+            const r = lastAnalyzedRoute || window.lastAnalyzedRoute;
+            if (!r) return;
             const modal = document.getElementById('route-analytics-modal');
             if (!modal) return;
 
             const oIso = (r.origin.code || '').toLowerCase().replace('_east','');
             const dIso = (r.dest.code || '').toLowerCase().replace('_east','');
 
-            document.getElementById('modal-origin-code').textContent = r.oIso3;
-            document.getElementById('modal-origin-flag').src = `https://flagcdn.com/w40/${oIso}.png`;
-            document.getElementById('modal-origin-country').textContent = r.origin.name;
-            document.getElementById('modal-origin-hub').textContent = getCountryHubName(r.origin, r.mode);
-            document.getElementById('modal-origin-coords').textContent = `${parseFloat(r.origin.lat).toFixed(3)}, ${parseFloat(r.origin.lng).toFixed(3)}`;
+            const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
-            document.getElementById('modal-dest-code').textContent = r.dIso3;
-            document.getElementById('modal-dest-flag').src = `https://flagcdn.com/w40/${dIso}.png`;
-            document.getElementById('modal-dest-country').textContent = r.dest.name;
-            document.getElementById('modal-dest-hub').textContent = getCountryHubName(r.dest, r.mode);
-            document.getElementById('modal-dest-coords').textContent = `${parseFloat(r.dest.lat).toFixed(3)}, ${parseFloat(r.dest.lng).toFixed(3)}`;
+            setTxt('modal-origin-code', r.oIso3);
+            const oFlag = document.getElementById('modal-origin-flag');
+            if (oFlag) oFlag.src = `https://flagcdn.com/w40/${oIso}.png`;
+            setTxt('modal-origin-country', r.origin.name);
+            setTxt('modal-origin-hub', getCountryHubName(r.origin, r.mode));
+            setTxt('modal-origin-coords', `${parseFloat(r.origin.lat).toFixed(3)}°, ${parseFloat(r.origin.lng).toFixed(3)}°`);
 
-            document.getElementById('modal-mode-badge').textContent = r.modeName;
-            document.getElementById('modal-distance').textContent = `${r.distKm.toLocaleString()} km (${r.distNM.toLocaleString()} NM)`;
-            document.getElementById('modal-duration').textContent = r.timeStr;
-            document.getElementById('modal-speed').textContent = r.speedStr;
-            document.getElementById('modal-corridor').textContent = r.corridorStr;
+            setTxt('modal-dest-code', r.dIso3);
+            const dFlag = document.getElementById('modal-dest-flag');
+            if (dFlag) dFlag.src = `https://flagcdn.com/w40/${dIso}.png`;
+            setTxt('modal-dest-country', r.dest.name);
+            setTxt('modal-dest-hub', getCountryHubName(r.dest, r.mode));
+            setTxt('modal-dest-coords', `${parseFloat(r.dest.lat).toFixed(3)}°, ${parseFloat(r.dest.lng).toFixed(3)}°`);
+
+            setTxt('modal-mode-badge', r.modeName);
+            setTxt('modal-distance', `${r.distKm.toLocaleString()} km (${r.distNM.toLocaleString()} NM)`);
+            setTxt('modal-duration', r.timeStr);
+            setTxt('modal-speed', r.speedStr);
+            setTxt('modal-corridor', r.corridorStr);
 
             const riskBadge = document.getElementById('modal-risk-badge');
-            riskBadge.textContent = `Transit Risk: ${r.riskScore}/100 (${r.riskLabel})`;
-            riskBadge.style.backgroundColor = r.riskBgColor;
+            if (riskBadge) {
+                riskBadge.textContent = `Transit Risk: ${r.riskScore}/100 (${r.riskLabel})`;
+                riskBadge.style.backgroundColor = r.riskBgColor;
+            }
 
             const riskBar = document.getElementById('modal-risk-bar');
-            riskBar.style.width = `${r.riskScore}%`;
-            riskBar.style.backgroundColor = r.riskBgColor;
+            if (riskBar) {
+                riskBar.style.width = `${r.riskScore}%`;
+                riskBar.style.backgroundColor = r.riskBgColor;
+            }
+
+            let riskDesc = '';
+            let insRec = '';
+            if (r.riskScore <= 35) {
+                riskDesc = 'Koridor transit ini dikategorikan aman dengan risiko cuaca atau hambatan operasional minimal. Integritas dan ketepatan waktu pengiriman kargo berada pada level optimum.';
+                insRec = '🛡️ Proteksi Asuransi Standar Logistik Direkomendasikan';
+            } else if (r.riskScore <= 65) {
+                riskDesc = 'Rute melintasi perairan/ruang udara dengan variabilitas cuaca sedang atau kepadatan lalu lintas transit. Disarankan monitoring real-time berkala.';
+                insRec = '⚠️ Direkomendasikan Tambahan Asuransi All-Risk Transit';
+            } else {
+                riskDesc = 'Rute melewati koridor transit jarak jauh lintas samudra atau selat internasional yang rentan cuaca buruk / kepadatan tinggi. Wajib pemantauan telemetry ketat.';
+                insRec = '🚨 Wajib Proteksi Asuransi Komprehensif Tingkat Tinggi';
+            }
+            setTxt('modal-risk-description', riskDesc);
+            setTxt('modal-insurance-rec', insRec);
 
             const orderBtn = document.getElementById('modal-order-btn');
             if (orderBtn) {
@@ -1953,12 +1996,23 @@
             }
 
             modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+
+            try {
+                if (window.lucide) lucide.createIcons();
+            } catch (err) {}
         }
 
         function closeRouteAnalyticsModal() {
             const modal = document.getElementById('route-analytics-modal');
-            if (modal) modal.classList.add('hidden');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
         }
+
+        window.openRouteAnalyticsModal = openRouteAnalyticsModal;
+        window.closeRouteAnalyticsModal = closeRouteAnalyticsModal;
 
         // ── BUILD WEATHER LAYER (Weather Pill Badges with Live Temp & Icon: Ref media_1794280421603_3a4f8e13.jpg) ──
         function buildWeatherLayer() {
