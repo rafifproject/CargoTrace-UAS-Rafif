@@ -246,7 +246,8 @@ class CustomerShipmentController extends Controller
             ->get();
 
         $routeHubs = Location::where('status', Location::STATUS_ACTIVE)->orderBy('name', 'asc')->get();
+        $countriesList = app(\App\Services\GlobalIntelligenceService::class)->getCountriesMaster();
 
-        return view('customer.shipments.map', compact('mapShipments', 'myShipments', 'allShipments', 'carriers', 'selectedShipmentId', 'selectedCarrierId', 'routeHubs'));
+        return view('customer.shipments.map', compact('mapShipments', 'myShipments', 'allShipments', 'carriers', 'selectedShipmentId', 'selectedCarrierId', 'routeHubs', 'countriesList'));
     }
 }

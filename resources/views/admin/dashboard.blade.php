@@ -131,6 +131,52 @@
         filter: grayscale(80%) !important;
         transition: opacity 0.3s ease, filter 0.3s ease;
     }
+
+    /* Clean Circular Country Nodes for Route Trace (Ref Screenshot 1: media_1794417156910_bd4e5b31.jpg) */
+    .country-trace-node {
+        transition: transform 0.2s ease, fill 0.2s ease;
+        cursor: pointer;
+    }
+    .country-trace-node:hover {
+        fill: #38bdf8 !important;
+        stroke: #ffffff !important;
+        stroke-width: 2.5px !important;
+    }
+
+    /* Route Tracker Markers (Ref Screenshot 2: media_1794417172832_e6df78b9.jpg) */
+    .route-node-pin {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #ffffff;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 9px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+    .route-node-pin:hover {
+        transform: scale(1.2);
+    }
+    .route-node-origin {
+        background: #10b981;
+        border: 2.5px solid #ffffff;
+        box-shadow: 0 0 14px rgba(16, 185, 129, 0.85);
+    }
+    .route-node-dest {
+        background: #ef4444;
+        border: 2.5px solid #ffffff;
+        box-shadow: 0 0 16px rgba(239, 68, 68, 0.9);
+        animation: dest-pulse 2s infinite;
+    }
+    @keyframes dest-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
 </style>
 @endpush
 
@@ -311,29 +357,40 @@
         <div class="flex flex-col lg:flex-row" style="min-height:520px">
             <!-- Left: Map + Status Banner -->
             <div class="flex-1 relative flex flex-col">
-                <!-- Active Mode Banner -->
+                <!-- Active Mode Banner (Standard for Cargo, Weather, Ports) -->
                 <div id="map-mode-banner" class="px-4 py-2 text-xs font-semibold text-white flex items-center gap-2 transition-all duration-300" style="background:linear-gradient(90deg,#0A1128,#0e3a6e);">
                     <span id="banner-icon">🧭</span>
                     <span id="banner-text">Mode: Pemantau CargoTrace — Kargo Aktif & Jalur Pengiriman</span>
                 </div>
-                <!-- Route Tracker Quick Selector Bar (Visible only in Route Tracker mode) -->
-                <div id="route-selector-bar" class="hidden px-4 py-2 bg-sky-950 text-xs text-white flex items-center gap-2 border-b border-sky-800/60 overflow-x-auto">
-                    <span class="text-[11px] font-bold text-sky-300 flex-shrink-0 flex items-center gap-1">
-                        📍 Simulasi Rute:
-                    </span>
-                    <button onclick="focusGlobalRoute(0)" class="px-2.5 py-1 rounded-md bg-sky-800/80 hover:bg-sky-700 text-[11px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1">
-                        🌏 Trans-Pacific (Shanghai ➔ LA)
-                    </button>
-                    <button onclick="focusGlobalRoute(1)" class="px-2.5 py-1 rounded-md bg-sky-800/80 hover:bg-sky-700 text-[11px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1">
-                        🇪🇺 Asia-Europe (Singapore ➔ Rotterdam)
-                    </button>
-                    <button onclick="focusGlobalRoute(2)" class="px-2.5 py-1 rounded-md bg-sky-800/80 hover:bg-sky-700 text-[11px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1">
-                        🇦🇺 Nusantara-Oceania (Jakarta ➔ Sydney)
-                    </button>
-                    <button onclick="focusGlobalRoute(3)" class="px-2.5 py-1 rounded-md bg-sky-800/80 hover:bg-sky-700 text-[11px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1">
-                        🌊 Trans-Atlantic (Rotterdam ➔ New York)
-                    </button>
+
+                <!-- ROUTE TRACKER 2-STEP INTERACTIVE BANNER (Ref Screenshot 1 & 2: media_1794417156910_bd4e5b31.jpg & media_1794417172832_e6df78b9.jpg) -->
+                <div id="route-step-banner" class="hidden px-4 py-2 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shadow-xs transition-all duration-200">
+                    <!-- Kiri: Mode Switcher Pelabuhan Laut vs Bandara Udara -->
+                    <div class="flex items-center gap-1 p-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <button type="button" id="trace-btn-port" onclick="setTraceTransportMode('PORT')"
+                            class="px-2.5 py-1 rounded-md text-[11px] font-bold transition-all bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs flex items-center gap-1">
+                            <span>⚓ Pelabuhan (Laut)</span>
+                        </button>
+                        <button type="button" id="trace-btn-air" onclick="setTraceTransportMode('AIR')"
+                            class="px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1">
+                            <span>✈️ Bandara (Udara)</span>
+                        </button>
+                    </div>
+
+                    <!-- Tengah: Status Teks Interaktif Persis Screenshot (Step 1 -> Step 2 -> Route Analyzed) -->
+                    <div class="text-center font-bold text-xs sm:text-sm tracking-tight" id="route-step-text-wrap">
+                        <span id="route-step-text" class="text-purple-600 dark:text-purple-400 font-bold">Step 1: Click Origin Country on map</span>
+                    </div>
+
+                    <!-- Kanan: Tombol Reset Persis Screenshot -->
+                    <div>
+                        <button type="button" onclick="resetRouteTrackerInteractive()"
+                            class="px-3.5 py-1 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-xs">
+                            Reset
+                        </button>
+                    </div>
                 </div>
+
                 <!-- Leaflet Map -->
                 <div id="dashboard-map" class="flex-1 z-10" style="min-height:460px"></div>
                 <!-- Legend -->
@@ -468,6 +525,117 @@
                         </div>
                     </div>
                 @endforeach
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Analisis Rute (View Analytics Modal) -->
+    <div id="route-analytics-modal" class="fixed inset-0 z-[99999] hidden overflow-y-auto bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="relative w-full max-w-2xl bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
+                        <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white" id="modal-route-title">Analisis Koridor Logistik Global</h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400" id="modal-route-subtitle">Perhitungan multi-faktor rute pengiriman antar negara</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeRouteAnalyticsModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center justify-center transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Origin & Destination Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <!-- Origin Node Card -->
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                            TITIK ASAL (ORIGIN)
+                        </span>
+                        <span id="modal-origin-code" class="text-xs font-mono font-bold text-slate-400">IDN</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 mb-1.5">
+                        <img id="modal-origin-flag" src="" alt="" class="w-7 h-5 object-cover rounded border border-slate-200 dark:border-slate-700 shadow-xs">
+                        <span id="modal-origin-country" class="font-bold text-sm text-slate-900 dark:text-white">Indonesia</span>
+                    </div>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 font-medium" id="modal-origin-hub">Pelabuhan Tanjung Priok</p>
+                    <p class="text-[10px] text-slate-400 font-mono mt-1" id="modal-origin-coords">-6.102, 106.882</p>
+                </div>
+
+                <!-- Destination Node Card -->
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
+                            TITIK TUJUAN (DESTINATION)
+                        </span>
+                        <span id="modal-dest-code" class="text-xs font-mono font-bold text-slate-400">NLD</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 mb-1.5">
+                        <img id="modal-dest-flag" src="" alt="" class="w-7 h-5 object-cover rounded border border-slate-200 dark:border-slate-700 shadow-xs">
+                        <span id="modal-dest-country" class="font-bold text-sm text-slate-900 dark:text-white">Belanda</span>
+                    </div>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 font-medium" id="modal-dest-hub">Port of Rotterdam</p>
+                    <p class="text-[10px] text-slate-400 font-mono mt-1" id="modal-dest-coords">51.924, 4.477</p>
+                </div>
+            </div>
+
+            <!-- Route Metrics Matrix -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800 text-center">
+                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Moda Kargo</span>
+                    <span id="modal-mode-badge" class="text-xs font-bold text-cyan-600 dark:text-cyan-400 mt-0.5 block">⚓ Pelabuhan Laut</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800 text-center">
+                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Total Jarak</span>
+                    <span id="modal-distance" class="text-xs font-bold text-slate-800 dark:text-white mt-0.5 block">8,920 km (4,816 NM)</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800 text-center">
+                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Estimasi Waktu</span>
+                    <span id="modal-duration" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 block">14 - 18 Hari</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800 text-center">
+                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Kecepatan Armada</span>
+                    <span id="modal-speed" class="text-xs font-bold text-slate-800 dark:text-white mt-0.5 block">20 Knots (~37 km/h)</span>
+                </div>
+            </div>
+
+            <!-- Transit Risk Analysis Section -->
+            <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+                        <i data-lucide="shield-alert" class="w-4 h-4 text-amber-500"></i>
+                        <span>Kalkulasi Skor Transit Risk</span>
+                    </span>
+                    <span id="modal-risk-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold text-white bg-emerald-500">
+                        Transit Risk: 25/100 (Safe Route)
+                    </span>
+                </div>
+                <!-- Risk Progress Bar -->
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                    <div id="modal-risk-bar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 25%"></div>
+                </div>
+                <p id="modal-risk-description" class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Koridor transit ini dikategorikan aman dengan risiko rendah. Tidak terdeteksi zona konflik maritim berstatus bahaya tinggi atau pembajakan aktif.
+                </p>
+                <div class="pt-2 border-t border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-[11px] flex-wrap gap-2">
+                    <span class="text-slate-400">Koridor Dilalui: <strong id="modal-corridor" class="text-slate-700 dark:text-slate-300">Selat Malaka ➔ Laut Arab ➔ Terusan Suez</strong></span>
+                    <span class="text-purple-600 dark:text-purple-400 font-semibold" id="modal-insurance-rec">🛡️ Proteksi Asuransi Standar AAR Direkomendasikan</span>
+                </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
+                <button type="button" onclick="closeRouteAnalyticsModal()" class="px-4 py-2 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    Tutup
+                </button>
+                <a id="modal-order-btn" href="{{ route('admin.shipments.index') }}" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 transition-colors shadow-sm flex items-center gap-1.5">
+                    <span>Pantau & Kelola Pengiriman</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
             </div>
         </div>
     </div>
@@ -724,16 +892,19 @@
         };
         function updateBanner(mode) {
             const b = banners[mode];
-            document.getElementById('banner-icon').textContent = b.icon;
-            document.getElementById('banner-text').textContent = b.text;
-            document.getElementById('map-mode-banner').style.background = b.bg;
+            const defaultBanner = document.getElementById('map-mode-banner');
+            const routeStepBanner = document.getElementById('route-step-banner');
 
-            const routeBar = document.getElementById('route-selector-bar');
-            if (routeBar) {
-                if (mode === 'route') {
-                    routeBar.classList.remove('hidden');
-                } else {
-                    routeBar.classList.add('hidden');
+            if (mode === 'route') {
+                if (defaultBanner) defaultBanner.classList.add('hidden');
+                if (routeStepBanner) routeStepBanner.classList.remove('hidden');
+            } else {
+                if (routeStepBanner) routeStepBanner.classList.add('hidden');
+                if (defaultBanner) {
+                    defaultBanner.classList.remove('hidden');
+                    document.getElementById('banner-icon').textContent = b.icon;
+                    document.getElementById('banner-text').textContent = b.text;
+                    defaultBanner.style.background = b.bg;
                 }
             }
         }
@@ -747,10 +918,10 @@
                       <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-emerald-600 inline-flex items-center justify-center text-[9px] text-white">🚛</span>Truk</span>
                       <span class="flex items-center gap-1.5"><span class="w-5 h-0.5 bg-cyan-500 inline-block"></span>Jalur Ditempuh</span>
                       <span class="flex items-center gap-1.5"><span class="w-5 h-0.5 border-b border-dashed border-cyan-400 inline-block"></span>Estimasi Rute</span>`,
-            route:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block border border-white"></span>Pelabuhan Asal</span>
-                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block border border-white"></span>Waypoint Transit</span>
-                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block border border-white"></span>Pelabuhan Tujuan</span>
-                      <span class="flex items-center gap-1.5 text-slate-400">Klik tiap titik untuk rincian rute & estimasi navigasi</span>`,
+            route:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block border border-white"></span>Titik Asal</span>
+                      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block border border-white"></span>Titik Tujuan</span>
+                      <span class="flex items-center gap-1.5"><span class="w-5 h-0.5 border-b border-dashed border-emerald-500 inline-block"></span>Jalur Terkoneksi</span>
+                      <span class="flex items-center gap-1.5 text-slate-400">Pilih dua titik negara di peta atau panel pencarian</span>`,
             weather: `<span class="flex items-center gap-1.5"><span class="w-3.5 h-2.5 rounded bg-blue-600 inline-block border border-white"></span>Dingin (&lt;15°C)</span>
                       <span class="flex items-center gap-1.5"><span class="w-3.5 h-2.5 rounded bg-emerald-600 inline-block border border-white"></span>Sejuk (15–25°C)</span>
                       <span class="flex items-center gap-1.5"><span class="w-3.5 h-2.5 rounded bg-orange-600 inline-block border border-white"></span>Hangat (&gt;25°C)</span>
@@ -1321,140 +1492,472 @@
             return latLngs;
         }
 
-        // ── BUILD ROUTE TRACKER LAYER (Global Maritime Highways & Intercontinental Checkpoints) ──
-        let routePolylines = [];
+        // ── ROUTE TRACKER 2-STEP INTERACTIVE SYSTEM ───────────────────
+        let traceOrigin = null;
+        let traceDestination = null;
+        let traceTransportMode = 'PORT'; // 'PORT' (Laut) atau 'AIR' (Udara)
+        let traceNodesGroup = L.layerGroup();
+        let traceRouteLine = null;
+        let traceOriginMarker = null;
+        let traceDestMarker = null;
+        let lastAnalyzedRoute = null;
+
+        // ISO2 to ISO3 lookup table for 3-letter codes
+        const ISO3_MAP = {
+            'ID':'IDN', 'MY':'MYS', 'SG':'SGP', 'TH':'THA', 'VN':'VNM', 'PH':'PHL',
+            'MM':'MMR', 'KH':'KHM', 'LA':'LAO', 'BN':'BRN', 'TL':'TLS', 'CN':'CHN',
+            'JP':'JPN', 'KR':'KOR', 'TW':'TWN', 'HK':'HKG', 'MO':'MAC', 'MN':'MNG',
+            'KP':'PRK', 'IN':'IND', 'PK':'PAK', 'BD':'BGD', 'LK':'LKA', 'NP':'NPL',
+            'BT':'BTN', 'MV':'MDV', 'AF':'AFG', 'KZ':'KAZ', 'UZ':'UZB', 'TM':'TKM',
+            'KG':'KGZ', 'TJ':'TJK', 'SA':'SAU', 'AE':'ARE', 'QA':'QAT', 'KW':'KWT',
+            'OM':'OMN', 'BH':'BHR', 'YE':'YEM', 'IR':'IRN', 'IQ':'IRQ', 'SY':'SYR',
+            'JO':'JOR', 'LB':'LBN', 'IL':'ISR', 'PS':'PSE', 'TR':'TUR', 'CY':'CYP',
+            'GE':'GEO', 'AM':'ARM', 'AZ':'AZE', 'GB':'GBR', 'DE':'DEU', 'FR':'FRA',
+            'NL':'NLD', 'BE':'BEL', 'LU':'LUX', 'IT':'ITA', 'ES':'ESP', 'PT':'PRT',
+            'CH':'CHE', 'AT':'AUT', 'SE':'SWE', 'NO':'NOR', 'DK':'DNK', 'FI':'FIN',
+            'IS':'ISL', 'IE':'IRL', 'GR':'GRC', 'PL':'POL', 'CZ':'CZE', 'SK':'SVK',
+            'HU':'HUN', 'RO':'ROU', 'BG':'BGR', 'UA':'UKR', 'BY':'BLR', 'MD':'MDA',
+            'RU':'RUS', 'US':'USA', 'CA':'CAN', 'MX':'MEX', 'BR':'BRA', 'AR':'ARG',
+            'CL':'CHL', 'CO':'COL', 'PE':'PER', 'EG':'EGY', 'ZA':'ZAF', 'NG':'NGA',
+            'KE':'KEN', 'MA':'MAR', 'GH':'GHA', 'NE':'NER', 'NER':'NER', 'BF':'BFA',
+            'BFA':'BFA', 'AU':'AUS', 'NZ':'NZL'
+        };
+
+        function getIso3Code(c) {
+            const raw = (c.code || '').toUpperCase().replace('_EAST','');
+            if (raw.length === 3) return raw;
+            return ISO3_MAP[raw] || (raw + 'X').substring(0,3);
+        }
+
+        const AIRPORT_NAMES = {
+            'ID':'Bandara Internasional Soekarno-Hatta (CGK)',
+            'MY':'Kuala Lumpur International (KUL)',
+            'SG':'Singapore Changi Airport (SIN)',
+            'TH':'Suvarnabhumi Airport (BKK)',
+            'VN':'Tan Son Nhat / Noi Bai Int\'l (SGN/HAN)',
+            'PH':'Ninoy Aquino International (MNL)',
+            'CN':'Shanghai Pudong Int\'l (PVG)',
+            'JP':'Tokyo Haneda / Narita Int\'l (HND/NRT)',
+            'KR':'Incheon International Airport (ICN)',
+            'US':'John F. Kennedy / LAX (JFK/LAX)',
+            'GB':'London Heathrow Airport (LHR)',
+            'NL':'Amsterdam Airport Schiphol (AMS)',
+            'DE':'Frankfurt Airport (FRA)',
+            'FR':'Paris Charles de Gaulle (CDG)',
+            'AE':'Dubai International Airport (DXB)',
+            'SA':'King Abdulaziz Int\'l (JED)',
+            'IN':'Indira Gandhi International (DEL)',
+            'AU':'Sydney Kingsford Smith (SYD)',
+            'NE':'Diori Hamani International (NIM)',
+            'NER':'Diori Hamani International (NIM)',
+            'BF':'Thomas Sankara International Ouagadougou (OUA)',
+            'BFA':'Thomas Sankara International Ouagadougou (OUA)',
+            'EG':'Cairo International Airport (CAI)',
+            'ZA':'O.R. Tambo International Johannesburg (JNB)',
+            'BR':'São Paulo/Guarulhos Int\'l (GRU)'
+        };
+
+        function getCountryHubName(c, mode) {
+            const code = (c.code || '').toUpperCase().replace('_EAST','');
+            if (mode === 'AIR') {
+                return AIRPORT_NAMES[code] || `Bandara Internasional ${c.name} (${getIso3Code(c)})`;
+            }
+            return c.hub || `Pelabuhan Logistik ${c.name} Hub`;
+        }
+
+        function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
         function buildRouteLayer() {
             routeLayerGroup.clearLayers();
-            routePolylines = [];
+            traceNodesGroup.clearLayers();
+            renderCountryTraceNodes();
+            routeLayerGroup.addLayer(traceNodesGroup);
 
-            globalRoutes.forEach((r, rIdx) => {
-                const points = [
-                    [r.origin.lat, r.origin.lng],
-                    ...r.waypoints.map(wp => [wp.lat, wp.lng]),
-                    [r.destination.lat, r.destination.lng]
-                ];
+            if (traceOrigin && traceDestination) {
+                drawTraceRoute(traceOrigin, traceDestination);
+            } else if (traceOrigin) {
+                renderOriginPin(traceOrigin);
+            }
+        }
 
-                // Route Polyline with glowing dashed line
-                const polyline = L.polyline(points, {
-                    color: '#0284c7',
-                    weight: 3.5,
-                    dashArray: '8, 8',
-                    opacity: 0.85
-                }).bindTooltip(`<b>${r.name}</b><br><span style="font-size:11px">${r.origin.name} ➔ ${r.destination.name}</span>`, { sticky: true });
-                polyline.addTo(routeLayerGroup);
-                routePolylines.push(polyline);
+        function renderCountryTraceNodes() {
+            traceNodesGroup.clearLayers();
+            countriesData.forEach(c => {
+                const lat = parseFloat(c.lat);
+                const lng = parseFloat(c.lng);
+                if (isNaN(lat) || isNaN(lng)) return;
 
-                // 1. Origin Marker (🟢 Green Port Anchor)
-                const originIcon = L.divIcon({
-                    className: 'route-tracker-marker',
-                    html: `
-                        <div style="background:#10B981; color:#ffffff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; box-shadow:0 0 12px rgba(16,185,129,0.8); border:2.5px solid #ffffff; cursor:pointer;">
-                            ⚓
-                        </div>
-                    `,
-                    iconSize: [30, 30],
-                    iconAnchor: [15, 15],
-                    popupAnchor: [0, -16]
+                const node = L.circleMarker([lat, lng], {
+                    radius: 5.5,
+                    fillColor: '#94a3b8',
+                    color: '#ffffff',
+                    weight: 1.5,
+                    opacity: 0.9,
+                    fillOpacity: 0.8,
+                    className: 'country-trace-node'
                 });
 
-                const originMarker = L.marker([r.origin.lat, r.origin.lng], { icon: originIcon });
-                originMarker.bindPopup(`
-                    <div style="min-width:260px; font-family: Outfit, sans-serif; padding:4px 2px;">
-                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                            <span style="background:#10B981; color:#fff; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; letter-spacing:0.5px;">PELABUHAN ASAL (ORIGIN)</span>
-                            <span style="font-size:11px; color:#64748b; font-weight:600;">${r.id}</span>
-                        </div>
-                        <div style="font-weight:800; font-size:15px; color:#0f172a; line-height:1.2;">${r.origin.name}</div>
-                        <div style="font-size:12px; color:#475569; margin-top:2px;">Negara: <b>${r.origin.country}</b></div>
-                        <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:8px; padding:7px 10px; margin-top:10px; font-size:11px; line-height:1.5;">
-                            🚢 Kapal Kargo: <b>${r.vessel}</b><br>
-                            🏢 Operator: <b>${r.carrier}</b><br>
-                            🕒 Waktu Berangkat: <b>${r.origin.departure}</b>
-                        </div>
-                        <div style="margin-top:10px; padding-top:8px; border-top:1px solid #e2e8f0; font-size:11px; color:#0284c7; font-weight:700;">
-                            ➔ Rute Menuju: ${r.destination.name} (${r.distanceNM})
-                        </div>
+                const iso3 = getIso3Code(c);
+                const hub = getCountryHubName(c, traceTransportMode);
+                const modeIcon = traceTransportMode === 'AIR' ? '✈️' : '⚓';
+
+                node.bindTooltip(`
+                    <div style="font-family: Outfit, sans-serif; font-size:11px; padding:2px;">
+                        <span style="font-weight:800;">${c.flag || '🌐'} ${c.name} (${iso3})</span><br>
+                        <span style="color:#0284c7; font-weight:600;">${modeIcon} ${hub}</span><br>
+                        <span style="color:#64748b; font-size:10px;">Klik untuk ${!traceOrigin ? 'Titik Asal (Step 1)' : 'Titik Tujuan (Step 2)'}</span>
                     </div>
-                `, { maxWidth: 300 }).addTo(routeLayerGroup);
+                `, { direction: 'top', offset: [0, -6] });
 
-                // 2. Waypoint Markers (🔵 Blue Pulsar Maritime Checkpoints)
-                r.waypoints.forEach((wp, wpIdx) => {
-                    const wpIcon = L.divIcon({
-                        className: 'route-tracker-marker',
-                        html: `
-                            <div style="background:#0284c7; color:#ffffff; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; box-shadow:0 0 10px rgba(2,132,199,0.7); border:2px solid #ffffff; cursor:pointer;">
-                                #${wpIdx + 1}
-                            </div>
-                        `,
-                        iconSize: [26, 26],
-                        iconAnchor: [13, 13],
-                        popupAnchor: [0, -14]
-                    });
-
-                    const wpMarker = L.marker([wp.lat, wp.lng], { icon: wpIcon });
-                    wpMarker.bindPopup(`
-                        <div style="min-width:250px; font-family: Outfit, sans-serif; padding:4px 2px;">
-                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                                <span style="background:#0284C7; color:#fff; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; letter-spacing:0.5px;">WAYPOINT CHECKPOINT #${wpIdx + 1}</span>
-                            </div>
-                            <div style="font-weight:800; font-size:14px; color:#0f172a; line-height:1.2;">${wp.name}</div>
-                            <div style="font-size:11px; color:#64748b; margin-top:2px;">Koridor: <b>${r.name}</b></div>
-                            <div style="background:#F0F9FF; border:1px solid #BAE6FD; border-radius:8px; padding:7px 10px; margin-top:10px; font-size:11px; color:#0369A1; line-height:1.5;">
-                                🌊 Kondisi Arus: <b>${wp.note}</b><br>
-                                ⛅ Cuaca Perairan: <b>${wp.weather}</b>
-                            </div>
-                            <div style="margin-top:8px; font-size:11px; color:#64748b;">
-                                Koordinat: <b>${wp.lat.toFixed(3)}, ${wp.lng.toFixed(3)}</b>
-                            </div>
-                        </div>
-                    `, { maxWidth: 290 }).addTo(routeLayerGroup);
+                node.on('click', function(e) {
+                    L.DomEvent.stopPropagation(e);
+                    handleCountryTraceSelect(c);
                 });
 
-                // 3. Destination Marker (🔴 Red Destination Flag)
-                const destIcon = L.divIcon({
-                    className: 'route-tracker-marker',
-                    html: `
-                        <div style="background:#F43F5E; color:#ffffff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; box-shadow:0 0 12px rgba(244,63,94,0.8); border:2.5px solid #ffffff; cursor:pointer;">
-                            🏁
-                        </div>
-                    `,
-                    iconSize: [30, 30],
-                    iconAnchor: [15, 15],
-                    popupAnchor: [0, -16]
-                });
-
-                const destMarker = L.marker([r.destination.lat, r.destination.lng], { icon: destIcon });
-                destMarker.bindPopup(`
-                    <div style="min-width:260px; font-family: Outfit, sans-serif; padding:4px 2px;">
-                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                            <span style="background:#F43F5E; color:#fff; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; letter-spacing:0.5px;">PELABUHAN TUJUAN (DESTINATION)</span>
-                            <span style="font-size:11px; color:#64748b; font-weight:600;">Terminal Bongkar</span>
-                        </div>
-                        <div style="font-weight:800; font-size:15px; color:#0f172a; line-height:1.2;">${r.destination.name}</div>
-                        <div style="font-size:12px; color:#475569; margin-top:2px;">Negara: <b>${r.destination.country}</b></div>
-                        <div style="background:#FFF1F2; border:1px solid #FECDD3; border-radius:8px; padding:7px 10px; margin-top:10px; font-size:11px; color:#9F1239; line-height:1.5;">
-                            🏁 Estimasi Sandar (ETA): <b>${r.destination.eta}</b><br>
-                            📏 Total Jarak Pelayaran: <b>${r.distanceNM} (~${r.distanceKm})</b><br>
-                            ⏱️ Estimasi Waktu Tempuh: <b>${r.duration}</b>
-                        </div>
-                        <div style="margin-top:8px; font-size:11px; color:#059669; font-weight:700;">
-                            Status Navigasi: ${r.status}
-                        </div>
-                    </div>
-                `, { maxWidth: 300 }).addTo(routeLayerGroup);
+                node.addTo(traceNodesGroup);
             });
         }
 
-        // Quick Focus to one of the Preset Global Routes
-        function focusGlobalRoute(index) {
-            if (!globalRoutes[index]) return;
-            const r = globalRoutes[index];
-            const allCoords = [
-                [r.origin.lat, r.origin.lng],
-                ...r.waypoints.map(wp => [wp.lat, wp.lng]),
-                [r.destination.lat, r.destination.lng]
-            ];
-            map.fitBounds(L.latLngBounds(allCoords).pad(0.18), { duration: 1.2 });
+        function handleCountryTraceSelect(c) {
+            if (!traceOrigin) {
+                // STEP 1: Set Origin
+                traceOrigin = c;
+                renderOriginPin(c);
+
+                const bannerText = document.getElementById('route-step-text');
+                if (bannerText) {
+                    bannerText.innerHTML = '<span class="text-purple-600 dark:text-purple-400 font-bold">Step 2: Click Destination Country on map</span>';
+                }
+            } else if (traceOrigin && !traceDestination) {
+                // STEP 2: Set Destination
+                if (c.code === traceOrigin.code && c.name === traceOrigin.name) {
+                    alert('Silakan pilih negara tujuan yang berbeda dari negara asal.');
+                    return;
+                }
+                traceDestination = c;
+                drawTraceRoute(traceOrigin, traceDestination);
+            } else {
+                // Reset and start as new Origin
+                resetRouteTrackerInteractive(false);
+                traceOrigin = c;
+                renderOriginPin(c);
+                const bannerText = document.getElementById('route-step-text');
+                if (bannerText) {
+                    bannerText.innerHTML = '<span class="text-purple-600 dark:text-purple-400 font-bold">Step 2: Click Destination Country on map</span>';
+                }
+            }
+        }
+
+        function renderOriginPin(c) {
+            if (traceOriginMarker) {
+                routeLayerGroup.removeLayer(traceOriginMarker);
+            }
+            const iso3 = getIso3Code(c);
+            const icon = L.divIcon({
+                className: 'route-node-pin-wrapper',
+                html: `<div class="route-node-pin route-node-origin" style="width:26px; height:26px;">${iso3}</div>`,
+                iconSize: [26, 26],
+                iconAnchor: [13, 13]
+            });
+            traceOriginMarker = L.marker([c.lat, c.lng], { icon }).addTo(routeLayerGroup);
+        }
+
+        function renderDestPin(c) {
+            if (traceDestMarker) {
+                routeLayerGroup.removeLayer(traceDestMarker);
+            }
+            const iso3 = getIso3Code(c);
+            const icon = L.divIcon({
+                className: 'route-node-pin-wrapper',
+                html: `<div class="route-node-pin route-node-dest" style="width:26px; height:26px;">${iso3}</div>`,
+                iconSize: [26, 26],
+                iconAnchor: [13, 13]
+            });
+            traceDestMarker = L.marker([c.lat, c.lng], { icon }).addTo(routeLayerGroup);
+        }
+
+        function drawTraceRoute(origin, dest) {
+            renderOriginPin(origin);
+            renderDestPin(dest);
+
+            if (traceRouteLine) {
+                routeLayerGroup.removeLayer(traceRouteLine);
+            }
+
+            const p1 = [parseFloat(origin.lat), parseFloat(origin.lng)];
+            const p2 = [parseFloat(dest.lat), parseFloat(dest.lng)];
+            const distKm = calculateDistanceKm(p1[0], p1[1], p2[0], p2[1]);
+            const distNM = distKm / 1.852;
+
+            // Generate Waypoints depending on mode (Sea Maritime vs Air Corridors)
+            let pathPoints = [];
+            let timeStr = '';
+            let speedStr = '';
+            let corridorStr = '';
+            let riskScore = 25;
+            let riskLabel = 'Safe Route';
+            let riskBgColor = '#10B981';
+
+            if (traceTransportMode === 'AIR') {
+                // Great Circle Air Geodesic Arc
+                const numSteps = 16;
+                pathPoints.push(p1);
+                for (let i = 1; i < numSteps; i++) {
+                    const f = i / numSteps;
+                    const lat = p1[0] + (p2[0] - p1[0]) * f;
+                    const lng = p1[1] + (p2[1] - p1[1]) * f;
+                    const arcOffset = Math.sin(f * Math.PI) * Math.min(12, distKm / 450);
+                    pathPoints.push([lat + arcOffset, lng]);
+                }
+                pathPoints.push(p2);
+
+                const airHours = (distKm / 850 + 2.5).toFixed(1);
+                timeStr = `${airHours} Jam`;
+                speedStr = '850 km/h (Jet Kargo Udara)';
+                corridorStr = `International Airway Corridor (${getIso3Code(origin)} ➔ ${getIso3Code(dest)})`;
+
+                riskScore = Math.min(85, Math.max(20, Math.round(distKm / 600) + 15));
+            } else {
+                // Maritime Sea Corridors
+                const isAsiaToEurope = (p1[1] > 60 && p2[1] < 30) || (p2[1] > 60 && p1[1] < 30);
+                const isAsiaToAmericas = (p1[1] > 80 && p2[1] < -60) || (p2[1] > 80 && p1[1] < -60);
+
+                if (isAsiaToEurope) {
+                    pathPoints = [
+                        p1,
+                        [2.5, 101.5],   // Malacca Strait
+                        [6.0, 78.0],    // Indian Ocean
+                        [12.5, 43.5],   // Bab el-Mandeb
+                        [27.5, 34.0],   // Red Sea
+                        [31.2, 32.3],   // Suez Canal
+                        [36.0, 15.0],   // Central Med
+                        [36.0, -5.5],   // Gibraltar
+                        p2
+                    ];
+                    corridorStr = 'Selat Malaka ➔ Laut Arab ➔ Terusan Suez ➔ Mediterania';
+                    riskScore = 58;
+                } else if (isAsiaToAmericas) {
+                    pathPoints = [
+                        p1,
+                        [35.0, 145.0],  // East Japan
+                        [45.0, 180.0],  // North Pacific Great Circle
+                        [40.0, -145.0], // West Coast US approach
+                        p2
+                    ];
+                    corridorStr = 'North Pacific Great Circle Sea Highway';
+                    riskScore = 32;
+                } else {
+                    const midLat = (p1[0] + p2[0]) / 2 - (distKm > 2000 ? 5 : 1);
+                    const midLng = (p1[1] + p2[1]) / 2;
+                    pathPoints = [p1, [midLat, midLng], p2];
+                    corridorStr = `Maritime Coastal Route (${getIso3Code(origin)} ➔ ${getIso3Code(dest)})`;
+                    riskScore = Math.min(80, Math.max(25, Math.round(distKm / 500) + 10));
+                }
+
+                const seaDays = Math.max(1, Math.round(distKm / (20 * 1.852 * 24)));
+                timeStr = `${seaDays} - ${seaDays + 3} Hari`;
+                speedStr = '20 Knots (~37 km/h)';
+            }
+
+            if (riskScore <= 35) {
+                riskLabel = 'Safe Route';
+                riskBgColor = '#10B981';
+            } else if (riskScore <= 65) {
+                riskLabel = 'Moderate Risk';
+                riskBgColor = '#F59E0B';
+            } else {
+                riskLabel = 'Elevated Risk / Caution';
+                riskBgColor = '#EF4444';
+            }
+
+            // Draw Dashed Polyline
+            traceRouteLine = L.polyline(pathPoints, {
+                color: '#10B981',
+                weight: 3.5,
+                dashArray: '6, 8',
+                opacity: 0.95
+            }).addTo(routeLayerGroup);
+
+            // Update Banner
+            const oIso3 = getIso3Code(origin);
+            const dIso3 = getIso3Code(dest);
+            const bannerText = document.getElementById('route-step-text');
+            if (bannerText) {
+                bannerText.innerHTML = `<span class="text-emerald-600 dark:text-emerald-400 font-bold">Route Analyzed: ${oIso3} ${dIso3}</span>`;
+            }
+
+            // Store for Modal
+            lastAnalyzedRoute = {
+                origin,
+                dest,
+                oIso3,
+                dIso3,
+                mode: traceTransportMode,
+                modeName: traceTransportMode === 'AIR' ? '✈️ Bandara (Udara)' : '⚓ Pelabuhan (Laut)',
+                distKm: Math.round(distKm),
+                distNM: Math.round(distNM),
+                timeStr,
+                speedStr,
+                corridorStr,
+                riskScore,
+                riskLabel,
+                riskBgColor
+            };
+
+            // Fit Bounds
+            map.fitBounds(L.latLngBounds([p1, p2]).pad(0.25), { duration: 1.0 });
+
+            // Popup on Destination Marker (Matches Screenshot 2!)
+            const oIsoLower = (origin.code || '').toLowerCase().replace('_east','');
+            const dIsoLower = (dest.code || '').toLowerCase().replace('_east','');
+            const modeIcon = traceTransportMode === 'AIR' ? '✈️' : '⚓';
+
+            const popupContent = `
+                <div style="min-width:210px; font-family: Outfit, sans-serif; text-align:center; padding:4px 2px;">
+                    <div style="font-weight:700; font-size:12px; color:#1e293b; margin-bottom:4px;">Route Analysis</div>
+                    <div style="display:flex; align-items:center; justify-content:center; gap:6px; font-weight:800; font-size:13px; margin-bottom:8px;">
+                        <span><img src="https://flagcdn.com/w40/${oIsoLower}.png" style="width:18px;height:12px;object-fit:cover;border-radius:2px;display:inline;vertical-align:middle;margin-right:2px;"> ${oIso3}</span>
+                        <span style="color:#94a3b8;">&rarr;</span>
+                        <span><img src="https://flagcdn.com/w40/${dIsoLower}.png" style="width:18px;height:12px;object-fit:cover;border-radius:2px;display:inline;vertical-align:middle;margin-right:2px;"> ${dIso3}</span>
+                    </div>
+                    <div style="margin-bottom:6px;">
+                        <span style="background:${riskBgColor}; color:#ffffff; font-weight:800; font-size:11px; padding:3px 12px; border-radius:9999px; box-shadow:0 1px 3px rgba(0,0,0,0.12); display:inline-block;">
+                            Transit Risk: ${riskScore}/100
+                        </span>
+                    </div>
+                    <div style="font-size:11px; color:#64748b; font-weight:600; margin-bottom:4px;">
+                        ${riskLabel}
+                    </div>
+                    <div style="font-size:10px; color:#0369a1; font-weight:700; margin-bottom:10px;">
+                        ${modeIcon} Est. ${timeStr} &bull; ${Math.round(distKm)} km
+                    </div>
+                    <button onclick="openRouteAnalyticsModal()" style="width:100%; background:#7C3AED; color:#ffffff; border:none; padding:7px 12px; border-radius:10px; font-weight:700; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 6px rgba(124,58,237,0.35); transition:background 0.2s;">
+                        <svg style="width:13px; height:13px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                        <span>View Analytics</span>
+                    </button>
+                </div>
+            `;
+
+            setTimeout(() => {
+                L.popup({ maxWidth: 260, offset: [0, -10] })
+                    .setLatLng(p2)
+                    .setContent(popupContent)
+                    .openOn(map);
+            }, 300);
+        }
+
+        function setTraceTransportMode(mode) {
+            traceTransportMode = mode;
+            const btnPort = document.getElementById('trace-btn-port');
+            const btnAir  = document.getElementById('trace-btn-air');
+
+            if (mode === 'PORT') {
+                if (btnPort) {
+                    btnPort.className = 'px-2.5 py-1 rounded-md text-[11px] font-bold transition-all bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs flex items-center gap-1';
+                }
+                if (btnAir) {
+                    btnAir.className = 'px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1';
+                }
+            } else {
+                if (btnAir) {
+                    btnAir.className = 'px-2.5 py-1 rounded-md text-[11px] font-bold transition-all bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-xs flex items-center gap-1';
+                }
+                if (btnPort) {
+                    btnPort.className = 'px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1';
+                }
+            }
+
+            renderCountryTraceNodes();
+            if (traceOrigin && traceDestination) {
+                drawTraceRoute(traceOrigin, traceDestination);
+            }
+        }
+
+        function resetRouteTrackerInteractive(flyToWorld = true) {
+            traceOrigin = null;
+            traceDestination = null;
+            lastAnalyzedRoute = null;
+
+            if (traceRouteLine) {
+                routeLayerGroup.removeLayer(traceRouteLine);
+                traceRouteLine = null;
+            }
+            if (traceOriginMarker) {
+                routeLayerGroup.removeLayer(traceOriginMarker);
+                traceOriginMarker = null;
+            }
+            if (traceDestMarker) {
+                routeLayerGroup.removeLayer(traceDestMarker);
+                traceDestMarker = null;
+            }
+
+            map.closePopup();
+
+            const bannerText = document.getElementById('route-step-text');
+            if (bannerText) {
+                bannerText.innerHTML = '<span class="text-purple-600 dark:text-purple-400 font-bold">Step 1: Click Origin Country on map</span>';
+            }
+
+            if (flyToWorld) {
+                map.flyTo([20, 20], 2.2, { duration: 1.0 });
+            }
+        }
+
+        function openRouteAnalyticsModal() {
+            if (!lastAnalyzedRoute) return;
+            const r = lastAnalyzedRoute;
+            const modal = document.getElementById('route-analytics-modal');
+            if (!modal) return;
+
+            const oIso = (r.origin.code || '').toLowerCase().replace('_east','');
+            const dIso = (r.dest.code || '').toLowerCase().replace('_east','');
+
+            document.getElementById('modal-origin-code').textContent = r.oIso3;
+            document.getElementById('modal-origin-flag').src = `https://flagcdn.com/w40/${oIso}.png`;
+            document.getElementById('modal-origin-country').textContent = r.origin.name;
+            document.getElementById('modal-origin-hub').textContent = getCountryHubName(r.origin, r.mode);
+            document.getElementById('modal-origin-coords').textContent = `${parseFloat(r.origin.lat).toFixed(3)}, ${parseFloat(r.origin.lng).toFixed(3)}`;
+
+            document.getElementById('modal-dest-code').textContent = r.dIso3;
+            document.getElementById('modal-dest-flag').src = `https://flagcdn.com/w40/${dIso}.png`;
+            document.getElementById('modal-dest-country').textContent = r.dest.name;
+            document.getElementById('modal-dest-hub').textContent = getCountryHubName(r.dest, r.mode);
+            document.getElementById('modal-dest-coords').textContent = `${parseFloat(r.dest.lat).toFixed(3)}, ${parseFloat(r.dest.lng).toFixed(3)}`;
+
+            document.getElementById('modal-mode-badge').textContent = r.modeName;
+            document.getElementById('modal-distance').textContent = `${r.distKm.toLocaleString()} km (${r.distNM.toLocaleString()} NM)`;
+            document.getElementById('modal-duration').textContent = r.timeStr;
+            document.getElementById('modal-speed').textContent = r.speedStr;
+            document.getElementById('modal-corridor').textContent = r.corridorStr;
+
+            const riskBadge = document.getElementById('modal-risk-badge');
+            riskBadge.textContent = `Transit Risk: ${r.riskScore}/100 (${r.riskLabel})`;
+            riskBadge.style.backgroundColor = r.riskBgColor;
+
+            const riskBar = document.getElementById('modal-risk-bar');
+            riskBar.style.width = `${r.riskScore}%`;
+            riskBar.style.backgroundColor = r.riskBgColor;
+
+            const orderBtn = document.getElementById('modal-order-btn');
+            if (orderBtn) {
+                orderBtn.href = `{{ route('admin.shipments.index') }}?search=${encodeURIComponent(r.origin.name)}`;
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeRouteAnalyticsModal() {
+            const modal = document.getElementById('route-analytics-modal');
+            if (modal) modal.classList.add('hidden');
         }
 
         // ── BUILD WEATHER LAYER (Weather Pill Badges with Live Temp & Icon: Ref media_1794280421603_3a4f8e13.jpg) ──
@@ -1650,7 +2153,7 @@
                 } else if (mode === 'route') {
                     buildRouteLayer();
                     routeLayerGroup.addTo(map);
-                    focusGlobalRoute(0);
+                    map.flyTo([20, 20], 2.2, { duration: 1.2 });
                 } else if (mode === 'weather') {
                     buildWeatherLayer();
                     weatherLayerGroup.addTo(map);
@@ -1773,19 +2276,13 @@
                     }, 400);
                 }
             } else if (currentMode === 'route') {
-                let closestRouteMarker = null;
-                let minRDist = 999999;
-                routeLayerGroup.eachLayer(layer => {
-                    if (layer.getLatLng) {
-                        const dist = Math.hypot(layer.getLatLng().lat - lat, layer.getLatLng().lng - lng);
-                        if (dist < minRDist) {
-                            minRDist = dist;
-                            closestRouteMarker = layer;
-                        }
-                    }
+                const countryObj = countriesData.find(c => {
+                    const cCode = (c.code || '').toUpperCase().replace('_EAST','');
+                    const cName = (c.name || '').toLowerCase();
+                    return cCode === code.replace('_EAST','') || cName === name.toLowerCase();
                 });
-                if (closestRouteMarker && minRDist < 10) {
-                    setTimeout(() => closestRouteMarker.openPopup(), 400);
+                if (countryObj) {
+                    handleCountryTraceSelect(countryObj);
                 }
             } else if (currentMode === 'cargo') {
                 // Berikan info transit kargo untuk negara yang dipilih
@@ -1821,13 +2318,17 @@
         }
 
         // Expose functions to window immediately so onclick="" attributes can always reach them
-        window.switchMapMode    = switchMapMode;
-        window.resetMapView     = resetMapView;
-        window.focusCountry     = focusCountry;
-        window.focusGlobalRoute = focusGlobalRoute;
-        window.filterCountriesList = filterCountriesList;
-        window.focusCargoShipment  = focusCargoShipment;
-        window.resetShipmentFocus  = resetCargoShipmentFocus;
+        window.switchMapMode                 = switchMapMode;
+        window.resetMapView                  = resetMapView;
+        window.focusCountry                  = focusCountry;
+        window.focusGlobalRoute              = focusGlobalRoute;
+        window.filterCountriesList           = filterCountriesList;
+        window.focusCargoShipment            = focusCargoShipment;
+        window.resetShipmentFocus            = resetCargoShipmentFocus;
+        window.setTraceTransportMode         = setTraceTransportMode;
+        window.resetRouteTrackerInteractive  = resetRouteTrackerInteractive;
+        window.openRouteAnalyticsModal       = openRouteAnalyticsModal;
+        window.closeRouteAnalyticsModal      = closeRouteAnalyticsModal;
 
         // Klik di area peta kosong mengembalikan fokus rute ke normal
         map.on('click', function(e) {
