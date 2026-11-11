@@ -37,6 +37,10 @@ class CustomerShipmentController extends Controller
             $query->where('status', $status);
         }
 
+        if ($transportMode = $request->input('transport_mode')) {
+            $query->where('transport_mode', $transportMode);
+        }
+
         if ($delay = $request->input('delay')) {
             if ($delay === 'delayed') {
                 $query->where('delay_minutes', '>', 0);
@@ -240,6 +244,7 @@ class CustomerShipmentController extends Controller
 
         $selectedShipmentId = $request->input('shipment_id');
         $selectedCarrierId  = $request->input('carrier_id');
+        $selectedTransportMode = $request->input('transport_mode');
 
         $carrierIds = $myShipments->pluck('carrier_id')->filter()->unique();
         $carriers = Carrier::whereIn('id', $carrierIds)->orderBy('name', 'asc')->get();
@@ -248,11 +253,12 @@ class CustomerShipmentController extends Controller
             ->with(['origin', 'destination', 'currentLocation', 'carrier', 'trackingEvents.location'])
             ->when($selectedShipmentId, fn ($q) => $q->where('id', $selectedShipmentId))
             ->when($selectedCarrierId, fn ($q) => $q->where('carrier_id', $selectedCarrierId))
+            ->when($selectedTransportMode, fn ($q) => $q->where('transport_mode', $selectedTransportMode))
             ->get();
 
         $routeHubs = Location::where('status', Location::STATUS_ACTIVE)->orderBy('name', 'asc')->get();
         $countriesList = app(\App\Services\GlobalIntelligenceService::class)->getCountriesMaster();
 
-        return view('customer.shipments.map', compact('mapShipments', 'myShipments', 'allShipments', 'carriers', 'selectedShipmentId', 'selectedCarrierId', 'routeHubs', 'countriesList'));
+        return view('customer.shipments.map', compact('mapShipments', 'myShipments', 'allShipments', 'carriers', 'selectedShipmentId', 'selectedCarrierId', 'selectedTransportMode', 'routeHubs', 'countriesList'));
     }
 }

@@ -89,8 +89,20 @@
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pemantauan armada aktif real-time & simulator kalkulasi rute titik asal-tujuan (Pelabuhan Laut vs Bandara Udara)</p>
         </div>
 
-        <!-- Mode Toggle Tabs -->
-        <div class="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+        <!-- Filter Moda & Mode Toggle Tabs -->
+        <div class="flex items-center gap-2 flex-wrap">
+            <form method="GET" action="{{ route('operator.shipments.map') }}" class="flex items-center gap-1.5">
+                @if(request('shipment_id'))
+                    <input type="hidden" name="shipment_id" value="{{ request('shipment_id') }}">
+                @endif
+                <select name="transport_mode" onchange="this.form.submit()" class="px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500 shadow-xs">
+                    <option value="">Semua Moda (Laut & Udara)</option>
+                    <option value="SEA" {{ request('transport_mode') === 'SEA' ? 'selected' : '' }}>🚢 Kapal Laut Saja</option>
+                    <option value="AIR" {{ request('transport_mode') === 'AIR' ? 'selected' : '' }}>✈️ Pesawat Udara Saja</option>
+                </select>
+            </form>
+
+            <div class="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
             <button type="button" id="tab-btn-tracking" onclick="switchMapMode('tracking')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-400 shadow-xs">
                 <i data-lucide="radio" class="w-3.5 h-3.5 text-cyan-500 animate-pulse"></i>
                 <span>Pemantauan Kargo Aktif</span>

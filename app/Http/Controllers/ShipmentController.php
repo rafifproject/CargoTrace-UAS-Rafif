@@ -36,6 +36,11 @@ class ShipmentController extends Controller
             $query->where('status', $status);
         }
 
+        // Filter Moda Transportasi (SEA/AIR)
+        if ($transportMode = $request->input('transport_mode')) {
+            $query->where('transport_mode', $transportMode);
+        }
+
         // Filter Carrier
         if ($carrierId = $request->input('carrier_id')) {
             $query->where('carrier_id', $carrierId);
@@ -161,13 +166,15 @@ class ShipmentController extends Controller
     public function map(Request $request): View
     {
         $selectedShipmentId = $request->input('shipment_id');
+        $selectedTransportMode = $request->input('transport_mode');
         $allShipments = Shipment::with(['origin', 'destination', 'currentLocation', 'carrier'])->get();
 
         $mapShipments = Shipment::with(['origin', 'destination', 'currentLocation', 'carrier', 'trackingEvents.location'])
             ->when($selectedShipmentId, fn ($q) => $q->where('id', $selectedShipmentId))
+            ->when($selectedTransportMode, fn ($q) => $q->where('transport_mode', $selectedTransportMode))
             ->get();
 
-        return view('admin.shipments.map', compact('mapShipments', 'allShipments', 'selectedShipmentId'));
+        return view('admin.shipments.map', compact('mapShipments', 'allShipments', 'selectedShipmentId', 'selectedTransportMode'));
     }
 }
 

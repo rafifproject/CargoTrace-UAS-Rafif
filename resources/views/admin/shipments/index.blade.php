@@ -24,11 +24,20 @@
 
     <!-- Filter & Search Bar -->
     <div class="p-4 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
-        <form method="GET" action="{{ route('admin.shipments.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <form method="GET" action="{{ route('admin.shipments.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2.5">
             <!-- Search -->
             <div class="lg:col-span-2 relative">
                 <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari No. Resi, Pelanggan, Kargo..." class="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-cyan-500">
+            </div>
+
+            <!-- Transport Mode Filter -->
+            <div>
+                <select name="transport_mode" class="w-full px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500">
+                    <option value="">Moda: Semua</option>
+                    <option value="SEA" {{ request('transport_mode') === 'SEA' ? 'selected' : '' }}>🚢 Kapal Laut</option>
+                    <option value="AIR" {{ request('transport_mode') === 'AIR' ? 'selected' : '' }}>✈️ Pesawat Udara</option>
+                </select>
             </div>
 
             <!-- Status Filter -->

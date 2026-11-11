@@ -25,6 +25,14 @@
             </div>
         </div>
         <div class="min-w-36">
+            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Jenis Moda</label>
+            <select name="transport_mode" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                <option value="">Semua Moda</option>
+                <option value="SEA" {{ request('transport_mode') === 'SEA' ? 'selected' : '' }}>🚢 Kapal Laut</option>
+                <option value="AIR" {{ request('transport_mode') === 'AIR' ? 'selected' : '' }}>✈️ Pesawat Udara</option>
+            </select>
+        </div>
+        <div class="min-w-36">
             <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5">Status Pengiriman</label>
             <select name="status" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                 <option value="">Semua Status</option>

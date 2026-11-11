@@ -1421,7 +1421,11 @@
                 if (!s || !s.origin || !s.destination) return;
 
                 // Sub-filter moda transportasi (Semua / Laut / Udara)
-                const sMode = s.transport_mode || 'SEA';
+                const originType = (s.origin?.location_type || '').toUpperCase();
+                const destType   = (s.destination?.location_type || '').toUpperCase();
+                const isAirCargo = (s.transport_mode === 'AIR') || (originType === 'AIRPORT' || destType === 'AIRPORT');
+                const sMode      = isAirCargo ? 'AIR' : (s.transport_mode || 'SEA');
+
                 if (cargoTransportFilter !== 'ALL' && sMode !== cargoTransportFilter) {
                     return;
                 }
@@ -2259,7 +2263,10 @@
                 if (btnAll) btnAll.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-600 text-white shadow-xs transition-all';
             }
 
-            buildCargoLayer();
+            const latLngs = buildCargoLayer();
+            if (latLngs && latLngs.length > 0) {
+                map.flyToBounds(latLngs, { padding: [50, 50], maxZoom: 4, duration: 1.2 });
+            }
         }
 
         // ── TWO-WAY SYNC HELPER (Marker Klik -> Update Sidebar Negara) ────────

@@ -81,6 +81,11 @@
         </div>
         <div>
             <form method="GET" action="{{ route('admin.shipments.map') }}" class="flex items-center gap-2">
+                <select name="transport_mode" onchange="this.form.submit()" class="px-3 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500">
+                    <option value="">Semua Moda (Laut & Udara)</option>
+                    <option value="SEA" {{ request('transport_mode') == 'SEA' ? 'selected' : '' }}>🚢 Kapal Laut Saja</option>
+                    <option value="AIR" {{ request('transport_mode') == 'AIR' ? 'selected' : '' }}>✈️ Pesawat Udara Saja</option>
+                </select>
                 <select name="shipment_id" onchange="this.form.submit()" class="px-3 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500">
                     <option value="">Tampilkan Semua Rute Kargo</option>
                     @foreach($allShipments as $s)
@@ -89,7 +94,7 @@
                         </option>
                     @endforeach
                 </select>
-                @if(request('shipment_id'))
+                @if(request('shipment_id') || request('transport_mode'))
                     <a href="{{ route('admin.shipments.map') }}" class="px-2.5 py-1.5 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 rounded-lg" title="Reset Tampilan">
                         <i data-lucide="x" class="w-3.5 h-3.5"></i>
                     </a>
