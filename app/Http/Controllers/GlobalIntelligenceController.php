@@ -122,6 +122,26 @@ class GlobalIntelligenceController extends Controller
     }
 
     /**
+     * 17b. Direktori Bandara Kargo Global (Global Cargo Airport Directory)
+     */
+    public function airports(Request $request): View
+    {
+        $allAirports = $this->intelligenceService->getGlobalAirports();
+
+        if ($search = $request->input('search')) {
+            $allAirports = array_filter($allAirports, function ($a) use ($search) {
+                return str_contains(strtolower($a['name'] ?? ''), strtolower($search))
+                    || str_contains(strtolower($a['city'] ?? ''), strtolower($search))
+                    || str_contains(strtolower($a['country'] ?? ''), strtolower($search))
+                    || str_contains(strtolower($a['code'] ?? ''), strtolower($search))
+                    || str_contains(strtolower($a['icao'] ?? ''), strtolower($search));
+            });
+        }
+
+        return view('admin.intelligence.airports', compact('allAirports'));
+    }
+
+    /**
      * 18. Perbandingan Negara (Country Comparison)
      */
     public function comparison(Request $request): View

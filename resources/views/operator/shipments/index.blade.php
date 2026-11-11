@@ -95,7 +95,14 @@
                 @endphp
                 <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-900/40 transition-colors">
                     <td class="px-5 py-3.5">
-                        <div class="font-mono font-semibold text-slate-800 dark:text-slate-100">{{ $shipment->shipment_number }}</div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-mono font-semibold text-slate-800 dark:text-slate-100">{{ $shipment->shipment_number }}</span>
+                            @if(($shipment->transport_mode ?? 'SEA') === 'AIR')
+                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300" title="Pesawat Udara (Air Cargo)">✈️ UDARA</span>
+                            @else
+                                <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" title="Kapal Laut (Maritime)">🚢 LAUT</span>
+                            @endif
+                        </div>
                         @if($shipment->open_exceptions_count > 0)
                             <div class="inline-flex items-center gap-1 mt-0.5 text-[10px] text-amber-600 dark:text-amber-400 font-medium">
                                 <i data-lucide="alert-triangle" class="w-3 h-3"></i>

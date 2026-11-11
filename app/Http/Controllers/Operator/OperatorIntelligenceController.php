@@ -105,6 +105,24 @@ class OperatorIntelligenceController extends Controller
         return view('operator.intelligence.ports', compact('allPorts'));
     }
 
+    /** Direktori Bandara Kargo Global */
+    public function airports(Request $request): View
+    {
+        $allAirports = $this->intelligenceService->getGlobalAirports();
+
+        if ($search = $request->input('search')) {
+            $allAirports = array_filter($allAirports, function ($a) use ($search) {
+                return str_contains(strtolower($a['name'] ?? ''), strtolower($search))
+                    || str_contains(strtolower($a['city'] ?? ''), strtolower($search))
+                    || str_contains(strtolower($a['country'] ?? ''), strtolower($search))
+                    || str_contains(strtolower($a['code'] ?? ''), strtolower($search))
+                    || str_contains(strtolower($a['icao'] ?? ''), strtolower($search));
+            });
+        }
+
+        return view('operator.intelligence.airports', compact('allAirports'));
+    }
+
     /** Mockup 14: Perbandingan Negara */
     public function comparison(Request $request): View
     {

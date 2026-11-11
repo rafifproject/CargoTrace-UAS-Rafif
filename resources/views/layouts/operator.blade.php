@@ -232,6 +232,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('operator.intelligence.airports') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('operator.intelligence.airports') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
+                                <i data-lucide="plane" class="w-4 h-4 {{ request()->routeIs('operator.intelligence.airports') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
+                                <span>Bandara Kargo Global</span>
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('operator.intelligence.comparison') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('operator.intelligence.comparison') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
                                 <i data-lucide="scale" class="w-4 h-4 {{ request()->routeIs('operator.intelligence.comparison') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
                                 <span>Perbandingan Negara</span>

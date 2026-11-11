@@ -31,6 +31,15 @@
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
                     {{ $shipment->status }}
                 </span>
+                @if(($shipment->transport_mode ?? 'SEA') === 'AIR')
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1">
+                        ✈️ Udara (Air Cargo)
+                    </span>
+                @else
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1">
+                        🚢 Laut (Maritime)
+                    </span>
+                @endif
             </div>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 Kargo: <strong class="text-slate-700 dark:text-slate-300">{{ $shipment->cargo_type }}</strong> &bull; Dibuat pada {{ $shipment->created_at->format('d M Y, H:i') }}

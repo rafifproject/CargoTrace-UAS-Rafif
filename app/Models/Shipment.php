@@ -19,6 +19,9 @@ class Shipment extends Model
     public const STATUS_IN_TRANSIT = 'IN_TRANSIT';
     public const STATUS_DELIVERED = 'DELIVERED';
 
+    public const TRANSPORT_SEA = 'SEA';
+    public const TRANSPORT_AIR = 'AIR';
+
     public const DELAY_NONE = 'NONE';
     public const DELAY_LOW = 'LOW';
     public const DELAY_MEDIUM = 'MEDIUM';
@@ -31,6 +34,7 @@ class Shipment extends Model
         'origin_location_id',
         'destination_location_id',
         'current_location_id',
+        'transport_mode',
         'cargo_type',
         'weight',
         'volume',

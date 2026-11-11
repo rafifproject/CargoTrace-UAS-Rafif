@@ -98,6 +98,7 @@ Route::middleware(['auth', 'role:ADMINISTRATOR'])->prefix('admin')->name('admin.
         Route::get('/economy', [GlobalIntelligenceController::class, 'economy'])->name('economy');
         Route::get('/news', [GlobalIntelligenceController::class, 'news'])->name('news');
         Route::get('/ports', [GlobalIntelligenceController::class, 'ports'])->name('ports');
+        Route::get('/airports', [GlobalIntelligenceController::class, 'airports'])->name('airports');
         Route::get('/comparison', [GlobalIntelligenceController::class, 'comparison'])->name('comparison');
         Route::get('/risk', function () {
             return redirect()->route('admin.intelligence.weather');
@@ -142,6 +143,7 @@ Route::middleware(['auth', 'role:LOGISTICS_OPERATOR'])->prefix('operator')->name
         Route::get('/economy', [OperatorIntelligenceController::class, 'economy'])->name('economy');
         Route::get('/news', [OperatorIntelligenceController::class, 'news'])->name('news');
         Route::get('/ports', [OperatorIntelligenceController::class, 'ports'])->name('ports');
+        Route::get('/airports', [OperatorIntelligenceController::class, 'airports'])->name('airports');
         Route::get('/comparison', [OperatorIntelligenceController::class, 'comparison'])->name('comparison');
         Route::get('/risk', function () {
             return redirect()->route('operator.intelligence.weather');
@@ -189,6 +191,7 @@ Route::middleware(['auth', 'role:CUSTOMER'])->prefix('customer')->name('customer
         Route::get('/economy', [CustomerIntelligenceController::class, 'economy'])->name('economy');
         Route::get('/news', [CustomerIntelligenceController::class, 'news'])->name('news');
         Route::get('/ports', [CustomerIntelligenceController::class, 'ports'])->name('ports');
+        Route::get('/airports', [CustomerIntelligenceController::class, 'airports'])->name('airports');
         Route::get('/comparison', [CustomerIntelligenceController::class, 'comparison'])->name('comparison');
         Route::get('/risk', function () {
             return redirect()->route('customer.intelligence.weather');

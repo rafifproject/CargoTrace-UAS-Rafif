@@ -196,5 +196,42 @@ class CustomerWorkflowTest extends TestCase
 
         $response->assertRedirect(route('customer.shipments.show', $createdShipment));
     }
+
+    /**
+     * Skenario 8: Customer dapat memesan pengiriman via Udara (AIR)
+     */
+    public function test_customer_can_book_air_cargo_shipment(): void
+    {
+        $carrier = Carrier::firstOrFail();
+        $origin = Location::firstOrFail();
+        $dest = Location::skip(1)->firstOrFail();
+
+        $payload = [
+            'carrier_id' => $carrier->id,
+            'transport_mode' => 'AIR',
+            'origin_location_id' => $origin->id,
+            'destination_location_id' => $dest->id,
+            'cargo_type' => 'Express Semiconductor Wafers',
+            'weight' => 150,
+            'volume' => 1.5,
+            'expected_departure' => now()->addDay()->format('Y-m-d'),
+            'expected_arrival' => now()->addDays(3)->format('Y-m-d'),
+            'item_name' => 'Silicon Microchips',
+            'hs_code' => '8542.31.00',
+            'item_qty' => 1000,
+            'item_value' => 85000,
+        ];
+
+        $response = $this->actingAs($this->customerA)->post(route('customer.shipments.store'), $payload);
+
+        $response->assertSessionHas('status');
+
+        $this->assertDatabaseHas('shipments', [
+            'customer_id' => $this->customerA->id,
+            'transport_mode' => 'AIR',
+            'cargo_type' => 'Express Semiconductor Wafers',
+            'status' => Shipment::STATUS_BOOKED,
+        ]);
+    }
 }
 

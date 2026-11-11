@@ -57,11 +57,13 @@ class CustomerShipmentController extends Controller
     {
         $carriers = Carrier::where('status', Carrier::STATUS_ACTIVE)->orderBy('name', 'asc')->get();
         $locations = Location::where('status', Location::STATUS_ACTIVE)->orderBy('name', 'asc')->get();
+        $portLocations = Location::where('status', Location::STATUS_ACTIVE)->where('location_type', Location::TYPE_PORT)->orderBy('name', 'asc')->get();
+        $airportLocations = Location::where('status', Location::STATUS_ACTIVE)->where('location_type', Location::TYPE_AIRPORT)->orderBy('name', 'asc')->get();
 
         $count = Shipment::count() + 1;
         $suggestedNumber = 'CT-2026-' . str_pad((string) $count, 3, '0', STR_PAD_LEFT);
 
-        return view('customer.shipments.create', compact('carriers', 'locations', 'suggestedNumber'));
+        return view('customer.shipments.create', compact('carriers', 'locations', 'portLocations', 'airportLocations', 'suggestedNumber'));
     }
 
     /**
@@ -71,6 +73,7 @@ class CustomerShipmentController extends Controller
     {
         $validated = $request->validate([
             'carrier_id' => ['required', 'exists:carriers,id'],
+            'transport_mode' => ['nullable', 'in:SEA,AIR'],
             'origin_location_id' => ['required', 'exists:locations,id'],
             'destination_location_id' => ['required', 'exists:locations,id', 'different:origin_location_id'],
             'cargo_type' => ['required', 'string', 'max:100'],
@@ -85,8 +88,9 @@ class CustomerShipmentController extends Controller
             'item_value' => ['nullable', 'numeric', 'min:0'],
         ], [
             'carrier_id.required' => 'Pilih perusahaan ekspedisi mitra.',
-            'origin_location_id.required' => 'Pilih pelabuhan / titik asal kargo.',
-            'destination_location_id.required' => 'Pilih pelabuhan / titik tujuan kargo.',
+            'transport_mode.required' => 'Pilih jenis pengiriman (Kapal Laut atau Pesawat Udara).',
+            'origin_location_id.required' => 'Pilih titik asal kargo.',
+            'destination_location_id.required' => 'Pilih titik tujuan kargo.',
             'destination_location_id.different' => 'Lokasi tujuan tidak boleh sama dengan lokasi asal.',
             'expected_arrival.after' => 'Estimasi kedatangan harus setelah waktu keberangkatan.',
         ]);
@@ -102,6 +106,7 @@ class CustomerShipmentController extends Controller
         $shipment->shipment_number = $shipmentNumber;
         $shipment->customer_id = $request->user()->id;
         $shipment->carrier_id = $validated['carrier_id'];
+        $shipment->transport_mode = $validated['transport_mode'] ?? Shipment::TRANSPORT_SEA;
         $shipment->origin_location_id = $validated['origin_location_id'];
         $shipment->destination_location_id = $validated['destination_location_id'];
         $shipment->current_location_id = $validated['origin_location_id'];

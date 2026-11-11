@@ -98,6 +98,11 @@
                             <td class="py-3.5 px-4 font-bold text-cyan-600 dark:text-cyan-400">
                                 <a href="{{ route('admin.shipments.show', $shipment) }}" class="hover:underline flex items-center gap-1.5">
                                     {{ $shipment->shipment_number }}
+                                    @if(($shipment->transport_mode ?? 'SEA') === 'AIR')
+                                        <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">✈️ Udara</span>
+                                    @else
+                                        <span class="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">🚢 Laut</span>
+                                    @endif
                                     @if($shipment->open_exceptions_count > 0)
                                         <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse" title="{{ $shipment->open_exceptions_count }} Pengecualian Aktif"></span>
                                     @endif
