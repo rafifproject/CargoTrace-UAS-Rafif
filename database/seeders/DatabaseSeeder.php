@@ -404,6 +404,327 @@ class DatabaseSeeder extends Seeder
                     ['name' => 'Pure Ceylon Black Tea Bags', 'hs' => '0902.30.00', 'qty' => 1500, 'val' => 72000.00],
                 ]
             ],
+            // ── Comprehensive Real-World Global Cargo Shipments (CT-2026-016 s/d CT-2026-035) ──
+            [
+                'number' => 'CT-2026-016',
+                'customer' => $customer1,
+                'carrier' => $carriers['MSK'],
+                'origin' => $locations['Pelabuhan Tanjung Priok'],
+                'dest' => $locations['Port of Los Angeles'],
+                'current' => $locations['Samudra Pasifik Utara Jalur Timur'],
+                'cargo' => 'Footwear & Consumer Sportswear',
+                'weight' => 8400.00, 'volume' => 38.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 8, 'arr_add' => 6, 'eta_add' => 6,
+                'items' => [
+                    ['name' => 'Running Shoes & Athletic Apparel', 'hs' => '6404.11.00', 'qty' => 4200, 'val' => 185000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-017',
+                'customer' => $customer2,
+                'carrier' => $carriers['ONE'],
+                'origin' => $locations['Port of Tokyo'],
+                'dest' => $locations['Pelabuhan Tanjung Priok'],
+                'current' => $locations['Laut Cina Selatan Transit Zone'],
+                'cargo' => 'Robotics & Precision Factory Automation',
+                'weight' => 5600.00, 'volume' => 22.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 4, 'arr_add' => 5, 'eta_add' => 5,
+                'items' => [
+                    ['name' => 'Industrial Robotic Arms & Controllers', 'hs' => '8479.50.00', 'qty' => 8, 'val' => 320000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-018',
+                'customer' => $customer1,
+                'carrier' => $carriers['CMA'],
+                'origin' => $locations['Port of Antwerp-Bruges'],
+                'dest' => $locations['Pelabuhan Tanjung Perak'],
+                'current' => $locations['Port Said (Suez Canal Hub)'],
+                'cargo' => 'Pharmaceutical Fine Chemicals & API',
+                'weight' => 3100.00, 'volume' => 12.50,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 11, 'arr_add' => 7, 'eta_add' => 7,
+                'items' => [
+                    ['name' => 'Active Pharmaceutical Ingredients (API)', 'hs' => '2942.00.00', 'qty' => 120, 'val' => 210000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-019',
+                'customer' => $customer2,
+                'carrier' => $carriers['MSC'],
+                'origin' => $locations['Pelabuhan Belawan'],
+                'dest' => $locations['Port of Rotterdam (Maasvlakte)'],
+                'current' => $locations['Pelabuhan Belawan'],
+                'cargo' => 'Certified Sustainable Palm Oil (RSPO)',
+                'weight' => 32000.00, 'volume' => 85.00,
+                'status' => Shipment::STATUS_BOOKED,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 0, 'arr_add' => 24, 'eta_add' => 24,
+                'items' => [
+                    ['name' => 'Refined Bleached Deodorized Palm Olein', 'hs' => '1511.90.00', 'qty' => 1200, 'val' => 165000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-020',
+                'customer' => $customer1,
+                'carrier' => $carriers['COS'],
+                'origin' => $locations['Ningbo-Zhoushan Port'],
+                'dest' => $locations['Pelabuhan Tanjung Priok'],
+                'current' => $locations['Selat Malaka Navigasi Barat'],
+                'cargo' => 'EV Batteries & Energy Storage Units',
+                'weight' => 14200.00, 'volume' => 45.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 5, 'arr_add' => 3, 'eta_add' => 3,
+                'items' => [
+                    ['name' => 'Lithium Iron Phosphate Battery Packs', 'hs' => '8507.60.00', 'qty' => 400, 'val' => 290000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-021',
+                'customer' => $customer2,
+                'carrier' => $carriers['EVG'],
+                'origin' => $locations['Port of Kaohsiung'],
+                'dest' => $locations['Port of Singapore (PSA Tuas)'],
+                'current' => $locations['Port of Singapore (PSA Tuas)'],
+                'cargo' => 'Semiconductors & Integrated Circuit Wafers',
+                'weight' => 1100.00, 'volume' => 5.20,
+                'status' => Shipment::STATUS_DELIVERED,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 9, 'arr_add' => -1, 'eta_add' => -1,
+                'items' => [
+                    ['name' => 'Advanced Microprocessor Silicon Wafers', 'hs' => '8542.31.00', 'qty' => 2500, 'val' => 580000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-022',
+                'customer' => $customer1,
+                'carrier' => $carriers['DHL'],
+                'origin' => $locations['Bandara Internasional Soekarno-Hatta (CGK)'],
+                'dest' => $locations['Port of Hamburg'],
+                'current' => $locations['Bandara Internasional Soekarno-Hatta (CGK)'],
+                'cargo' => 'Handcrafted Furniture & Home Decor',
+                'weight' => 1800.00, 'volume' => 16.00,
+                'status' => Shipment::STATUS_BOOKED,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 0, 'arr_add' => 12, 'eta_add' => 12,
+                'items' => [
+                    ['name' => 'Teak Wood Dining Sets & Rattan Crafts', 'hs' => '9403.60.00', 'qty' => 60, 'val' => 48000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-023',
+                'customer' => $customer2,
+                'carrier' => $carriers['HPL'],
+                'origin' => $locations['Port of Genoa'],
+                'dest' => $locations['Pelabuhan Tanjung Priok'],
+                'current' => $locations['Laut Arab (Rute Teluk Oman)'],
+                'cargo' => 'Italian Leather Goods & Footwear',
+                'weight' => 2400.00, 'volume' => 11.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 720, 'sev' => Shipment::DELAY_MEDIUM,
+                'dep_sub' => 14, 'arr_add' => 4, 'eta_add' => 5,
+                'items' => [
+                    ['name' => 'Full Grain Calfskin Leather Goods', 'hs' => '4202.21.00', 'qty' => 650, 'val' => 175000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-024',
+                'customer' => $customer1,
+                'carrier' => $carriers['MSK'],
+                'origin' => $locations['Port of Melbourne'],
+                'dest' => $locations['Pelabuhan Tanjung Perak'],
+                'current' => $locations['Port of Melbourne'],
+                'cargo' => 'Chilled Dairy Products & Milk Powder',
+                'weight' => 16000.00, 'volume' => 42.00,
+                'status' => Shipment::STATUS_BOOKED,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 0, 'arr_add' => 15, 'eta_add' => 15,
+                'items' => [
+                    ['name' => 'Skim Milk Powder & Cheddar Cheese Blocks', 'hs' => '0402.10.00', 'qty' => 800, 'val' => 92000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-025',
+                'customer' => $customer2,
+                'carrier' => $carriers['FDX'],
+                'origin' => $locations['Port of Shenzhen (Yantian)'],
+                'dest' => $locations['Port of Los Angeles'],
+                'current' => $locations['Samudra Pasifik Utara Jalur Timur'],
+                'cargo' => 'Consumer Electronics & 5G Smartphones',
+                'weight' => 4800.00, 'volume' => 20.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 7, 'arr_add' => 6, 'eta_add' => 6,
+                'items' => [
+                    ['name' => '5G Smartphones & OLED Tablets', 'hs' => '8517.13.00', 'qty' => 3000, 'val' => 650000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-026',
+                'customer' => $customer1,
+                'carrier' => $carriers['MSC'],
+                'origin' => $locations['Pelabuhan Tanjung Priok'],
+                'dest' => $locations['Jebel Ali Port (Dubai)'],
+                'current' => $locations['Jebel Ali Port (Dubai)'],
+                'cargo' => 'Organic Spices, Nutmeg & Cloves',
+                'weight' => 12500.00, 'volume' => 35.00,
+                'status' => Shipment::STATUS_DELIVERED,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 18, 'arr_add' => -2, 'eta_add' => -2,
+                'items' => [
+                    ['name' => 'Whole Dried Cloves & Nutmeg Seeds', 'hs' => '0907.10.00', 'qty' => 600, 'val' => 115000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-027',
+                'customer' => $customer2,
+                'carrier' => $carriers['CMA'],
+                'origin' => $locations['Port of Valencia'],
+                'dest' => $locations['Port of Santos'],
+                'current' => $locations['Port of Valencia'],
+                'cargo' => 'Ceramic Tiles & Building Materials',
+                'weight' => 28000.00, 'volume' => 70.00,
+                'status' => Shipment::STATUS_BOOKED,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 0, 'arr_add' => 22, 'eta_add' => 22,
+                'items' => [
+                    ['name' => 'Glazed Porcelain Floor Tiles', 'hs' => '6907.21.00', 'qty' => 1800, 'val' => 85000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-028',
+                'customer' => $customer1,
+                'carrier' => $carriers['ONE'],
+                'origin' => $locations['Port of Busan'],
+                'dest' => $locations['Pelabuhan Tanjung Priok'],
+                'current' => $locations['Pelabuhan Tanjung Priok'],
+                'cargo' => 'Automotive Steel Coils & Stamping Sheets',
+                'weight' => 45000.00, 'volume' => 50.00,
+                'status' => Shipment::STATUS_DELIVERED,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 12, 'arr_add' => -1, 'eta_add' => -1,
+                'items' => [
+                    ['name' => 'Cold-Rolled High-Strength Steel Coils', 'hs' => '7209.16.00', 'qty' => 20, 'val' => 195000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-029',
+                'customer' => $customer2,
+                'carrier' => $carriers['COS'],
+                'origin' => $locations['Jawaharlal Nehru Port (Nhava Sheva)'],
+                'dest' => $locations['Port of Singapore (PSA Tuas)'],
+                'current' => $locations['Selat Malaka Navigasi Barat'],
+                'cargo' => 'Cotton Yarn & Industrial Fabrics',
+                'weight' => 9500.00, 'volume' => 36.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 4, 'arr_add' => 3, 'eta_add' => 3,
+                'items' => [
+                    ['name' => 'Combed Cotton Ring-Spun Yarn', 'hs' => '5205.23.00', 'qty' => 450, 'val' => 78000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-030',
+                'customer' => $customer1,
+                'carrier' => $carriers['EVG'],
+                'origin' => $locations['Port of Hong Kong (Kwai Tsing)'],
+                'dest' => $locations['Pelabuhan Makassar (Soekarno-Hatta)'],
+                'current' => $locations['Port of Hong Kong (Kwai Tsing)'],
+                'cargo' => 'Solar PV Glass Panels & Aluminum Frames',
+                'weight' => 15000.00, 'volume' => 40.00,
+                'status' => Shipment::STATUS_BOOKED,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 0, 'arr_add' => 9, 'eta_add' => 9,
+                'items' => [
+                    ['name' => 'Anti-Reflective Solar Photovoltaic Glass', 'hs' => '7007.19.00', 'qty' => 900, 'val' => 110000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-031',
+                'customer' => $customer2,
+                'carrier' => $carriers['HPL'],
+                'origin' => $locations['Port of Hamburg'],
+                'dest' => $locations['Port of Singapore (PSA Tuas)'],
+                'current' => $locations['Port Said (Suez Canal Hub)'],
+                'cargo' => 'German Industrial Pumps & Valves',
+                'weight' => 7800.00, 'volume' => 26.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 1440, 'sev' => Shipment::DELAY_MEDIUM,
+                'dep_sub' => 10, 'arr_add' => 6, 'eta_add' => 7,
+                'items' => [
+                    ['name' => 'High-Pressure Centrifugal Water Pumps', 'hs' => '8413.70.00', 'qty' => 35, 'val' => 225000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-032',
+                'customer' => $customer1,
+                'carrier' => $carriers['DHL'],
+                'origin' => $locations['Port of Vancouver'],
+                'dest' => $locations['Port of Tokyo'],
+                'current' => $locations['Samudra Pasifik Utara Jalur Timur'],
+                'cargo' => 'Softwood Lumber & Paper Pulp',
+                'weight' => 34000.00, 'volume' => 90.00,
+                'status' => Shipment::STATUS_IN_TRANSIT,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 9, 'arr_add' => 5, 'eta_add' => 5,
+                'items' => [
+                    ['name' => 'Kiln-Dried Douglas Fir Timber', 'hs' => '4407.11.00', 'qty' => 150, 'val' => 88000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-033',
+                'customer' => $customer2,
+                'carrier' => $carriers['MSK'],
+                'origin' => $locations['Pelabuhan Tanjung Priok'],
+                'dest' => $locations['Port of Felixstowe'],
+                'current' => $locations['Pelabuhan Tanjung Priok'],
+                'cargo' => 'Natural Rubber Blocks & Latex Gloves',
+                'weight' => 21000.00, 'volume' => 60.00,
+                'status' => Shipment::STATUS_BOOKED,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 0, 'arr_add' => 26, 'eta_add' => 26,
+                'items' => [
+                    ['name' => 'Standard Indonesian Rubber (SIR-20)', 'hs' => '4001.22.00', 'qty' => 800, 'val' => 145000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-034',
+                'customer' => $customer1,
+                'carrier' => $carriers['MSC'],
+                'origin' => $locations['Port of Balboa (Panama Canal)'],
+                'dest' => $locations['Port of Rotterdam (Maasvlakte)'],
+                'current' => $locations['Port of Rotterdam (Maasvlakte)'],
+                'cargo' => 'Fresh Cavendish Bananas & Fruit Puree',
+                'weight' => 19500.00, 'volume' => 52.00,
+                'status' => Shipment::STATUS_DELIVERED,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 17, 'arr_add' => -1, 'eta_add' => -1,
+                'items' => [
+                    ['name' => 'Fresh Cavendish Bananas in Controlled Atmosphere', 'hs' => '0803.90.00', 'qty' => 1200, 'val' => 64000.00],
+                ]
+            ],
+            [
+                'number' => 'CT-2026-035',
+                'customer' => $customer2,
+                'carrier' => $carriers['ONE'],
+                'origin' => $locations['Port of Singapore (PSA Tuas)'],
+                'dest' => $locations['Pelabuhan Tanjung Perak'],
+                'current' => $locations['Pelabuhan Tanjung Perak'],
+                'cargo' => 'Polymer Resin Pellets (HDPE)',
+                'weight' => 38000.00, 'volume' => 75.00,
+                'status' => Shipment::STATUS_DELIVERED,
+                'delay' => 0, 'sev' => Shipment::DELAY_NONE,
+                'dep_sub' => 8, 'arr_add' => -2, 'eta_add' => -2,
+                'items' => [
+                    ['name' => 'High-Density Polyethylene (HDPE) Pellets', 'hs' => '3901.20.00', 'qty' => 1500, 'val' => 128000.00],
+                ]
+            ],
         ];
 
         foreach ($shipmentsSpecs as $spec) {
@@ -448,21 +769,35 @@ class DatabaseSeeder extends Seeder
                 );
             }
 
-            // Seed Baseline Tracking Event
+            // Seed Baseline Tracking Event (Booking Placed by Customer)
             TrackingEvent::firstOrCreate(
-                ['shipment_id' => $shipment->id, 'event_type' => TrackingEvent::TYPE_STATUS_CHANGE],
+                ['shipment_id' => $shipment->id, 'event_type' => TrackingEvent::TYPE_STATUS_CHANGE, 'shipment_status_at_event' => Shipment::STATUS_BOOKED],
                 [
                     'location_id' => $spec['origin']->id,
                     'latitude' => $spec['origin']->latitude,
                     'longitude' => $spec['origin']->longitude,
-                    'event_time' => $dep->subDay(),
-                    'shipment_status_at_event' => Shipment::STATUS_BOOKED,
-                    'description' => "Pengiriman dijadwalkan bersama {$spec['carrier']->name}.",
-                    'created_by' => $operator->id,
+                    'event_time' => $dep->copy()->subDays(2),
+                    'description' => "Pemesanan pengiriman (#{$spec['number']}) diajukan oleh Pelanggan {$spec['customer']->name} dan dikonfirmasi oleh ekspedisi {$spec['carrier']->name}.",
+                    'created_by' => $spec['customer']->id,
                 ]
             );
 
             if ($spec['status'] === Shipment::STATUS_IN_TRANSIT) {
+                // Customs Cleared Origin
+                TrackingEvent::firstOrCreate(
+                    ['shipment_id' => $shipment->id, 'event_type' => TrackingEvent::TYPE_CUSTOMS_CLEARED],
+                    [
+                        'location_id' => $spec['origin']->id,
+                        'latitude' => $spec['origin']->latitude,
+                        'longitude' => $spec['origin']->longitude,
+                        'event_time' => $dep->copy()->subHours(12),
+                        'shipment_status_at_event' => Shipment::STATUS_PICKED_UP,
+                        'description' => "Dokumen manifest dan izin kepabeanan ekspor disetujui di {$spec['origin']->name}.",
+                        'created_by' => $operator->id,
+                    ]
+                );
+
+                // Vessel Departure
                 TrackingEvent::firstOrCreate(
                     ['shipment_id' => $shipment->id, 'event_type' => TrackingEvent::TYPE_DEPARTURE],
                     [
@@ -471,7 +806,7 @@ class DatabaseSeeder extends Seeder
                         'longitude' => $spec['origin']->longitude,
                         'event_time' => $dep,
                         'shipment_status_at_event' => Shipment::STATUS_IN_TRANSIT,
-                        'description' => "Kargo bertolak dari {$spec['origin']->name} menuju {$spec['dest']->name}.",
+                        'description' => "Armada kapal kargo bertolak meninggalkan {$spec['origin']->name} berlayar menuju {$spec['dest']->name}.",
                         'created_by' => $operator->id,
                     ]
                 );
@@ -485,11 +820,66 @@ class DatabaseSeeder extends Seeder
                             'longitude' => $spec['current']->longitude,
                             'event_time' => Carbon::now()->subHours(6),
                             'shipment_status_at_event' => Shipment::STATUS_IN_TRANSIT,
-                            'description' => "Kapal kargo melewati koordinat navigasi di {$spec['current']->name}.",
+                            'description' => "Kapal kargo melewati koordinat navigasi maritim di {$spec['current']->name}.",
                             'created_by' => $operator->id,
                         ]
                     );
                 }
+            } elseif ($spec['status'] === Shipment::STATUS_DELIVERED) {
+                // Customs Cleared Origin
+                TrackingEvent::firstOrCreate(
+                    ['shipment_id' => $shipment->id, 'event_type' => TrackingEvent::TYPE_CUSTOMS_CLEARED],
+                    [
+                        'location_id' => $spec['origin']->id,
+                        'latitude' => $spec['origin']->latitude,
+                        'longitude' => $spec['origin']->longitude,
+                        'event_time' => $dep->copy()->subHours(12),
+                        'shipment_status_at_event' => Shipment::STATUS_PICKED_UP,
+                        'description' => "Dokumen ekspor disetujui di {$spec['origin']->name}.",
+                        'created_by' => $operator->id,
+                    ]
+                );
+
+                // Departure
+                TrackingEvent::firstOrCreate(
+                    ['shipment_id' => $shipment->id, 'event_type' => TrackingEvent::TYPE_DEPARTURE],
+                    [
+                        'location_id' => $spec['origin']->id,
+                        'latitude' => $spec['origin']->latitude,
+                        'longitude' => $spec['origin']->longitude,
+                        'event_time' => $dep,
+                        'shipment_status_at_event' => Shipment::STATUS_IN_TRANSIT,
+                        'description' => "Kapal bertolak dari {$spec['origin']->name}.",
+                        'created_by' => $operator->id,
+                    ]
+                );
+
+                // Arrival at Destination Port
+                TrackingEvent::firstOrCreate(
+                    ['shipment_id' => $shipment->id, 'event_type' => TrackingEvent::TYPE_ARRIVAL],
+                    [
+                        'location_id' => $spec['dest']->id,
+                        'latitude' => $spec['dest']->latitude,
+                        'longitude' => $spec['dest']->longitude,
+                        'event_time' => $arr->copy()->subHours(18),
+                        'shipment_status_at_event' => Shipment::STATUS_IN_TRANSIT,
+                        'description' => "Kapal kargo sandar dan proses bongkar muat kontainer dimulai di {$spec['dest']->name}.",
+                        'created_by' => $operator->id,
+                    ]
+                );
+
+                // Final Delivered
+                TrackingEvent::firstOrCreate(
+                    ['shipment_id' => $shipment->id, 'event_type' => TrackingEvent::TYPE_STATUS_CHANGE, 'shipment_status_at_event' => Shipment::STATUS_DELIVERED],
+                    [
+                        'location_id' => $spec['dest']->id,
+                        'latitude' => $spec['dest']->latitude,
+                        'longitude' => $spec['dest']->longitude,
+                        'event_time' => $arr,
+                        'description' => "Kargo berhasil diterima secara penuh oleh penerima (Consignee) di {$spec['dest']->name}.",
+                        'created_by' => $operator->id,
+                    ]
+                );
             }
 
             // Seed Exceptions for delayed shipments

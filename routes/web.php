@@ -168,6 +168,8 @@ Route::middleware(['auth', 'role:CUSTOMER'])->prefix('customer')->name('customer
 
     // 04, 05, 07. Pengiriman Saya & Detail
     Route::get('/shipments', [CustomerShipmentController::class, 'index'])->name('shipments.index');
+    Route::get('/shipments/create', [CustomerShipmentController::class, 'create'])->name('shipments.create');
+    Route::post('/shipments', [CustomerShipmentController::class, 'store'])->name('shipments.store');
     Route::get('/shipments/map', [CustomerShipmentController::class, 'map'])->name('shipments.map');
     Route::get('/shipments/{shipment}', [CustomerShipmentController::class, 'show'])->name('shipments.show');
 

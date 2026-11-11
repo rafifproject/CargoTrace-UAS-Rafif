@@ -152,6 +152,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('customer.shipments.create') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.shipments.create') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
+                                <i data-lucide="package-plus" class="w-4 h-4 {{ request()->routeIs('customer.shipments.create') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
+                                <span>Pesan Pengiriman</span>
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('customer.tracking.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.tracking.index') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
                                 <i data-lucide="git-commit" class="w-4 h-4 {{ request()->routeIs('customer.tracking.index') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
                                 <span>Riwayat Pelacakan</span>

@@ -3,11 +3,15 @@
 @section('title', 'Pengiriman Saya')
 
 @section('content')
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
         <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Pengiriman Saya</h1>
         <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Daftar lengkap kargo dan jadwal perjalanan kiriman Anda.</p>
     </div>
+    <a href="{{ route('customer.shipments.create') }}" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 shadow-sm transition-all flex items-center gap-2">
+        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+        <span>Pesan Pengiriman Baru</span>
+    </a>
 </div>
 
 {{-- Filter Bar (Mockup 04) --}}

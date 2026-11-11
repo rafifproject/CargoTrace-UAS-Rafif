@@ -137,5 +137,64 @@ class CustomerWorkflowTest extends TestCase
         $this->assertAuthenticated();
         $response->assertRedirect(route('customer.dashboard'));
     }
+
+    /**
+     * Skenario 6: Customer dapat membuka formulir pemesanan pengiriman baru
+     */
+    public function test_customer_can_view_create_shipment_form(): void
+    {
+        $response = $this->actingAs($this->customerA)->get(route('customer.shipments.create'));
+        $response->assertStatus(200);
+        $response->assertSee('Pesan Pengiriman Kargo Baru');
+        $response->assertSee('Nomor Booking');
+    }
+
+    /**
+     * Skenario 7: Customer dapat melakukan booking pemesanan pengiriman kargo baru
+     */
+    public function test_customer_can_book_new_shipment_successfully(): void
+    {
+        $carrier = Carrier::firstOrFail();
+        $origin = Location::firstOrFail();
+        $dest = Location::skip(1)->firstOrFail();
+
+        $payload = [
+            'carrier_id' => $carrier->id,
+            'origin_location_id' => $origin->id,
+            'destination_location_id' => $dest->id,
+            'cargo_type' => 'High Grade Arabica Coffee',
+            'weight' => 5000,
+            'volume' => 20,
+            'expected_departure' => now()->addDays(2)->format('Y-m-d'),
+            'expected_arrival' => now()->addDays(10)->format('Y-m-d'),
+            'item_name' => 'Green Coffee Beans Specialty',
+            'hs_code' => '0901.11.10',
+            'item_qty' => 500,
+            'item_value' => 45000,
+            'notes' => 'Simpan di kontainer berpendingin',
+        ];
+
+        $response = $this->actingAs($this->customerA)->post(route('customer.shipments.store'), $payload);
+
+        $response->assertSessionHas('status');
+
+        $createdShipment = Shipment::where('customer_id', $this->customerA->id)
+            ->where('cargo_type', 'High Grade Arabica Coffee')
+            ->first();
+
+        $this->assertNotNull($createdShipment);
+        $this->assertEquals(Shipment::STATUS_BOOKED, $createdShipment->status);
+        $this->assertEquals($origin->id, $createdShipment->current_location_id);
+        $this->assertDatabaseHas('shipment_items', [
+            'shipment_id' => $createdShipment->id,
+            'item_name' => 'Green Coffee Beans Specialty',
+        ]);
+        $this->assertDatabaseHas('tracking_events', [
+            'shipment_id' => $createdShipment->id,
+            'shipment_status_at_event' => Shipment::STATUS_BOOKED,
+        ]);
+
+        $response->assertRedirect(route('customer.shipments.show', $createdShipment));
+    }
 }
 
