@@ -65,3 +65,4 @@ class CustomerCarrierController extends Controller
         return view('customer.carriers.index', compact('carriers', 'mapCarriers'));
     }
 }
+

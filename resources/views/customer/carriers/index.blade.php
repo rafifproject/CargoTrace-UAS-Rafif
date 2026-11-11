@@ -40,8 +40,8 @@
                 <div id="custCarriersMap" class="w-full h-[500px] bg-slate-100 dark:bg-slate-900 z-10"></div>
                 <!-- Layer Info Pill -->
                 <div class="absolute bottom-3 left-3 z-[400] bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-lg text-[11px] font-medium text-slate-600 dark:text-slate-300 shadow-sm flex items-center gap-2 pointer-events-none">
-                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
-                    <span>Marker Oranye/Emas: Markas Mitra Ekspedisi Resmi</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-xs"></span>
+                    <span>Titik Emas: Markas Mitra Ekspedisi Resmi (Klik titik atau pilih negara di samping)</span>
                 </div>
             </div>
 
@@ -203,29 +203,52 @@
             zoomControl: true
         });
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; CargoTrace &copy; CartoDB',
-            maxZoom: 19
-        }).addTo(custCarriersMap);
+        // Layer Peta Resmi: Google Maps Hybrid (Satelit), Google Maps Street, dan OpenStreetMap (Bebas Watermark)
+        const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps Satelit'
+        });
+
+        const googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps'
+        });
+
+        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        });
+
+        // Default: Google Satelit Hybrid yang elegan & jelas
+        googleHybrid.addTo(custCarriersMap);
+
+        // Layer Switcher Control di kanan atas peta
+        L.control.layers({
+            "🛰️ Satelit Hybrid": googleHybrid,
+            "🗺️ Google Streets": googleStreets,
+            "🌐 OpenStreetMap": osm
+        }, null, { position: 'topright' }).addTo(custCarriersMap);
 
         custMapCarriersData.forEach(c => {
             if (!c.lat || !c.lng || (c.lat === 0 && c.lng === 0)) return;
 
             const flagUrl = (c.iso && c.iso !== 'un') ? `https://flagcdn.com/w40/${c.iso}.png` : null;
 
-            const customIcon = L.divIcon({
-                className: 'carrier-custom-pin',
-                html: `
-                    <div style="position:relative; width:28px; height:28px; display:flex; align-items:center; justify-content:center; background:#D97706; color:#fff; border-radius:50%; box-shadow:0 3px 8px rgba(217,119,6,0.45); border:2px solid #FFFFFF; cursor:pointer;">
-                        <span style="font-size:11px;">🏢</span>
-                    </div>
-                `,
-                iconSize: [28, 28],
-                iconAnchor: [14, 14],
-                popupAnchor: [0, -14]
-            });
+            // Titik CircleMarker presisi & tidak menumpuk padat
+            const marker = L.circleMarker([c.lat, c.lng], {
+                radius: 6,
+                fillColor: '#F59E0B',
+                color: '#FFFFFF',
+                weight: 1.5,
+                fillOpacity: 0.95
+            }).addTo(custCarriersMap);
 
-            const marker = L.marker([c.lat, c.lng], { icon: customIcon }).addTo(custCarriersMap);
+            marker.bindTooltip(`<b>${c.name}</b> (${c.country})`, {
+                direction: 'top',
+                offset: [0, -6]
+            });
 
             const popupHtml = `
                 <div style="font-family:inherit; min-width:240px; padding:4px 2px;">
@@ -257,6 +280,23 @@
                 updateCustSelectedBanner(c);
             });
 
+            marker.on('mouseover', function () {
+                this.setRadius(8);
+                this.setStyle({ fillColor: '#EF4444' });
+            });
+            marker.on('mouseout', function () {
+                this.setRadius(6);
+                this.setStyle({ fillColor: '#F59E0B' });
+            });
+
+            custCarrierMarkers[c.code.toLowerCase()] = { marker: marker, data: c };
+            custCarrierMarkers[c.country.toLowerCase()] = { marker: marker, data: c };
+        });
+
+            marker.on('click', function () {
+                updateCustSelectedBanner(c);
+            });
+
             custCarrierMarkers[c.code.toLowerCase()] = { marker: marker, data: c };
             custCarrierMarkers[c.country.toLowerCase()] = { marker: marker, data: c };
         });
@@ -269,7 +309,11 @@
 
         const item = custCarrierMarkers[code.toLowerCase()];
         if (item && item.marker) {
-            item.marker.openPopup();
+            item.marker.setRadius(10);
+            item.marker.setStyle({ fillColor: '#EF4444' });
+            setTimeout(() => {
+                item.marker.openPopup();
+            }, 600);
             updateCustSelectedBanner(item.data);
         }
 
@@ -325,3 +369,4 @@
     }
 </script>
 @endpush
+

@@ -44,8 +44,8 @@
                 <div id="carriersMap" class="w-full h-[520px] bg-slate-100 dark:bg-slate-900 z-10"></div>
                 <!-- Layer Info Pill -->
                 <div class="absolute bottom-3 left-3 z-[400] bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-lg text-[11px] font-medium text-slate-600 dark:text-slate-300 shadow-sm flex items-center gap-2 pointer-events-none">
-                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
-                    <span>Marker Oranye/Emas: Titik Markas Resmi Ekspedisi Global</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-xs"></span>
+                    <span>Titik Emas: Markas Resmi Ekspedisi Dunia (Klik titik atau pilih negara di samping)</span>
                 </div>
             </div>
 
@@ -338,33 +338,54 @@
             zoomControl: true
         });
 
-        // Layer peta CartoDB Positron / Google-like elegan
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; CargoTrace Global Carrier Network &copy; CartoDB',
-            maxZoom: 19
-        }).addTo(carriersMap);
+        // Layer Peta Resmi: Google Maps Hybrid (Satelit), Google Maps Street, dan OpenStreetMap (Bebas Watermark)
+        const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps Satelit'
+        });
 
-        // Render setiap titik ekspedisi
+        const googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '&copy; Google Maps'
+        });
+
+        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        });
+
+        // Default: Google Satelit Hybrid yang elegan & jelas
+        googleHybrid.addTo(carriersMap);
+
+        // Layer Switcher Control di kanan atas peta
+        L.control.layers({
+            "🛰️ Satelit Hybrid": googleHybrid,
+            "🗺️ Google Streets": googleStreets,
+            "🌐 OpenStreetMap": osm
+        }, null, { position: 'topright' }).addTo(carriersMap);
+
+        // Render setiap titik ekspedisi menggunakan CircleMarker emas/amber elegan
         mapCarriersData.forEach(c => {
             if (!c.lat || !c.lng || (c.lat === 0 && c.lng === 0)) return;
 
-            // Custom HTML Pin Marker bernuansa emas/amber
             const flagUrl = (c.iso && c.iso !== 'un') ? `https://flagcdn.com/w40/${c.iso}.png` : null;
-            const flagHtml = flagUrl ? `<img src="${flagUrl}" style="width:16px;height:11px;border-radius:2px;display:inline-block;object-fit:cover;">` : '🏢';
 
-            const customIcon = L.divIcon({
-                className: 'carrier-custom-pin',
-                html: `
-                    <div style="position:relative; width:30px; height:30px; display:flex; align-items:center; justify-content:center; background:#D97706; color:#fff; border-radius:50%; box-shadow:0 3px 8px rgba(217,119,6,0.45); border:2px solid #FFFFFF; cursor:pointer; transition:transform 0.15s ease;">
-                        <span style="font-size:12px;">🏢</span>
-                    </div>
-                `,
-                iconSize: [30, 30],
-                iconAnchor: [15, 15],
-                popupAnchor: [0, -15]
+            // Titik CircleMarker presisi & tidak menumpuk padat
+            const marker = L.circleMarker([c.lat, c.lng], {
+                radius: 6,
+                fillColor: '#F59E0B',
+                color: '#FFFFFF',
+                weight: 1.5,
+                fillOpacity: 0.95
+            }).addTo(carriersMap);
+
+            // Hover tooltip ringkas
+            marker.bindTooltip(`<b>${c.name}</b> (${c.country})`, {
+                direction: 'top',
+                offset: [0, -6]
             });
-
-            const marker = L.marker([c.lat, c.lng], { icon: customIcon }).addTo(carriersMap);
 
             // Popup informatif mewah persis seperti referensi
             const popupHtml = `
@@ -400,6 +421,16 @@
                 updateSelectedBanner(c);
             });
 
+            // Efek hover membesar
+            marker.on('mouseover', function () {
+                this.setRadius(8);
+                this.setStyle({ fillColor: '#EF4444' });
+            });
+            marker.on('mouseout', function () {
+                this.setRadius(6);
+                this.setStyle({ fillColor: '#F59E0B' });
+            });
+
             // Simpan referensi marker dengan key lowercase code & country
             carrierMarkers[c.code.toLowerCase()] = { marker: marker, data: c };
             carrierMarkers[c.country.toLowerCase()] = { marker: marker, data: c };
@@ -413,7 +444,11 @@
 
         const item = carrierMarkers[code.toLowerCase()];
         if (item && item.marker) {
-            item.marker.openPopup();
+            item.marker.setRadius(10);
+            item.marker.setStyle({ fillColor: '#EF4444' });
+            setTimeout(() => {
+                item.marker.openPopup();
+            }, 600);
             updateSelectedBanner(item.data);
         }
 

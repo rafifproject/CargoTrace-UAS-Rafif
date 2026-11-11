@@ -69,3 +69,4 @@ class OperatorCarrierController extends Controller
         return view('operator.carriers.index', compact('carriers', 'mapCarriers'));
     }
 }
+
