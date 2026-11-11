@@ -170,11 +170,31 @@
     <div id="weatherHubGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 mt-4">
         @foreach($allWeatherHubs as $hub)
         @php
-            $isHubSelected = isset($selectedHub) && $selectedHub['country'] === $hub['country'];
+            $isHubSelected = isset($selectedHub) && ($selectedHub['country'] === $hub['country'] || $selectedHub['code'] === $hub['code']);
+            $hubAliases = strtolower($hub['country'] . ' ' . $hub['city'] . ' ' . $hub['code'] . ' ' . ($hub['iso'] ?? ''));
+            if (str_starts_with(strtoupper($hub['code']), 'RU')) {
+                $hubAliases .= ' rusia russia moscow moskow siberia vladivostok yakutsk novisibirsk';
+            } elseif ($hub['code'] === 'US') {
+                $hubAliases .= ' amerika serikat united states usa america';
+            } elseif ($hub['code'] === 'GB') {
+                $hubAliases .= ' inggris united kingdom uk britain';
+            } elseif ($hub['code'] === 'DE') {
+                $hubAliases .= ' jerman germany';
+            } elseif ($hub['code'] === 'FR') {
+                $hubAliases .= ' prancis france';
+            } elseif ($hub['code'] === 'NL') {
+                $hubAliases .= ' belanda netherlands holland';
+            } elseif ($hub['code'] === 'JP') {
+                $hubAliases .= ' jepang japan';
+            } elseif ($hub['code'] === 'CN') {
+                $hubAliases .= ' tiongkok china cina';
+            }
         @endphp
         <div class="weather-hub-card p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border {{ $isHubSelected ? 'border-purple-500 ring-2 ring-purple-500/20' : 'border-slate-200 dark:border-slate-800' }} hover:border-cyan-500/50 transition-all flex flex-col justify-between"
              data-country="{{ strtolower($hub['country']) }}"
-             data-city="{{ strtolower($hub['city']) }}">
+             data-city="{{ strtolower($hub['city']) }}"
+             data-code="{{ strtolower($hub['code']) }}"
+             data-aliases="{{ $hubAliases }}">
             <div>
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center gap-2">
@@ -268,7 +288,9 @@ function filterWeatherHubs() {
     document.querySelectorAll('.weather-hub-card').forEach(card => {
         const country = card.dataset.country || '';
         const city = card.dataset.city || '';
-        const match = country.includes(query) || city.includes(query);
+        const aliases = card.dataset.aliases || '';
+        const code = card.dataset.code || '';
+        const match = country.includes(query) || city.includes(query) || aliases.includes(query) || code.includes(query);
         card.style.display = match ? '' : 'none';
     });
 }

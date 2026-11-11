@@ -19,7 +19,8 @@ class GlobalIntelligenceService
 
         return Cache::remember($cacheKey, 900, function () use ($lat, $lng) {
             try {
-                $response = Http::timeout(6)->retry(2, 200)->get('https://api.open-meteo.com/v1/forecast', [
+                $baseUrl = rtrim(config('services.openmeteo.url', env('OPENMETEO_BASE_URL', 'https://api.open-meteo.com/v1')), '/');
+                $response = Http::timeout(6)->retry(2, 200)->get($baseUrl . '/forecast', [
                     'latitude' => $lat,
                     'longitude' => $lng,
                     'current' => 'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m',
@@ -917,8 +918,17 @@ class GlobalIntelligenceService
             ['code' => 'IT', 'iso' => 'it', 'country' => 'Italy', 'region' => 'Europe', 'city' => 'Port of Genoa / Ligurian Coast', 'lat' => 41.871, 'lng' => 12.567, 'temp' => 17.5, 'condition' => 'Calm Waters', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 62, 'wind' => 12.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 16],
             ['code' => 'GR', 'iso' => 'gr', 'country' => 'Greece', 'region' => 'Europe', 'city' => 'Port of Piraeus / Aegean Sea', 'lat' => 39.074, 'lng' => 21.824, 'temp' => 18.9, 'condition' => 'Sunny Archipelago', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 54, 'wind' => 15.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 15],
             ['code' => 'TR', 'iso' => 'tr', 'country' => 'Turkey', 'region' => 'Europe/Asia', 'city' => 'Port of Ambarli / Bosphorus', 'lat' => 38.963, 'lng' => 35.243, 'temp' => 15.3, 'condition' => 'Clear Straits', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 64, 'wind' => 18.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
-            ['code' => 'RU', 'iso' => 'ru', 'country' => 'Russia', 'region' => 'Europe', 'city' => 'Moscow / Inland Logistic Basin', 'lat' => 55.755, 'lng' => 42.000, 'temp' => -5.0, 'condition' => 'Freezing Snow', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 85, 'wind' => 26.0, 'precipitation' => 4.5, 'risk' => 'High Risk / Storm', 'risk_score' => 78],
-            ['code' => 'RU_E', 'iso' => 'ru', 'country' => 'Russia (Far East)', 'region' => 'Asia', 'city' => 'Vladivostok / Sea of Japan', 'lat' => 45.000, 'lng' => 133.000, 'temp' => -0.5, 'condition' => 'Icy Coastal Wind', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 72, 'wind' => 32.0, 'precipitation' => 1.2, 'risk' => 'Medium Risk', 'risk_score' => 45],
+            // Eurasia Utara, Rusia, Mongolia & Asia Tengah
+            ['code' => 'RU', 'iso' => 'ru', 'country' => 'Rusia', 'region' => 'Eropa / Rusia Barat', 'city' => 'Moskow (Moscow Logistics Hub)', 'lat' => 55.755, 'lng' => 37.617, 'temp' => 1.5, 'condition' => 'Cold Overcast', 'icon' => 'cloud', 'icon_emoji' => '☁️', 'humidity' => 84, 'wind' => 12.0, 'precipitation' => 0.2, 'risk' => 'Low Risk', 'risk_score' => 20],
+            ['code' => 'RU_LED', 'iso' => 'ru', 'country' => 'Rusia', 'region' => 'Laut Baltik / Rusia Barat Laut', 'city' => 'Saint Petersburg (Baltic Port)', 'lat' => 59.934, 'lng' => 30.335, 'temp' => 1.8, 'condition' => 'Baltic Chilly Breeze', 'icon' => 'cloud', 'icon_emoji' => '⛅', 'humidity' => 82, 'wind' => 15.0, 'precipitation' => 0.4, 'risk' => 'Low Risk', 'risk_score' => 22],
+            ['code' => 'RU_OVB', 'iso' => 'ru', 'country' => 'Rusia', 'region' => 'Siberia Barat / Trans-Siberian', 'city' => 'Novosibirsk (Tolmachevo Hub)', 'lat' => 55.008, 'lng' => 82.935, 'temp' => -0.5, 'condition' => 'Freezing Fog', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 86, 'wind' => 14.0, 'precipitation' => 0.8, 'risk' => 'Medium Risk', 'risk_score' => 38],
+            ['code' => 'RU_KJA', 'iso' => 'ru', 'country' => 'Rusia', 'region' => 'Siberia Tengah / Yenisey Basin', 'city' => 'Krasnoyarsk (Central Siberia)', 'lat' => 56.015, 'lng' => 92.893, 'temp' => -4.2, 'condition' => 'Sub-Zero Breeze', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 80, 'wind' => 16.0, 'precipitation' => 1.0, 'risk' => 'Medium Risk', 'risk_score' => 42],
+            ['code' => 'RU_YKS', 'iso' => 'ru', 'country' => 'Rusia', 'region' => 'Siberia Timur / Sakha', 'city' => 'Yakutsk (Lena Basin)', 'lat' => 62.035, 'lng' => 129.675, 'temp' => -12.5, 'condition' => 'Deep Sub-Arctic Chill', 'icon' => 'snow', 'icon_emoji' => '❄️', 'humidity' => 85, 'wind' => 10.0, 'precipitation' => 0.5, 'risk' => 'High Risk / Cold', 'risk_score' => 68],
+            ['code' => 'RU_VVO', 'iso' => 'ru', 'country' => 'Rusia', 'region' => 'Timur Jauh / Samudra Pasifik', 'city' => 'Vladivostok (Pacific Sea Gateway)', 'lat' => 43.115, 'lng' => 131.885, 'temp' => 4.8, 'condition' => 'Brisk Coastal Wind', 'icon' => 'wind', 'icon_emoji' => '💨', 'humidity' => 70, 'wind' => 24.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 25],
+            ['code' => 'RU_NVR', 'iso' => 'ru', 'country' => 'Rusia', 'region' => 'Laut Hitam / Kaukasus', 'city' => 'Novorossiysk (Black Sea Hub)', 'lat' => 44.724, 'lng' => 37.785, 'temp' => 12.0, 'condition' => 'Coastal Sea Breeze', 'icon' => 'sun', 'icon_emoji' => '⛅', 'humidity' => 68, 'wind' => 18.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
+            ['code' => 'MN', 'iso' => 'mn', 'country' => 'Mongolia', 'region' => 'Asia Timur / Stepa', 'city' => 'Ulaanbaatar (Chinggis Khaan Hub)', 'lat' => 47.918, 'lng' => 106.917, 'temp' => -2.0, 'condition' => 'Dry Steppe Sun', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 62, 'wind' => 8.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 20],
+            ['code' => 'KZ', 'iso' => 'kz', 'country' => 'Kazakhstan', 'region' => 'Asia Tengah / Jalur Sutra', 'city' => 'Almaty (Silk Road Air Hub)', 'lat' => 43.352, 'lng' => 77.040, 'temp' => 8.5, 'condition' => 'Mild Continental', 'icon' => 'sun', 'icon_emoji' => '⛅', 'humidity' => 58, 'wind' => 12.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 18],
+            ['code' => 'KZ_TSE', 'iso' => 'kz', 'country' => 'Kazakhstan', 'region' => 'Asia Tengah / Stepa Utara', 'city' => 'Astana (Central Steppe Hub)', 'lat' => 51.169, 'lng' => 71.449, 'temp' => 2.0, 'condition' => 'Cold Wind', 'icon' => 'wind', 'icon_emoji' => '💨', 'humidity' => 75, 'wind' => 22.0, 'precipitation' => 0.2, 'risk' => 'Medium Risk', 'risk_score' => 34],
 
             // Amerika Utara
             ['code' => 'US', 'iso' => 'us', 'country' => 'United States', 'region' => 'North America', 'city' => 'Port of LA & Long Beach', 'lat' => 37.090, 'lng' => -95.712, 'temp' => 19.8, 'condition' => 'Clear Sky', 'icon' => 'sun', 'icon_emoji' => '☀️', 'humidity' => 52, 'wind' => 14.0, 'precipitation' => 0.0, 'risk' => 'Low Risk', 'risk_score' => 16],
@@ -976,10 +986,12 @@ class GlobalIntelligenceService
         }
 
         $allHubs = [];
+        $addedCodes = [];
         foreach ($this->getCountriesMaster() as $c) {
             $code = strtoupper($c['code']);
             if (isset($curatedIndex[$code])) {
                 $allHubs[] = $curatedIndex[$code];
+                $addedCodes[$code] = true;
             } else {
                 $lat = (float) $c['lat'];
                 $lng = (float) $c['lng'];
@@ -1050,10 +1062,87 @@ class GlobalIntelligenceService
                     'risk' => $risk,
                     'risk_score' => $riskScore,
                 ];
+                $addedCodes[$code] = true;
+            }
+        }
+
+        // Pastikan seluruh sub-stasiun cuaca regional penting (Rusia/Siberia, Vladivostok, Alaska, Hawaii) terdaftar
+        foreach ($curated as $h) {
+            $cUpper = strtoupper($h['code']);
+            if (!isset($addedCodes[$cUpper])) {
+                $allHubs[] = $h;
+                $addedCodes[$cUpper] = true;
             }
         }
 
         return $allHubs;
+    }
+
+    /**
+     * Cari stasiun cuaca yang paling cocok berdasarkan nama negara / kode / kota / alias bilingual
+     */
+    public function findWeatherHub(?string $query): ?array
+    {
+        if (!$query) {
+            return null;
+        }
+
+        $q = trim(strtolower($query));
+        $allHubs = $this->getGlobalWeatherHubs();
+
+        // Kamus alias dwibahasa (Indonesia <-> Inggris & kota-kota utama)
+        $aliases = [
+            'rusia' => 'russia',
+            'russia' => 'rusia',
+            'moscow' => 'moskow',
+            'moskow' => 'moscow',
+            'siberia' => 'rusia',
+            'vladivostok' => 'rusia',
+            'inggris' => 'united kingdom',
+            'amerika' => 'united states',
+            'jepang' => 'japan',
+            'jerman' => 'germany',
+            'belanda' => 'netherlands',
+            'tiongkok' => 'china',
+            'prancis' => 'france',
+            'korea' => 'south korea',
+            'spanyol' => 'spain',
+            'italia' => 'italy',
+            'filipina' => 'philippines',
+            'singapura' => 'singapore',
+            'mongolia' => 'mongol',
+            'mongol' => 'mongolia',
+            'kazakhstan' => 'kazakh',
+        ];
+
+        $targetAlias = $aliases[$q] ?? $q;
+
+        // 1. Exact match code (RU, US, ID, dll)
+        foreach ($allHubs as $hub) {
+            $hCode = strtolower($hub['code']);
+            $hIso  = strtolower($hub['iso']);
+            if ($hCode === $q || $hIso === $q) {
+                return $hub;
+            }
+        }
+
+        // 2. Exact / alias match country
+        foreach ($allHubs as $hub) {
+            $hCountry = strtolower($hub['country']);
+            if ($hCountry === $q || $hCountry === $targetAlias || str_contains($hCountry, $q) || str_contains($hCountry, $targetAlias)) {
+                return $hub;
+            }
+        }
+
+        // 3. Match kota
+        foreach ($allHubs as $hub) {
+            $hCity = strtolower($hub['city']);
+            if (str_contains($hCity, $q) || str_contains($hCity, $targetAlias)) {
+                return $hub;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -1159,7 +1248,7 @@ class GlobalIntelligenceService
             ['code' => 'SK', 'name' => 'Slowakia', 'flag' => '🇸🇰', 'lat' => 48.669, 'lng' => 19.699, 'hub' => 'Bratislava Danube Port'],
             ['code' => 'BY', 'name' => 'Belarusia', 'flag' => '🇧🇾', 'lat' => 53.709, 'lng' => 27.953, 'hub' => 'Brest Dry Port / Great Stone'],
             ['code' => 'MD', 'name' => 'Moldova', 'flag' => '🇲🇩', 'lat' => 47.411, 'lng' => 28.369, 'hub' => 'Port of Giurgiulesti'],
-            ['code' => 'RU', 'name' => 'Rusia', 'flag' => '🇷🇺', 'lat' => 61.524, 'lng' => 105.318, 'hub' => 'Port of St. Petersburg / Vladivostok'],
+            ['code' => 'RU', 'name' => 'Rusia', 'flag' => '🇷🇺', 'lat' => 55.755, 'lng' => 37.617, 'hub' => 'Moskow (Sheremetyevo / St. Petersburg / Vladivostok)'],
             ['code' => 'US', 'name' => 'Amerika Serikat', 'flag' => '🇺🇸', 'lat' => 37.09, 'lng' => -95.712, 'hub' => 'Port of LA / Long Beach / New York'],
             ['code' => 'CA', 'name' => 'Kanada', 'flag' => '🇨🇦', 'lat' => 56.13, 'lng' => -106.346, 'hub' => 'Port of Vancouver / Montreal / Prince Rupert'],
             ['code' => 'MX', 'name' => 'Meksiko', 'flag' => '🇲🇽', 'lat' => 23.634, 'lng' => -102.552, 'hub' => 'Port of Manzanillo / Veracruz'],

@@ -35,13 +35,10 @@ class CustomerIntelligenceController extends Controller
         $selectedHub    = null;
 
         if ($targetCountry) {
-            foreach ($allWeatherHubs as $hub) {
-                if (strcasecmp($hub['country'], $targetCountry) === 0 || strcasecmp($hub['code'], $targetCountry) === 0) {
-                    $selectedHub = $hub;
-                    $originLat   = $hub['lat'];
-                    $originLng   = $hub['lng'];
-                    break;
-                }
+            $selectedHub = $this->intelligenceService->findWeatherHub($targetCountry);
+            if ($selectedHub) {
+                $originLat = (float) $selectedHub['lat'];
+                $originLng = (float) $selectedHub['lng'];
             }
         }
 

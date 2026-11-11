@@ -670,7 +670,21 @@
     window.openRouteAnalyticsModal       = window.openRouteAnalyticsModal || function() {};
     window.closeRouteAnalyticsModal      = window.closeRouteAnalyticsModal || function() {};
 
-    document.addEventListener('DOMContentLoaded', function () {
+    function initDashboard() {
+        if (window.__cargoTraceDashboardInitialized) return;
+
+        // If Leaflet library is still loading asynchronously from CDN, poll for it briefly
+        if (typeof L === 'undefined') {
+            if (!window.__leafletWaitAttempts) window.__leafletWaitAttempts = 0;
+            if (window.__leafletWaitAttempts < 50) {
+                window.__leafletWaitAttempts++;
+                setTimeout(initDashboard, 100);
+                return;
+            }
+        }
+
+        window.__cargoTraceDashboardInitialized = true;
+
         // 1. Donut Chart - Shipment by Status (Protected with safe checks)
         const statusEl = document.getElementById('statusChart');
         if (statusEl && typeof Chart !== 'undefined') {
@@ -2488,7 +2502,9 @@
             // Tutup popup aktif sebelumnya agar tidak tertinggal negara sebelumnya
             map.closePopup();
 
-            map.flyTo([lat, lng], 5.5, { duration: 1.2 });
+            // Adaptive zoom based on country size (continental nations need wider field of view)
+            const zoomLevel = ['RU', 'CA', 'US', 'CN', 'AU', 'BR', 'KZ', 'IN'].includes(code) ? 3.6 : 5.5;
+            map.flyTo([lat, lng], zoomLevel, { duration: 1.2 });
 
             // Highlight list item
             document.querySelectorAll('.country-item').forEach(li => {
@@ -2507,8 +2523,17 @@
             // Auto open matching popup in active mode (Exact Identifier Match, never mistaken!)
             if (currentMode === 'weather') {
                 let found = false;
+                const nameLower = name.toLowerCase();
+                const isRussianMatch = (code === 'RU' || nameLower.includes('rusia') || nameLower.includes('russia'));
+
                 weatherLayerGroup.eachLayer(layer => {
-                    if (!found && layer.countryCode && (layer.countryCode === code || layer.countryName === name.toLowerCase())) {
+                    const lCode = (layer.countryCode || '').toUpperCase();
+                    const lName = (layer.countryName || '').toLowerCase();
+                    const match = isRussianMatch
+                        ? (lCode === 'RU' || lCode.startsWith('RU_') || lName.includes('russia') || lName.includes('rusia'))
+                        : (lCode === code || lName.includes(nameLower) || nameLower.includes(lName));
+
+                    if (!found && match) {
                         setTimeout(() => layer.openPopup(), 400);
                         found = true;
                     }
@@ -2516,7 +2541,7 @@
                 if (!found) {
                     weatherLayerGroup.eachLayer(layer => {
                         const lLatLng = layer.getLatLng();
-                        if (!found && Math.hypot(lLatLng.lat - lat, lLatLng.lng - lng) < 2) {
+                        if (!found && Math.hypot(lLatLng.lat - lat, lLatLng.lng - lng) < 5) {
                             setTimeout(() => layer.openPopup(), 400);
                             found = true;
                         }
@@ -2655,7 +2680,15 @@
         updateModeButtons('cargo');
         updateBanner('cargo');
         updateLegend('cargo');
-    });
+    }
+
+    // Dual-trigger bootloader: ensures execution whether DOM is loading, interactive, or complete
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    } else {
+        // Document already loaded or interactive - fire immediately
+        initDashboard();
+    }
 </script>
 @endpush
 
