@@ -43,4 +43,8 @@ return [
         'key' => env('GNEWS_API_KEY'),
     ],
 
+    'freeairportdb' => [
+        'url' => env('FREEAIRPORTDB_BASE_URL', 'https://api.freeairportdb.com/v1'),
+    ],
+
 ];

@@ -109,17 +109,8 @@ class CustomerIntelligenceController extends Controller
      */
     public function airports(Request $request): View
     {
-        $allAirports = $this->intelligenceService->getGlobalAirports();
-
-        if ($search = $request->input('search')) {
-            $allAirports = array_filter($allAirports, function ($a) use ($search) {
-                return str_contains(strtolower($a['name'] ?? ''), strtolower($search))
-                    || str_contains(strtolower($a['city'] ?? ''), strtolower($search))
-                    || str_contains(strtolower($a['country'] ?? ''), strtolower($search))
-                    || str_contains(strtolower($a['code'] ?? ''), strtolower($search))
-                    || str_contains(strtolower($a['icao'] ?? ''), strtolower($search));
-            });
-        }
+        $search = $request->input('search');
+        $allAirports = $this->intelligenceService->getGlobalAirports($search);
 
         return view('customer.intelligence.airports', compact('allAirports'));
     }

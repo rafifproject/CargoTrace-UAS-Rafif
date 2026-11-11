@@ -656,6 +656,20 @@
 
 @push('scripts')
 <script>
+    // Global function registry so onclick buttons work immediately even if clicked before ready
+    window.switchMapMode                 = window.switchMapMode || function(mode) { console.log('Init pending...', mode); };
+    window.resetMapView                  = window.resetMapView || function() {};
+    window.focusCountry                  = window.focusCountry || function(el) {};
+    window.focusGlobalRoute              = window.focusGlobalRoute || function(id) {};
+    window.filterCountriesList           = window.filterCountriesList || function() {};
+    window.focusCargoShipment            = window.focusCargoShipment || function(id) {};
+    window.resetShipmentFocus            = window.resetShipmentFocus || function() {};
+    window.setTraceTransportMode         = window.setTraceTransportMode || function(mode) {};
+    window.setCargoTransportFilter       = window.setCargoTransportFilter || function(filter) {};
+    window.resetRouteTrackerInteractive  = window.resetRouteTrackerInteractive || function() {};
+    window.openRouteAnalyticsModal       = window.openRouteAnalyticsModal || function() {};
+    window.closeRouteAnalyticsModal      = window.closeRouteAnalyticsModal || function() {};
+
     document.addEventListener('DOMContentLoaded', function () {
         // 1. Donut Chart - Shipment by Status
         const statusCtx = document.getElementById('statusChart').getContext('2d');
@@ -751,8 +765,15 @@
             attribution: '&copy; OpenStreetMap contributors'
         });
 
-        // Pasang Google Maps (Jalan + Toko/POI) sebagai peta dasar utama
-        googleStreets.addTo(map);
+        // Pasang OpenStreetMap sebagai layer default yang 100% bebas watermark & reliabel
+        osm.addTo(map);
+
+        // Resize trigger untuk memastikan peta ter-render utuh & tidak blank putih
+        setTimeout(function() {
+            if (map) {
+                map.invalidateSize();
+            }
+        }, 250);
 
         // Layer Switcher Control di sudut kanan atas peta
         const baseMaps = {
@@ -2338,12 +2359,6 @@
                 } else if (mode === 'airports') {
                     buildAirportsLayer();
                     airportsLayerGroup.addTo(map);
-                    map.flyTo([20, 20], 2.2, { duration: 1.2 });
-                }
-            } catch (err) {
-                console.error("Error switching mode to " + mode + ":", err);
-            }
-        }
                     map.flyTo([20, 20], 2.2, { duration: 1.2 });
                 }
             } catch (err) {
