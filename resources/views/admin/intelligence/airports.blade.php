@@ -21,7 +21,7 @@
                 <span>Direktori Bandara Kargo Global (Global Air Cargo Hubs)</span>
             </h1>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Database dan visualisasi sebaran simpul bandara kargo internasional, hub ekspres interkontinental, dan lintasan kargo udara berbasis integrasi <strong>FreeAirportDB API</strong> (<span class="font-mono text-cyan-600 dark:text-cyan-400">api.freeairportdb.com</span>).
+                Database dan visualisasi sebaran simpul bandara kargo internasional, hub ekspres interkontinental, dan lintasan kargo udara berbasis integrasi <strong>FreeAirportDB API</strong>.
             </p>
         </div>
         <div class="flex items-center gap-2">

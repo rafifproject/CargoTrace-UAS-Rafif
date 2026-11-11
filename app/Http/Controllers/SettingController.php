@@ -15,13 +15,13 @@ class SettingController extends Controller
         $settings = SystemSetting::all()->pluck('value', 'key')->toArray();
 
         $apiStatuses = [
-            'open_meteo' => ['name' => 'Open-Meteo Weather API', 'status' => 'CONNECTED', 'type' => 'Cuaca & Prakiraan Global', 'url' => config('services.openmeteo.url', env('OPENMETEO_BASE_URL', 'https://api.open-meteo.com/v1'))],
-            'exchange_rate' => ['name' => 'ExchangeRate-API', 'status' => 'CONNECTED', 'type' => 'Nilai Tukar Valuta & Kurs', 'url' => 'https://open.er-api.com/v6'],
-            'world_bank' => ['name' => 'World Bank Indicator API', 'status' => 'CONNECTED', 'type' => 'Indikator Makro Ekonomi', 'url' => env('WORLDBANK_BASE_URL', 'https://api.worldbank.org/v2')],
-            'rest_countries' => ['name' => 'REST Countries API', 'status' => 'CONNECTED', 'type' => 'Profil & Referensi Negara', 'url' => env('RESTCOUNTRIES_BASE_URL', 'https://restcountries.com/v3.1')],
-            'freeairportdb' => ['name' => 'FreeAirportDB Global Airport API', 'status' => 'CONNECTED', 'type' => 'Database Bandara & Koridor Udara Global', 'url' => config('services.freeairportdb.url', env('FREEAIRPORTDB_BASE_URL', 'https://api.freeairportdb.com/v1'))],
-            'nominatim' => ['name' => 'OpenStreetMap Nominatim', 'status' => 'CONNECTED', 'type' => 'Geocoding & Koordinat Pelabuhan', 'url' => 'https://nominatim.openstreetmap.org'],
-            'gnews' => ['name' => 'GNews Global Logistics News', 'status' => 'CONNECTED', 'type' => 'Warta Logistik & Rantai Pasok', 'url' => 'https://gnews.io/api/v4'],
+            'open_meteo' => ['name' => 'Open-Meteo Weather API', 'status' => 'CONNECTED', 'type' => 'Cuaca & Prakiraan Global'],
+            'exchange_rate' => ['name' => 'ExchangeRate-API', 'status' => 'CONNECTED', 'type' => 'Nilai Tukar Valuta & Kurs'],
+            'world_bank' => ['name' => 'World Bank Indicator API', 'status' => 'CONNECTED', 'type' => 'Indikator Makro Ekonomi'],
+            'rest_countries' => ['name' => 'REST Countries API', 'status' => 'CONNECTED', 'type' => 'Profil & Referensi Negara'],
+            'freeairportdb' => ['name' => 'FreeAirportDB Global Airport API', 'status' => 'CONNECTED', 'type' => 'Database Bandara & Koridor Udara Global'],
+            'nominatim' => ['name' => 'OpenStreetMap Nominatim', 'status' => 'CONNECTED', 'type' => 'Geocoding & Koordinat Pelabuhan'],
+            'gnews' => ['name' => 'GNews Global Logistics News', 'status' => 'CONNECTED', 'type' => 'Warta Logistik & Rantai Pasok'],
         ];
 
         return view('admin.settings.index', compact('settings', 'apiStatuses'));
