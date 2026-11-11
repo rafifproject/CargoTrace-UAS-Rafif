@@ -346,6 +346,10 @@
                     class="map-mode-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 flex items-center gap-1.5">
                     ⚓ Sebaran Pelabuhan
                 </button>
+                <button onclick="switchMapMode('airports')" id="btn-airports"
+                    class="map-mode-btn px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all duration-200 flex items-center gap-1.5">
+                    ✈️ Sebaran Bandara
+                </button>
                 <button onclick="resetMapView()" id="btn-reset"
                     class="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 flex items-center gap-1.5">
                     🔄 Reset
@@ -357,10 +361,18 @@
         <div class="flex flex-col lg:flex-row" style="min-height:520px">
             <!-- Left: Map + Status Banner -->
             <div class="flex-1 relative flex flex-col">
-                <!-- Active Mode Banner (Standard for Cargo, Weather, Ports) -->
-                <div id="map-mode-banner" class="px-4 py-2 text-xs font-semibold text-white flex items-center gap-2 transition-all duration-300" style="background:linear-gradient(90deg,#0A1128,#0e3a6e);">
-                    <span id="banner-icon">🧭</span>
-                    <span id="banner-text">Mode: Pemantau CargoTrace — Kargo Aktif & Jalur Pengiriman</span>
+                <!-- Active Mode Banner (Standard for Cargo, Weather, Ports, Airports) -->
+                <div id="map-mode-banner" class="px-4 py-2 text-xs font-semibold text-white flex items-center justify-between transition-all duration-300" style="background:linear-gradient(90deg,#0A1128,#0e3a6e);">
+                    <div class="flex items-center gap-2">
+                        <span id="banner-icon">🧭</span>
+                        <span id="banner-text">Mode: Pemantau CargoTrace — Kargo Aktif & Jalur Pengiriman</span>
+                    </div>
+                    <!-- Sub-filter moda pengiriman di mode CargoTrace -->
+                    <div id="cargo-mode-subfilter" class="flex items-center gap-1 bg-slate-900/80 p-0.5 rounded-lg border border-slate-700/80">
+                        <button type="button" onclick="setCargoTransportFilter('ALL')" id="filter-cargo-all" class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-600 text-white transition-all">Semua</button>
+                        <button type="button" onclick="setCargoTransportFilter('SEA')" id="filter-cargo-sea" class="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-300 hover:text-white transition-all">🚢 Laut</button>
+                        <button type="button" onclick="setCargoTransportFilter('AIR')" id="filter-cargo-air" class="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-300 hover:text-white transition-all">✈️ Udara</button>
+                    </div>
                 </div>
 
                 <!-- ROUTE TRACKER 2-STEP INTERACTIVE BANNER (Ref Screenshot 1 & 2: media_1794417156910_bd4e5b31.jpg & media_1794417172832_e6df78b9.jpg) -->
@@ -772,6 +784,7 @@
         // Data from PHP controller
         const shipments    = {!! json_encode($mapShipments) !!};
         const portsData    = {!! json_encode($globalPorts) !!};
+        const airportsData = {!! json_encode($globalAirports ?? []) !!};
         const weatherData  = {!! json_encode($weatherHubs) !!};
         const countriesData = {!! json_encode($countriesList) !!};
         const carriersData = {!! json_encode($carriersMapData) !!};
@@ -779,6 +792,7 @@
         // Guaranteed Absolute Route URLs direct from Laravel Blade (No 404s!)
         const WEATHER_PAGE_URL = "{{ route('admin.intelligence.weather') }}";
         const PORTS_PAGE_URL   = "{{ route('admin.intelligence.ports') }}";
+        const AIRPORTS_PAGE_URL = "{{ route('admin.intelligence.airports') }}";
         const SHIPMENT_BASE_URL = "{{ url('admin/shipments') }}";
 
         // Route URLs helper - 100% Safe across localhost, subfolders, and virtual hosts
@@ -866,12 +880,14 @@
         ];
 
         // Layer groups for each mode
-        const cargoLayerGroup   = L.layerGroup();
-        const routeLayerGroup   = L.layerGroup();
-        const weatherLayerGroup = L.layerGroup();
-        const portsLayerGroup   = L.layerGroup();
+        const cargoLayerGroup    = L.layerGroup();
+        const routeLayerGroup    = L.layerGroup();
+        const weatherLayerGroup  = L.layerGroup();
+        const portsLayerGroup    = L.layerGroup();
+        const airportsLayerGroup = L.layerGroup();
 
         let currentMode = 'cargo';
+        let cargoTransportFilter = 'ALL';
 
         // ── MODE BUTTON STYLES ──────────────────────────────────
         function updateModeButtons(mode) {
@@ -888,26 +904,30 @@
                 btn.style.borderColor = '';
             });
             const activeMap = {
-                'cargo':   { id: 'btn-cargo',   bg:'#0e6ba8', border:'#0e6ba8' },
-                'route':   { id: 'btn-route',   bg:'#0284c7', border:'#0284c7' },
-                'weather': { id: 'btn-weather', bg:'#d97706', border:'#d97706' },
-                'ports':   { id: 'btn-ports',   bg:'#7c3aed', border:'#7c3aed' }
+                'cargo':    { id: 'btn-cargo',    bg:'#0e6ba8', border:'#0e6ba8' },
+                'route':    { id: 'btn-route',    bg:'#0284c7', border:'#0284c7' },
+                'weather':  { id: 'btn-weather',  bg:'#d97706', border:'#d97706' },
+                'ports':    { id: 'btn-ports',    bg:'#7c3aed', border:'#7c3aed' },
+                'airports': { id: 'btn-airports', bg:'#0284c7', border:'#0284c7' }
             };
             if (activeMap[mode]) {
                 const btn = document.getElementById(activeMap[mode].id);
-                btn.classList.remove('border-slate-300','text-slate-500');
-                btn.style.backgroundColor = activeMap[mode].bg;
-                btn.style.borderColor = activeMap[mode].border;
-                btn.style.color = '#fff';
+                if (btn) {
+                    btn.classList.remove('border-slate-300','text-slate-500');
+                    btn.style.backgroundColor = activeMap[mode].bg;
+                    btn.style.borderColor = activeMap[mode].border;
+                    btn.style.color = '#fff';
+                }
             }
         }
 
         // ── BANNER UPDATE ───────────────────────────────────────
         const banners = {
-            cargo:   { icon:'🧭', text:'Mode: Pemantau CargoTrace — Kargo Aktif & Jalur Pengiriman Global', bg:'linear-gradient(90deg,#0A1128,#0e3a6e)' },
-            route:   { icon:'📍', text:'Mode: Route Tracker — Pelacakan Rute Maritim Global Interaktif & Titik Waypoint Antar Benua', bg:'linear-gradient(90deg,#0c4a6e,#0284c7)' },
-            weather: { icon:'⛅', text:'Mode: Cuaca Langsung — 60+ Titik Cuaca Maritim Terkalibrasi & Evaluasi Risiko Badai', bg:'linear-gradient(90deg,#431407,#92400e)' },
-            ports:   { icon:'⚓', text:'Mode: Sebaran Pelabuhan — Data Pelabuhan Maritim Dunia Merata Global (ArcGIS Live WPI FeatureServer)', bg:'linear-gradient(90deg,#2e1065,#5b21b6)' }
+            cargo:    { icon:'🧭', text:'Mode: Pemantau CargoTrace — Kargo Aktif & Jalur Pengiriman Global', bg:'linear-gradient(90deg,#0A1128,#0e3a6e)' },
+            route:    { icon:'📍', text:'Mode: Route Tracker — Pelacakan Rute Maritim Global Interaktif & Titik Waypoint Antar Benua', bg:'linear-gradient(90deg,#0c4a6e,#0284c7)' },
+            weather:  { icon:'⛅', text:'Mode: Cuaca Langsung — 60+ Titik Cuaca Maritim Terkalibrasi & Evaluasi Risiko Badai', bg:'linear-gradient(90deg,#431407,#92400e)' },
+            ports:    { icon:'⚓', text:'Mode: Sebaran Pelabuhan — Data Pelabuhan Maritim Dunia Merata Global (ArcGIS Live WPI FeatureServer)', bg:'linear-gradient(90deg,#2e1065,#5b21b6)' },
+            airports: { icon:'✈️', text:'Mode: Sebaran Bandara Kargo Global — 60+ Hub Kargo Udara Internasional (FreeAirportDB Live)', bg:'linear-gradient(90deg,#075985,#0284c7)' }
         };
         function updateBanner(mode) {
             const b = banners[mode];
@@ -946,7 +966,9 @@
                       <span class="flex items-center gap-1.5"><span class="w-3.5 h-2.5 rounded bg-orange-600 inline-block border border-white"></span>Hangat (&gt;25°C)</span>
                       <span class="flex items-center gap-1.5 text-slate-400">Pill cuaca tiap negara (klik untuk detail profil)</span>`,
             ports:   `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-600 inline-block"></span>Pelabuhan ArcGIS Live WPI</span>
-                      <span class="flex items-center gap-1.5 text-slate-400">Klik marker untuk melihat profil pelabuhan</span>`
+                      <span class="flex items-center gap-1.5 text-slate-400">Klik marker untuk melihat profil pelabuhan</span>`,
+            airports: `<span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-sky-600 text-white inline-flex items-center justify-center text-[9px]">✈️</span>Bandara Kargo FreeAirportDB</span>
+                       <span class="flex items-center gap-1.5 text-slate-400">Klik marker untuk melihat profil bandara & kapasitas</span>`
         };
         function updateLegend(mode) {
             document.getElementById('map-legend').innerHTML = legends[mode];
@@ -1020,7 +1042,7 @@
             const notes       = (s.notes || '').toLowerCase();
 
             // 1. Pesawat Kargo Udara (Real Jet Freighter Top-Down)
-            if (originType === 'AIRPORT' || destType === 'AIRPORT' ||
+            if (s.transport_mode === 'AIR' || originType === 'AIRPORT' || destType === 'AIRPORT' ||
                 originName.includes('bandara') || originName.includes('airport') ||
                 destName.includes('bandara') || destName.includes('airport') ||
                 carrierCode === 'FDX' || carrierName.includes('fedex') || carrierName.includes('express air') ||
@@ -1376,6 +1398,12 @@
 
             shipments.forEach(s => {
                 if (!s || !s.origin || !s.destination) return;
+
+                // Sub-filter moda transportasi (Semua / Laut / Udara)
+                const sMode = s.transport_mode || 'SEA';
+                if (cargoTransportFilter !== 'ALL' && sMode !== cargoTransportFilter) {
+                    return;
+                }
 
                 const oLat = parseFloat(s.origin.latitude);
                 const oLng = parseFloat(s.origin.longitude);
@@ -2130,6 +2158,89 @@
             });
         }
 
+        // ── BUILD AIRPORTS LAYER (FreeAirportDB 60+ International Air Cargo Hubs) ────────
+        function buildAirportsLayer() {
+            airportsLayerGroup.clearLayers();
+            if (!Array.isArray(airportsData)) return;
+
+            airportsData.forEach(a => {
+                const lat = parseFloat(a.lat);
+                const lng = parseFloat(a.lng);
+                if (isNaN(lat) || isNaN(lng)) return;
+
+                const icon = L.divIcon({
+                    className: 'airport-marker-wrapper',
+                    html: `
+                        <div style="background:#0284C7; color:#fff; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; border:2px solid #ffffff; box-shadow:0 3px 8px rgba(2,132,199,0.55); cursor:pointer;">
+                            ✈️
+                        </div>
+                    `,
+                    iconSize: [26, 26],
+                    iconAnchor: [13, 13]
+                });
+
+                const marker = L.marker([lat, lng], { icon });
+                marker.countryCode = (a.iso || '').toUpperCase();
+                marker.countryName = (a.country || '').toLowerCase();
+                marker.airportCode = (a.code || '').toUpperCase();
+
+                marker.on('click', function() {
+                    syncSidebarWithCountry(a.iso, a.country, a.name);
+                });
+
+                marker.bindPopup(`
+                    <div style="min-width:240px; font-family: Outfit, sans-serif; padding:4px 2px;">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                            <img src="https://flagcdn.com/w40/${a.iso || 'un'}.png" alt="${a.country}"
+                                 style="width:30px; height:20px; object-fit:cover; border-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,0.18); border:1px solid #e2e8f0; flex-shrink:0;">
+                            <div>
+                                <div style="font-weight:800; font-size:14px; color:#0f172a; line-height:1.2;">${a.name}</div>
+                                <div style="font-size:11px; color:#64748b;">${a.country} &bull; ${a.city}</div>
+                            </div>
+                        </div>
+                        <div style="background:#E0F2FE; color:#0369A1; border:1px solid #BAE6FD; padding:6px 10px; border-radius:10px; font-weight:700; font-size:11px; margin-bottom:7px; display:flex; justify-content:space-between; align-items:center;">
+                            <span>✈️ IATA: <strong>${a.code}</strong></span>
+                            <span style="font-size:10px; color:#0284c7;">ICAO: ${a.icao || '-'}</span>
+                        </div>
+                        <div style="font-size:11px; color:#334155; line-height:1.6; margin-bottom:8px;">
+                            <strong>Kapasitas Kargo:</strong> ${a.capacity || 'TBA'}<br>
+                            <strong>Panjang Runway:</strong> ${a.runway || '-'}<br>
+                            <strong>Tipe Hub:</strong> ${a.type || 'International Cargo Airport'}
+                        </div>
+                        <a href="${AIRPORTS_PAGE_URL}?search=${a.code}" class="block text-center text-[10px] font-bold py-1.5 px-3 rounded-lg bg-sky-600 hover:bg-sky-500 text-white transition-colors" style="text-decoration:none;">
+                            Buka Direktori Bandara Lengkap &rarr;
+                        </a>
+                    </div>
+                `, { maxWidth: 280 });
+
+                marker.addTo(airportsLayerGroup);
+            });
+        }
+
+        // ── CARGO TRANSPORT FILTER (Semua / Laut / Udara) ────────
+        function setCargoTransportFilter(mode) {
+            cargoTransportFilter = mode;
+            const btnAll = document.getElementById('filter-cargo-all');
+            const btnSea = document.getElementById('filter-cargo-sea');
+            const btnAir = document.getElementById('filter-cargo-air');
+
+            [btnAll, btnSea, btnAir].forEach(b => {
+                if (b) {
+                    b.className = 'px-2 py-0.5 rounded text-[10px] font-semibold text-slate-300 hover:text-white transition-all';
+                }
+            });
+
+            if (mode === 'SEA') {
+                if (btnSea) btnSea.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white shadow-xs transition-all';
+            } else if (mode === 'AIR') {
+                if (btnAir) btnAir.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-purple-600 text-white shadow-xs transition-all';
+            } else {
+                if (btnAll) btnAll.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-600 text-white shadow-xs transition-all';
+            }
+
+            buildCargoLayer();
+        }
+
         // ── TWO-WAY SYNC HELPER (Marker Klik -> Update Sidebar Negara) ────────
         function syncSidebarWithCountry(codeOrIso, countryName, hubName) {
             if (!codeOrIso && !countryName) return;
@@ -2194,6 +2305,14 @@
             map.removeLayer(routeLayerGroup);
             map.removeLayer(weatherLayerGroup);
             map.removeLayer(portsLayerGroup);
+            map.removeLayer(airportsLayerGroup);
+
+            const cargoFilterEl = document.getElementById('cargo-mode-subfilter');
+            if (mode === 'cargo') {
+                if (cargoFilterEl) cargoFilterEl.classList.remove('hidden');
+            } else {
+                if (cargoFilterEl) cargoFilterEl.classList.add('hidden');
+            }
 
             updateModeButtons(mode);
             updateBanner(mode);
@@ -2215,6 +2334,16 @@
                 } else if (mode === 'ports') {
                     buildPortsLayer();
                     portsLayerGroup.addTo(map);
+                    map.flyTo([20, 20], 2.2, { duration: 1.2 });
+                } else if (mode === 'airports') {
+                    buildAirportsLayer();
+                    airportsLayerGroup.addTo(map);
+                    map.flyTo([20, 20], 2.2, { duration: 1.2 });
+                }
+            } catch (err) {
+                console.error("Error switching mode to " + mode + ":", err);
+            }
+        }
                     map.flyTo([20, 20], 2.2, { duration: 1.2 });
                 }
             } catch (err) {
@@ -2360,6 +2489,14 @@
                         `)
                         .openOn(map);
                 }, 400);
+            } else if (currentMode === 'airports') {
+                let foundApt = false;
+                airportsLayerGroup.eachLayer(layer => {
+                    if (!foundApt && layer.countryCode && (layer.countryCode === code.replace('_EAST','').toUpperCase() || layer.countryName === name.toLowerCase())) {
+                        setTimeout(() => layer.openPopup(), 400);
+                        foundApt = true;
+                    }
+                });
             }
         }
 
@@ -2380,6 +2517,7 @@
         window.focusCargoShipment            = focusCargoShipment;
         window.resetShipmentFocus            = resetCargoShipmentFocus;
         window.setTraceTransportMode         = setTraceTransportMode;
+        window.setCargoTransportFilter       = setCargoTransportFilter;
         window.resetRouteTrackerInteractive  = resetRouteTrackerInteractive;
         window.openRouteAnalyticsModal       = openRouteAnalyticsModal;
         window.closeRouteAnalyticsModal      = closeRouteAnalyticsModal;

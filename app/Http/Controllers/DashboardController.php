@@ -63,8 +63,9 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Global Intelligence Data for 5-Mode Interactive Map
+        // Global Intelligence Data for Interactive Map
         $globalPorts    = $intelligenceService->getGlobalPorts();
+        $globalAirports = $intelligenceService->getGlobalAirports();
         $weatherHubs    = $intelligenceService->getGlobalWeatherHubs();
         $countriesList  = $intelligenceService->getCountriesMaster();
 
@@ -121,6 +122,7 @@ class DashboardController extends Controller
             'allCarriers',
             'carriersMapData',
             'globalPorts',
+            'globalAirports',
             'weatherHubs',
             'countriesList'
         ));

@@ -961,7 +961,7 @@
             const originType = s.origin ? (s.origin.location_type || '').toUpperCase() : '';
             const destType   = s.destination ? (s.destination.location_type || '').toUpperCase() : '';
 
-            if (originType === 'AIRPORT' || destType === 'AIRPORT' || cargo.includes('air') || cargo.includes('express')) {
+            if (s.transport_mode === 'AIR' || originType === 'AIRPORT' || destType === 'AIRPORT' || cargo.includes('air') || cargo.includes('express')) {
                 return {
                     type: 'AIR', label: 'Pesawat Kargo', color: '#38bdf8',
                     realSvg: `<svg width="36" height="36" viewBox="0 0 48 48" fill="none"><path d="M24 2L28 16L44 24L28 26L27 40L33 44L24 43L15 44L21 40L20 26L4 24L20 16L24 2Z" fill="#38bdf8" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/></svg>`

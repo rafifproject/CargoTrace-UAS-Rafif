@@ -12,7 +12,7 @@
                 <i data-lucide="chevron-right" class="w-3 h-3"></i>
                 <span>Intelijen Logistik</span>
                 <i data-lucide="chevron-right" class="w-3 h-3"></i>
-                <span class="text-sky-600 dark:text-sky-400 font-semibold">Bandara Kargo Global</span>
+                <span class="text-cyan-600 dark:text-cyan-400 font-semibold">Bandara Kargo Global</span>
             </div>
             <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
                 <span class="p-2 rounded-xl bg-sky-500/10 text-sky-500 dark:bg-sky-500/20">
@@ -97,9 +97,12 @@
                 <i data-lucide="globe" class="w-4 h-4 text-sky-500"></i>
                 <span>Peta Sebaran Bandara Kargo Internasional Dunia</span>
             </h2>
-            <span class="text-xs text-slate-500 dark:text-slate-400">Klik marker untuk melihat spesifikasi bandara</span>
+            <div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span> Simpul Bandara Kargo</span>
+                <span class="text-[11px] text-slate-400">Total: <strong>{{ count($allAirports) }}</strong> titik aktif</span>
+            </div>
         </div>
-        <div id="airportsMap" class="w-full h-88 rounded-xl border border-slate-200 dark:border-slate-800 z-10"></div>
+        <div id="airportsMap" class="w-full rounded-xl border border-slate-200 dark:border-slate-800 z-10 shadow-inner" style="height: 520px; min-height: 520px; background: #0A1128;"></div>
     </div>
 
     <!-- Table of Airports -->
@@ -121,6 +124,7 @@
                         <th class="py-3 px-4">Kapasitas Kargo</th>
                         <th class="py-3 px-4">Panjang Runway</th>
                         <th class="py-3 px-4">Kategori Hub</th>
+                        <th class="py-3 px-4 text-center">Aksi Peta</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -164,10 +168,16 @@
                                     {{ $apt['type'] ?? 'International Airport' }}
                                 </span>
                             </td>
+                            <td class="py-3.5 px-4 text-center">
+                                <button type="button" onclick="focusAirport('{{ $apt['code'] }}')" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/80 text-sky-600 dark:text-sky-400 font-bold text-[10px] border border-sky-200 dark:border-sky-800 transition-colors shadow-2xs">
+                                    <i data-lucide="map-pin" class="w-3 h-3"></i>
+                                    <span>Fokus Peta</span>
+                                </button>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-10 text-center text-slate-400">
+                            <td colspan="8" class="py-10 text-center text-slate-400">
                                 <i data-lucide="plane" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
                                 <p>Tidak ada bandara yang cocok dengan kata kunci pencarian Anda.</p>
                             </td>
@@ -182,51 +192,84 @@
 
 @push('scripts')
 <script>
+    let airportsMap = null;
+    const markersByCode = {};
+
     document.addEventListener('DOMContentLoaded', function () {
-        const map = L.map('airportsMap', {
+        initAirportsMap();
+    });
+
+    function initAirportsMap() {
+        const container = document.getElementById('airportsMap');
+        if (!container) return;
+
+        airportsMap = L.map('airportsMap', {
             center: [20, 20],
             zoom: 2.2,
             minZoom: 2,
-            maxZoom: 18
+            maxZoom: 18,
+            zoomControl: true
         });
 
-        L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-            maxZoom: 20,
-            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-            attribution: '&copy; Google Maps Satelit | FreeAirportDB'
-        }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | FreeAirportDB'
+        }).addTo(airportsMap);
 
         const airports = {!! json_encode(array_values($allAirports)) !!};
 
         airports.forEach(a => {
-            if (!a.lat || !a.lng) return;
+            const lat = parseFloat(a.lat);
+            const lng = parseFloat(a.lng);
+            if (isNaN(lat) || isNaN(lng)) return;
 
             const icon = L.divIcon({
                 className: 'airport-marker-wrapper',
-                html: `<div style="background:#0284C7; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; border:2px solid #ffffff; box-shadow:0 2px 6px rgba(2,132,199,0.5);">✈️</div>`,
-                iconSize: [24, 24],
-                iconAnchor: [12, 12]
+                html: `
+                    <div style="background:#0284C7; color:#fff; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; border:2px solid #ffffff; box-shadow:0 3px 8px rgba(2,132,199,0.55); cursor:pointer; transition:transform 0.15s ease;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                        ✈️
+                    </div>
+                `,
+                iconSize: [26, 26],
+                iconAnchor: [13, 13]
             });
 
-            const marker = L.marker([a.lat, a.lng], { icon }).addTo(map);
+            const marker = L.marker([lat, lng], { icon }).addTo(airportsMap);
 
             const popupHtml = `
-                <div style="font-family: Outfit, sans-serif; min-width: 200px; padding: 2px;">
-                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
-                        <span style="font-weight:800; font-size:12px; color:#0284C7;">${a.code} / ${a.icao || ''}</span>
+                <div style="font-family: Outfit, sans-serif; min-width: 230px; padding: 2px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                        <span style="font-weight:800; font-size:13px; color:#0284C7;">${a.code} / ${a.icao || '-'}</span>
                         <span style="font-size:10px; background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:6px; font-weight:700;">AIR CARGO</span>
                     </div>
                     <div style="font-weight:700; font-size:12px; color:#0f172a; margin-bottom:3px;">${a.name}</div>
-                    <div style="font-size:11px; color:#64748b; margin-bottom:6px;">📍 ${a.city}, ${a.country}</div>
-                    <div style="border-top:1px solid #f1f5f9; padding-top:4px; font-size:10px; color:#475569; display:grid; grid-template-columns:1fr 1fr; gap:4px;">
-                        <div><strong>Kapasitas:</strong><br>${a.capacity || '-'}</div>
-                        <div><strong>Runway:</strong><br>${a.runway || '-'}</div>
+                    <div style="font-size:11px; color:#64748b; margin-bottom:8px;">📍 ${a.city ? a.city + ', ' : ''}${a.country}</div>
+                    <div style="border-top:1px solid #f1f5f9; padding-top:6px; font-size:10px; color:#475569; display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                        <div><strong style="color:#0f172a;">Kapasitas:</strong><br><span style="color:#059669; font-weight:700;">${a.capacity || '-'}</span></div>
+                        <div><strong style="color:#0f172a;">Runway:</strong><br>${a.runway || '-'}</div>
                     </div>
                 </div>
             `;
             marker.bindPopup(popupHtml);
+
+            if (a.code) {
+                markersByCode[a.code] = { marker, lat, lng };
+            }
         });
-    });
+
+        setTimeout(() => {
+            airportsMap.invalidateSize();
+        }, 250);
+    }
+
+    function focusAirport(code) {
+        if (!airportsMap || !markersByCode[code]) return;
+        const target = markersByCode[code];
+        airportsMap.flyTo([target.lat, target.lng], 6, { duration: 1.2 });
+        target.marker.openPopup();
+        document.getElementById('airportsMap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    window.focusAirport = focusAirport;
 </script>
 @endpush
-
