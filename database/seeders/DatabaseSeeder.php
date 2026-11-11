@@ -144,6 +144,15 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Jawaharlal Nehru Port (Nhava Sheva)', 'city' => 'Mumbai', 'country' => 'India', 'location_type' => Location::TYPE_PORT, 'latitude' => 18.9490000, 'longitude' => 72.9510000],
             ['name' => 'Port Said (Suez Canal Hub)', 'city' => 'Port Said', 'country' => 'Mesir', 'location_type' => Location::TYPE_PORT, 'latitude' => 31.2650000, 'longitude' => 32.3010000],
 
+            // Eurasia Utara, Rusia, Mongolia & Skandinavia
+            ['name' => 'Pelabuhan Vladivostok (Commercial Port of Vladivostok)', 'city' => 'Vladivostok', 'country' => 'Rusia', 'location_type' => Location::TYPE_PORT, 'latitude' => 43.1056000, 'longitude' => 131.8735000],
+            ['name' => 'Pelabuhan Saint Petersburg (Big Port of St. Petersburg)', 'city' => 'Saint Petersburg', 'country' => 'Rusia', 'location_type' => Location::TYPE_PORT, 'latitude' => 59.9000000, 'longitude' => 30.2200000],
+            ['name' => 'Pelabuhan Novorossiysk (Black Sea Hub)', 'city' => 'Novorossiysk', 'country' => 'Rusia', 'location_type' => Location::TYPE_PORT, 'latitude' => 44.7244000, 'longitude' => 37.7850000],
+            ['name' => 'Zamiin-Uud Dry Port & Logistics Terminal', 'city' => 'Zamiin-Uud', 'country' => 'Mongolia', 'location_type' => Location::TYPE_PORT, 'latitude' => 43.7170000, 'longitude' => 111.9050000],
+            ['name' => 'Khorgos Gateway Dry Port (New Silk Road)', 'city' => 'Khorgos', 'country' => 'Kazakhstan', 'location_type' => Location::TYPE_PORT, 'latitude' => 44.1333000, 'longitude' => 80.4000000],
+            ['name' => 'Pelabuhan Aktau (Caspian Sea Hub)', 'city' => 'Aktau', 'country' => 'Kazakhstan', 'location_type' => Location::TYPE_PORT, 'latitude' => 43.6333000, 'longitude' => 51.1833000],
+            ['name' => 'Port of Gothenburg (Göteborg)', 'city' => 'Gothenburg', 'country' => 'Swedia', 'location_type' => Location::TYPE_PORT, 'latitude' => 57.7080000, 'longitude' => 11.9740000],
+
             // Amerika Utara & Selatan (USA, Kanada, Panama, Brasil)
             ['name' => 'Port of Los Angeles', 'city' => 'Los Angeles', 'country' => 'Amerika Serikat', 'location_type' => Location::TYPE_PORT, 'latitude' => 33.7430000, 'longitude' => -118.2670000],
             ['name' => 'Port of Long Beach', 'city' => 'Long Beach', 'country' => 'Amerika Serikat', 'location_type' => Location::TYPE_PORT, 'latitude' => 33.7540000, 'longitude' => -118.2160000],

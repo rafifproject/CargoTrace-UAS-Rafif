@@ -40,8 +40,8 @@ class CustomerWorkflowTest extends TestCase
         $this->admin = User::where('role', User::ROLE_ADMINISTRATOR)->firstOrFail();
         $this->operator = User::where('role', User::ROLE_LOGISTICS_OPERATOR)->firstOrFail();
 
-        // Pastikan ada shipment milik Customer A
-        $this->shipmentA = Shipment::where('customer_id', $this->customerA->id)->firstOrFail();
+        // Pastikan ada shipment milik Customer A (ambil yang paling baru diupdate agar ada di halaman 1 list)
+        $this->shipmentA = Shipment::where('customer_id', $this->customerA->id)->latest('updated_at')->firstOrFail();
 
         // Buat shipment milik Customer B
         $carrier = Carrier::first();

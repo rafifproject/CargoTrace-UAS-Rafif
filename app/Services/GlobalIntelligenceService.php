@@ -742,6 +742,13 @@ class GlobalIntelligenceService
             ['code' => 'NOOSL', 'name' => 'Port of Oslo', 'country' => 'Norwegia', 'iso' => 'no', 'city' => 'Oslo', 'lat' => 59.913, 'lng' => 10.752, 'capacity' => '0.3M TEU', 'type' => 'Oslofjord Port'],
             ['code' => 'FIHEL', 'name' => 'Port of Helsinki (Vuosaari)', 'country' => 'Finlandia', 'iso' => 'fi', 'city' => 'Helsinki', 'lat' => 60.169, 'lng' => 24.938, 'capacity' => '0.5M TEU', 'type' => 'Gulf of Finland Port'],
 
+            // Eurasia Utara, Rusia, Mongolia & Asia Tengah
+            ['code' => 'RUPET', 'name' => 'Big Port of Saint Petersburg', 'country' => 'Rusia', 'iso' => 'ru', 'city' => 'Saint Petersburg', 'lat' => 59.900, 'lng' => 30.220, 'capacity' => '2.5M TEU', 'type' => 'Baltic Sea Mega Port'],
+            ['code' => 'RUVVO', 'name' => 'Commercial Port of Vladivostok (CPV)', 'country' => 'Rusia', 'iso' => 'ru', 'city' => 'Vladivostok', 'lat' => 43.1056, 'lng' => 131.8735, 'capacity' => '1.4M TEU', 'type' => 'Pacific & Trans-Siberian Gateway'],
+            ['code' => 'RUNVS', 'name' => 'Port of Novorossiysk', 'country' => 'Rusia', 'iso' => 'ru', 'city' => 'Novorossiysk', 'lat' => 44.7244, 'lng' => 37.7850, 'capacity' => '1.8M TEU', 'type' => 'Black Sea Gateway'],
+            ['code' => 'KZAKT', 'name' => 'Port of Aktau (Caspian Hub)', 'country' => 'Kazakhstan', 'iso' => 'kz', 'city' => 'Aktau', 'lat' => 43.6333, 'lng' => 51.1833, 'capacity' => '0.6M TEU', 'type' => 'Caspian Sea Trans-Caspian Hub'],
+            ['code' => 'MNZAM', 'name' => 'Zamiin-Uud Dry Port & Logistics Terminal', 'country' => 'Mongolia', 'iso' => 'mn', 'city' => 'Zamiin-Uud', 'lat' => 43.7170, 'lng' => 111.9050, 'capacity' => '0.8M TEU', 'type' => 'Trans-Mongolian Rail-Sea Hub'],
+
             // Afrika (Suez, Mediterania, Barat, Selatan & Timur)
             ['code' => 'EGPSD', 'name' => 'Port Said (SCCT / Terusan Suez)', 'country' => 'Mesir', 'iso' => 'eg', 'city' => 'Port Said', 'lat' => 31.265, 'lng' => 32.301, 'capacity' => '4.2M TEU', 'type' => 'Suez Canal Mega Hub'],
             ['code' => 'EGALX', 'name' => 'Port of Alexandria', 'country' => 'Mesir', 'iso' => 'eg', 'city' => 'Alexandria', 'lat' => 31.200, 'lng' => 29.918, 'capacity' => '1.8M TEU', 'type' => 'Egyptian Gateway'],
@@ -1708,6 +1715,38 @@ class GlobalIntelligenceService
                 'code' => 'BOM', 'icao' => 'VABB', 'name' => 'Chhatrapati Shivaji Maharaj International Cargo', 'country' => 'India', 'iso' => 'in',
                 'city' => 'Mumbai', 'lat' => 19.0896, 'lng' => 72.8656, 'elevation' => '39 ft (12 m)',
                 'capacity' => '850K Ton / Thn', 'type' => 'Pharma & Commercial Freight Hub', 'runway' => '3,660 m'
+            ],
+
+            // Eurasia Utara, Rusia, Mongolia & Asia Tengah
+            [
+                'code' => 'SVO', 'icao' => 'UUEE', 'name' => 'Sheremetyevo International Airport Cargo (Moscow Cargo)', 'country' => 'Rusia', 'iso' => 'ru',
+                'city' => 'Moskow', 'lat' => 55.9726, 'lng' => 37.4146, 'elevation' => '622 ft (190 m)',
+                'capacity' => '1.2M Ton / Thn', 'type' => 'Russian National Airfreight SuperHub', 'runway' => '3,700 m'
+            ],
+            [
+                'code' => 'OVB', 'icao' => 'UNNT', 'name' => 'Novosibirsk Tolmachevo Airport Trans-Siberian Cargo', 'country' => 'Rusia', 'iso' => 'ru',
+                'city' => 'Novosibirsk / Siberia', 'lat' => 55.0126, 'lng' => 82.6507, 'elevation' => '364 ft (111 m)',
+                'capacity' => '450K Ton / Thn', 'type' => 'Trans-Siberian Eurasian Air Corridor', 'runway' => '3,600 m'
+            ],
+            [
+                'code' => 'VVO', 'icao' => 'UHWW', 'name' => 'Vladivostok International Airport Cargo (Knevichi)', 'country' => 'Rusia', 'iso' => 'ru',
+                'city' => 'Vladivostok', 'lat' => 43.3990, 'lng' => 132.1480, 'elevation' => '46 ft (14 m)',
+                'capacity' => '280K Ton / Thn', 'type' => 'Russian Far East Pacific Hub', 'runway' => '3,500 m'
+            ],
+            [
+                'code' => 'UBN', 'icao' => 'ZMCK', 'name' => 'Chinggis Khaan International Airport Cargo Hub', 'country' => 'Mongolia', 'iso' => 'mn',
+                'city' => 'Ulaanbaatar', 'lat' => 47.6472, 'lng' => 106.8189, 'elevation' => '4,482 ft (1,366 m)',
+                'capacity' => '180K Ton / Thn', 'type' => 'Mongolian National Airfreight Gateway', 'runway' => '3,600 m'
+            ],
+            [
+                'code' => 'ALA', 'icao' => 'UAAA', 'name' => 'Almaty International Airport Cargo Gateway', 'country' => 'Kazakhstan', 'iso' => 'kz',
+                'city' => 'Almaty', 'lat' => 43.3521, 'lng' => 77.0405, 'elevation' => '2,234 ft (681 m)',
+                'capacity' => '380K Ton / Thn', 'type' => 'Central Asian Silk Road Air Hub', 'runway' => '4,400 m'
+            ],
+            [
+                'code' => 'HEL', 'icao' => 'EFHK', 'name' => 'Helsinki-Vantaa Airport Cool Nordic Cargo Hub', 'country' => 'Finlandia', 'iso' => 'fi',
+                'city' => 'Helsinki / Vantaa', 'lat' => 60.3172, 'lng' => 24.9633, 'elevation' => '179 ft (55 m)',
+                'capacity' => '420K Ton / Thn', 'type' => 'Nordic-Asia Polar Airfreight Hub', 'runway' => '3,500 m'
             ],
 
             // Timur Tengah
