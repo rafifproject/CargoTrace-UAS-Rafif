@@ -644,8 +644,8 @@
                 <button type="button" onclick="closeRouteAnalyticsModal()" class="px-4 py-2 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                     Tutup
                 </button>
-                <a id="modal-order-btn" href="{{ route('admin.shipments.index') }}" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 transition-colors shadow-sm flex items-center gap-1.5">
-                    <span>Pantau & Kelola Pengiriman</span>
+                <a id="modal-order-btn" href="{{ route('admin.shipments.create') }}" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 transition-colors shadow-sm flex items-center gap-1.5">
+                    <span>Pesan Pengiriman Rute Ini</span>
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </a>
             </div>
@@ -671,70 +671,84 @@
     window.closeRouteAnalyticsModal      = window.closeRouteAnalyticsModal || function() {};
 
     document.addEventListener('DOMContentLoaded', function () {
-        // 1. Donut Chart - Shipment by Status
-        const statusCtx = document.getElementById('statusChart').getContext('2d');
-        new Chart(statusCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Dalam Proses', 'Terkirim', 'Dipesan', 'Dijemput', 'Dibuat'],
-                datasets: [{
-                    data: [
-                        {{ $statusCounts['IN_TRANSIT'] }},
-                        {{ $statusCounts['DELIVERED'] }},
-                        {{ $statusCounts['BOOKED'] }},
-                        {{ $statusCounts['PICKED_UP'] }},
-                        {{ $statusCounts['CREATED'] }}
-                    ],
-                    backgroundColor: ['#00A8E8', '#10B981', '#3B82F6', '#6366F1', '#94A3B8'],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                cutout: '72%'
-            }
-        });
-
-        // 2. Line Chart - 30 Days Trend
-        const trendCtx = document.getElementById('trendChart').getContext('2d');
-        new Chart(trendCtx, {
-            type: 'line',
-            data: {
-                labels: {!! json_encode($trendDates) !!},
-                datasets: [{
-                    label: 'Volume Pengiriman',
-                    data: {!! json_encode($trendValues) !!},
-                    borderColor: '#00A8E8',
-                    backgroundColor: 'rgba(0, 168, 232, 0.1)',
-                    fill: true,
-                    tension: 0.35,
-                    pointRadius: 2,
-                    pointHoverRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        ticks: { font: { size: 10 } }
+        // 1. Donut Chart - Shipment by Status (Protected with safe checks)
+        const statusEl = document.getElementById('statusChart');
+        if (statusEl && typeof Chart !== 'undefined') {
+            try {
+                const statusCtx = statusEl.getContext('2d');
+                new Chart(statusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Dalam Proses', 'Terkirim', 'Dipesan', 'Dijemput', 'Dibuat'],
+                        datasets: [{
+                            data: [
+                                {{ $statusCounts['IN_TRANSIT'] ?? 0 }},
+                                {{ $statusCounts['DELIVERED'] ?? 0 }},
+                                {{ $statusCounts['BOOKED'] ?? 0 }},
+                                {{ $statusCounts['PICKED_UP'] ?? 0 }},
+                                {{ $statusCounts['CREATED'] ?? 0 }}
+                            ],
+                            backgroundColor: ['#00A8E8', '#10B981', '#3B82F6', '#6366F1', '#94A3B8'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
                     },
-                    y: {
-                        grid: { color: 'rgba(148, 163, 184, 0.1)' },
-                        ticks: { font: { size: 10 }, precision: 0 }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        cutout: '72%'
                     }
-                }
+                });
+            } catch (err) {
+                console.warn('Status chart initialization error:', err);
             }
-        });
+        }
+
+        // 2. Line Chart - 30 Days Trend (Protected with safe checks)
+        const trendEl = document.getElementById('trendChart');
+        if (trendEl && typeof Chart !== 'undefined') {
+            try {
+                const trendCtx = trendEl.getContext('2d');
+                new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: {!! json_encode($trendDates ?? []) !!},
+                        datasets: [{
+                            label: 'Volume Pengiriman',
+                            data: {!! json_encode($trendValues ?? []) !!},
+                            borderColor: '#00A8E8',
+                            backgroundColor: 'rgba(0, 168, 232, 0.1)',
+                            fill: true,
+                            tension: 0.35,
+                            pointRadius: 2,
+                            pointHoverRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { font: { size: 10 } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(148, 163, 184, 0.1)' },
+                                ticks: { font: { size: 10 }, precision: 0 }
+                            }
+                        }
+                    }
+                });
+            } catch (err) {
+                console.warn('Trend chart initialization error:', err);
+            }
+        }
 
         // 3. Leaflet 3-Mode Interactive Global Map
         // ─────────────────────────────────────────
@@ -2126,7 +2140,7 @@
 
             const orderBtn = document.getElementById('modal-order-btn');
             if (orderBtn) {
-                orderBtn.href = `{{ route('admin.shipments.index') }}?search=${encodeURIComponent(r.origin.name)}`;
+                orderBtn.href = `{{ route('admin.shipments.create') }}?mode=${r.mode || 'SEA'}&origin=${encodeURIComponent(r.origin.name)}&destination=${encodeURIComponent(r.dest.name)}`;
             }
 
             modal.classList.remove('hidden');
@@ -2612,18 +2626,17 @@
         }
 
         // Expose functions to window immediately so onclick="" attributes can always reach them
-        window.switchMapMode                 = switchMapMode;
-        window.resetMapView                  = resetMapView;
-        window.focusCountry                  = focusCountry;
-        window.focusGlobalRoute              = focusGlobalRoute;
-        window.filterCountriesList           = filterCountriesList;
-        window.focusCargoShipment            = focusCargoShipment;
-        window.resetShipmentFocus            = resetCargoShipmentFocus;
-        window.setTraceTransportMode         = setTraceTransportMode;
-        window.setCargoTransportFilter       = setCargoTransportFilter;
-        window.resetRouteTrackerInteractive  = resetRouteTrackerInteractive;
-        window.openRouteAnalyticsModal       = openRouteAnalyticsModal;
-        window.closeRouteAnalyticsModal      = closeRouteAnalyticsModal;
+        window.switchMapMode                 = typeof switchMapMode === 'function' ? switchMapMode : function() {};
+        window.resetMapView                  = typeof resetMapView === 'function' ? resetMapView : function() {};
+        window.focusCountry                  = typeof focusCountry === 'function' ? focusCountry : function() {};
+        window.filterCountriesList           = typeof filterCountriesList === 'function' ? filterCountriesList : function() {};
+        window.focusCargoShipment            = typeof focusCargoShipment === 'function' ? focusCargoShipment : function() {};
+        window.resetShipmentFocus            = typeof resetCargoShipmentFocus === 'function' ? resetCargoShipmentFocus : function() {};
+        window.setTraceTransportMode         = typeof setTraceTransportMode === 'function' ? setTraceTransportMode : function() {};
+        window.setCargoTransportFilter       = typeof setCargoTransportFilter === 'function' ? setCargoTransportFilter : function() {};
+        window.resetRouteTrackerInteractive  = typeof resetRouteTrackerInteractive === 'function' ? resetRouteTrackerInteractive : function() {};
+        window.openRouteAnalyticsModal       = typeof openRouteAnalyticsModal === 'function' ? openRouteAnalyticsModal : function() {};
+        window.closeRouteAnalyticsModal      = typeof closeRouteAnalyticsModal === 'function' ? closeRouteAnalyticsModal : function() {};
 
         // Klik di area peta kosong mengembalikan fokus rute ke normal
         map.on('click', function(e) {

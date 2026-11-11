@@ -60,6 +60,8 @@ Route::middleware(['auth', 'role:ADMINISTRATOR'])->prefix('admin')->name('admin.
 
     // 02 - 05. Shipments, Tracking, Map
     Route::get('/shipments', [ShipmentController::class, 'index'])->name('shipments.index');
+    Route::get('/shipments/create', [\App\Http\Controllers\Operator\OperatorShipmentController::class, 'create'])->name('shipments.create');
+    Route::post('/shipments', [\App\Http\Controllers\Operator\OperatorShipmentController::class, 'store'])->name('shipments.store');
     Route::get('/shipments/map', [ShipmentController::class, 'map'])->name('shipments.map');
     Route::get('/shipments/{shipment}', [ShipmentController::class, 'show'])->name('shipments.show');
     Route::get('/tracking', [ShipmentController::class, 'tracking'])->name('tracking.index');
