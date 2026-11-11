@@ -24,6 +24,7 @@ CargoTrace mengintegrasikan 5 sumber data publik langsung dari internet dengan m
 | Sumber API | Endpoint Eksternal | Penggunaan di CargoTrace | Cache TTL |
 | :--- | :--- | :--- | :--- |
 | **Open-Meteo API** | `https://api.open-meteo.com/v1/forecast` | Cuaca maritim, temperatur, kelembapan, kecepatan angin, curah hujan, & peringatan badai | 15 Menit |
+| **FreeAirportDB API** | `https://api.freeairportdb.com/v1/airports` | Direktori & sebaran bandara kargo internasional, hub interkontinental, dan koridor kargo udara | 24 Jam |
 | **World Bank API** | `https://api.worldbank.org/v2/country/{code}/indicator/...` | PDB/GDP nominal, tingkat inflasi, dan jumlah populasi negara | 1 Jam |
 | **REST Countries API** | `https://restcountries.com/v3.1/alpha/{code}` | Profil negara, kode mata uang, region, dan bahasa resmi | 1 Jam |
 | **ExchangeRate-API** | `https://open.er-api.com/v6/latest/{base}` | Kurs valuta asing langsung (USD, EUR, GBP, IDR, SGD, CNY, JPY) | 30 Menit |
@@ -142,4 +143,4 @@ Endpoints yang tercakup:
 ---
 
 ## ⚖️ Lisensi & Hak Cipta
-Dikembangkan untuk penilaian Ujian Akhir Semester (UAS) mata kuliah Pemrograman Web 2. Seluruh API publik (Open-Meteo, ExchangeRate-API, World Bank, REST Countries) digunakan sesuai dengan lisensi *open data* masing-masing.
+Dikembangkan untuk penilaian Ujian Akhir Semester (UAS) mata kuliah Pemrograman Web 2. Seluruh API publik (Open-Meteo, FreeAirportDB, ExchangeRate-API, World Bank, REST Countries) digunakan sesuai dengan lisensi *open data* masing-masing.

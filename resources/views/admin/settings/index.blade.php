@@ -79,8 +79,13 @@
             @foreach($apiStatuses as $key => $api)
                 <div class="py-3 flex items-center justify-between">
                     <div>
-                        <h4 class="text-xs font-bold text-slate-900 dark:text-white">{{ $api['name'] }}</h4>
-                        <p class="text-[11px] text-slate-400">{{ $api['type'] }}</p>
+                        <div class="flex items-center gap-2">
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white">{{ $api['name'] }}</h4>
+                            @if(isset($api['url']))
+                                <span class="text-[10px] font-mono text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 px-1.5 py-0.5 rounded border border-cyan-200 dark:border-cyan-800/60">{{ $api['url'] }}</span>
+                            @endif
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-0.5">{{ $api['type'] }}</p>
                     </div>
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
