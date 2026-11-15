@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Location;
 use App\Models\Shipment;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
 class BrazilSantosShipmentSeeder extends Seeder
@@ -67,6 +68,8 @@ class BrazilSantosShipmentSeeder extends Seeder
                 'courier_name' => 'Armada Kurir Mobil Kopi Santos Jakarta',
                 'courier_vehicle' => 'Mobil Van Paket Kopi (B 9482 CT)',
                 'notes' => 'Berangkat via Kapal Laut dari Pelabuhan Santos ke Pelabuhan Tanjung Priok. Saat ini kontainer telah dibongkar dan di-oper ke mobil paket kurir lokal menuju Roastery Senopati Jakarta Selatan.',
+                'dep_days_ago' => 18,
+                'arr_hours_ahead' => 3,
             ],
             [
                 'shipment_number' => 'CT-2026-002',
@@ -85,6 +88,8 @@ class BrazilSantosShipmentSeeder extends Seeder
                 'courier_name' => 'Santos Express London Courier Van',
                 'courier_vehicle' => 'Mobil Van Paket Listrik (LDN-77-CT)',
                 'notes' => 'Berangkat via Pesawat Kargo Udara Kilat dari Bandara GRU São Paulo ke London Heathrow. Setelah mendarat, kargo di-oper ke mobil van paket kurir menuju 38 Upper Montagu Street, Westminster.',
+                'dep_days_ago' => 2,
+                'arr_hours_ahead' => 2,
             ],
             [
                 'shipment_number' => 'CT-2026-003',
@@ -103,6 +108,8 @@ class BrazilSantosShipmentSeeder extends Seeder
                 'courier_name' => 'Yamato Santos Coffee Logistics',
                 'courier_vehicle' => 'Mobil Van Paket Pendingin (TK-2026)',
                 'notes' => 'Pesawat kargo mendarat di Tokyo Haneda dari São Paulo GRU. Biji kopi di-oper ke mobil paket kurir pendingin menuju Shibuya Roastery.',
+                'dep_days_ago' => 2,
+                'arr_hours_ahead' => 4,
             ],
             [
                 'shipment_number' => 'CT-2026-004',
@@ -121,6 +128,8 @@ class BrazilSantosShipmentSeeder extends Seeder
                 'courier_name' => 'EuroCoffee Fast Van Delivery',
                 'courier_vehicle' => 'Mobil Van Paket Euro 6 (NL-CT-404)',
                 'notes' => 'Kapal kontainer tiba di Pelabuhan Rotterdam dari Santos Brazil. Kontainer dibongkar lalu di-oper ke mobil paket kurir menuju Roastery Coolsingel.',
+                'dep_days_ago' => 16,
+                'arr_hours_ahead' => 3,
             ],
             [
                 'shipment_number' => 'CT-2026-005',
@@ -139,6 +148,8 @@ class BrazilSantosShipmentSeeder extends Seeder
                 'courier_name' => 'Santos NYC Metro Courier Van',
                 'courier_vehicle' => 'Mobil Van Paket Kargo NY (NYC-552)',
                 'notes' => 'Penerbangan kargo kilat dari GRU tiba di Bandara JFK New York. Biji kopi di-oper ke mobil paket kurir menuju Manhattan Roastery.',
+                'dep_days_ago' => 1,
+                'arr_hours_ahead' => 2,
             ],
             [
                 'shipment_number' => 'CT-2026-006',
@@ -157,6 +168,8 @@ class BrazilSantosShipmentSeeder extends Seeder
                 'courier_name' => 'Armada Kurir Mobil Kopi Santos Jawa Timur',
                 'courier_vehicle' => 'Mobil Van Paket Box (L 8192 CT)',
                 'notes' => 'Kapal kargo tiba di Pelabuhan Tanjung Perak dari Pelabuhan Santos. Kargo karung kopi di-oper ke mobil van paket kurir menuju Kafe Gubeng Surabaya.',
+                'dep_days_ago' => 21,
+                'arr_hours_ahead' => 1,
             ]
         ];
 
@@ -184,6 +197,15 @@ class BrazilSantosShipmentSeeder extends Seeder
                 $shipment->courier_name = $data['courier_name'];
                 $shipment->courier_vehicle = $data['courier_vehicle'];
                 $shipment->notes = $data['notes'];
+
+                // Realistic departure and arrival times
+                $dep = Carbon::now()->subDays($data['dep_days_ago']);
+                $arr = Carbon::now()->addHours($data['arr_hours_ahead']);
+                $shipment->expected_departure = $dep;
+                $shipment->actual_departure = $dep;
+                $shipment->expected_arrival = $arr;
+                $shipment->estimated_time_arrival = $arr;
+
                 $shipment->save();
             } else {
                 // Generalized Brazil Santos Coffee export shipment
@@ -192,10 +214,30 @@ class BrazilSantosShipmentSeeder extends Seeder
                 $isAir = ($shipment->transport_mode === 'AIR');
 
                 $shipment->origin_location_id = $isAir ? $gruAirport->id : $santosPort->id;
+                $shipment->is_last_mile = false;
                 $shipment->coffee_variety = $variety;
                 $shipment->coffee_grade = $grade;
                 $shipment->cargo_type = 'Kopi Ekspor Brazil Santos: ' . $variety;
                 $shipment->notes = 'Ekspor Resmi Kopi Brazil Santos — Santos Coffee Exporters S.A. Kemasan kantong hermetis GrainPro 60kg.';
+
+                // Staggered departure and arrival schedule so no two shipments share the same spot
+                if ($isAir) {
+                    $depHours = 4 + (($index * 7) % 36);
+                    $arrHours = 6 + (($index * 5) % 24);
+                    $dep = Carbon::now()->subHours($depHours);
+                    $arr = Carbon::now()->addHours($arrHours);
+                } else {
+                    $depDays = 3 + (($index * 3) % 18);
+                    $arrDays = 4 + (($index * 2) % 16);
+                    $dep = Carbon::now()->subDays($depDays);
+                    $arr = Carbon::now()->addDays($arrDays);
+                }
+
+                $shipment->expected_departure = $dep;
+                $shipment->actual_departure = $dep;
+                $shipment->expected_arrival = $arr;
+                $shipment->estimated_time_arrival = $arr;
+
                 $shipment->save();
             }
         }

@@ -1024,8 +1024,8 @@
             document.getElementById('map-legend').innerHTML = legends[mode];
         }
 
-        // ── HELPER: CURVED PATH GENERATOR (Natural Geodesic Arc) ───
-        function createCurvedPath(p1, p2, numPoints = 20, curvature = 0.12) {
+        // ── HELPER: CURVED PATH GENERATOR (Natural Geodesic Arc with Lane Separation) ───
+        function createCurvedPath(p1, p2, numPoints = 20, curvature = 0.12, laneShift = 0) {
             const lat1 = p1[0], lng1 = p1[1];
             const lat2 = p2[0], lng2 = p2[1];
 
@@ -1045,8 +1045,8 @@
             const nx = -dLng / dist;
             const ny = dLat / dist;
 
-            // Arc elevation (natural great-circle bow)
-            const arcHeight = Math.min(12, Math.max(1.8, dist * curvature));
+            // Arc elevation with lane separation so parallel shipping lines don't stack
+            const arcHeight = Math.min(24, Math.max(1.5, (dist * curvature) + laneShift));
             const sign = (dLng >= 0) ? 1 : -1;
             const hemisphereFactor = midLat >= 0 ? 1 : -1;
 
@@ -1114,9 +1114,9 @@
         }
 
         // ── HELPER: INTERPOLASI POSISI DI KORIDOR RUTE SESUAI PROGRES ──
-        function getPositionOnRoute(originPt, destPt, progress) {
-            const numPoints = 40;
-            const path = createCurvedPath(originPt, destPt, numPoints, 0.14);
+        function getPositionOnRoute(originPt, destPt, progress, curvature = 0.12, laneShift = 0) {
+            const numPoints = 50;
+            const path = createCurvedPath(originPt, destPt, numPoints, curvature, laneShift);
             const idx = Math.min(numPoints, Math.max(0, Math.round(progress * numPoints)));
             return path[idx] || originPt;
         }
@@ -1132,36 +1132,7 @@
             const cargo       = (s.cargo_type || '').toLowerCase();
             const notes       = (s.notes || '').toLowerCase();
 
-            // 0. Mobil / Truk Kargo (Khusus Moda Darat Murni / LAND)
-            if (s.transport_mode === 'LAND') {
-                return {
-                    type: 'van',
-                    label: 'Mobil Pengantaran Kurir (Last-Mile Delivery)',
-                    emoji: '🚚',
-                    accentColor: '#f59e0b',
-                    iconW: 36,
-                    iconH: 52,
-                    realSvg: `
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 64" width="28" height="48" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.55));">
-                            <rect x="5" y="4" width="26" height="56" rx="4" fill="#0f172a" opacity="0.3" transform="translate(1, 2)"/>
-                            <rect x="5" y="6" width="26" height="52" rx="4" fill="#f59e0b" stroke="#d97706" stroke-width="1.2"/>
-                            <rect x="7" y="7" width="22" height="15" rx="2" fill="#1e293b"/>
-                            <path d="M8 9 Q18 7 28 9 L27 15 Q18 13 9 15 Z" fill="#38bdf8"/>
-                            <rect x="4" y="11" width="2.5" height="4" rx="1" fill="#0f172a"/>
-                            <rect x="29.5" y="11" width="2.5" height="4" rx="1" fill="#0f172a"/>
-                            <rect x="7" y="24" width="22" height="32" rx="2" fill="#fbbf24" stroke="#d97706" stroke-width="0.8"/>
-                            <text x="18" y="40" font-size="6" font-weight="bold" fill="#78350f" text-anchor="middle" font-family="sans-serif">SANTOS</text>
-                            <text x="18" y="48" font-size="4.5" font-weight="bold" fill="#92400e" text-anchor="middle" font-family="sans-serif">☕ COFFEE</text>
-                            <rect x="4" y="18" width="2" height="7" rx="0.5" fill="#0f172a"/>
-                            <rect x="30" y="18" width="2" height="7" rx="0.5" fill="#0f172a"/>
-                            <rect x="4" y="48" width="2" height="7" rx="0.5" fill="#0f172a"/>
-                            <rect x="30" y="48" width="2" height="7" rx="0.5" fill="#0f172a"/>
-                        </svg>
-                    `
-                };
-            }
-
-            // 1. Pesawat Kargo Udara (Real Jet Freighter Top-Down)
+            // 0. Pesawat Kargo Udara (Real Jet Freighter Top-Down)
             if (s.transport_mode === 'AIR' || originType === 'AIRPORT' || destType === 'AIRPORT' ||
                 originName.includes('bandara') || originName.includes('airport') ||
                 destName.includes('bandara') || destName.includes('airport') ||
@@ -1199,58 +1170,36 @@
                 };
             }
 
-            // 2. Truk Kontainer Logistik (Real Semi-Trailer Truck Top-Down)
-            if (originType === 'WAREHOUSE' || destType === 'WAREHOUSE' ||
-                originType === 'CUSTOMS_OFFICE' || destType === 'CUSTOMS_OFFICE' ||
-                originName.includes('gudang') || destName.includes('gudang') ||
-                carrierName.includes('truck') || notes.includes('truck') || notes.includes('darat')) {
+            // 1. Truk / Mobil Paket Domestik (Hanya untuk pengiriman darat dalam satu negara)
+            if (s.transport_mode === 'LAND' && (s.origin?.country && s.destination?.country && s.origin.country === s.destination.country)) {
                 return {
-                    type: 'truck',
-                    label: 'Truk Kontainer (Freight Truck)',
-                    emoji: '🚛',
-                    accentColor: '#10b981',
-                    iconW: 38,
-                    iconH: 68,
+                    type: 'van',
+                    label: 'Mobil Pengantaran Kurir (Last-Mile Delivery)',
+                    emoji: '🚚',
+                    accentColor: '#f59e0b',
+                    iconW: 36,
+                    iconH: 52,
                     realSvg: `
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 76" width="26" height="54" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.55));">
-                            <!-- Chassis Shadow -->
-                            <rect x="7" y="4" width="22" height="68" rx="4" fill="#0f172a" opacity="0.35" transform="translate(1, 2)"/>
-                            <!-- Trailer Chassis -->
-                            <rect x="7" y="22" width="22" height="48" rx="2" fill="#1e293b"/>
-                            <!-- 40ft Shipping Container -->
-                            <rect x="8" y="23" width="20" height="46" rx="2" fill="#059669" stroke="#047857" stroke-width="0.9"/>
-                            <!-- Corrugated Ridges (Panel Kontainer Nyata) -->
-                            <line x1="8" y1="28" x2="28" y2="28" stroke="#047857" stroke-width="1.2"/>
-                            <line x1="8" y1="33" x2="28" y2="33" stroke="#047857" stroke-width="1.2"/>
-                            <line x1="8" y1="38" x2="28" y2="38" stroke="#047857" stroke-width="1.2"/>
-                            <line x1="8" y1="43" x2="28" y2="43" stroke="#047857" stroke-width="1.2"/>
-                            <line x1="8" y1="48" x2="28" y2="48" stroke="#047857" stroke-width="1.2"/>
-                            <line x1="8" y1="53" x2="28" y2="53" stroke="#047857" stroke-width="1.2"/>
-                            <line x1="8" y1="58" x2="28" y2="58" stroke="#047857" stroke-width="1.2"/>
-                            <line x1="8" y1="63" x2="28" y2="63" stroke="#047857" stroke-width="1.2"/>
-                            <!-- Container Castings -->
-                            <rect x="8.5" y="23.5" width="2.5" height="2.5" fill="#f8fafc"/>
-                            <rect x="25" y="23.5" width="2.5" height="2.5" fill="#f8fafc"/>
-                            <rect x="8.5" y="66" width="2.5" height="2.5" fill="#f8fafc"/>
-                            <rect x="25" y="66" width="2.5" height="2.5" fill="#f8fafc"/>
-                            <!-- Tractor Cab Front -->
-                            <rect x="8" y="4" width="20" height="17" rx="3" fill="#f8fafc" stroke="#64748b" stroke-width="1"/>
-                            <!-- Windshield -->
-                            <path d="M10 7 Q18 5 26 7 L25 10 Q18 8.5 11 10 Z" fill="#0284c7"/>
-                            <!-- Side Mirrors -->
-                            <rect x="5.5" y="7" width="2.5" height="4" rx="1" fill="#334155"/>
-                            <rect x="28" y="7" width="2.5" height="4" rx="1" fill="#334155"/>
-                            <!-- Wheels -->
-                            <rect x="6" y="14" width="2" height="5" rx="0.5" fill="#0f172a"/>
-                            <rect x="28" y="14" width="2" height="5" rx="0.5" fill="#0f172a"/>
-                            <rect x="6" y="58" width="2" height="8" rx="0.5" fill="#0f172a"/>
-                            <rect x="28" y="58" width="2" height="8" rx="0.5" fill="#0f172a"/>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 64" width="28" height="48" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.55));">
+                            <rect x="5" y="4" width="26" height="56" rx="4" fill="#0f172a" opacity="0.3" transform="translate(1, 2)"/>
+                            <rect x="5" y="6" width="26" height="52" rx="4" fill="#f59e0b" stroke="#d97706" stroke-width="1.2"/>
+                            <rect x="7" y="7" width="22" height="15" rx="2" fill="#1e293b"/>
+                            <path d="M8 9 Q18 7 28 9 L27 15 Q18 13 9 15 Z" fill="#38bdf8"/>
+                            <rect x="4" y="11" width="2.5" height="4" rx="1" fill="#0f172a"/>
+                            <rect x="29.5" y="11" width="2.5" height="4" rx="1" fill="#0f172a"/>
+                            <rect x="7" y="24" width="22" height="32" rx="2" fill="#fbbf24" stroke="#d97706" stroke-width="0.8"/>
+                            <text x="18" y="40" font-size="6" font-weight="bold" fill="#78350f" text-anchor="middle" font-family="sans-serif">SANTOS</text>
+                            <text x="18" y="48" font-size="4.5" font-weight="bold" fill="#92400e" text-anchor="middle" font-family="sans-serif">☕ COFFEE</text>
+                            <rect x="4" y="18" width="2" height="7" rx="0.5" fill="#0f172a"/>
+                            <rect x="30" y="18" width="2" height="7" rx="0.5" fill="#0f172a"/>
+                            <rect x="4" y="48" width="2" height="7" rx="0.5" fill="#0f172a"/>
+                            <rect x="30" y="48" width="2" height="7" rx="0.5" fill="#0f172a"/>
                         </svg>
                     `
                 };
             }
 
-            // 3. Default: Kapal Kontainer Samudera (Real Cargo Container Vessel Top-Down)
+            // 2. Default: Kapal Kontainer Samudera (Real Cargo Container Vessel Top-Down)
             return {
                 type: 'ship',
                 label: 'Kapal Kontainer Samudera (Cargo Vessel)',
@@ -1504,6 +1453,8 @@
                             if (tag) tag.classList.add('tag-focused');
                         }
                         it.vehicleMarker.openPopup();
+                    } else if (it.courierVanMarker) {
+                        it.courierVanMarker.openPopup();
                     } else if (it.traveledPoly) {
                         it.traveledPoly.openPopup(targetLatLng || it.bounds.getCenter());
                     } else if (it.directPoly) {
@@ -1587,6 +1538,7 @@
             cargoShipmentItems = [];
             activeCargoId = null;
             const latLngs = [];
+            const occupiedVehicleCoords = [];
 
             if (!Array.isArray(shipments)) return latLngs;
 
@@ -1620,38 +1572,25 @@
                 const vehicle = getShipmentVehicle(s);
                 const eta     = getShipmentETA(s);
 
+                // Hitung pemisahan lajur koridor (Lane Separation) agar rute paralel tidak saling tumpuk
+                const laneSeed = ((s.id * 11) % 9) - 4; // Deviasi per kargo (-4 s/d +4)
+                const laneShift = laneSeed * 1.6; // Deviasi lateral kurva
+                const laneCurvature = (isAirCargo ? 0.16 : 0.11) + (laneSeed * 0.012);
+
                 // Hitung progres real-time berdasarkan waktu keberangkatan & perkiraan tiba
                 const progress = getShipmentRealtimeProgress(s);
 
-                const curLoc = s.current_location || s.currentLocation;
-                const isCurLocAtOrigin = curLoc && curLoc.latitude && curLoc.longitude &&
-                    Math.abs(parseFloat(curLoc.latitude) - oLat) < 0.25 &&
-                    Math.abs(parseFloat(curLoc.longitude) - oLng) < 0.25;
+                // Buat lintasan kurva lengkap dengan pemisahan lajur
+                const fullCorridor = createCurvedPath(originCoords, destCoords, 50, laneCurvature, laneShift);
+                const progressIdx  = Math.min(50, Math.max(1, Math.round(progress * 50)));
 
-                let hasCurrent = false;
-                let curCoords = null;
-
-                if (curLoc && curLoc.latitude && curLoc.longitude && !isCurLocAtOrigin && s.status !== 'DELIVERED') {
-                    const cLat = parseFloat(curLoc.latitude);
-                    const cLng = parseFloat(curLoc.longitude);
-                    if (!isNaN(cLat) && !isNaN(cLng)) {
-                        curCoords = [cLat, cLng];
-                        hasCurrent = true;
-                    }
-                }
-
-                // Jika posisi terkini belum ada atau kargo sudah tiba di pelabuhan tujuan (tahap last-mile)
-                if (!hasCurrent) {
-                    if (s.status === 'DELIVERED' || s.is_last_mile) {
-                        curCoords = destCoords;
-                    } else {
-                        curCoords = getPositionOnRoute(originCoords, destCoords, progress);
-                    }
-                    hasCurrent = true;
+                let curCoords = fullCorridor[progressIdx] || originCoords;
+                if (s.is_last_mile || s.status === 'DELIVERED') {
+                    curCoords = destCoords;
                 }
                 latLngs.push(curCoords);
 
-                const displayCurLoc = (!isCurLocAtOrigin && curLoc?.name) ? curLoc : {
+                const displayCurLoc = {
                     name: s.is_last_mile ? `Tiba di ${s.destination.name} &bull; Di-oper ke Mobil Paket Kurir` : (isAirCargo ? `Di Udara (Koridor Udara Internasional - FL360)` : `Di Jalur Pelayaran Samudra (Laut Lepas)`)
                 };
 
@@ -1674,81 +1613,81 @@
                 let directPoly = null;
                 let vehicleMarker = null;
 
-                if (hasCurrent) {
-                    if (s.is_last_mile) {
-                        // Kargo sudah sampai di pelabuhan tujuan, lintasan samudra 100% selesai
-                        const traveledCurve = createCurvedPath(originCoords, destCoords, 24, 0.12);
-                        traveledPoly = L.polyline(traveledCurve, {
-                            color: '#0284c7',
-                            weight: 3.5,
-                            opacity: 0.85,
-                            lineCap: 'round',
-                            cursor: 'pointer'
-                        }).bindPopup(popupHtml).addTo(cargoLayerGroup);
-                        traveledPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
-                        // Tidak ada kendaraan terapung di laut karena kargo sudah di-oper ke mobil paket di darat!
-                    } else {
-                        // 1. Lintasan Ditempuh: Asal -> Posisi Terkini (Lengkung solid bercahaya)
-                        const traveledCurve = createCurvedPath(originCoords, curCoords, 18, 0.12);
-                        traveledPoly = L.polyline(traveledCurve, {
-                            color: '#0284c7',
-                            weight: 3.5,
-                            opacity: 0.9,
-                            lineCap: 'round',
-                            lineJoin: 'round',
-                            cursor: 'pointer'
-                        }).bindPopup(popupHtml).addTo(cargoLayerGroup);
-                        traveledPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
-
-                        // 2. Estimasi Lintasan Lanjutan: Posisi Terkini -> Tujuan (Lengkung putus-putus)
-                        const remainingCurve = createCurvedPath(curCoords, destCoords, 18, 0.12);
-                        remainingPoly = L.polyline(remainingCurve, {
-                            color: '#38bdf8',
-                            weight: 2.5,
-                            dashArray: '6, 8',
-                            opacity: 0.8,
-                            lineCap: 'round',
-                            lineJoin: 'round',
-                            cursor: 'pointer'
-                        }).bindPopup(popupHtml).addTo(cargoLayerGroup);
-                        remainingPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
-
-                        // 3. Real Vehicle Visual Marker (Kapal Kontainer / Pesawat Udara di koridor internasional)
-                        const heading = calculateBearing(curCoords, destCoords);
-                        const vehicleDivIcon = L.divIcon({
-                            className: 'cargo-real-vehicle-marker',
-                            html: `
-                                <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${heading}deg);" title="${vehicle.label} &bull; ${s.shipment_number}">
-                                    ${vehicle.realSvg}
-                                </div>
-                                <div class="cargo-vehicle-tag">
-                                    <span class="cargo-tag-dot" style="background:${vehicle.accentColor};"></span>
-                                    <span>${s.shipment_number}</span>
-                                </div>
-                            `,
-                            iconSize: [vehicle.iconW || 44, vehicle.iconH || 68],
-                            iconAnchor: [(vehicle.iconW || 44) / 2, (vehicle.iconH || 68) / 2],
-                            popupAnchor: [0, -((vehicle.iconH || 68) / 2 + 5)]
-                        });
-
-                        vehicleMarker = L.marker(curCoords, { icon: vehicleDivIcon, zIndexOffset: 1000 })
-                            .bindPopup(popupHtml)
-                            .addTo(cargoLayerGroup);
-                        vehicleMarker.on('click', () => focusCargoShipment(s.id, curCoords));
-                    }
+                if (s.is_last_mile) {
+                    // Kargo sudah sampai di pelabuhan tujuan, lintasan samudra 100% selesai penuh
+                    traveledPoly = L.polyline(fullCorridor, {
+                        color: isAirCargo ? '#0284c7' : '#0369a1',
+                        weight: 3.5,
+                        opacity: 0.85,
+                        lineCap: 'round',
+                        cursor: 'pointer'
+                    }).bindPopup(popupHtml).addTo(cargoLayerGroup);
+                    traveledPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+                    // Tidak ada kendaraan terapung di laut/udara karena kargo sudah di-oper ke mobil paket di darat!
                 } else {
-                    // Belum ada lokasi terkini terpisah, buat kurva langsung Asal ke Tujuan
-                    const directCurve = createCurvedPath(originCoords, destCoords, 24, 0.12);
-                    directPoly = L.polyline(directCurve, {
-                        color: '#0284c7',
-                        weight: 2.5,
-                        dashArray: '6, 8',
-                        opacity: 0.75,
+                    // 1. Lintasan Ditempuh: Asal -> Posisi Terkini (Lapis lengkung solid menyala)
+                    const traveledCurve = fullCorridor.slice(0, progressIdx + 1);
+                    traveledPoly = L.polyline(traveledCurve, {
+                        color: isAirCargo ? '#0284c7' : '#0369a1',
+                        weight: 3.5,
+                        opacity: 0.9,
                         lineCap: 'round',
                         lineJoin: 'round',
                         cursor: 'pointer'
                     }).bindPopup(popupHtml).addTo(cargoLayerGroup);
-                    directPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+                    traveledPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+
+                    // 2. Estimasi Lintasan Lanjutan: Posisi Terkini -> Tujuan (Garis putus-putus)
+                    const remainingCurve = fullCorridor.slice(progressIdx);
+                    remainingPoly = L.polyline(remainingCurve, {
+                        color: isAirCargo ? '#38bdf8' : '#7dd3fc',
+                        weight: 2.5,
+                        dashArray: '6, 8',
+                        opacity: 0.8,
+                        lineCap: 'round',
+                        lineJoin: 'round',
+                        cursor: 'pointer'
+                    }).bindPopup(popupHtml).addTo(cargoLayerGroup);
+                    remainingPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+
+                    // 3. Real Vehicle Visual Marker (Kapal Kontainer / Pesawat Udara di koridor internasional)
+                    // Anti-Collision / De-clustering: Pastikan tidak ada 2 armada yang bertumpukan di titik yang sama
+                    let vehicleCoords = [curCoords[0], curCoords[1]];
+                    let collisionAttempts = 0;
+                    while (collisionAttempts < 8) {
+                        const collides = occupiedVehicleCoords.some(occ => {
+                            return (Math.abs(occ[0] - vehicleCoords[0]) < 2.8 && Math.abs(occ[1] - vehicleCoords[1]) < 4.2);
+                        });
+                        if (!collides) break;
+                        collisionAttempts++;
+                        const nudgeSeed = (s.id * 7 + collisionAttempts * 11) % 4;
+                        const latNudge = (nudgeSeed === 0 ? 3.0 : (nudgeSeed === 1 ? -3.0 : (nudgeSeed === 2 ? 2.2 : -2.2)));
+                        const lngNudge = (nudgeSeed === 0 ? 4.2 : (nudgeSeed === 1 ? -4.2 : (nudgeSeed === 2 ? -4.2 : 4.2)));
+                        vehicleCoords = [vehicleCoords[0] + latNudge, vehicleCoords[1] + lngNudge];
+                    }
+                    occupiedVehicleCoords.push(vehicleCoords);
+
+                    const heading = calculateBearing(vehicleCoords, destCoords);
+                    const vehicleDivIcon = L.divIcon({
+                        className: 'cargo-real-vehicle-marker',
+                        html: `
+                            <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${heading}deg);" title="${vehicle.label} &bull; ${s.shipment_number}">
+                                ${vehicle.realSvg}
+                            </div>
+                            <div class="cargo-vehicle-tag">
+                                <span class="cargo-tag-dot" style="background:${vehicle.accentColor};"></span>
+                                <span>${s.shipment_number}</span>
+                            </div>
+                        `,
+                        iconSize: [vehicle.iconW || 44, vehicle.iconH || 68],
+                        iconAnchor: [(vehicle.iconW || 44) / 2, (vehicle.iconH || 68) / 2],
+                        popupAnchor: [0, -((vehicle.iconH || 68) / 2 + 5)]
+                    });
+
+                    vehicleMarker = L.marker(vehicleCoords, { icon: vehicleDivIcon, zIndexOffset: 1000 })
+                        .bindPopup(popupHtml)
+                        .addTo(cargoLayerGroup);
+                    vehicleMarker.on('click', () => focusCargoShipment(s.id, vehicleCoords));
                 }
 
                 // Bounds untuk zoom fokus rute
@@ -1779,56 +1718,59 @@
                         deliveryPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
                         // 1. Mobil Van Paket Kurir (Sama seperti mobil paket pada umumnya - TANPA LINGKARAN BULAT)
-                        const vanLat = destCoords[0] + (devCoords[0] - destCoords[0]) * 0.65;
-                        const vanLng = destCoords[1] + (devCoords[1] - destCoords[1]) * 0.65;
-                        const vanHeading = calculateBearing(destCoords, devCoords);
+                        // Tampilkan mobil van paket bergerak jika pengiriman sudah tahap last-mile atau tiba di negara tujuan
+                        if (s.is_last_mile || s.status === 'DELIVERED') {
+                            const vanLat = destCoords[0] + (devCoords[0] - destCoords[0]) * 0.65;
+                            const vanLng = destCoords[1] + (devCoords[1] - destCoords[1]) * 0.65;
+                            const vanHeading = calculateBearing(destCoords, devCoords);
 
-                        const courierVanDivIcon = L.divIcon({
-                            className: 'cargo-real-vehicle-marker',
-                            html: `
-                                <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${vanHeading}deg);" title="${s.courier_name || 'Mobil Paket Kurir'} &bull; ${s.shipment_number}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 68" width="30" height="54" style="filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));">
-                                        <!-- Bayangan Mobil -->
-                                        <rect x="4" y="3" width="30" height="62" rx="6" fill="#0f172a" opacity="0.35" transform="translate(1.5, 2.5)"/>
-                                        <!-- Roda Mobil (4 Roda) -->
-                                        <rect x="3" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
-                                        <rect x="32" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
-                                        <rect x="3" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
-                                        <rect x="32" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
-                                        <!-- Bodi Utama Mobil Van Paket (Putih Bersih) -->
-                                        <rect x="5" y="4" width="28" height="60" rx="5" fill="#f8fafc" stroke="#64748b" stroke-width="1.2"/>
-                                        <!-- Kabin Depan Pengemudi -->
-                                        <rect x="7" y="6" width="24" height="15" rx="3" fill="#e2e8f0"/>
-                                        <!-- Kaca Depan (Windshield) -->
-                                        <path d="M8 8 Q19 6 30 8 L29 15 Q19 13.5 9 15 Z" fill="#0284c7"/>
-                                        <!-- Kaca Samping -->
-                                        <rect x="6.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
-                                        <rect x="29.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
-                                        <!-- Spion -->
-                                        <rect x="3" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
-                                        <rect x="32.5" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
-                                        <!-- Boks Muatan Paket Belakang (Warna Oranye Ekspedisi) -->
-                                        <rect x="6.5" y="23" width="25" height="39" rx="2.5" fill="#f59e0b" stroke="#d97706" stroke-width="0.8"/>
-                                        <!-- Simbol Paket / Parcel Kurir -->
-                                        <rect x="9.5" y="27" width="19" height="2" fill="#fde68a"/>
-                                        <text x="19" y="42" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="sans-serif">📦</text>
-                                        <text x="19" y="54" font-size="5" font-weight="800" fill="#78350f" text-anchor="middle" font-family="sans-serif">KURIR PAKET</text>
-                                    </svg>
-                                </div>
-                                <div class="cargo-vehicle-tag" style="white-space:nowrap; margin-top:-2px;">
-                                    <span class="cargo-tag-dot" style="background:#f59e0b;"></span>
-                                    <span>Mobil Paket: ${s.courier_vehicle ? (s.courier_vehicle.split('(')[1]?.replace(')','') || s.shipment_number) : s.shipment_number}</span>
-                                </div>
-                            `,
-                            iconSize: [36, 56],
-                            iconAnchor: [18, 28],
-                            popupAnchor: [0, -32]
-                        });
+                            const courierVanDivIcon = L.divIcon({
+                                className: 'cargo-real-vehicle-marker',
+                                html: `
+                                    <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${vanHeading}deg);" title="${s.courier_name || 'Mobil Paket Kurir'} &bull; ${s.shipment_number}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 68" width="30" height="54" style="filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));">
+                                            <!-- Bayangan Mobil -->
+                                            <rect x="4" y="3" width="30" height="62" rx="6" fill="#0f172a" opacity="0.35" transform="translate(1.5, 2.5)"/>
+                                            <!-- Roda Mobil (4 Roda) -->
+                                            <rect x="3" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
+                                            <rect x="32" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
+                                            <rect x="3" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
+                                            <rect x="32" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
+                                            <!-- Bodi Utama Mobil Van Paket (Putih Bersih) -->
+                                            <rect x="5" y="4" width="28" height="60" rx="5" fill="#f8fafc" stroke="#64748b" stroke-width="1.2"/>
+                                            <!-- Kabin Depan Pengemudi -->
+                                            <rect x="7" y="6" width="24" height="15" rx="3" fill="#e2e8f0"/>
+                                            <!-- Kaca Depan (Windshield) -->
+                                            <path d="M8 8 Q19 6 30 8 L29 15 Q19 13.5 9 15 Z" fill="#0284c7"/>
+                                            <!-- Kaca Samping -->
+                                            <rect x="6.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
+                                            <rect x="29.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
+                                            <!-- Spion -->
+                                            <rect x="3" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
+                                            <rect x="32.5" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
+                                            <!-- Boks Muatan Paket Belakang (Warna Oranye Ekspedisi) -->
+                                            <rect x="6.5" y="23" width="25" height="39" rx="2.5" fill="#f59e0b" stroke="#d97706" stroke-width="0.8"/>
+                                            <!-- Simbol Paket / Parcel Kurir -->
+                                            <rect x="9.5" y="27" width="19" height="2" fill="#fde68a"/>
+                                            <text x="19" y="42" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="sans-serif">📦</text>
+                                            <text x="19" y="54" font-size="5" font-weight="800" fill="#78350f" text-anchor="middle" font-family="sans-serif">KURIR PAKET</text>
+                                        </svg>
+                                    </div>
+                                    <div class="cargo-vehicle-tag" style="white-space:nowrap; margin-top:-2px;">
+                                        <span class="cargo-tag-dot" style="background:#f59e0b;"></span>
+                                        <span>Mobil Paket: ${s.courier_vehicle ? (s.courier_vehicle.split('(')[1]?.replace(')','') || s.shipment_number) : s.shipment_number}</span>
+                                    </div>
+                                `,
+                                iconSize: [36, 56],
+                                iconAnchor: [18, 28],
+                                popupAnchor: [0, -32]
+                            });
 
-                        courierVanMarker = L.marker([vanLat, vanLng], { icon: courierVanDivIcon, zIndexOffset: 1500 })
-                            .bindPopup(popupHtml)
-                            .addTo(cargoLayerGroup);
-                        courierVanMarker.on('click', () => focusCargoShipment(s.id, [vanLat, vanLng]));
+                            courierVanMarker = L.marker([vanLat, vanLng], { icon: courierVanDivIcon, zIndexOffset: 1500 })
+                                .bindPopup(popupHtml)
+                                .addTo(cargoLayerGroup);
+                            courierVanMarker.on('click', () => focusCargoShipment(s.id, [vanLat, vanLng]));
+                        }
 
                         // 2. Pin Alamat Tujuan Penerima (Pin Lokasi Biasa - TANPA LINGKARAN BULAT)
                         const destPinIcon = L.divIcon({
