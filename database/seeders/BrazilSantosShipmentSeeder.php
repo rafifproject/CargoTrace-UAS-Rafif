@@ -19,6 +19,14 @@ class BrazilSantosShipmentSeeder extends Seeder
         $gruAirport = Location::where('name', 'like', '%Guarulhos%')->first()
             ?? Location::where('country', 'like', '%Brasil%')->where('location_type', 'AIRPORT')->first();
 
+        // Destination ports and airports
+        $tanjungPriok = Location::where('name', 'like', '%Tanjung Priok%')->first();
+        $tanjungPerak = Location::where('name', 'like', '%Tanjung Perak%')->first();
+        $heathrow = Location::where('name', 'like', '%Heathrow%')->first();
+        $rotterdam = Location::where('name', 'like', '%Rotterdam%')->first();
+        $jfk = Location::where('name', 'like', '%Kennedy%')->first() ?? Location::where('name', 'like', '%JFK%')->first();
+        $haneda = Location::where('name', 'like', '%Haneda%')->first() ?? Location::where('name', 'like', '%Tokyo%')->first();
+
         if (! $santosPort || ! $gruAirport) {
             $this->command->warn('Santos Port or GRU Airport not found.');
             return;
@@ -40,11 +48,13 @@ class BrazilSantosShipmentSeeder extends Seeder
             'Commercial Export Grade A',
         ];
 
-        // Specific Last-Mile Ground Deliveries
+        // Specific Last-Mile Multimodal Deliveries (Ocean/Air from Brazil -> Local Courier Van to address)
         $lastMileTargets = [
             [
                 'shipment_number' => 'CT-2026-001',
-                'transport_mode' => 'LAND',
+                'transport_mode' => 'SEA',
+                'origin_id' => $santosPort->id,
+                'dest_id' => $tanjungPriok ? $tanjungPriok->id : 1,
                 'is_last_mile' => true,
                 'coffee_variety' => 'Kopi Brazil Santos Bourbon Specialty',
                 'coffee_grade' => 'Specialty Grade 1 (SCA Score 84+)',
@@ -55,12 +65,14 @@ class BrazilSantosShipmentSeeder extends Seeder
                 'delivery_lat' => -6.2297,
                 'delivery_lng' => 106.8075,
                 'courier_name' => 'Armada Kurir Mobil Kopi Santos Jakarta',
-                'courier_vehicle' => 'Mobil Van Distribusi Kopi (B 9482 CT)',
-                'notes' => 'Tiba di Pelabuhan Tanjung Priok. Saat ini mobil kurir sedang mengantar langsung karung biji kopi ke Roastery Senopati Jakarta Selatan.',
+                'courier_vehicle' => 'Mobil Van Paket Kopi (B 9482 CT)',
+                'notes' => 'Berangkat via Kapal Laut dari Pelabuhan Santos ke Pelabuhan Tanjung Priok. Saat ini kontainer telah dibongkar dan di-oper ke mobil paket kurir lokal menuju Roastery Senopati Jakarta Selatan.',
             ],
             [
                 'shipment_number' => 'CT-2026-002',
-                'transport_mode' => 'LAND',
+                'transport_mode' => 'AIR',
+                'origin_id' => $gruAirport->id,
+                'dest_id' => $heathrow ? $heathrow->id : 58,
                 'is_last_mile' => true,
                 'coffee_variety' => 'Brazil Santos Yellow Catuai Natural Micro-lot',
                 'coffee_grade' => 'Exclusive Micro-Lot Nano Batch',
@@ -71,12 +83,14 @@ class BrazilSantosShipmentSeeder extends Seeder
                 'delivery_lat' => 51.52016,
                 'delivery_lng' => -0.1603064,
                 'courier_name' => 'Santos Express London Courier Van',
-                'courier_vehicle' => 'Electric Delivery Van (LDN-77-CT)',
-                'notes' => 'Sampel micro-lot kopi kilat tiba di London Heathrow, kurir mobil listrik sedang mengantar ke 38 Upper Montagu Street, Westminster.',
+                'courier_vehicle' => 'Mobil Van Paket Listrik (LDN-77-CT)',
+                'notes' => 'Berangkat via Pesawat Kargo Udara Kilat dari Bandara GRU São Paulo ke London Heathrow. Setelah mendarat, kargo di-oper ke mobil van paket kurir menuju 38 Upper Montagu Street, Westminster.',
             ],
             [
                 'shipment_number' => 'CT-2026-003',
                 'transport_mode' => 'AIR',
+                'origin_id' => $gruAirport->id,
+                'dest_id' => $haneda ? $haneda->id : 3,
                 'is_last_mile' => true,
                 'coffee_variety' => 'Brazil Santos Strictly Soft Fine Cup (SSFC)',
                 'coffee_grade' => 'Specialty Grade 1 (SCA Score 84+)',
@@ -87,12 +101,14 @@ class BrazilSantosShipmentSeeder extends Seeder
                 'delivery_lat' => 35.6628,
                 'delivery_lng' => 139.7013,
                 'courier_name' => 'Yamato Santos Coffee Logistics',
-                'courier_vehicle' => 'Mobil Truk Pendingin Khusus Biji Kopi (TK-2026)',
-                'notes' => 'Kargo udara tiba di Haneda. Mobil kurir khusus dalam proses pengantaran langsung ke Shibuya Roastery.',
+                'courier_vehicle' => 'Mobil Van Paket Pendingin (TK-2026)',
+                'notes' => 'Pesawat kargo mendarat di Tokyo Haneda dari São Paulo GRU. Biji kopi di-oper ke mobil paket kurir pendingin menuju Shibuya Roastery.',
             ],
             [
                 'shipment_number' => 'CT-2026-004',
                 'transport_mode' => 'SEA',
+                'origin_id' => $santosPort->id,
+                'dest_id' => $rotterdam ? $rotterdam->id : 20,
                 'is_last_mile' => true,
                 'coffee_variety' => 'Brazil Santos Cerrado Mineiro Single-Origin',
                 'coffee_grade' => 'Strictly Soft Fine Cup NY 2/3',
@@ -103,12 +119,14 @@ class BrazilSantosShipmentSeeder extends Seeder
                 'delivery_lat' => 51.9225,
                 'delivery_lng' => 4.4791,
                 'courier_name' => 'EuroCoffee Fast Van Delivery',
-                'courier_vehicle' => 'Mobil Van Euro 6 (NL-CT-404)',
-                'notes' => 'Kontainer dibongkar di Maasvlakte Rotterdam. Mobil kurir kargo mendistribusikan karung kopi ke Roastery Coolsingel.',
+                'courier_vehicle' => 'Mobil Van Paket Euro 6 (NL-CT-404)',
+                'notes' => 'Kapal kontainer tiba di Pelabuhan Rotterdam dari Santos Brazil. Kontainer dibongkar lalu di-oper ke mobil paket kurir menuju Roastery Coolsingel.',
             ],
             [
                 'shipment_number' => 'CT-2026-005',
                 'transport_mode' => 'AIR',
+                'origin_id' => $gruAirport->id,
+                'dest_id' => $jfk ? $jfk->id : 60,
                 'is_last_mile' => true,
                 'coffee_variety' => 'Brazil Santos Decaf Swiss Water Process',
                 'coffee_grade' => 'Specialty Grade 1 (SCA Score 84+)',
@@ -119,12 +137,14 @@ class BrazilSantosShipmentSeeder extends Seeder
                 'delivery_lat' => 40.7423,
                 'delivery_lng' => -74.0076,
                 'courier_name' => 'Santos NYC Metro Courier Van',
-                'courier_vehicle' => 'Mobil Van Kargo Kopi NY (NYC-552)',
-                'notes' => 'Penerbangan kargo kilat dari GRU tiba di JFK. Mobil kurir dalam perjalanan mengantar ke Manhattan Roastery.',
+                'courier_vehicle' => 'Mobil Van Paket Kargo NY (NYC-552)',
+                'notes' => 'Penerbangan kargo kilat dari GRU tiba di Bandara JFK New York. Biji kopi di-oper ke mobil paket kurir menuju Manhattan Roastery.',
             ],
             [
                 'shipment_number' => 'CT-2026-006',
-                'transport_mode' => 'LAND',
+                'transport_mode' => 'SEA',
+                'origin_id' => $santosPort->id,
+                'dest_id' => $tanjungPerak ? $tanjungPerak->id : 2,
                 'is_last_mile' => true,
                 'coffee_variety' => 'Brazil Santos Espresso Roast Master Blend',
                 'coffee_grade' => 'Commercial Export Grade A',
@@ -135,8 +155,8 @@ class BrazilSantosShipmentSeeder extends Seeder
                 'delivery_lat' => -7.2756,
                 'delivery_lng' => 112.7541,
                 'courier_name' => 'Armada Kurir Mobil Kopi Santos Jawa Timur',
-                'courier_vehicle' => 'Mobil Truk Box Pendingin (L 8192 CT)',
-                'notes' => 'Mobil kurir armada kargo darat mengantar 50 karung biji kopi espresso blend langsung ke Kafe Gubeng Surabaya.',
+                'courier_vehicle' => 'Mobil Van Paket Box (L 8192 CT)',
+                'notes' => 'Kapal kargo tiba di Pelabuhan Tanjung Perak dari Pelabuhan Santos. Kargo karung kopi di-oper ke mobil van paket kurir menuju Kafe Gubeng Surabaya.',
             ]
         ];
 
@@ -149,6 +169,8 @@ class BrazilSantosShipmentSeeder extends Seeder
             if (isset($targetMap[$num])) {
                 $data = $targetMap[$num];
                 $shipment->transport_mode = $data['transport_mode'];
+                $shipment->origin_location_id = $data['origin_id'];
+                $shipment->destination_location_id = $data['dest_id'];
                 $shipment->is_last_mile = $data['is_last_mile'];
                 $shipment->coffee_variety = $data['coffee_variety'];
                 $shipment->coffee_grade = $data['coffee_grade'];
@@ -162,14 +184,6 @@ class BrazilSantosShipmentSeeder extends Seeder
                 $shipment->courier_name = $data['courier_name'];
                 $shipment->courier_vehicle = $data['courier_vehicle'];
                 $shipment->notes = $data['notes'];
-
-                // Origin is Brazil (Santos or GRU)
-                if ($data['transport_mode'] === 'AIR') {
-                    $shipment->origin_location_id = $gruAirport->id;
-                } else {
-                    $shipment->origin_location_id = $santosPort->id;
-                }
-
                 $shipment->save();
             } else {
                 // Generalized Brazil Santos Coffee export shipment

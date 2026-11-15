@@ -345,3 +345,4 @@ class GeoService
         return ['lat' => -23.9618, 'lng' => -46.3322]; // Default: Santos, Brazil
     }
 }
+

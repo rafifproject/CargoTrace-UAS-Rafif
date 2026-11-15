@@ -73,3 +73,4 @@ class GeoController extends Controller
         ]);
     }
 }
+

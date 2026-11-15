@@ -1484,6 +1484,11 @@
                         const el = it.deliveryMarker.getElement();
                         if (el) el.classList.remove('marker-dimmed');
                     }
+                    if (it.courierVanMarker) {
+                        it.courierVanMarker.setZIndexOffset(10000);
+                        const el = it.courierVanMarker.getElement();
+                        if (el) el.classList.remove('marker-dimmed');
+                    }
 
                     // Menonjolkan icon kendaraan kargo
                     if (it.vehicleMarker) {
@@ -1518,6 +1523,11 @@
                         const el = it.deliveryMarker.getElement();
                         if (el) el.classList.add('marker-dimmed');
                     }
+                    if (it.courierVanMarker) {
+                        it.courierVanMarker.setZIndexOffset(100);
+                        const el = it.courierVanMarker.getElement();
+                        if (el) el.classList.add('marker-dimmed');
+                    }
 
                     if (it.vehicleMarker) {
                         it.vehicleMarker.setZIndexOffset(100);
@@ -1547,6 +1557,11 @@
                 if (it.deliveryMarker) {
                     it.deliveryMarker.setZIndexOffset(1200);
                     const el = it.deliveryMarker.getElement();
+                    if (el) el.classList.remove('marker-dimmed');
+                }
+                if (it.courierVanMarker) {
+                    it.courierVanMarker.setZIndexOffset(1500);
+                    const el = it.courierVanMarker.getElement();
                     if (el) el.classList.remove('marker-dimmed');
                 }
 
@@ -1729,6 +1744,7 @@
                 // 4. Pin & Lintasan Mobil Kurir Pengantaran Alamat (Last-Mile Delivery)
                 let deliveryMarker = null;
                 let deliveryPoly = null;
+                let courierVanMarker = null;
                 if (s.delivery_lat && s.delivery_lng) {
                     const devLat = parseFloat(s.delivery_lat);
                     const devLng = parseFloat(s.delivery_lng);
@@ -1737,31 +1753,83 @@
                         routePoints.push(devCoords);
                         latLngs.push(devCoords);
 
-                        // Garis pengantaran mobil kurir dari simpul tujuan ke alamat penerima
+                        // Garis jalan darat pengantaran mobil paket dari pelabuhan/bandara kedatangan ke alamat kafe
                         deliveryPoly = L.polyline([destCoords, devCoords], {
                             color: '#f59e0b',
                             weight: 3.5,
-                            dashArray: '3, 6',
+                            dashArray: '5, 6',
                             opacity: 0.95,
                             lineCap: 'round',
                             cursor: 'pointer'
                         }).bindPopup(popupHtml).addTo(cargoLayerGroup);
                         deliveryPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
-                        // Pin Mobil Kurir Pengantaran Alamat
-                        const truckPinIcon = L.divIcon({
-                            className: 'cargo-last-mile-pin',
+                        // 1. Mobil Van Paket Kurir (Sama seperti mobil paket pada umumnya - TANPA LINGKARAN BULAT)
+                        const vanLat = destCoords[0] + (devCoords[0] - destCoords[0]) * 0.65;
+                        const vanLng = destCoords[1] + (devCoords[1] - destCoords[1]) * 0.65;
+                        const vanHeading = calculateBearing(destCoords, devCoords);
+
+                        const courierVanDivIcon = L.divIcon({
+                            className: 'cargo-real-vehicle-marker',
                             html: `
-                                <div style="background:#f59e0b; color:#fff; border:2px solid #fff; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 12px rgba(245,158,11,0.85); font-size:14px; cursor:pointer;" title="Alamat Pengantaran: ${s.delivery_address || s.delivery_city}">
-                                    🚚
+                                <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${vanHeading}deg);" title="${s.courier_name || 'Mobil Paket Kurir'} &bull; ${s.shipment_number}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 68" width="30" height="54" style="filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));">
+                                        <!-- Bayangan Mobil -->
+                                        <rect x="4" y="3" width="30" height="62" rx="6" fill="#0f172a" opacity="0.35" transform="translate(1.5, 2.5)"/>
+                                        <!-- Roda Mobil (4 Roda) -->
+                                        <rect x="3" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
+                                        <rect x="32" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
+                                        <rect x="3" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
+                                        <rect x="32" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
+                                        <!-- Bodi Utama Mobil Van Paket (Putih Bersih) -->
+                                        <rect x="5" y="4" width="28" height="60" rx="5" fill="#f8fafc" stroke="#64748b" stroke-width="1.2"/>
+                                        <!-- Kabin Depan Pengemudi -->
+                                        <rect x="7" y="6" width="24" height="15" rx="3" fill="#e2e8f0"/>
+                                        <!-- Kaca Depan (Windshield) -->
+                                        <path d="M8 8 Q19 6 30 8 L29 15 Q19 13.5 9 15 Z" fill="#0284c7"/>
+                                        <!-- Kaca Samping -->
+                                        <rect x="6.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
+                                        <rect x="29.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
+                                        <!-- Spion -->
+                                        <rect x="3" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
+                                        <rect x="32.5" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
+                                        <!-- Boks Muatan Paket Belakang (Warna Oranye Ekspedisi) -->
+                                        <rect x="6.5" y="23" width="25" height="39" rx="2.5" fill="#f59e0b" stroke="#d97706" stroke-width="0.8"/>
+                                        <!-- Simbol Paket / Parcel Kurir -->
+                                        <rect x="9.5" y="27" width="19" height="2" fill="#fde68a"/>
+                                        <text x="19" y="42" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="sans-serif">📦</text>
+                                        <text x="19" y="54" font-size="5" font-weight="800" fill="#78350f" text-anchor="middle" font-family="sans-serif">KURIR PAKET</text>
+                                    </svg>
+                                </div>
+                                <div class="cargo-vehicle-tag" style="white-space:nowrap; margin-top:-2px;">
+                                    <span class="cargo-tag-dot" style="background:#f59e0b;"></span>
+                                    <span>Mobil Paket: ${s.courier_vehicle ? (s.courier_vehicle.split('(')[1]?.replace(')','') || s.shipment_number) : s.shipment_number}</span>
                                 </div>
                             `,
-                            iconSize: [28, 28],
-                            iconAnchor: [14, 14],
-                            popupAnchor: [0, -15]
+                            iconSize: [36, 56],
+                            iconAnchor: [18, 28],
+                            popupAnchor: [0, -32]
                         });
 
-                        deliveryMarker = L.marker(devCoords, { icon: truckPinIcon, zIndexOffset: 1200 })
+                        courierVanMarker = L.marker([vanLat, vanLng], { icon: courierVanDivIcon, zIndexOffset: 1500 })
+                            .bindPopup(popupHtml)
+                            .addTo(cargoLayerGroup);
+                        courierVanMarker.on('click', () => focusCargoShipment(s.id, [vanLat, vanLng]));
+
+                        // 2. Pin Alamat Tujuan Penerima (Pin Lokasi Biasa - TANPA LINGKARAN BULAT)
+                        const destPinIcon = L.divIcon({
+                            className: 'cargo-destination-pin',
+                            html: `
+                                <div style="font-size:26px; line-height:1; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.5)); transform:translate(-2px, -14px); cursor:pointer;" title="Alamat Pengantaran: ${s.delivery_address || s.delivery_city}">
+                                    📍
+                                </div>
+                            `,
+                            iconSize: [26, 26],
+                            iconAnchor: [13, 26],
+                            popupAnchor: [0, -28]
+                        });
+
+                        deliveryMarker = L.marker(devCoords, { icon: destPinIcon, zIndexOffset: 1200 })
                             .bindPopup(popupHtml)
                             .addTo(cargoLayerGroup);
                         deliveryMarker.on('click', () => focusCargoShipment(s.id, devCoords));
@@ -1782,6 +1850,7 @@
                     directPoly,
                     deliveryPoly,
                     deliveryMarker,
+                    courierVanMarker,
                     vehicleMarker,
                     curCoords,
                     bounds
