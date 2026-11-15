@@ -363,8 +363,43 @@
             .bindPopup(`<b>🔴 Titik Tujuan:</b> {{ $shipment->destination->name }}<br><span style="font-size:11px; color:#64748b;">{{ $shipment->destination->city }}, {{ $shipment->destination->country }}</span>`)
             .addTo(detailMap);
 
+        const boundsPoints = [origin, dest];
+
+        @if($shipment->delivery_lat && $shipment->delivery_lng)
+            const devCoords = [{{ $shipment->delivery_lat }}, {{ $shipment->delivery_lng }}];
+            boundsPoints.push(devCoords);
+
+            // Garis jalan darat pengantaran mobil kurir
+            L.polyline([dest, devCoords], { color: '#f59e0b', weight: 3.5, dashArray: '5, 6', opacity: 0.95 }).addTo(detailMap);
+
+            // Pin Alamat Penerima (📍)
+            const destPin = L.divIcon({
+                className: 'cargo-destination-pin',
+                html: `<div style="font-size:26px; line-height:1; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.5)); transform:translate(-2px, -14px);" title="{{ $shipment->delivery_address }}">📍</div>`,
+                iconSize: [26, 26],
+                iconAnchor: [13, 26]
+            });
+            L.marker(devCoords, { icon: destPin }).addTo(detailMap)
+                .bindPopup(`<b>🚚 Alamat Pengantaran:</b> {{ $shipment->delivery_address }}<br><span style="font-size:11px; color:#92400e;">{{ $shipment->delivery_district ? $shipment->delivery_district . ", " : "" }}{{ $shipment->delivery_city }} ({{ $shipment->delivery_country }})</span>`);
+
+            @if($shipment->is_last_mile)
+                const vanLat = dest[0] + (devCoords[0] - dest[0]) * 0.65;
+                const vanLng = dest[1] + (devCoords[1] - dest[1]) * 0.65;
+                const vanIcon = L.divIcon({
+                    className: 'cargo-v-van',
+                    html: `<div style="background:#f59e0b; color:#fff; width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 3px 10px rgba(245,158,11,0.6); border:2px solid #fff;">🚚</div>`,
+                    iconSize: [34, 34],
+                    iconAnchor: [17, 17]
+                });
+                L.marker([vanLat, vanLng], { icon: vanIcon }).addTo(detailMap)
+                    .bindPopup(`<b>🚚 Armada Kurir Paket:</b> {{ $shipment->courier_name ?? "Mobil Van Paket" }}<br><span style="font-size:11px; color:#d97706; font-weight:700;">{{ $shipment->courier_vehicle ?? "Van Kurir" }}</span>`)
+                    .openPopup();
+            @endif
+        @endif
+
         @if($shipment->currentLocation)
             const current = [{{ $shipment->currentLocation->latitude }}, {{ $shipment->currentLocation->longitude }}];
+            boundsPoints.push(current);
             
             L.polyline([origin, current], { color: '#00F0FF', weight: 4.5, opacity: 0.95 }).addTo(detailMap);
             L.polyline([current, dest], { color: '#38BDF8', weight: 3.5, dashArray: '6, 8', opacity: 0.85 }).addTo(detailMap);
@@ -373,7 +408,7 @@
                 className: 'cargo-v-icon',
                 html: `
                     <div style="background:#0284c7; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 0 14px rgba(0,240,255,0.9); border:2.5px solid #fff;">
-                        🚢
+                        {{ $shipment->transport_mode === 'AIR' ? '✈️' : '🚢' }}
                     </div>
                 `,
                 iconSize: [34, 34],
@@ -382,13 +417,12 @@
 
             L.marker(current, { icon: vIcon })
                 .bindPopup(`<b>📍 Posisi Saat Ini:</b> {{ $shipment->currentLocation->name }}<br><span style="font-size:11px; color:#0284c7; font-weight:700;">Status: {{ $shipment->status }}</span>`)
-                .addTo(detailMap)
-                .openPopup();
-            detailMap.fitBounds(L.latLngBounds([origin, current, dest]), { padding: [50, 50] });
+                .addTo(detailMap);
         @else
-            L.polyline([origin, dest], { color: '#00F0FF', weight: 3.5, dashArray: '6, 6' }).addTo(detailMap);
-            detailMap.fitBounds(L.latLngBounds([origin, dest]), { padding: [50, 50] });
+            L.polyline([origin, dest], { color: '#00F0FF', weight: 3.5, opacity: 0.85 }).addTo(detailMap);
         @endif
+
+        detailMap.fitBounds(L.latLngBounds(boundsPoints), { padding: [50, 50] });
     }
 </script>
 @endpush

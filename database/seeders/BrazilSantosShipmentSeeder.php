@@ -184,6 +184,7 @@ class BrazilSantosShipmentSeeder extends Seeder
                 $shipment->transport_mode = $data['transport_mode'];
                 $shipment->origin_location_id = $data['origin_id'];
                 $shipment->destination_location_id = $data['dest_id'];
+                $shipment->current_location_id = null;
                 $shipment->is_last_mile = $data['is_last_mile'];
                 $shipment->coffee_variety = $data['coffee_variety'];
                 $shipment->coffee_grade = $data['coffee_grade'];
@@ -214,6 +215,7 @@ class BrazilSantosShipmentSeeder extends Seeder
                 $isAir = ($shipment->transport_mode === 'AIR');
 
                 $shipment->origin_location_id = $isAir ? $gruAirport->id : $santosPort->id;
+                $shipment->current_location_id = null;
                 $shipment->is_last_mile = false;
                 $shipment->coffee_variety = $variety;
                 $shipment->coffee_grade = $grade;
