@@ -1132,8 +1132,8 @@
             const cargo       = (s.cargo_type || '').toLowerCase();
             const notes       = (s.notes || '').toLowerCase();
 
-            // 0. Mobil / Van Pengantaran Kurir (Ground / Last-Mile Delivery ke Alamat)
-            if (s.transport_mode === 'LAND' || s.is_last_mile) {
+            // 0. Mobil / Truk Kargo (Khusus Moda Darat Murni / LAND)
+            if (s.transport_mode === 'LAND') {
                 return {
                     type: 'van',
                     label: 'Mobil Pengantaran Kurir (Last-Mile Delivery)',
@@ -1355,17 +1355,19 @@
 
         // ── HELPER: POPUP CONTENT WITH RICH ROUTE & ETA ─────────
         function generateShipmentPopupContent(s, vehicle, eta, curLoc, progress = 0.45) {
-            const isAir = (s.transport_mode === 'AIR') || (vehicle.type === 'plane');
-            const isLand = (s.transport_mode === 'LAND') || (vehicle.type === 'van') || s.is_last_mile;
-            const pct = Math.round(progress * 100);
+            const isAir = (s.transport_mode === 'AIR');
+            const isLand = (s.transport_mode === 'LAND') || !!s.is_last_mile;
+            const pct = isLand ? 95 : Math.round(progress * 100);
+            const activeEmoji = isLand ? '🚚' : (isAir ? '✈️' : '🚢');
+            const activeLabel = isLand ? (s.courier_name || 'Mobil Van Paket Kurir Lokal') : vehicle.label;
             return `
                 <div style="min-width:290px; font-family: Outfit, sans-serif; padding:4px 2px;">
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
                         <div style="display:flex; align-items:center; gap:8px;">
-                            <span style="font-size:22px;">${vehicle.emoji}</span>
+                            <span style="font-size:22px;">${activeEmoji}</span>
                             <div>
                                 <div style="font-weight:800; font-size:14px; color:#0284c7;">${s.shipment_number}</div>
-                                <div style="font-size:10px; color:#64748b;">${vehicle.label}</div>
+                                <div style="font-size:10px; color:#64748b;">${activeLabel}</div>
                             </div>
                         </div>
                         <span style="font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; background:#e0f2fe; color:#0369a1;">
@@ -1638,10 +1640,9 @@
                     }
                 }
 
-                // Jika posisi terkini belum ada atau masih terhenti di bandara/pelabuhan asal,
-                // posisikan secara realtime di sepanjang koridor rute sesuai perkiraan tiba
+                // Jika posisi terkini belum ada atau kargo sudah tiba di pelabuhan tujuan (tahap last-mile)
                 if (!hasCurrent) {
-                    if (s.status === 'DELIVERED') {
+                    if (s.status === 'DELIVERED' || s.is_last_mile) {
                         curCoords = destCoords;
                     } else {
                         curCoords = getPositionOnRoute(originCoords, destCoords, progress);
@@ -1651,7 +1652,7 @@
                 latLngs.push(curCoords);
 
                 const displayCurLoc = (!isCurLocAtOrigin && curLoc?.name) ? curLoc : {
-                    name: isAirCargo ? `Di Udara (Koridor Udara Internasional - FL360)` : `Di Jalur Pelayaran Samudra (Laut Lepas)`
+                    name: s.is_last_mile ? `Tiba di ${s.destination.name} &bull; Di-oper ke Mobil Paket Kurir` : (isAirCargo ? `Di Udara (Koridor Udara Internasional - FL360)` : `Di Jalur Pelayaran Samudra (Laut Lepas)`)
                 };
 
                 const popupHtml = generateShipmentPopupContent(s, vehicle, eta, displayCurLoc, progress);
@@ -1674,54 +1675,67 @@
                 let vehicleMarker = null;
 
                 if (hasCurrent) {
-                    // 1. Lintasan Ditempuh: Asal -> Posisi Terkini (Lengkung solid bercahaya)
-                    const traveledCurve = createCurvedPath(originCoords, curCoords, 18, 0.12);
-                    traveledPoly = L.polyline(traveledCurve, {
-                        color: '#0284c7',
-                        weight: 3.5,
-                        opacity: 0.9,
-                        lineCap: 'round',
-                        lineJoin: 'round',
-                        cursor: 'pointer'
-                    }).bindPopup(popupHtml).addTo(cargoLayerGroup);
-                    traveledPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+                    if (s.is_last_mile) {
+                        // Kargo sudah sampai di pelabuhan tujuan, lintasan samudra 100% selesai
+                        const traveledCurve = createCurvedPath(originCoords, destCoords, 24, 0.12);
+                        traveledPoly = L.polyline(traveledCurve, {
+                            color: '#0284c7',
+                            weight: 3.5,
+                            opacity: 0.85,
+                            lineCap: 'round',
+                            cursor: 'pointer'
+                        }).bindPopup(popupHtml).addTo(cargoLayerGroup);
+                        traveledPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+                        // Tidak ada kendaraan terapung di laut karena kargo sudah di-oper ke mobil paket di darat!
+                    } else {
+                        // 1. Lintasan Ditempuh: Asal -> Posisi Terkini (Lengkung solid bercahaya)
+                        const traveledCurve = createCurvedPath(originCoords, curCoords, 18, 0.12);
+                        traveledPoly = L.polyline(traveledCurve, {
+                            color: '#0284c7',
+                            weight: 3.5,
+                            opacity: 0.9,
+                            lineCap: 'round',
+                            lineJoin: 'round',
+                            cursor: 'pointer'
+                        }).bindPopup(popupHtml).addTo(cargoLayerGroup);
+                        traveledPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
-                    // 2. Estimasi Lintasan Lanjutan: Posisi Terkini -> Tujuan (Lengkung putus-putus)
-                    const remainingCurve = createCurvedPath(curCoords, destCoords, 18, 0.12);
-                    remainingPoly = L.polyline(remainingCurve, {
-                        color: '#38bdf8',
-                        weight: 2.5,
-                        dashArray: '6, 8',
-                        opacity: 0.8,
-                        lineCap: 'round',
-                        lineJoin: 'round',
-                        cursor: 'pointer'
-                    }).bindPopup(popupHtml).addTo(cargoLayerGroup);
-                    remainingPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+                        // 2. Estimasi Lintasan Lanjutan: Posisi Terkini -> Tujuan (Lengkung putus-putus)
+                        const remainingCurve = createCurvedPath(curCoords, destCoords, 18, 0.12);
+                        remainingPoly = L.polyline(remainingCurve, {
+                            color: '#38bdf8',
+                            weight: 2.5,
+                            dashArray: '6, 8',
+                            opacity: 0.8,
+                            lineCap: 'round',
+                            lineJoin: 'round',
+                            cursor: 'pointer'
+                        }).bindPopup(popupHtml).addTo(cargoLayerGroup);
+                        remainingPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
-                    // 3. Real Vehicle Visual Marker (Tanpa Bulatan - Dynamic Bearing)
-                    const heading = calculateBearing(curCoords, destCoords);
-                    const vehicleDivIcon = L.divIcon({
-                        className: 'cargo-real-vehicle-marker',
-                        html: `
-                            <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${heading}deg);" title="${vehicle.label} &bull; ${s.shipment_number}">
-                                ${vehicle.realSvg}
-                            </div>
-                            <div class="cargo-vehicle-tag">
-                                <span class="cargo-tag-dot" style="background:${vehicle.accentColor};"></span>
-                                <span>${s.shipment_number}</span>
-                            </div>
-                        `,
-                        iconSize: [vehicle.iconW || 44, vehicle.iconH || 68],
-                        iconAnchor: [(vehicle.iconW || 44) / 2, (vehicle.iconH || 68) / 2],
-                        popupAnchor: [0, -((vehicle.iconH || 68) / 2 + 5)]
-                    });
+                        // 3. Real Vehicle Visual Marker (Kapal Kontainer / Pesawat Udara di koridor internasional)
+                        const heading = calculateBearing(curCoords, destCoords);
+                        const vehicleDivIcon = L.divIcon({
+                            className: 'cargo-real-vehicle-marker',
+                            html: `
+                                <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${heading}deg);" title="${vehicle.label} &bull; ${s.shipment_number}">
+                                    ${vehicle.realSvg}
+                                </div>
+                                <div class="cargo-vehicle-tag">
+                                    <span class="cargo-tag-dot" style="background:${vehicle.accentColor};"></span>
+                                    <span>${s.shipment_number}</span>
+                                </div>
+                            `,
+                            iconSize: [vehicle.iconW || 44, vehicle.iconH || 68],
+                            iconAnchor: [(vehicle.iconW || 44) / 2, (vehicle.iconH || 68) / 2],
+                            popupAnchor: [0, -((vehicle.iconH || 68) / 2 + 5)]
+                        });
 
-                    vehicleMarker = L.marker(curCoords, { icon: vehicleDivIcon, zIndexOffset: 1000 })
-                        .bindPopup(popupHtml)
-                        .addTo(cargoLayerGroup);
-                    vehicleMarker.on('click', () => focusCargoShipment(s.id, curCoords));
-
+                        vehicleMarker = L.marker(curCoords, { icon: vehicleDivIcon, zIndexOffset: 1000 })
+                            .bindPopup(popupHtml)
+                            .addTo(cargoLayerGroup);
+                        vehicleMarker.on('click', () => focusCargoShipment(s.id, curCoords));
+                    }
                 } else {
                     // Belum ada lokasi terkini terpisah, buat kurva langsung Asal ke Tujuan
                     const directCurve = createCurvedPath(originCoords, destCoords, 24, 0.12);
