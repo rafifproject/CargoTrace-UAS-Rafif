@@ -110,9 +110,10 @@
                     <input type="hidden" name="shipment_id" value="{{ request('shipment_id') }}">
                 @endif
                 <select name="transport_mode" onchange="this.form.submit()" class="px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500 shadow-xs">
-                    <option value="">Semua Moda (Laut & Udara)</option>
+                    <option value="">Semua Moda Pengiriman</option>
                     <option value="SEA" {{ request('transport_mode') === 'SEA' ? 'selected' : '' }}>🚢 Kapal Laut Saja</option>
                     <option value="AIR" {{ request('transport_mode') === 'AIR' ? 'selected' : '' }}>✈️ Pesawat Udara Saja</option>
+                    <option value="LAND" {{ request('transport_mode') === 'LAND' ? 'selected' : '' }}>🚚 Mobil / Truk Kargo (Darat)</option>
                 </select>
             </form>
 

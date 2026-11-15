@@ -19,6 +19,14 @@ Route::get('/ports', [PublicIntelligenceApiController::class, 'ports']);
 Route::get('/news', [PublicIntelligenceApiController::class, 'news']);
 Route::get('/currency', [PublicIntelligenceApiController::class, 'currency']);
 
+// Geoapify Cascading Dropdowns & Places API
+Route::prefix('geo')->group(function () {
+    Route::get('/countries', [\App\Http\Controllers\GeoController::class, 'countries']);
+    Route::get('/cities', [\App\Http\Controllers\GeoController::class, 'cities']);
+    Route::get('/districts', [\App\Http\Controllers\GeoController::class, 'districts']);
+    Route::get('/geocode', [\App\Http\Controllers\GeoController::class, 'geocode']);
+});
+
 // Protected API Endpoints (Sanctum Authenticated)
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);

@@ -1,6 +1,6 @@
 @extends('layouts.operator')
 
-@section('title', 'Buat Pengiriman Baru')
+@section('title', 'Buat Pengiriman Baru — Santos Coffee Exporters S.A.')
 
 @section('content')
 <div class="mb-6 flex items-center justify-between">
@@ -8,10 +8,15 @@
         <div class="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500 mb-1">
             <a href="{{ route('operator.shipments.index') }}" class="hover:text-cyan-500">Semua Pengiriman</a>
             <i data-lucide="chevron-right" class="w-3 h-3"></i>
-            <span>Buat Pengiriman Baru</span>
+            <span>Santos Coffee Exporters S.A. (Brazil)</span>
+            <i data-lucide="chevron-right" class="w-3 h-3"></i>
+            <span class="text-slate-600 dark:text-slate-300">Buat Pengiriman Baru</span>
         </div>
-        <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Buat Pengiriman Baru</h1>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Daftarkan pengiriman baru via moda Kapal Laut (Pelabuhan) atau Pesawat Udara (Bandara Kargo)</p>
+        <h1 class="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2.5">
+            <span>☕</span>
+            <span>Buat Pengiriman Ekspor Kopi Brazil Santos</span>
+        </h1>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Daftarkan pengiriman ekspor biji kopi via moda Kapal Laut (Pelabuhan Santos), Pesawat Kargo Udara (GRU São Paulo), atau Mobil Pengantaran Darat langsung ke kafe/toko tujuan</p>
     </div>
     <a href="{{ route('operator.shipments.index') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5">
         <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
@@ -27,76 +32,102 @@
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {{-- LEFT: Form Fields --}}
         <div class="lg:col-span-3 space-y-5">
-            {{-- PILIHAN MODA PENGIRIMAN: KAPAL LAUT vs PESAWAT UDARA --}}
+            {{-- PILIHAN MODA PENGIRIMAN: KAPAL LAUT vs PESAWAT UDARA vs MOBIL KARGO --}}
             <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
                 <div class="flex items-center justify-between mb-3">
                     <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
-                        1. Jenis Moda Pengiriman <span class="text-rose-500">*</span>
+                        1. Jenis Moda Distribusi Ekspor <span class="text-rose-500">*</span>
                     </label>
-                    <span class="text-[11px] text-slate-400">Pilih moda untuk menentukan daftar simpul logistik</span>
+                    <span class="text-[11px] text-slate-400">Pilih moda untuk menentukan simpul logistik & jenis armada</span>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {{-- Opsi Kapal Laut --}}
-                    <div id="mode-card-sea" onclick="setTransportMode('SEA')" class="cursor-pointer relative p-4 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
+                    <div id="mode-card-sea" onclick="setTransportMode('SEA')" class="cursor-pointer relative p-3.5 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
                         <div class="flex items-start justify-between mb-2">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-9 h-9 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg shadow-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg shadow-sm">
                                     🚢
                                 </div>
                                 <div>
-                                    <h4 class="text-sm font-bold text-slate-800 dark:text-white">Kapal Laut</h4>
-                                    <span class="text-[10px] text-slate-400">Maritime Freight</span>
+                                    <h4 class="text-xs font-bold text-slate-800 dark:text-white">Kapal Laut</h4>
+                                    <span class="text-[9px] text-slate-400">Maritime Freight</span>
                                 </div>
                             </div>
-                            <span id="badge-sea" class="text-[10px] font-bold px-2 py-0.5 rounded-full border">
+                            <span id="badge-sea" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full border">
                                 Terpilih
                             </span>
                         </div>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
-                            Simpul Pelabuhan Laut Internasional (~$0.35/kg, 7-21 hari).
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug">
+                            Simpul <strong>Pelabuhan Santos (Brazil)</strong> ke pelabuhan kontainer dunia (7-21 hari).
                         </p>
                     </div>
 
                     {{-- Opsi Pesawat Udara --}}
-                    <div id="mode-card-air" onclick="setTransportMode('AIR')" class="cursor-pointer relative p-4 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
+                    <div id="mode-card-air" onclick="setTransportMode('AIR')" class="cursor-pointer relative p-3.5 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
                         <div class="flex items-start justify-between mb-2">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-9 h-9 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg shadow-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg shadow-sm">
                                     ✈️
                                 </div>
                                 <div>
-                                    <h4 class="text-sm font-bold text-slate-800 dark:text-white">Pesawat Udara</h4>
-                                    <span class="text-[10px] text-slate-400">Air Cargo Express</span>
+                                    <h4 class="text-xs font-bold text-slate-800 dark:text-white">Pesawat Udara</h4>
+                                    <span class="text-[9px] text-slate-400">Air Cargo Express</span>
                                 </div>
                             </div>
-                            <span id="badge-air" class="text-[10px] font-bold px-2 py-0.5 rounded-full border">
+                            <span id="badge-air" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full border">
                                 Pilih
                             </span>
                         </div>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
-                            Simpul Bandara Kargo Internasional (~$2.80/kg, 1-3 hari kilat).
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug">
+                            Simpul <strong>Bandara São Paulo (GRU)</strong> untuk sampel & pesanan prioritas kilat (1-3 hari).
+                        </p>
+                    </div>
+
+                    {{-- Opsi Mobil / Truk Kargo (Darat) --}}
+                    <div id="mode-card-land" onclick="setTransportMode('LAND')" class="cursor-pointer relative p-3.5 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
+                        <div class="flex items-start justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg shadow-sm">
+                                    🚚
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-800 dark:text-white">Mobil / Truk</h4>
+                                    <span class="text-[9px] text-slate-400">Ground / Last-Mile</span>
+                                </div>
+                            </div>
+                            <span id="badge-land" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full border">
+                                Pilih
+                            </span>
+                        </div>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug">
+                            Armada <strong>Mobil Van Kurir Kopi Santos</strong> pengantaran langsung ke kafe/toko/roastery tujuan.
                         </p>
                     </div>
                 </div>
                 @error('transport_mode')<p class="text-rose-500 text-xs mt-2">{{ $message }}</p>@enderror
             </div>
 
-            {{-- Informasi Pengiriman --}}
+            {{-- Informasi Pengiriman, Pelanggan & Komoditas Kopi --}}
             <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
-                <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2">
-                    <i data-lucide="package" class="w-4 h-4 text-cyan-500"></i>
-                    2. Informasi Pengiriman & Pelanggan
-                </h3>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <i data-lucide="package" class="w-4 h-4 text-cyan-500"></i>
+                        <span>2. Informasi Pengiriman & Komoditas Kopi Santos</span>
+                    </h3>
+                    <span class="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded-full border border-cyan-500/20">
+                        {{ $suggestedNumber }}
+                    </span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="col-span-2">
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nomor Pengiriman <span class="text-rose-500">*</span></label>
-                        <input type="text" name="shipment_number" value="{{ old('shipment_number', $suggestedNumber) }}" class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 font-mono @error('shipment_number') border-rose-400 @enderror">
+                        <input type="text" name="shipment_number" value="{{ old('shipment_number', $suggestedNumber) }}" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 font-mono @error('shipment_number') border-rose-400 @enderror">
                         @error('shipment_number')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
-                    <div class="col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Pelanggan <span class="text-rose-500">*</span></label>
-                        <select name="customer_id" class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('customer_id') border-rose-400 @enderror">
+                    <div class="col-span-2 sm:col-span-1">
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Pelanggan / Roastery Tujuan <span class="text-rose-500">*</span></label>
+                        <select name="customer_id" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('customer_id') border-rose-400 @enderror">
                             <option value="">— Pilih Pelanggan —</option>
                             @foreach($customers as $c)
                                 <option value="{{ $c->id }}" {{ old('customer_id') == $c->id ? 'selected' : '' }}>{{ $c->name }} ({{ $c->email }})</option>
@@ -104,38 +135,58 @@
                         </select>
                         @error('customer_id')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
-                    <div>
+                    <div class="col-span-2 sm:col-span-1">
                         <div class="flex items-center justify-between mb-1.5">
-                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">Ekspedisi (205+ Negara) <span class="text-rose-500">*</span></label>
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">Mitra Ekspedisi <span class="text-rose-500">*</span></label>
                             <span class="text-[11px] text-cyan-600 dark:text-cyan-400 font-medium">{{ count($carriers) }} Mitra</span>
                         </div>
-                        <div class="space-y-1.5">
-                            <input type="text" id="carrier_quick_filter" placeholder="Cari nama ekspedisi, kode, atau negara..." onkeyup="filterCarrierOptions(this.value)" class="w-full px-3 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-cyan-500">
-                            <select id="carrier_select" name="carrier_id" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('carrier_id') border-rose-400 @enderror">
-                                <option value="">— Pilih Ekspedisi Resmi Global —</option>
-                                @foreach($carriers as $c)
-                                    <option value="{{ $c->id }}" data-search="{{ strtolower($c->name . ' ' . $c->code . ' ' . $c->country) }}" {{ old('carrier_id') == $c->id ? 'selected' : '' }}>
-                                        {{ $c->name }} ({{ $c->code }}) — {{ $c->country }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <select id="carrier_select" name="carrier_id" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('carrier_id') border-rose-400 @enderror">
+                            <option value="">— Pilih Ekspedisi Resmi Global —</option>
+                            @foreach($carriers as $c)
+                                <option value="{{ $c->id }}" {{ old('carrier_id') == $c->id ? 'selected' : '' }}>
+                                    {{ $c->name }} ({{ $c->code }}) — {{ $c->country }}
+                                </option>
+                            @endforeach
+                        </select>
                         @error('carrier_id')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Jenis Kargo <span class="text-rose-500">*</span></label>
-                        <input type="text" name="cargo_type" value="{{ old('cargo_type') }}" placeholder="cth. Electronics, Textiles..." class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('cargo_type') border-rose-400 @enderror">
+
+                    <div class="col-span-2 sm:col-span-1">
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Komoditas Kargo <span class="text-rose-500">*</span></label>
+                        <input type="text" name="cargo_type" value="{{ old('cargo_type', 'Kopi Ekspor Brazil Santos (Specialty Coffee)') }}" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('cargo_type') border-rose-400 @enderror">
                         @error('cargo_type')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+
+                    <div class="col-span-2 sm:col-span-1">
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Varietas Kopi Brazil Santos</label>
+                        <select name="coffee_variety" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="Kopi Brazil Santos Bourbon Specialty" {{ old('coffee_variety') === 'Kopi Brazil Santos Bourbon Specialty' ? 'selected' : '' }}>Kopi Brazil Santos Bourbon Specialty</option>
+                            <option value="Brazil Santos Strictly Soft Fine Cup (SSFC)" {{ old('coffee_variety') === 'Brazil Santos Strictly Soft Fine Cup (SSFC)' ? 'selected' : '' }}>Brazil Santos Strictly Soft Fine Cup (SSFC)</option>
+                            <option value="Brazil Santos Yellow Catuai Natural Micro-lot" {{ old('coffee_variety') === 'Brazil Santos Yellow Catuai Natural Micro-lot' ? 'selected' : '' }}>Brazil Santos Yellow Catuai Natural Micro-lot</option>
+                            <option value="Brazil Santos Cerrado Mineiro Single-Origin" {{ old('coffee_variety') === 'Brazil Santos Cerrado Mineiro Single-Origin' ? 'selected' : '' }}>Brazil Santos Cerrado Mineiro Single-Origin</option>
+                            <option value="Brazil Santos Decaf Swiss Water Process" {{ old('coffee_variety') === 'Brazil Santos Decaf Swiss Water Process' ? 'selected' : '' }}>Brazil Santos Decaf Swiss Water Process</option>
+                            <option value="Brazil Santos Espresso Roast Master Blend" {{ old('coffee_variety') === 'Brazil Santos Espresso Roast Master Blend' ? 'selected' : '' }}>Brazil Santos Espresso Roast Master Blend</option>
+                        </select>
+                    </div>
+
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Grade / Kualitas Kopi Ekspor</label>
+                        <select name="coffee_grade" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="Specialty Grade 1 (SCA Score 84+)" {{ old('coffee_grade') === 'Specialty Grade 1 (SCA Score 84+)' ? 'selected' : '' }}>Specialty Grade 1 (SCA Score 84+) — Premium Green Beans</option>
+                            <option value="Strictly Soft Fine Cup NY 2/3" {{ old('coffee_grade') === 'Strictly Soft Fine Cup NY 2/3' ? 'selected' : '' }}>Strictly Soft Fine Cup NY 2/3 — Export Standard</option>
+                            <option value="Exclusive Micro-Lot Nano Batch" {{ old('coffee_grade') === 'Exclusive Micro-Lot Nano Batch' ? 'selected' : '' }}>Exclusive Micro-Lot Nano Batch — Roasted / Green</option>
+                            <option value="Commercial Export Grade A" {{ old('coffee_grade') === 'Commercial Export Grade A' ? 'selected' : '' }}>Commercial Export Grade A</option>
+                        </select>
                     </div>
                 </div>
             </div>
 
-            {{-- Rute Pengiriman --}}
+            {{-- Rute Pengiriman: Dinamis sesuai pilihan Kapal Laut, Pesawat, atau Truk Darat --}}
             <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
                         <i data-lucide="map-pin" class="w-4 h-4 text-cyan-500"></i>
-                        <span id="route-heading">3. Rute Pelabuhan Asal & Tujuan</span>
+                        <span id="route-heading">3. Rute Pelayaran Maritim (Pelabuhan Laut)</span>
                     </h3>
                     <span id="node-count-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                         {{ count($portLocations) }} Lokasi
@@ -144,17 +195,114 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label id="origin-label" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Pelabuhan Asal <span class="text-rose-500">*</span></label>
-                        <select name="origin_location_id" id="origin-select" onchange="updateMap()" class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('origin_location_id') border-rose-400 @enderror">
+                        <select name="origin_location_id" id="origin-select" onchange="updateMap()" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('origin_location_id') border-rose-400 @enderror">
                             <option value="">— Pilih Titik Asal —</option>
                         </select>
                         @error('origin_location_id')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label id="dest-label" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Pelabuhan Tujuan <span class="text-rose-500">*</span></label>
-                        <select name="destination_location_id" id="dest-select" onchange="updateMap()" class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('destination_location_id') border-rose-400 @enderror">
+                        <select name="destination_location_id" id="dest-select" onchange="updateMap()" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('destination_location_id') border-rose-400 @enderror">
                             <option value="">— Pilih Titik Tujuan —</option>
                         </select>
                         @error('destination_location_id')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+                </div>
+            </div>
+
+            {{-- 4. ALAMAT LENGKAP PENGANTARAN MOBIL / KURIR (CASCADING DROPDOWN: NEGARA -> KOTA -> DAERAH) --}}
+            <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                            <i data-lucide="truck" class="w-4 h-4 text-amber-500"></i>
+                            <span>4. Alamat Lengkap Pengantaran Mobil / Kurir ke Lokasi Penerima</span>
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Cascading selector: pilih negara, kota, hingga daerah tujuan pengantaran langsung ke kafe/gudang.</p>
+                    </div>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Geoapify Verified
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                    {{-- Dropdown 1: Negara Tujuan --}}
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
+                            1. Negara Tujuan <span class="text-rose-500">*</span>
+                        </label>
+                        <select name="delivery_country" id="delivery_country" onchange="onCountrySelected(this.value)" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="">— Pilih Negara Tujuan —</option>
+                            @foreach($countries as $c)
+                                <option value="{{ $c['name'] }}" data-iso="{{ $c['iso'] }}" {{ old('delivery_country', 'Indonesia') == $c['name'] ? 'selected' : '' }}>
+                                    {{ $c['flag'] }} {{ $c['name'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Dropdown 2: Kota Tujuan (Cascading dari Negara) --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">
+                                2. Kota Tujuan <span class="text-rose-500">*</span>
+                            </label>
+                            <span id="city-spinner" class="hidden text-[10px] text-cyan-500 animate-pulse">Memuat kota...</span>
+                        </div>
+                        <select name="delivery_city" id="delivery_city" onchange="onCitySelected(this.value)" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="">— Pilih Kota —</option>
+                        </select>
+                    </div>
+
+                    {{-- Dropdown 3: Daerah / Kecamatan (Cascading dari Kota) --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">
+                                3. Daerah / Distrik <span class="text-rose-500">*</span>
+                            </label>
+                            <span id="district-spinner" class="hidden text-[10px] text-cyan-500 animate-pulse">Memuat daerah...</span>
+                        </div>
+                        <select name="delivery_district" id="delivery_district" onchange="onDistrictSelected(this.value)" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="">— Pilih Daerah / Kecamatan —</option>
+                        </select>
+                    </div>
+                </div>
+
+                {{-- Detail Alamat Jalan / Kafe / Roastery --}}
+                <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
+                        Alamat Spesifik Penerima (Nama Kafe / Roastery / Jalan & Nomor Gedung)
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="text" name="delivery_address" id="delivery_address" oninput="triggerGeocodeDebounce()" value="{{ old('delivery_address', 'Jl. Senopati No. 42, Roastery Kopi Santos') }}" placeholder="cth. 38 Upper Montagu Street, Westminster Roastery atau Jl. Senopati No. 42" class="flex-1 px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <button type="button" onclick="verifyAddressWithGeoapify()" class="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-cyan-600 hover:bg-cyan-500 transition-colors flex items-center gap-1.5 shadow-sm">
+                            <i data-lucide="locate-fixed" class="w-3.5 h-3.5"></i>
+                            <span>Verifikasi Geoapify</span>
+                        </button>
+                    </div>
+
+                    {{-- Hidden Lat & Lng --}}
+                    <input type="hidden" name="delivery_lat" id="delivery_lat" value="{{ old('delivery_lat', '-6.2297') }}">
+                    <input type="hidden" name="delivery_lng" id="delivery_lng" value="{{ old('delivery_lng', '106.8075') }}">
+
+                    {{-- Geocoded Preview Box --}}
+                    <div id="geocode-preview-box" class="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-[11px] flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span class="text-slate-500 dark:text-slate-400">Koordinat Pengantaran Mobil:</span>
+                            <span id="geocode-coords-display" class="font-mono font-bold text-slate-800 dark:text-slate-200">-6.2297, 106.8075</span>
+                        </div>
+                        <span id="geocode-status-badge" class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                            ✓ Tergeocoding Presisi
+                        </span>
+                    </div>
+
+                    <div class="mt-3 flex items-center gap-2">
+                        <input type="checkbox" name="is_last_mile" id="is_last_mile" value="1" checked class="w-4 h-4 text-cyan-600 rounded border-slate-300 focus:ring-cyan-500">
+                        <label for="is_last_mile" class="text-xs text-slate-700 dark:text-slate-300 font-medium">
+                            Aktifkan Layanan Pengantaran Mobil Kurir (Last-Mile Delivery) langsung ke alamat toko/kafe
+                        </label>
                     </div>
                 </div>
             </div>
@@ -163,27 +311,27 @@
             <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
                 <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2">
                     <i data-lucide="scale" class="w-4 h-4 text-cyan-500"></i>
-                    4. Spesifikasi & Jadwal
+                    5. Spesifikasi & Jadwal
                 </h3>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Berat (kg) <span class="text-rose-500">*</span></label>
-                        <input type="number" name="weight" value="{{ old('weight') }}" step="0.01" min="0.1" placeholder="0.00" class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <input type="number" name="weight" value="{{ old('weight', '1000') }}" step="0.01" min="0.1" placeholder="1000" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                         @error('weight')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Volume (m³) <span class="text-rose-500">*</span></label>
-                        <input type="number" name="volume" value="{{ old('volume') }}" step="0.01" min="0.1" placeholder="0.00" class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <input type="number" name="volume" value="{{ old('volume', '10') }}" step="0.01" min="0.1" placeholder="10" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                         @error('volume')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Jadwal Keberangkatan <span class="text-rose-500">*</span></label>
-                        <input type="datetime-local" name="expected_departure" value="{{ old('expected_departure') }}" class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <input type="datetime-local" name="expected_departure" value="{{ old('expected_departure', date('Y-m-d\TH:i')) }}" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                         @error('expected_departure')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Estimasi Tiba (ETA) <span class="text-rose-500">*</span></label>
-                        <input type="datetime-local" name="expected_arrival" value="{{ old('expected_arrival') }}" class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <input type="datetime-local" name="expected_arrival" value="{{ old('expected_arrival', date('Y-m-d\TH:i', strtotime('+14 days'))) }}" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                         @error('expected_arrival')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
                 </div>
@@ -201,34 +349,34 @@
                 <div id="item-form" class="mt-4 grid grid-cols-2 gap-4 hidden">
                     <div class="col-span-2">
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nama Item</label>
-                        <input type="text" name="item_name" value="{{ old('item_name') }}" placeholder="cth. Microcontrollers..." class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <input type="text" name="item_name" value="{{ old('item_name', 'Green Coffee Beans 60kg Jute Bag') }}" placeholder="cth. Green Coffee Beans..." class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Kode HS</label>
-                        <input type="text" name="hs_code" value="{{ old('hs_code') }}" placeholder="cth. 8542.31" class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 font-mono">
+                        <input type="text" name="hs_code" value="{{ old('hs_code', '0901.11') }}" placeholder="0901.11" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 font-mono">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Kuantitas</label>
-                        <input type="number" name="item_qty" value="{{ old('item_qty', 1) }}" min="1" class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Kuantitas Karung/Box</label>
+                        <input type="number" name="item_qty" value="{{ old('item_qty', 540) }}" min="1" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                     </div>
                     <div class="col-span-2">
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nilai Deklarasi ($ USD)</label>
-                        <input type="number" name="item_value" value="{{ old('item_value') }}" step="0.01" min="0" placeholder="0.00" class="w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <input type="number" name="item_value" value="{{ old('item_value', '185000') }}" step="0.01" min="0" placeholder="0.00" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                     </div>
                 </div>
             </div>
 
             {{-- Catatan --}}
             <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
-                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Catatan Tambahan</label>
-                <textarea name="notes" rows="3" placeholder="Informasi penanganan khusus, instruksi, dsb..." class="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">{{ old('notes') }}</textarea>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Catatan Tambahan & Sertifikasi</label>
+                <textarea name="notes" rows="3" placeholder="Informasi sertifikasi ICO, GrainPro lining, instruksi penanganan suhu..." class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">{{ old('notes', 'Kantong GrainPro hermetis. Suhu kontainer dijaga stabil 18-22°C. Pengantaran mobil kurir langsung ke roastery.') }}</textarea>
             </div>
 
             {{-- Submit --}}
             <div class="flex items-center gap-3">
                 <button type="submit" class="px-6 py-2.5 rounded-xl text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 transition-colors shadow-sm flex items-center gap-2">
                     <i data-lucide="check" class="w-4 h-4"></i>
-                    <span>Simpan Pengiriman</span>
+                    <span>Simpan Pengiriman Kopi Santos</span>
                 </button>
                 <a href="{{ route('operator.shipments.index') }}" class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                     Batal
@@ -248,7 +396,7 @@
                         Pilih Lokasi
                     </span>
                 </div>
-                <div id="route-map" style="height: 320px; background: #0A1128;"></div>
+                <div id="route-map" style="height: 340px; background: #0A1128;"></div>
                 <div id="route-map-footer" class="px-5 py-3 text-xs text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-800">
                     Pilih lokasi asal dan tujuan untuk melihat rute di peta.
                 </div>
@@ -272,12 +420,19 @@ let originMarker = null;
 let destMarker = null;
 let routeLine = null;
 let planeMarker = null;
+let deliveryMarker = null;
+let geocodeTimeout = null;
 
 document.addEventListener('DOMContentLoaded', function () {
-    routeMap = L.map('route-map', { zoomControl: true }).setView([15, 100], 3);
+    routeMap = L.map('route-map', { zoomControl: true }).setView([-15, -45], 3);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 18 }).addTo(routeMap);
 
     setTransportMode(initialMode, false);
+
+    const initialCountry = document.getElementById('delivery_country').value;
+    if (initialCountry) {
+        onCountrySelected(initialCountry);
+    }
 });
 
 function setTransportMode(mode, resetSelections = true) {
@@ -286,38 +441,54 @@ function setTransportMode(mode, resetSelections = true) {
 
     const cardSea = document.getElementById('mode-card-sea');
     const cardAir = document.getElementById('mode-card-air');
+    const cardLand = document.getElementById('mode-card-land');
     const badgeSea = document.getElementById('badge-sea');
     const badgeAir = document.getElementById('badge-air');
+    const badgeLand = document.getElementById('badge-land');
     const heading = document.getElementById('route-heading');
     const badgeCount = document.getElementById('node-count-badge');
     const originLabel = document.getElementById('origin-label');
     const destLabel = document.getElementById('dest-label');
 
+    // Reset all cards
+    [cardSea, cardAir, cardLand].forEach(c => {
+        if (c) c.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0A1128] hover:border-slate-300 dark:hover:border-slate-700 flex flex-col justify-between';
+    });
+    [badgeSea, badgeAir, badgeLand].forEach(b => {
+        if (b) {
+            b.className = 'text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700';
+            b.textContent = 'Pilih';
+        }
+    });
+
     if (mode === 'AIR') {
-        cardAir.className = 'cursor-pointer relative p-4 rounded-xl border-2 border-purple-500 bg-purple-50/40 dark:bg-purple-950/20 shadow-sm flex flex-col justify-between';
-        badgeAir.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white border-purple-600';
+        cardAir.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-purple-500 bg-purple-50/40 dark:bg-purple-950/20 shadow-sm flex flex-col justify-between';
+        badgeAir.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-600 text-white border-purple-600';
         badgeAir.textContent = 'Terpilih ✓';
 
-        cardSea.className = 'cursor-pointer relative p-4 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0A1128] hover:border-slate-300 dark:hover:border-slate-700 flex flex-col justify-between';
-        badgeSea.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700';
-        badgeSea.textContent = 'Pilih';
-
-        heading.innerHTML = '3. Rute Penerbangan Kargo (Bandara Internasional)';
+        heading.innerHTML = '3. Rute Penerbangan Kargo Udara (Bandara São Paulo GRU & Tujuan)';
         badgeCount.textContent = `${airportLocations.length} Bandara`;
         originLabel.innerHTML = 'Bandara Asal <span class="text-rose-500">*</span>';
         destLabel.innerHTML = 'Bandara Tujuan <span class="text-rose-500">*</span>';
 
         populateDropdowns(airportLocations, resetSelections ? null : initialOriginId, resetSelections ? null : initialDestId, 'Bandara');
+    } else if (mode === 'LAND') {
+        cardLand.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-amber-500 bg-amber-50/40 dark:bg-amber-950/20 shadow-sm flex flex-col justify-between';
+        badgeLand.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-600 text-white border-amber-600';
+        badgeLand.textContent = 'Terpilih ✓';
+
+        heading.innerHTML = '3. Hub Logistik Darat & Pengantaran Mobil Kopi';
+        badgeCount.textContent = `${portLocations.length + airportLocations.length} Hub Logistik`;
+        originLabel.innerHTML = 'Hub Transit Asal <span class="text-rose-500">*</span>';
+        destLabel.innerHTML = 'Depot Distribusi Tujuan <span class="text-rose-500">*</span>';
+
+        populateDropdowns(portLocations.concat(airportLocations), resetSelections ? null : initialOriginId, resetSelections ? null : initialDestId, 'Hub Logistik');
     } else {
-        cardSea.className = 'cursor-pointer relative p-4 rounded-xl border-2 border-blue-500 bg-blue-50/40 dark:bg-blue-950/20 shadow-sm flex flex-col justify-between';
-        badgeSea.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-600 text-white border-blue-600';
+        cardSea.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-blue-500 bg-blue-50/40 dark:bg-blue-950/20 shadow-sm flex flex-col justify-between';
+        badgeSea.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-600 text-white border-blue-600';
         badgeSea.textContent = 'Terpilih ✓';
 
-        cardAir.className = 'cursor-pointer relative p-4 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0A1128] hover:border-slate-300 dark:hover:border-slate-700 flex flex-col justify-between';
-        badgeAir.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700';
-        badgeAir.textContent = 'Pilih';
-
-        heading.innerHTML = '3. Rute Pelayaran Maritim (Pelabuhan Laut)';
+        heading.innerHTML = '3. Rute Pelayaran Maritim (Pelabuhan Santos ke Dunia)';
         badgeCount.textContent = `${portLocations.length} Pelabuhan`;
         originLabel.innerHTML = 'Pelabuhan Asal <span class="text-rose-500">*</span>';
         destLabel.innerHTML = 'Pelabuhan Tujuan <span class="text-rose-500">*</span>';
@@ -352,6 +523,132 @@ function populateDropdowns(locations, selOriginId, selDestId, nodeName) {
     destSel.innerHTML = destHtml;
 }
 
+async function onCountrySelected(country) {
+    if (!country) return;
+    const citySelect = document.getElementById('delivery_city');
+    const districtSelect = document.getElementById('delivery_district');
+    const spinner = document.getElementById('city-spinner');
+    if (spinner) spinner.classList.remove('hidden');
+
+    citySelect.innerHTML = '<option value="">Memuat kota via Geoapify...</option>';
+    districtSelect.innerHTML = '<option value="">— Pilih Daerah Setelah Kota —</option>';
+
+    try {
+        const res = await fetch(`/api/geo/cities?country=${encodeURIComponent(country)}`);
+        const json = await res.json();
+        let opts = '<option value="">— Pilih Kota Tujuan —</option>';
+        if (json.data && json.data.length > 0) {
+            json.data.forEach(city => {
+                opts += `<option value="${city}">${city}</option>`;
+            });
+            citySelect.innerHTML = opts;
+            if (json.data[0]) {
+                citySelect.value = json.data[0];
+                onCitySelected(json.data[0]);
+            }
+        } else {
+            citySelect.innerHTML = '<option value="">Kota Lainnya</option>';
+        }
+    } catch (e) {
+        console.error("Gagal memuat kota:", e);
+    } finally {
+        if (spinner) spinner.classList.add('hidden');
+    }
+}
+
+async function onCitySelected(city) {
+    if (!city) return;
+    const country = document.getElementById('delivery_country').value;
+    const districtSelect = document.getElementById('delivery_district');
+    const spinner = document.getElementById('district-spinner');
+    if (spinner) spinner.classList.remove('hidden');
+
+    districtSelect.innerHTML = '<option value="">Memuat daerah via Geoapify...</option>';
+
+    try {
+        const res = await fetch(`/api/geo/districts?country=${encodeURIComponent(country)}&city=${encodeURIComponent(city)}`);
+        const json = await res.json();
+        let opts = '<option value="">— Pilih Daerah / Kecamatan —</option>';
+        if (json.data && json.data.length > 0) {
+            json.data.forEach(d => {
+                opts += `<option value="${d}">${d}</option>`;
+            });
+            districtSelect.innerHTML = opts;
+            if (json.data[0]) {
+                districtSelect.value = json.data[0];
+                onDistrictSelected(json.data[0]);
+            }
+        }
+    } catch (e) {
+        console.error("Gagal memuat daerah:", e);
+    } finally {
+        if (spinner) spinner.classList.add('hidden');
+    }
+    triggerGeocodeDebounce();
+}
+
+function onDistrictSelected(district) {
+    triggerGeocodeDebounce();
+}
+
+function triggerGeocodeDebounce() {
+    clearTimeout(geocodeTimeout);
+    geocodeTimeout = setTimeout(verifyAddressWithGeoapify, 600);
+}
+
+async function verifyAddressWithGeoapify() {
+    const country = document.getElementById('delivery_country').value;
+    const city = document.getElementById('delivery_city').value;
+    const district = document.getElementById('delivery_district').value;
+    const address = document.getElementById('delivery_address').value;
+    const coordsDisplay = document.getElementById('geocode-coords-display');
+    const statusBadge = document.getElementById('geocode-status-badge');
+
+    if (!city && !country && !address) return;
+
+    if (coordsDisplay) coordsDisplay.textContent = 'Memverifikasi geocoding...';
+
+    try {
+        const query = `${address}, ${district}, ${city}, ${country}`;
+        const res = await fetch(`/api/geo/geocode?address=${encodeURIComponent(address)}&district=${encodeURIComponent(district)}&city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}`);
+        const json = await res.json();
+
+        if (json.success && json.data && json.data.lat) {
+            const lat = json.data.lat;
+            const lng = json.data.lng;
+
+            document.getElementById('delivery_lat').value = lat;
+            document.getElementById('delivery_lng').value = lng;
+
+            if (coordsDisplay) coordsDisplay.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)} (${json.data.city || city}, ${json.data.district || district})`;
+            if (statusBadge) {
+                statusBadge.textContent = '✓ Terverifikasi Geoapify';
+                statusBadge.className = 'text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800';
+            }
+
+            updateLastMileMapMarker(lat, lng, json.data.formatted || query);
+        }
+    } catch (err) {
+        console.error("Geocoding error:", err);
+    }
+}
+
+function updateLastMileMapMarker(lat, lng, label) {
+    if (!routeMap) return;
+    if (deliveryMarker) routeMap.removeLayer(deliveryMarker);
+
+    const truckIcon = L.divIcon({
+        html: '<div style="font-size:22px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6));">🚚📍</div>',
+        className: 'delivery-truck-pin',
+        iconSize: [30, 30],
+        iconAnchor: [15, 25]
+    });
+
+    deliveryMarker = L.marker([lat, lng], { icon: truckIcon })
+        .bindPopup(`<b>Alamat Pengantaran Mobil Kopi Santos:</b><br>${label}`)
+        .addTo(routeMap);
+}
+
 function updateMap() {
     if (!routeMap) return;
 
@@ -371,20 +668,21 @@ function updateMap() {
     const dLng = destOpt && destOpt.value ? parseFloat(destOpt.dataset.lng) : null;
 
     const isAir = (currentMode === 'AIR');
-    const originColor = isAir ? '#A855F7' : '#10b981';
-    const destColor = isAir ? '#EC4899' : '#f43f5e';
-    const lineColor = isAir ? '#C084FC' : '#06b6d4';
+    const isLand = (currentMode === 'LAND');
+    const originColor = isAir ? '#A855F7' : (isLand ? '#f59e0b' : '#10b981');
+    const destColor = isAir ? '#EC4899' : (isLand ? '#ea580c' : '#f43f5e');
+    const lineColor = isAir ? '#C084FC' : (isLand ? '#f59e0b' : '#06b6d4');
 
     if (oLat && dLat) {
-        originMarker = L.circleMarker([oLat, oLng], { radius: 8, color: originColor, fillColor: originColor, fillOpacity: 1 }).addTo(routeMap).bindPopup(`<b>${isAir ? 'Bandara Asal' : 'Pelabuhan Asal'}:</b><br>${originOpt.text}`);
-        destMarker = L.circleMarker([dLat, dLng], { radius: 8, color: destColor, fillColor: destColor, fillOpacity: 1 }).addTo(routeMap).bindPopup(`<b>${isAir ? 'Bandara Tujuan' : 'Pelabuhan Tujuan'}:</b><br>${destOpt.text}`);
-        routeLine = L.polyline([[oLat, oLng], [dLat, dLng]], { color: lineColor, weight: 3, dashArray: isAir ? '4,6' : '8,6' }).addTo(routeMap);
+        originMarker = L.circleMarker([oLat, oLng], { radius: 8, color: originColor, fillColor: originColor, fillOpacity: 1 }).addTo(routeMap).bindPopup(`<b>Titik Asal:</b><br>${originOpt.text}`);
+        destMarker = L.circleMarker([dLat, dLng], { radius: 8, color: destColor, fillColor: destColor, fillOpacity: 1 }).addTo(routeMap).bindPopup(`<b>Titik Tujuan:</b><br>${destOpt.text}`);
+        routeLine = L.polyline([[oLat, oLng], [dLat, dLng]], { color: lineColor, weight: 3, dashArray: isAir ? '4,6' : (isLand ? '2,4' : '8,6') }).addTo(routeMap);
 
         const midLat = (oLat + dLat) / 2;
         const midLng = (oLng + dLng) / 2;
         const iconHtml = isAir 
             ? '<div style="font-size:16px;">✈️</div>'
-            : '<div style="font-size:16px;">🚢</div>';
+            : (isLand ? '<div style="font-size:16px;">🚚</div>' : '<div style="font-size:16px;">🚢</div>');
         
         planeMarker = L.marker([midLat, midLng], {
             icon: L.divIcon({ html: iconHtml, className: 'route-vehicle-icon', iconSize: [20, 20], iconAnchor: [10, 10] })
@@ -398,7 +696,7 @@ function updateMap() {
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         const distKM = Math.round(6371 * c);
 
-        document.getElementById('route-distance-badge').textContent = isAir ? `Rute Udara: ~${distKM} km` : `Rute Laut: ~${Math.round(distKM * 0.5399)} NM`;
+        document.getElementById('route-distance-badge').textContent = isAir ? `Rute Udara: ~${distKM} km` : (isLand ? `Rute Darat: ~${distKM} km` : `Rute Laut: ~${Math.round(distKM * 0.5399)} NM`);
         document.getElementById('route-map-footer').textContent = `Terpilih: ${originOpt.text} ➔ ${destOpt.text}`;
     } else if (oLat) {
         originMarker = L.circleMarker([oLat, oLng], { radius: 8, color: originColor, fillColor: originColor, fillOpacity: 1 }).addTo(routeMap);
@@ -408,18 +706,6 @@ function updateMap() {
     } else {
         document.getElementById('route-distance-badge').textContent = 'Pilih Lokasi';
         document.getElementById('route-map-footer').textContent = 'Pilih lokasi asal dan tujuan untuk melihat rute di peta.';
-    }
-}
-
-function filterCarrierOptions(term) {
-    const q = (term || '').toLowerCase().trim();
-    const select = document.getElementById('carrier_select');
-    if (!select) return;
-
-    for (let i = 1; i < select.options.length; i++) {
-        const opt = select.options[i];
-        const searchVal = opt.getAttribute('data-search') || opt.text.toLowerCase();
-        opt.style.display = (!q || searchVal.includes(q)) ? '' : 'none';
     }
 }
 

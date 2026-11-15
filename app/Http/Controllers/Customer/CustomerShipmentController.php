@@ -63,11 +63,12 @@ class CustomerShipmentController extends Controller
         $locations = Location::where('status', Location::STATUS_ACTIVE)->orderBy('name', 'asc')->get();
         $portLocations = Location::where('status', Location::STATUS_ACTIVE)->where('location_type', Location::TYPE_PORT)->orderBy('name', 'asc')->get();
         $airportLocations = Location::where('status', Location::STATUS_ACTIVE)->where('location_type', Location::TYPE_AIRPORT)->orderBy('name', 'asc')->get();
+        $countries = app(\App\Services\GeoService::class)->getCountries();
 
         $count = Shipment::count() + 1;
         $suggestedNumber = 'CT-2026-' . str_pad((string) $count, 3, '0', STR_PAD_LEFT);
 
-        return view('customer.shipments.create', compact('carriers', 'locations', 'portLocations', 'airportLocations', 'suggestedNumber'));
+        return view('customer.shipments.create', compact('carriers', 'locations', 'portLocations', 'airportLocations', 'countries', 'suggestedNumber'));
     }
 
     /**
@@ -77,9 +78,18 @@ class CustomerShipmentController extends Controller
     {
         $validated = $request->validate([
             'carrier_id' => ['required', 'exists:carriers,id'],
-            'transport_mode' => ['nullable', 'in:SEA,AIR'],
+            'transport_mode' => ['nullable', 'in:SEA,AIR,LAND'],
             'origin_location_id' => ['required', 'exists:locations,id'],
             'destination_location_id' => ['required', 'exists:locations,id', 'different:origin_location_id'],
+            'delivery_country' => ['nullable', 'string', 'max:100'],
+            'delivery_city' => ['nullable', 'string', 'max:100'],
+            'delivery_district' => ['nullable', 'string', 'max:150'],
+            'delivery_address' => ['nullable', 'string', 'max:500'],
+            'delivery_lat' => ['nullable', 'numeric'],
+            'delivery_lng' => ['nullable', 'numeric'],
+            'coffee_variety' => ['nullable', 'string', 'max:100'],
+            'coffee_grade' => ['nullable', 'string', 'max:100'],
+            'is_last_mile' => ['nullable', 'boolean'],
             'cargo_type' => ['required', 'string', 'max:100'],
             'weight' => ['required', 'numeric', 'min:0.1'],
             'volume' => ['required', 'numeric', 'min:0.1'],
@@ -92,7 +102,7 @@ class CustomerShipmentController extends Controller
             'item_value' => ['nullable', 'numeric', 'min:0'],
         ], [
             'carrier_id.required' => 'Pilih perusahaan ekspedisi mitra.',
-            'transport_mode.required' => 'Pilih jenis pengiriman (Kapal Laut atau Pesawat Udara).',
+            'transport_mode.required' => 'Pilih jenis pengiriman (Kapal Laut, Pesawat Udara, atau Mobil Darat).',
             'origin_location_id.required' => 'Pilih titik asal kargo.',
             'destination_location_id.required' => 'Pilih titik tujuan kargo.',
             'destination_location_id.different' => 'Lokasi tujuan tidak boleh sama dengan lokasi asal.',
@@ -114,6 +124,37 @@ class CustomerShipmentController extends Controller
         $shipment->origin_location_id = $validated['origin_location_id'];
         $shipment->destination_location_id = $validated['destination_location_id'];
         $shipment->current_location_id = $validated['origin_location_id'];
+
+        $shipment->delivery_country = $validated['delivery_country'] ?? null;
+        $shipment->delivery_city = $validated['delivery_city'] ?? null;
+        $shipment->delivery_district = $validated['delivery_district'] ?? null;
+        $shipment->delivery_address = $validated['delivery_address'] ?? null;
+        $shipment->delivery_lat = !empty($validated['delivery_lat']) ? (float)$validated['delivery_lat'] : null;
+        $shipment->delivery_lng = !empty($validated['delivery_lng']) ? (float)$validated['delivery_lng'] : null;
+        $shipment->coffee_variety = $validated['coffee_variety'] ?? 'Kopi Brazil Santos Bourbon Specialty';
+        $shipment->coffee_grade = $validated['coffee_grade'] ?? 'Specialty Grade 1 (SCA 84+)';
+
+        $isLastMile = ($validated['transport_mode'] ?? '') === Shipment::TRANSPORT_LAND || $request->boolean('is_last_mile');
+        $shipment->is_last_mile = $isLastMile;
+        if ($isLastMile) {
+            $shipment->courier_name = 'Armada Kurir Mobil Kopi Santos';
+            $shipment->courier_vehicle = 'Mobil Van Distribusi Kopi (B 9482 CT)';
+        }
+
+        // Resolusi otomatis koordinat alamat jika belum terisi via Geoapify
+        if ((empty($shipment->delivery_lat) || empty($shipment->delivery_lng)) && (!empty($shipment->delivery_address) || !empty($shipment->delivery_city))) {
+            $geoResult = app(\App\Services\GeoService::class)->geocode(
+                $shipment->delivery_address ?? '',
+                $shipment->delivery_country,
+                $shipment->delivery_city,
+                $shipment->delivery_district
+            );
+            if ($geoResult && !empty($geoResult['lat'])) {
+                $shipment->delivery_lat = $geoResult['lat'];
+                $shipment->delivery_lng = $geoResult['lng'];
+            }
+        }
+
         $shipment->cargo_type = $validated['cargo_type'];
         $shipment->weight = $validated['weight'];
         $shipment->volume = $validated['volume'];

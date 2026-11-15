@@ -70,12 +70,13 @@ class OperatorShipmentController extends Controller
         $locations = Location::where('status', Location::STATUS_ACTIVE)->orderBy('name', 'asc')->get();
         $portLocations = Location::where('status', Location::STATUS_ACTIVE)->where('location_type', Location::TYPE_PORT)->orderBy('name', 'asc')->get();
         $airportLocations = Location::where('status', Location::STATUS_ACTIVE)->where('location_type', Location::TYPE_AIRPORT)->orderBy('name', 'asc')->get();
+        $countries = app(\App\Services\GeoService::class)->getCountries();
 
         // Auto-generate next shipment number CT-2026-XXX
         $count = Shipment::count() + 1;
         $suggestedNumber = 'CT-2026-' . str_pad((string) $count, 3, '0', STR_PAD_LEFT);
 
-        return view('operator.shipments.create', compact('customers', 'carriers', 'locations', 'portLocations', 'airportLocations', 'suggestedNumber'));
+        return view('operator.shipments.create', compact('customers', 'carriers', 'locations', 'portLocations', 'airportLocations', 'countries', 'suggestedNumber'));
     }
 
     /**
@@ -87,15 +88,24 @@ class OperatorShipmentController extends Controller
             'shipment_number' => ['required', 'string', 'max:50', 'unique:shipments,shipment_number'],
             'customer_id' => ['required', 'exists:users,id'],
             'carrier_id' => ['required', 'exists:carriers,id'],
-            'transport_mode' => ['nullable', 'in:SEA,AIR'],
+            'transport_mode' => ['nullable', 'in:SEA,AIR,LAND'],
             'origin_location_id' => ['required', 'exists:locations,id'],
             'destination_location_id' => ['required', 'exists:locations,id', 'different:origin_location_id'],
+            'delivery_country' => ['nullable', 'string', 'max:100'],
+            'delivery_city' => ['nullable', 'string', 'max:100'],
+            'delivery_district' => ['nullable', 'string', 'max:150'],
+            'delivery_address' => ['nullable', 'string', 'max:500'],
+            'delivery_lat' => ['nullable', 'numeric'],
+            'delivery_lng' => ['nullable', 'numeric'],
+            'coffee_variety' => ['nullable', 'string', 'max:100'],
+            'coffee_grade' => ['nullable', 'string', 'max:100'],
+            'is_last_mile' => ['nullable', 'boolean'],
             'cargo_type' => ['required', 'string', 'max:100'],
             'weight' => ['required', 'numeric', 'min:0.1'],
             'volume' => ['required', 'numeric', 'min:0.1'],
             'expected_departure' => ['required', 'date'],
             'expected_arrival' => ['required', 'date', 'after:expected_departure'],
-            'estimated_time_arrival' => ['required', 'date'],
+            'estimated_time_arrival' => ['nullable', 'date'],
             'notes' => ['nullable', 'string'],
             // Optional first item
             'item_name' => ['nullable', 'string', 'max:150'],
@@ -107,7 +117,7 @@ class OperatorShipmentController extends Controller
             'shipment_number.unique' => 'Nomor pengiriman sudah terdaftar.',
             'customer_id.required' => 'Pilih pelanggan kargo.',
             'carrier_id.required' => 'Pilih perusahaan ekspedisi.',
-            'transport_mode.required' => 'Pilih moda pengiriman (Kapal Laut atau Pesawat Udara).',
+            'transport_mode.required' => 'Pilih moda pengiriman (Kapal Laut, Pesawat Udara, atau Mobil Darat).',
             'origin_location_id.required' => 'Pilih lokasi asal.',
             'destination_location_id.required' => 'Pilih lokasi tujuan.',
             'destination_location_id.different' => 'Lokasi tujuan tidak boleh sama dengan lokasi asal.',
@@ -115,6 +125,32 @@ class OperatorShipmentController extends Controller
         ]);
 
         $validated['transport_mode'] = $validated['transport_mode'] ?? Shipment::TRANSPORT_SEA;
+        $isLastMile = ($validated['transport_mode'] === Shipment::TRANSPORT_LAND) || $request->boolean('is_last_mile');
+        $validated['is_last_mile'] = $isLastMile;
+        $validated['coffee_variety'] = $validated['coffee_variety'] ?? 'Kopi Brazil Santos Bourbon Specialty';
+        $validated['coffee_grade'] = $validated['coffee_grade'] ?? 'Specialty Grade 1 (SCA 84+)';
+
+        if ($isLastMile) {
+            $validated['courier_name'] = 'Armada Kurir Mobil Kopi Santos';
+            $validated['courier_vehicle'] = 'Mobil Van Distribusi Kopi (B 9482 CT)';
+        }
+
+        // Resolusi geocoding alamat via Geoapify jika koordinat kosong
+        if ((empty($validated['delivery_lat']) || empty($validated['delivery_lng'])) && (!empty($validated['delivery_address']) || !empty($validated['delivery_city']))) {
+            $geoResult = app(\App\Services\GeoService::class)->geocode(
+                $validated['delivery_address'] ?? '',
+                $validated['delivery_country'] ?? null,
+                $validated['delivery_city'] ?? null,
+                $validated['delivery_district'] ?? null
+            );
+            if ($geoResult && !empty($geoResult['lat'])) {
+                $validated['delivery_lat'] = $geoResult['lat'];
+                $validated['delivery_lng'] = $geoResult['lng'];
+            }
+        }
+
+        $validated['estimated_time_arrival'] = $validated['estimated_time_arrival'] ?? $validated['expected_arrival'];
+
         $shipment = new Shipment($validated);
         $shipment->current_location_id = $validated['origin_location_id'];
         $shipment->status = Shipment::STATUS_CREATED;

@@ -20,6 +20,7 @@ class SettingController extends Controller
             'world_bank' => ['name' => 'World Bank Indicator API', 'status' => 'CONNECTED', 'type' => 'Indikator Makro Ekonomi'],
             'rest_countries' => ['name' => 'REST Countries API', 'status' => 'CONNECTED', 'type' => 'Profil & Referensi Negara'],
             'freeairportdb' => ['name' => 'FreeAirportDB Global Airport API', 'status' => 'CONNECTED', 'type' => 'Database Bandara & Koridor Udara Global'],
+            'geoapify' => ['name' => 'Geoapify Geocoding & Places API', 'status' => 'CONNECTED', 'type' => 'Validasi Alamat Presisi & Cascading Daerah'],
             'nominatim' => ['name' => 'OpenStreetMap Nominatim', 'status' => 'CONNECTED', 'type' => 'Geocoding & Koordinat Pelabuhan'],
             'gnews' => ['name' => 'GNews Global Logistics News', 'status' => 'CONNECTED', 'type' => 'Warta Logistik & Rantai Pasok'],
         ];

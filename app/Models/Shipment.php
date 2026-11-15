@@ -21,6 +21,7 @@ class Shipment extends Model
 
     public const TRANSPORT_SEA = 'SEA';
     public const TRANSPORT_AIR = 'AIR';
+    public const TRANSPORT_LAND = 'LAND';
 
     public const DELAY_NONE = 'NONE';
     public const DELAY_LOW = 'LOW';
@@ -33,6 +34,17 @@ class Shipment extends Model
         'carrier_id',
         'origin_location_id',
         'destination_location_id',
+        'delivery_country',
+        'delivery_city',
+        'delivery_district',
+        'delivery_address',
+        'delivery_lat',
+        'delivery_lng',
+        'is_last_mile',
+        'courier_name',
+        'courier_vehicle',
+        'coffee_variety',
+        'coffee_grade',
         'current_location_id',
         'transport_mode',
         'cargo_type',
@@ -60,6 +72,9 @@ class Shipment extends Model
             'weight' => 'float',
             'volume' => 'float',
             'delay_minutes' => 'integer',
+            'is_last_mile' => 'boolean',
+            'delivery_lat' => 'float',
+            'delivery_lng' => 'float',
         ];
     }
 

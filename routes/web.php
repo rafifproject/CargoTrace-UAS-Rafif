@@ -51,6 +51,14 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 });
 
+// Geoapify Cascading Dropdown Endpoints (Negara -> Kota -> Daerah / Geocoding Presisi)
+Route::prefix('api/geo')->name('geo.')->group(function () {
+    Route::get('/countries', [\App\Http\Controllers\GeoController::class, 'countries'])->name('countries');
+    Route::get('/cities', [\App\Http\Controllers\GeoController::class, 'cities'])->name('cities');
+    Route::get('/districts', [\App\Http\Controllers\GeoController::class, 'districts'])->name('districts');
+    Route::get('/geocode', [\App\Http\Controllers\GeoController::class, 'geocode'])->name('geocode');
+});
+
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Protected Administrator Routes

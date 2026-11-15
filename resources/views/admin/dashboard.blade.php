@@ -372,6 +372,7 @@
                         <button type="button" onclick="setCargoTransportFilter('ALL')" id="filter-cargo-all" class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-600 text-white transition-all">Semua</button>
                         <button type="button" onclick="setCargoTransportFilter('SEA')" id="filter-cargo-sea" class="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-300 hover:text-white transition-all">🚢 Laut</button>
                         <button type="button" onclick="setCargoTransportFilter('AIR')" id="filter-cargo-air" class="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-300 hover:text-white transition-all">✈️ Udara</button>
+                        <button type="button" onclick="setCargoTransportFilter('LAND')" id="filter-cargo-land" class="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-300 hover:text-white transition-all">🚚 Mobil / Dekat</button>
                     </div>
                 </div>
 
@@ -1131,6 +1132,35 @@
             const cargo       = (s.cargo_type || '').toLowerCase();
             const notes       = (s.notes || '').toLowerCase();
 
+            // 0. Mobil / Van Pengantaran Kurir (Ground / Last-Mile Delivery ke Alamat)
+            if (s.transport_mode === 'LAND' || s.is_last_mile) {
+                return {
+                    type: 'van',
+                    label: 'Mobil Pengantaran Kurir (Last-Mile Delivery)',
+                    emoji: '🚚',
+                    accentColor: '#f59e0b',
+                    iconW: 36,
+                    iconH: 52,
+                    realSvg: `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 64" width="28" height="48" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.55));">
+                            <rect x="5" y="4" width="26" height="56" rx="4" fill="#0f172a" opacity="0.3" transform="translate(1, 2)"/>
+                            <rect x="5" y="6" width="26" height="52" rx="4" fill="#f59e0b" stroke="#d97706" stroke-width="1.2"/>
+                            <rect x="7" y="7" width="22" height="15" rx="2" fill="#1e293b"/>
+                            <path d="M8 9 Q18 7 28 9 L27 15 Q18 13 9 15 Z" fill="#38bdf8"/>
+                            <rect x="4" y="11" width="2.5" height="4" rx="1" fill="#0f172a"/>
+                            <rect x="29.5" y="11" width="2.5" height="4" rx="1" fill="#0f172a"/>
+                            <rect x="7" y="24" width="22" height="32" rx="2" fill="#fbbf24" stroke="#d97706" stroke-width="0.8"/>
+                            <text x="18" y="40" font-size="6" font-weight="bold" fill="#78350f" text-anchor="middle" font-family="sans-serif">SANTOS</text>
+                            <text x="18" y="48" font-size="4.5" font-weight="bold" fill="#92400e" text-anchor="middle" font-family="sans-serif">☕ COFFEE</text>
+                            <rect x="4" y="18" width="2" height="7" rx="0.5" fill="#0f172a"/>
+                            <rect x="30" y="18" width="2" height="7" rx="0.5" fill="#0f172a"/>
+                            <rect x="4" y="48" width="2" height="7" rx="0.5" fill="#0f172a"/>
+                            <rect x="30" y="48" width="2" height="7" rx="0.5" fill="#0f172a"/>
+                        </svg>
+                    `
+                };
+            }
+
             // 1. Pesawat Kargo Udara (Real Jet Freighter Top-Down)
             if (s.transport_mode === 'AIR' || originType === 'AIRPORT' || destType === 'AIRPORT' ||
                 originName.includes('bandara') || originName.includes('airport') ||
@@ -1326,9 +1356,10 @@
         // ── HELPER: POPUP CONTENT WITH RICH ROUTE & ETA ─────────
         function generateShipmentPopupContent(s, vehicle, eta, curLoc, progress = 0.45) {
             const isAir = (s.transport_mode === 'AIR') || (vehicle.type === 'plane');
+            const isLand = (s.transport_mode === 'LAND') || (vehicle.type === 'van') || s.is_last_mile;
             const pct = Math.round(progress * 100);
             return `
-                <div style="min-width:280px; font-family: Outfit, sans-serif; padding:4px 2px;">
+                <div style="min-width:290px; font-family: Outfit, sans-serif; padding:4px 2px;">
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
                         <div style="display:flex; align-items:center; gap:8px;">
                             <span style="font-size:22px;">${vehicle.emoji}</span>
@@ -1356,34 +1387,56 @@
                         </div>
                     </div>
 
-                    <!-- Live Real-Time Flight / Voyage Progress Bar -->
+                    <!-- Live Real-Time Flight / Voyage / Last-Mile Progress Bar -->
                     <div style="background:#F0FDF4; border:1px solid #BBF7D0; padding:8px 10px; border-radius:10px; margin-bottom:10px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; font-weight:800; font-size:11px; color:#15803d; margin-bottom:4px;">
-                            <span>${isAir ? '✈️ Progres Penerbangan Realtime:' : '🚢 Progres Pelayaran Maritim:'}</span>
+                            <span>${isLand ? '🚚 Progres Pengantaran Mobil Dekat:' : (isAir ? '✈️ Progres Penerbangan Realtime:' : '🚢 Progres Pelayaran Maritim:')}</span>
                             <span style="font-size:12px; color:#047857; font-weight:900;">${pct}%</span>
                         </div>
                         <div style="width:100%; height:7px; background:#dcfce7; border-radius:999px; overflow:hidden;">
                             <div style="width:${pct}%; height:100%; background:linear-gradient(90deg, #10b981, #06b6d4); border-radius:999px;"></div>
                         </div>
                         <div style="font-size:10px; color:#475569; margin-top:5px; display:flex; justify-content:space-between;">
-                            <span>Kecepatan: <b>${isAir ? '860 km/h (Cruising)' : '21.5 kts (Navigasi)'}</b></span>
-                            <span>Ketinggian: <b>${isAir ? 'FL360 (36.000 ft)' : '0 m (Laut)'}</b></span>
+                            <span>Kecepatan: <b>${isLand ? '45 km/h (Kurir Kota)' : (isAir ? '860 km/h (Cruising)' : '21.5 kts (Navigasi)')}</b></span>
+                            <span>Posisi: <b>${isLand ? 'Darat (Last-Mile)' : (isAir ? 'FL360 (36.000 ft)' : '0 m (Laut)')}</b></span>
                         </div>
                     </div>
 
-                    <!-- Titik Awal hingga Akhir -->
+                    <!-- Komoditas Kopi Brazil Santos -->
+                    <div style="background:#fef3c7; border:1px solid #fde68a; padding:7px 10px; border-radius:8px; font-size:11px; margin-bottom:8px;">
+                        <div style="font-weight:800; color:#92400e; display:flex; align-items:center; gap:4px;">
+                            <span>☕</span>
+                            <span>${s.coffee_variety || s.cargo_type || 'Kopi Brazil Santos Specialty'}</span>
+                        </div>
+                        <div style="font-size:10px; color:#78350f; margin-top:2px;">
+                            Grade: <b>${s.coffee_grade || 'Specialty Grade 1 (SCA 84+)'}</b> &bull; Total: <b>${parseFloat(s.weight || 0).toLocaleString()} kg</b>
+                        </div>
+                    </div>
+
+                    <!-- Titik Awal hingga Akhir & Alamat Pengantaran Mobil -->
                     <div style="background:#F8FAFC; border:1px solid #E2E8F0; padding:8px 10px; border-radius:8px; font-size:11px; margin-bottom:10px;">
                         <div style="margin-bottom:6px;">
-                            <span style="color:#059669; font-weight:800;">🟢 Titik Asal:</span>
+                            <span style="color:#059669; font-weight:800;">🟢 Titik Asal (Hub Santos Brazil):</span>
                             <div style="font-weight:700; color:#0f172a;">${s.origin.name}</div>
                             <div style="font-size:10px; color:#64748b;">${s.origin.city}, ${s.origin.country}</div>
                         </div>
                         <div style="border-top:1px dashed #cbd5e1; padding-top:6px; margin-top:6px;">
-                            <span style="color:#dc2626; font-weight:800;">🔴 Titik Tujuan:</span>
+                            <span style="color:#dc2626; font-weight:800;">🔴 Simpul Transit / Pelabuhan Tujuan:</span>
                             <div style="font-weight:700; color:#0f172a;">${s.destination.name}</div>
                             <div style="font-size:10px; color:#64748b;">${s.destination.city}, ${s.destination.country}</div>
                         </div>
-                        ${curLoc ? `
+                        ${s.delivery_address ? `
+                        <div style="border-top:1px dashed #cbd5e1; padding-top:6px; margin-top:6px; background:#fffbeb; margin-left:-10px; margin-right:-10px; padding-left:10px; padding-right:10px; border-radius:0 0 8px 8px;">
+                            <span style="color:#d97706; font-weight:800;">🚚 Alamat Pengantaran Mobil (Last-Mile):</span>
+                            <div style="font-weight:700; color:#78350f;">${s.delivery_address}</div>
+                            <div style="font-size:10px; color:#92400e;">
+                                ${s.delivery_district ? s.delivery_district + ', ' : ''}${s.delivery_city || ''} (${s.delivery_country || ''})
+                            </div>
+                            <div style="font-size:10px; color:#b45309; margin-top:2px;">
+                                Armada: <b>${s.courier_name || 'Mobil Kurir Kopi Santos'}</b> &bull; ${s.courier_vehicle || 'Van Kurir'}
+                            </div>
+                        </div>` : ''}
+                        ${curLoc && !s.delivery_address ? `
                         <div style="border-top:1px dashed #cbd5e1; padding-top:6px; margin-top:6px;">
                             <span style="color:#0284c7; font-weight:800;">📍 Posisi Terkini:</span>
                             <div style="font-weight:700; color:#0f172a;">${curLoc.name || 'Dalam Penerbangan Udara'}</div>
@@ -1392,8 +1445,7 @@
 
                     <!-- Armada & Muatan -->
                     <div style="font-size:11px; color:#475569; margin-bottom:10px; line-height:1.4;">
-                        Armada: <b>${s.carrier?.name || '-'}</b><br>
-                        Muatan: <b>${s.cargo_type || 'General Cargo'}</b> (${parseFloat(s.weight || 0).toLocaleString()} kg)
+                        Mitra Ekspedisi: <b>${s.carrier?.name || '-'}</b>
                     </div>
 
                     <!-- Tombol Aksi -->
@@ -1422,10 +1474,16 @@
                     it.traveledPoly?.setStyle({ color: '#00F0FF', weight: 6.5, opacity: 1 });
                     it.remainingPoly?.setStyle({ color: '#38BDF8', weight: 5, opacity: 1, dashArray: '8, 8' });
                     it.directPoly?.setStyle({ color: '#00F0FF', weight: 5.5, opacity: 1 });
+                    it.deliveryPoly?.setStyle({ color: '#f59e0b', weight: 6, opacity: 1 });
 
                     // Menonjolkan titik asal dan akhir
                     it.originMarker?.setRadius(11).setStyle({ fillColor: '#10B981', color: '#ffffff', weight: 3.5, fillOpacity: 1 });
                     it.destMarker?.setRadius(11).setStyle({ fillColor: '#EF4444', color: '#ffffff', weight: 3.5, fillOpacity: 1 });
+                    if (it.deliveryMarker) {
+                        it.deliveryMarker.setZIndexOffset(10000);
+                        const el = it.deliveryMarker.getElement();
+                        if (el) el.classList.remove('marker-dimmed');
+                    }
 
                     // Menonjolkan icon kendaraan kargo
                     if (it.vehicleMarker) {
@@ -1452,8 +1510,14 @@
                     it.traveledPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.15 });
                     it.remainingPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.12, dashArray: '4, 6' });
                     it.directPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.15 });
+                    it.deliveryPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.15 });
                     it.originMarker?.setRadius(5).setStyle({ opacity: 0.25, fillOpacity: 0.25 });
                     it.destMarker?.setRadius(5).setStyle({ opacity: 0.25, fillOpacity: 0.25 });
+                    if (it.deliveryMarker) {
+                        it.deliveryMarker.setZIndexOffset(100);
+                        const el = it.deliveryMarker.getElement();
+                        if (el) el.classList.add('marker-dimmed');
+                    }
 
                     if (it.vehicleMarker) {
                         it.vehicleMarker.setZIndexOffset(100);
@@ -1476,9 +1540,15 @@
                 it.traveledPoly?.setStyle({ color: '#0284c7', weight: 3.5, opacity: 0.9 });
                 it.remainingPoly?.setStyle({ color: '#38bdf8', weight: 2.5, opacity: 0.8, dashArray: '6, 8' });
                 it.directPoly?.setStyle({ color: '#0284c7', weight: 2.5, opacity: 0.75, dashArray: '6, 8' });
+                it.deliveryPoly?.setStyle({ color: '#f59e0b', weight: 3.5, opacity: 0.95 });
 
                 it.originMarker?.setRadius(7).setStyle({ fillColor: '#10B981', color: '#fff', weight: 2, fillOpacity: 1, opacity: 1 });
                 it.destMarker?.setRadius(7).setStyle({ fillColor: '#EF4444', color: '#fff', weight: 2, fillOpacity: 1, opacity: 1 });
+                if (it.deliveryMarker) {
+                    it.deliveryMarker.setZIndexOffset(1200);
+                    const el = it.deliveryMarker.getElement();
+                    if (el) el.classList.remove('marker-dimmed');
+                }
 
                 if (it.vehicleMarker) {
                     it.vehicleMarker.setZIndexOffset(1000);
@@ -1506,14 +1576,17 @@
             shipments.forEach(s => {
                 if (!s || !s.origin || !s.destination) return;
 
-                // Sub-filter moda transportasi (Semua / Laut / Udara)
+                // Sub-filter moda transportasi (Semua / Laut / Udara / Mobil Dekat)
                 const originType = (s.origin?.location_type || '').toUpperCase();
                 const destType   = (s.destination?.location_type || '').toUpperCase();
                 const isAirCargo = (s.transport_mode === 'AIR') || (originType === 'AIRPORT' || destType === 'AIRPORT');
-                const sMode      = isAirCargo ? 'AIR' : (s.transport_mode || 'SEA');
+                const isLandCargo = (s.transport_mode === 'LAND') || !!s.is_last_mile || (!!s.delivery_lat && !!s.delivery_lng);
+                const sMode      = isLandCargo ? 'LAND' : (isAirCargo ? 'AIR' : (s.transport_mode || 'SEA'));
 
-                if (cargoTransportFilter !== 'ALL' && sMode !== cargoTransportFilter) {
-                    return;
+                if (cargoTransportFilter !== 'ALL') {
+                    if (cargoTransportFilter === 'LAND' && !isLandCargo) return;
+                    if (cargoTransportFilter === 'AIR' && (!isAirCargo || s.transport_mode === 'LAND')) return;
+                    if (cargoTransportFilter === 'SEA' && (isAirCargo || s.transport_mode === 'LAND')) return;
                 }
 
                 const oLat = parseFloat(s.origin.latitude);
@@ -1652,6 +1725,49 @@
                 // Bounds untuk zoom fokus rute
                 const routePoints = [originCoords, destCoords];
                 if (curCoords) routePoints.push(curCoords);
+
+                // 4. Pin & Lintasan Mobil Kurir Pengantaran Alamat (Last-Mile Delivery)
+                let deliveryMarker = null;
+                let deliveryPoly = null;
+                if (s.delivery_lat && s.delivery_lng) {
+                    const devLat = parseFloat(s.delivery_lat);
+                    const devLng = parseFloat(s.delivery_lng);
+                    if (!isNaN(devLat) && !isNaN(devLng)) {
+                        const devCoords = [devLat, devLng];
+                        routePoints.push(devCoords);
+                        latLngs.push(devCoords);
+
+                        // Garis pengantaran mobil kurir dari simpul tujuan ke alamat penerima
+                        deliveryPoly = L.polyline([destCoords, devCoords], {
+                            color: '#f59e0b',
+                            weight: 3.5,
+                            dashArray: '3, 6',
+                            opacity: 0.95,
+                            lineCap: 'round',
+                            cursor: 'pointer'
+                        }).bindPopup(popupHtml).addTo(cargoLayerGroup);
+                        deliveryPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+
+                        // Pin Mobil Kurir Pengantaran Alamat
+                        const truckPinIcon = L.divIcon({
+                            className: 'cargo-last-mile-pin',
+                            html: `
+                                <div style="background:#f59e0b; color:#fff; border:2px solid #fff; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 12px rgba(245,158,11,0.85); font-size:14px; cursor:pointer;" title="Alamat Pengantaran: ${s.delivery_address || s.delivery_city}">
+                                    🚚
+                                </div>
+                            `,
+                            iconSize: [28, 28],
+                            iconAnchor: [14, 14],
+                            popupAnchor: [0, -15]
+                        });
+
+                        deliveryMarker = L.marker(devCoords, { icon: truckPinIcon, zIndexOffset: 1200 })
+                            .bindPopup(popupHtml)
+                            .addTo(cargoLayerGroup);
+                        deliveryMarker.on('click', () => focusCargoShipment(s.id, devCoords));
+                    }
+                }
+
                 const bounds = L.latLngBounds(routePoints);
 
                 cargoShipmentItems.push({
@@ -1664,6 +1780,8 @@
                     traveledPoly,
                     remainingPoly,
                     directPoly,
+                    deliveryPoly,
+                    deliveryMarker,
                     vehicleMarker,
                     curCoords,
                     bounds
@@ -2351,14 +2469,15 @@
             });
         }
 
-        // ── CARGO TRANSPORT FILTER (Semua / Laut / Udara) ────────
+        // ── CARGO TRANSPORT FILTER (Semua / Laut / Udara / Mobil Dekat) ────────
         function setCargoTransportFilter(mode) {
             cargoTransportFilter = mode;
             const btnAll = document.getElementById('filter-cargo-all');
             const btnSea = document.getElementById('filter-cargo-sea');
             const btnAir = document.getElementById('filter-cargo-air');
+            const btnLand = document.getElementById('filter-cargo-land');
 
-            [btnAll, btnSea, btnAir].forEach(b => {
+            [btnAll, btnSea, btnAir, btnLand].forEach(b => {
                 if (b) {
                     b.className = 'px-2 py-0.5 rounded text-[10px] font-semibold text-slate-300 hover:text-white transition-all';
                 }
@@ -2368,13 +2487,15 @@
                 if (btnSea) btnSea.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white shadow-xs transition-all';
             } else if (mode === 'AIR') {
                 if (btnAir) btnAir.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-purple-600 text-white shadow-xs transition-all';
+            } else if (mode === 'LAND') {
+                if (btnLand) btnLand.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-amber-600 text-white shadow-xs transition-all';
             } else {
                 if (btnAll) btnAll.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-600 text-white shadow-xs transition-all';
             }
 
             const latLngs = buildCargoLayer();
             if (latLngs && latLngs.length > 0) {
-                map.flyToBounds(latLngs, { padding: [50, 50], maxZoom: 4, duration: 1.2 });
+                map.flyToBounds(latLngs, { padding: [50, 50], maxZoom: 6, duration: 1.2 });
             }
         }
 

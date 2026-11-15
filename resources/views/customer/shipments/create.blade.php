@@ -27,7 +27,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {{-- LEFT: Form Fields --}}
         <div class="lg:col-span-3 space-y-5">
-            {{-- PILIHAN MODA PENGIRIMAN: KAPAL LAUT vs PESAWAT UDARA --}}
+            {{-- PILIHAN MODA PENGIRIMAN: KAPAL LAUT vs PESAWAT UDARA vs MOBIL KARGO/DARAT --}}
             <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
                 <div class="flex items-center justify-between mb-3">
                     <label class="block text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
@@ -36,74 +36,91 @@
                     <span class="text-[11px] text-slate-400">Pilihan ini menentukan daftar simpul logistik & estimasi tarif</span>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {{-- Opsi Kapal Laut --}}
-                    <div id="mode-card-sea" onclick="setTransportMode('SEA')" class="cursor-pointer relative p-4 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
+                    <div id="mode-card-sea" onclick="setTransportMode('SEA')" class="cursor-pointer relative p-3.5 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
                         <div class="flex items-start justify-between mb-2">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl shadow-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg shadow-sm">
                                     🚢
                                 </div>
                                 <div>
-                                    <h4 class="text-sm font-bold text-slate-800 dark:text-white">Kapal Laut</h4>
-                                    <span class="text-[10px] text-slate-400">Maritime Freight</span>
+                                    <h4 class="text-xs font-bold text-slate-800 dark:text-white">Kapal Laut</h4>
+                                    <span class="text-[9px] text-slate-400">Maritime Container</span>
                                 </div>
                             </div>
-                            <span id="badge-sea" class="text-[10px] font-bold px-2 py-0.5 rounded-full border">
+                            <span id="badge-sea" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full border">
                                 Terpilih
                             </span>
                         </div>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mb-3">
-                            Ideal untuk muatan besar/kontainer. Menggunakan simpul <strong>Pelabuhan Laut Internasional</strong>.
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug mb-2">
+                            Simpul <strong>Pelabuhan Santos (Brazil)</strong> ke pelabuhan dunia.
                         </p>
-                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+                        <div class="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px]">
                             <span class="text-slate-400">Tarif Basis:</span>
-                            <span class="font-bold text-emerald-600 dark:text-emerald-400">~$0.35 / kg (Ekonomis)</span>
-                        </div>
-                        <div class="flex items-center justify-between text-[11px] mt-1">
-                            <span class="text-slate-400">Lead Time:</span>
-                            <span class="font-semibold text-slate-700 dark:text-slate-300">7 – 21 Hari</span>
+                            <span class="font-bold text-emerald-600 dark:text-emerald-400">~$0.35 / kg</span>
                         </div>
                     </div>
 
                     {{-- Opsi Pesawat Udara --}}
-                    <div id="mode-card-air" onclick="setTransportMode('AIR')" class="cursor-pointer relative p-4 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
+                    <div id="mode-card-air" onclick="setTransportMode('AIR')" class="cursor-pointer relative p-3.5 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
                         <div class="flex items-start justify-between mb-2">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-10 h-10 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xl shadow-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg shadow-sm">
                                     ✈️
                                 </div>
                                 <div>
-                                    <h4 class="text-sm font-bold text-slate-800 dark:text-white">Pesawat Udara</h4>
-                                    <span class="text-[10px] text-slate-400">Air Cargo Express</span>
+                                    <h4 class="text-xs font-bold text-slate-800 dark:text-white">Pesawat Udara</h4>
+                                    <span class="text-[9px] text-slate-400">Air Cargo Express</span>
                                 </div>
                             </div>
-                            <span id="badge-air" class="text-[10px] font-bold px-2 py-0.5 rounded-full border">
+                            <span id="badge-air" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full border">
                                 Pilih
                             </span>
                         </div>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mb-3">
-                            Prioritas tinggi & super cepat. Menggunakan simpul <strong>Bandara Kargo Internasional</strong>.
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug mb-2">
+                            Simpul <strong>Bandara São Paulo (GRU)</strong> untuk sampel & pesanan kilat.
                         </p>
-                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+                        <div class="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px]">
                             <span class="text-slate-400">Tarif Basis:</span>
-                            <span class="font-bold text-purple-600 dark:text-purple-400">~$2.80 / kg (Premium Air)</span>
+                            <span class="font-bold text-purple-600 dark:text-purple-400">~$2.80 / kg</span>
                         </div>
-                        <div class="flex items-center justify-between text-[11px] mt-1">
-                            <span class="text-slate-400">Lead Time:</span>
-                            <span class="font-bold text-cyan-600 dark:text-cyan-400">⚡ 1 – 3 Hari (Kilat)</span>
+                    </div>
+
+                    {{-- Opsi Mobil / Truk Kargo (Darat) --}}
+                    <div id="mode-card-land" onclick="setTransportMode('LAND')" class="cursor-pointer relative p-3.5 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
+                        <div class="flex items-start justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg shadow-sm">
+                                    🚚
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-800 dark:text-white">Mobil / Truk</h4>
+                                    <span class="text-[9px] text-slate-400">Ground / Last-Mile</span>
+                                </div>
+                            </div>
+                            <span id="badge-land" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full border">
+                                Pilih
+                            </span>
+                        </div>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug mb-2">
+                            Armada mobil kurir & truk kargo pengantaran langsung ke alamat tujuan.
+                        </p>
+                        <div class="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px]">
+                            <span class="text-slate-400">Tarif Basis:</span>
+                            <span class="font-bold text-amber-600 dark:text-amber-400">~$0.85 / kg</span>
                         </div>
                     </div>
                 </div>
                 @error('transport_mode')<p class="text-rose-500 text-xs mt-2">{{ $message }}</p>@enderror
             </div>
 
-            {{-- Informasi Ekspedisi & Komoditas --}}
+            {{-- Informasi Ekspedisi & Komoditas Kopi Brazil Santos --}}
             <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
                         <i data-lucide="package" class="w-4 h-4 text-cyan-500"></i>
-                        <span>2. Informasi Pemesanan & Ekspedisi</span>
+                        <span>2. Informasi Pemesanan & Komoditas Kopi Brazil Santos</span>
                     </h3>
                     <span class="text-xs font-mono font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
                         Nomor Booking: {{ $suggestedNumber }}
@@ -132,15 +149,37 @@
                         @error('carrier_id')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
 
-                    <div class="col-span-2">
+                    <div>
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Jenis Kargo / Komoditas <span class="text-rose-500">*</span></label>
-                        <input type="text" name="cargo_type" value="{{ old('cargo_type') }}" placeholder="cth. Komoditas Kopi Ekspor, Elektronik Presisi, Suku Cadang Mesin..." required class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('cargo_type') border-rose-400 @enderror">
+                        <input type="text" name="cargo_type" value="{{ old('cargo_type', 'Kopi Ekspor Brazil Santos (Specialty Coffee)') }}" required class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('cargo_type') border-rose-400 @enderror">
                         @error('cargo_type')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Varietas Kopi Brazil Santos</label>
+                        <select name="coffee_variety" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="Kopi Brazil Santos Bourbon Specialty" {{ old('coffee_variety') === 'Kopi Brazil Santos Bourbon Specialty' ? 'selected' : '' }}>Kopi Brazil Santos Bourbon Specialty</option>
+                            <option value="Brazil Santos Strictly Soft Fine Cup (SSFC)" {{ old('coffee_variety') === 'Brazil Santos Strictly Soft Fine Cup (SSFC)' ? 'selected' : '' }}>Brazil Santos Strictly Soft Fine Cup (SSFC)</option>
+                            <option value="Brazil Santos Yellow Catuai Natural Micro-lot" {{ old('coffee_variety') === 'Brazil Santos Yellow Catuai Natural Micro-lot' ? 'selected' : '' }}>Brazil Santos Yellow Catuai Natural Micro-lot</option>
+                            <option value="Brazil Santos Cerrado Mineiro Single-Origin" {{ old('coffee_variety') === 'Brazil Santos Cerrado Mineiro Single-Origin' ? 'selected' : '' }}>Brazil Santos Cerrado Mineiro Single-Origin</option>
+                            <option value="Brazil Santos Decaf Swiss Water Process" {{ old('coffee_variety') === 'Brazil Santos Decaf Swiss Water Process' ? 'selected' : '' }}>Brazil Santos Decaf Swiss Water Process</option>
+                            <option value="Brazil Santos Espresso Roast Master Blend" {{ old('coffee_variety') === 'Brazil Santos Espresso Roast Master Blend' ? 'selected' : '' }}>Brazil Santos Espresso Roast Master Blend</option>
+                        </select>
+                    </div>
+
+                    <div class="col-span-2">
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Grade / Kualitas Kopi Ekspor</label>
+                        <select name="coffee_grade" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="Specialty Grade 1 (SCA Score 84+)" {{ old('coffee_grade') === 'Specialty Grade 1 (SCA Score 84+)' ? 'selected' : '' }}>Specialty Grade 1 (SCA Score 84+) — Premium Green Beans</option>
+                            <option value="Strictly Soft Fine Cup NY 2/3" {{ old('coffee_grade') === 'Strictly Soft Fine Cup NY 2/3' ? 'selected' : '' }}>Strictly Soft Fine Cup NY 2/3 — Export Standard</option>
+                            <option value="Exclusive Micro-Lot Nano Batch" {{ old('coffee_grade') === 'Exclusive Micro-Lot Nano Batch' ? 'selected' : '' }}>Exclusive Micro-Lot Nano Batch — Roasted / Green</option>
+                            <option value="Commercial Export Grade A" {{ old('coffee_grade') === 'Commercial Export Grade A' ? 'selected' : '' }}>Commercial Export Grade A</option>
+                        </select>
                     </div>
                 </div>
             </div>
 
-            {{-- Rute Pengiriman: Dinamis sesuai pilihan Kapal Laut (Pelabuhan) vs Pesawat (Bandara) --}}
+            {{-- Rute Pengiriman: Dinamis sesuai pilihan Kapal Laut (Pelabuhan), Pesawat (Bandara), atau Truk Darat --}}
             <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
@@ -176,6 +215,103 @@
                     <i data-lucide="info" class="w-3.5 h-3.5 text-cyan-500"></i>
                     <span>Daftar titik lokasi secara otomatis memuat simpul pelabuhan laut internasional resmi.</span>
                 </p>
+            </div>
+
+            {{-- 4. ALAMAT LENGKAP PENGANTARAN AKHIR (CASCADING DROPDOWN: NEGARA -> KOTA -> DAERAH) --}}
+            <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                            <i data-lucide="truck" class="w-4 h-4 text-amber-500"></i>
+                            <span>4. Alamat Lengkap Pengantaran Mobil / Kurir ke Lokasi Penerima</span>
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Cascading selector: pilih negara, kota, hingga daerah tujuan pengantaran langsung ke kafe/gudang.</p>
+                    </div>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Geoapify Verified
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                    {{-- Dropdown 1: Negara Tujuan --}}
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
+                            1. Negara Tujuan <span class="text-rose-500">*</span>
+                        </label>
+                        <select name="delivery_country" id="delivery_country" onchange="onCountrySelected(this.value)" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="">— Pilih Negara Tujuan —</option>
+                            @foreach($countries as $c)
+                                <option value="{{ $c['name'] }}" data-iso="{{ $c['iso'] }}" {{ old('delivery_country', 'Indonesia') == $c['name'] ? 'selected' : '' }}>
+                                    {{ $c['flag'] }} {{ $c['name'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Dropdown 2: Kota Tujuan (Cascading dari Negara) --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">
+                                2. Kota Tujuan <span class="text-rose-500">*</span>
+                            </label>
+                            <span id="city-spinner" class="hidden text-[10px] text-cyan-500 animate-pulse">Memuat kota...</span>
+                        </div>
+                        <select name="delivery_city" id="delivery_city" onchange="onCitySelected(this.value)" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="">— Pilih Kota —</option>
+                        </select>
+                    </div>
+
+                    {{-- Dropdown 3: Daerah / Kecamatan (Cascading dari Kota) --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">
+                                3. Daerah / Distrik <span class="text-rose-500">*</span>
+                            </label>
+                            <span id="district-spinner" class="hidden text-[10px] text-cyan-500 animate-pulse">Memuat daerah...</span>
+                        </div>
+                        <select name="delivery_district" id="delivery_district" onchange="onDistrictSelected(this.value)" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="">— Pilih Daerah / Kecamatan —</option>
+                        </select>
+                    </div>
+                </div>
+
+                {{-- Detail Alamat Jalan / Kafe / Roastery --}}
+                <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
+                        Alamat Spesifik Penerima (Nama Kafe / Roastery / Jalan & Nomor Gedung)
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="text" name="delivery_address" id="delivery_address" oninput="triggerGeocodeDebounce()" value="{{ old('delivery_address', 'Jl. Senopati No. 42, Roastery Kopi Santos') }}" placeholder="cth. 38 Upper Montagu Street, Westminster Roastery atau Jl. Senopati No. 42" class="flex-1 px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <button type="button" onclick="verifyAddressWithGeoapify()" class="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-cyan-600 hover:bg-cyan-500 transition-colors flex items-center gap-1.5 shadow-sm">
+                            <i data-lucide="locate-fixed" class="w-3.5 h-3.5"></i>
+                            <span>Verifikasi Geoapify</span>
+                        </button>
+                    </div>
+
+                    {{-- Hidden Lat & Lng --}}
+                    <input type="hidden" name="delivery_lat" id="delivery_lat" value="{{ old('delivery_lat', '-6.2297') }}">
+                    <input type="hidden" name="delivery_lng" id="delivery_lng" value="{{ old('delivery_lng', '106.8075') }}">
+
+                    {{-- Geocoded Preview Box --}}
+                    <div id="geocode-preview-box" class="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-[11px] flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span class="text-slate-500 dark:text-slate-400">Koordinat Pengantaran Mobil:</span>
+                            <span id="geocode-coords-display" class="font-mono font-bold text-slate-800 dark:text-slate-200">-6.2297, 106.8075</span>
+                        </div>
+                        <span id="geocode-status-badge" class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                            ✓ Tergeocoding Presisi
+                        </span>
+                    </div>
+
+                    <div class="mt-3 flex items-center gap-2">
+                        <input type="checkbox" name="is_last_mile" id="is_last_mile" value="1" checked class="w-4 h-4 text-cyan-600 rounded border-slate-300 focus:ring-cyan-500">
+                        <label for="is_last_mile" class="text-xs text-slate-700 dark:text-slate-300 font-medium">
+                            Aktifkan Layanan Pengantaran Mobil Kurir (Last-Mile Delivery) langsung ke alamat kafe/toko tujuan
+                        </label>
+                    </div>
+                </div>
             </div>
 
             {{-- Spesifikasi Fisik & Jadwal --}}
@@ -342,15 +478,24 @@
     let destMarker = null;
     let routePolyline = null;
     let planeMarker = null;
+    let deliveryMarker = null;
+    let lastMilePolyline = null;
+    let geocodeTimeout = null;
 
     document.addEventListener('DOMContentLoaded', function () {
         initRouteMap();
         setTransportMode(initialMode, false);
         calculateEstimates();
+
+        // Load kota awal jika negara default sudah terpilih
+        const initialCountry = document.getElementById('delivery_country').value;
+        if (initialCountry) {
+            onCountrySelected(initialCountry);
+        }
     });
 
     /**
-     * Mengatur Moda Pengiriman: SEA (Kapal Laut) atau AIR (Pesawat Udara)
+     * Mengatur Moda Pengiriman: SEA (Kapal Laut), AIR (Pesawat Udara), atau LAND (Mobil / Truk Kargo)
      */
     function setTransportMode(mode, resetSelections = true) {
         currentMode = mode;
@@ -358,8 +503,10 @@
 
         const cardSea = document.getElementById('mode-card-sea');
         const cardAir = document.getElementById('mode-card-air');
+        const cardLand = document.getElementById('mode-card-land');
         const badgeSea = document.getElementById('badge-sea');
         const badgeAir = document.getElementById('badge-air');
+        const badgeLand = document.getElementById('badge-land');
 
         const heading = document.getElementById('route-section-heading');
         const nodeBadge = document.getElementById('route-node-count-badge');
@@ -371,27 +518,31 @@
         const mapCaption = document.getElementById('route-map-caption');
         const summaryPill = document.getElementById('summary-mode-pill');
 
-        const originSelect = document.getElementById('origin-select');
-        const destSelect = document.getElementById('dest-select');
+        // Reset all selector cards to neutral
+        [cardSea, cardAir, cardLand].forEach(c => {
+            if (c) c.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0A1128] hover:border-slate-300 dark:hover:border-slate-700 flex flex-col justify-between';
+        });
+        [badgeSea, badgeAir, badgeLand].forEach(b => {
+            if (b) {
+                b.className = 'text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700';
+                b.textContent = 'Pilih';
+            }
+        });
 
         // Style selector cards
         if (mode === 'AIR') {
-            cardAir.className = 'cursor-pointer relative p-4 rounded-xl border-2 border-purple-500 bg-purple-50/40 dark:bg-purple-950/20 shadow-sm flex flex-col justify-between';
-            badgeAir.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white border-purple-600';
+            cardAir.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-purple-500 bg-purple-50/40 dark:bg-purple-950/20 shadow-sm flex flex-col justify-between';
+            badgeAir.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-600 text-white border-purple-600';
             badgeAir.textContent = 'Terpilih ✓';
 
-            cardSea.className = 'cursor-pointer relative p-4 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0A1128] hover:border-slate-300 dark:hover:border-slate-700 flex flex-col justify-between';
-            badgeSea.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700';
-            badgeSea.textContent = 'Pilih';
-
-            heading.innerHTML = '3. Rute Penerbangan Kargo Udara (Bandara)';
+            heading.innerHTML = '3. Rute Penerbangan Kargo Udara (Bandara Asal São Paulo GRU & Tujuan)';
             nodeBadge.textContent = `${airportLocations.length} Bandara Internasional`;
             originLabel.innerHTML = 'Bandara Asal <span class="text-rose-500">*</span>';
             destLabel.innerHTML = 'Bandara Tujuan <span class="text-rose-500">*</span>';
-            modeHint.innerHTML = '<i data-lucide="info" class="w-3.5 h-3.5 text-purple-500"></i><span>Daftar titik lokasi difilter khusus <strong>Bandara Internasional (IATA/ICAO)</strong> untuk kargo udara cepat.</span>';
+            modeHint.innerHTML = '<i data-lucide="info" class="w-3.5 h-3.5 text-purple-500"></i><span>Daftar titik lokasi difilter khusus <strong>Bandara Internasional (IATA/ICAO)</strong> untuk pengiriman sampel kopi kilat.</span>';
 
             mapTitle.textContent = 'Pratinjau Rute Udara (Air Corridor)';
-            mapCaption.textContent = 'Garis busur ungu menunjukkan estimasi lintasan udara antarbendara.';
+            mapCaption.textContent = 'Garis busur ungu menunjukkan estimasi lintasan udara dari Bandara São Paulo.';
             summaryPill.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300';
             summaryPill.textContent = '✈️ Pesawat Udara (Air Express)';
 
@@ -404,23 +555,44 @@
             }
 
             populateLocationDropdowns(airportLocations, resetSelections ? null : initialOriginId, resetSelections ? null : initialDestId, 'Bandara');
+        } else if (mode === 'LAND') {
+            cardLand.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-amber-500 bg-amber-50/40 dark:bg-amber-950/20 shadow-sm flex flex-col justify-between';
+            badgeLand.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-600 text-white border-amber-600';
+            badgeLand.textContent = 'Terpilih ✓';
+
+            heading.innerHTML = '3. Hub Kargo Darat & Gudang Distribusi Kopi Santos';
+            nodeBadge.textContent = `${portLocations.length + airportLocations.length} Hub Logistik`;
+            originLabel.innerHTML = 'Hub Logistik Asal <span class="text-rose-500">*</span>';
+            destLabel.innerHTML = 'Depot Transit Tujuan <span class="text-rose-500">*</span>';
+            modeHint.innerHTML = '<i data-lucide="info" class="w-3.5 h-3.5 text-amber-500"></i><span>Pengantaran darat langsung via <strong>Armada Mobil Van & Truk Kurir Kopi Santos</strong> hingga ke alamat toko/kafe.</span>';
+
+            mapTitle.textContent = 'Pratinjau Pengantaran Mobil Kargo (Darat / Last-Mile)';
+            mapCaption.textContent = 'Rute mobil kurir pengantaran langsung menuju ke alamat penerima.';
+            summaryPill.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300';
+            summaryPill.textContent = '🚚 Mobil / Truk Kargo (Darat)';
+
+            // Atur default tanggal tiba kilat darat (1 hari)
+            const depVal = document.getElementById('expected_departure').value;
+            if (depVal) {
+                const depDate = new Date(depVal);
+                depDate.setDate(depDate.getDate() + 1);
+                document.getElementById('expected_arrival').value = depDate.toISOString().split('T')[0];
+            }
+
+            populateLocationDropdowns(portLocations.concat(airportLocations), resetSelections ? null : initialOriginId, resetSelections ? null : initialDestId, 'Hub Logistik');
         } else {
-            cardSea.className = 'cursor-pointer relative p-4 rounded-xl border-2 border-blue-500 bg-blue-50/40 dark:bg-blue-950/20 shadow-sm flex flex-col justify-between';
-            badgeSea.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-600 text-white border-blue-600';
+            cardSea.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-blue-500 bg-blue-50/40 dark:bg-blue-950/20 shadow-sm flex flex-col justify-between';
+            badgeSea.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-600 text-white border-blue-600';
             badgeSea.textContent = 'Terpilih ✓';
 
-            cardAir.className = 'cursor-pointer relative p-4 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0A1128] hover:border-slate-300 dark:hover:border-slate-700 flex flex-col justify-between';
-            badgeAir.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700';
-            badgeAir.textContent = 'Pilih';
-
-            heading.innerHTML = '3. Rute Pelayaran Maritim (Pelabuhan Laut)';
+            heading.innerHTML = '3. Rute Pelayaran Maritim (Pelabuhan Santos Brazil ke Dunia)';
             nodeBadge.textContent = `${portLocations.length} Pelabuhan Tersedia`;
             originLabel.innerHTML = 'Pelabuhan Asal <span class="text-rose-500">*</span>';
             destLabel.innerHTML = 'Pelabuhan Tujuan <span class="text-rose-500">*</span>';
-            modeHint.innerHTML = '<i data-lucide="info" class="w-3.5 h-3.5 text-blue-500"></i><span>Daftar titik lokasi difilter khusus <strong>Pelabuhan Laut Samudra</strong> untuk kapal kontainer.</span>';
+            modeHint.innerHTML = '<i data-lucide="info" class="w-3.5 h-3.5 text-blue-500"></i><span>Pengiriman kontainer laut muatan besar biji kopi Brazil Santos langsung dari <strong>Pelabuhan Santos (Brazil)</strong>.</span>';
 
             mapTitle.textContent = 'Pratinjau Rute Maritim (Pelabuhan)';
-            mapCaption.textContent = 'Garis putus-putus menunjukkan rute estimasi pelayaran dari pelabuhan asal menuju pelabuhan tujuan.';
+            mapCaption.textContent = 'Garis putus-putus menunjukkan rute estimasi pelayaran kapal kontainer dari Pelabuhan Santos.';
             summaryPill.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300';
             summaryPill.textContent = '🚢 Kapal Laut (Maritime)';
 
@@ -467,6 +639,141 @@
     }
 
     /**
+     * Cascading Dropdowns: Negara -> Kota
+     */
+    async function onCountrySelected(country) {
+        if (!country) return;
+        const citySelect = document.getElementById('delivery_city');
+        const districtSelect = document.getElementById('delivery_district');
+        const spinner = document.getElementById('city-spinner');
+        if (spinner) spinner.classList.remove('hidden');
+
+        citySelect.innerHTML = '<option value="">Memuat kota via Geoapify...</option>';
+        districtSelect.innerHTML = '<option value="">— Pilih Daerah Setelah Kota —</option>';
+
+        try {
+            const res = await fetch(`/api/geo/cities?country=${encodeURIComponent(country)}`);
+            const json = await res.json();
+            let opts = '<option value="">— Pilih Kota Tujuan —</option>';
+            if (json.data && json.data.length > 0) {
+                json.data.forEach(city => {
+                    opts += `<option value="${city}">${city}</option>`;
+                });
+                citySelect.innerHTML = opts;
+                if (json.data[0]) {
+                    citySelect.value = json.data[0];
+                    onCitySelected(json.data[0]);
+                }
+            } else {
+                citySelect.innerHTML = '<option value="">Kota Bebas / Custom</option>';
+            }
+        } catch (e) {
+            console.error("Gagal memuat kota:", e);
+        } finally {
+            if (spinner) spinner.classList.add('hidden');
+        }
+    }
+
+    /**
+     * Cascading Dropdowns: Kota -> Daerah
+     */
+    async function onCitySelected(city) {
+        if (!city) return;
+        const country = document.getElementById('delivery_country').value;
+        const districtSelect = document.getElementById('delivery_district');
+        const spinner = document.getElementById('district-spinner');
+        if (spinner) spinner.classList.remove('hidden');
+
+        districtSelect.innerHTML = '<option value="">Memuat daerah via Geoapify...</option>';
+
+        try {
+            const res = await fetch(`/api/geo/districts?country=${encodeURIComponent(country)}&city=${encodeURIComponent(city)}`);
+            const json = await res.json();
+            let opts = '<option value="">— Pilih Daerah / Kecamatan —</option>';
+            if (json.data && json.data.length > 0) {
+                json.data.forEach(d => {
+                    opts += `<option value="${d}">${d}</option>`;
+                });
+                districtSelect.innerHTML = opts;
+                if (json.data[0]) {
+                    districtSelect.value = json.data[0];
+                    onDistrictSelected(json.data[0]);
+                }
+            }
+        } catch (e) {
+            console.error("Gagal memuat daerah:", e);
+        } finally {
+            if (spinner) spinner.classList.add('hidden');
+        }
+        triggerGeocodeDebounce();
+    }
+
+    function onDistrictSelected(district) {
+        triggerGeocodeDebounce();
+    }
+
+    function triggerGeocodeDebounce() {
+        clearTimeout(geocodeTimeout);
+        geocodeTimeout = setTimeout(verifyAddressWithGeoapify, 600);
+    }
+
+    /**
+     * Verifikasi Geocoding Presisi menggunakan Geoapify API
+     */
+    async function verifyAddressWithGeoapify() {
+        const country = document.getElementById('delivery_country').value;
+        const city = document.getElementById('delivery_city').value;
+        const district = document.getElementById('delivery_district').value;
+        const address = document.getElementById('delivery_address').value;
+        const coordsDisplay = document.getElementById('geocode-coords-display');
+        const statusBadge = document.getElementById('geocode-status-badge');
+
+        if (!city && !country && !address) return;
+
+        if (coordsDisplay) coordsDisplay.textContent = 'Memverifikasi geocoding...';
+
+        try {
+            const query = `${address}, ${district}, ${city}, ${country}`;
+            const res = await fetch(`/api/geo/geocode?address=${encodeURIComponent(address)}&district=${encodeURIComponent(district)}&city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}`);
+            const json = await res.json();
+
+            if (json.success && json.data && json.data.lat) {
+                const lat = json.data.lat;
+                const lng = json.data.lng;
+
+                document.getElementById('delivery_lat').value = lat;
+                document.getElementById('delivery_lng').value = lng;
+
+                if (coordsDisplay) coordsDisplay.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)} (${json.data.city || city}, ${json.data.district || district})`;
+                if (statusBadge) {
+                    statusBadge.textContent = '✓ Terverifikasi Geoapify';
+                    statusBadge.className = 'text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800';
+                }
+
+                updateLastMileMapMarker(lat, lng, json.data.formatted || query);
+            }
+        } catch (err) {
+            console.error("Geocoding error:", err);
+        }
+    }
+
+    function updateLastMileMapMarker(lat, lng, label) {
+        if (!routeMap) return;
+        if (deliveryMarker) routeMap.removeLayer(deliveryMarker);
+
+        const truckIcon = L.divIcon({
+            html: '<div style="font-size:22px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6));">🚚📍</div>',
+            className: 'delivery-truck-pin',
+            iconSize: [30, 30],
+            iconAnchor: [15, 25]
+        });
+
+        deliveryMarker = L.marker([lat, lng], { icon: truckIcon })
+            .bindPopup(`<b>Alamat Pengantaran Mobil Kargo Kopi:</b><br>${label}`)
+            .addTo(routeMap);
+    }
+
+    /**
      * Hitung Estimasi Biaya & Durasi Kargo Secara Transparan
      */
     function calculateEstimates() {
@@ -482,13 +789,18 @@
         let ratePerKg = 0.35;
         let handlingFee = 250;
         let leadTime = '7 - 21 Hari';
-        let note = 'Pengiriman laut ekonomis';
+        let note = 'Pengiriman kontainer laut ekonomis (Santos Port)';
 
         if (currentMode === 'AIR') {
-            ratePerKg = 2.80;      // Kargo udara 8x lebih mahal dari laut
-            handlingFee = 450;     // Airport security & handling fee
+            ratePerKg = 2.80;      // Kargo udara kilat
+            handlingFee = 450;     // Airport handling & security
             leadTime = '1 - 3 Hari (Super Kilat)';
-            note = 'Pengiriman udara prioritas kilat';
+            note = 'Pengiriman udara prioritas kilat (GRU Airport)';
+        } else if (currentMode === 'LAND') {
+            ratePerKg = 0.85;      // Kargo darat / mobil pengantaran
+            handlingFee = 120;     // Ground logistics
+            leadTime = 'Same-Day / 1 - 2 Hari';
+            note = 'Pengantaran langsung armada mobil kargo kopi';
         }
 
         const totalCost = (weight * ratePerKg) + handlingFee;

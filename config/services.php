@@ -47,4 +47,9 @@ return [
         'url' => env('FREEAIRPORTDB_BASE_URL', 'https://api.freeairportdb.com/v1'),
     ],
 
+    'geoapify' => [
+        'key' => env('GEOAPIFY_API_KEY', '11121e44a86f40d593e90176dda45e95'),
+        'url' => env('GEOAPIFY_BASE_URL', 'https://api.geoapify.com/v1'),
+    ],
+
 ];

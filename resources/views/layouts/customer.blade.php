@@ -113,16 +113,16 @@
                     <h1 class="font-extrabold text-white text-lg tracking-tight leading-none" style="font-family: 'Outfit', sans-serif;">
                         Cargo<span class="text-[#00C2FF]">Trace</span>
                     </h1>
-                    <p class="text-[9px] text-cyan-400 font-bold tracking-wider uppercase mt-1">Customer Portal</p>
+                    <p class="text-[9px] text-amber-400 font-bold tracking-wider uppercase mt-1">☕ Santos Coffee (Brazil)</p>
                 </div>
             </div>
 
             <!-- Role Badge -->
             <div class="px-5 py-3 border-b border-slate-800/60 bg-slate-900/40 flex items-center justify-between">
-                <span class="text-xs text-slate-400 font-medium">Akses Akun:</span>
-                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                    Verified Customer
+                <span class="text-xs text-slate-400 font-medium">Mitra Pembeli:</span>
+                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                    Cafe & Roastery Buyer
                 </span>
             </div>
 

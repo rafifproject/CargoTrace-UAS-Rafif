@@ -113,16 +113,16 @@
                     <h1 class="font-extrabold text-white text-lg tracking-tight leading-none" style="font-family: 'Outfit', sans-serif;">
                         Cargo<span class="text-[#00C2FF]">Trace</span>
                     </h1>
-                    <p class="text-[9px] text-emerald-400 font-bold tracking-wider uppercase mt-1">Operations Hub</p>
+                    <p class="text-[9px] text-amber-400 font-bold tracking-wider uppercase mt-1">☕ Santos Coffee (Brazil)</p>
                 </div>
             </div>
 
             <!-- Role Badge -->
             <div class="px-5 py-3 border-b border-slate-800/60 bg-slate-900/40 flex items-center justify-between">
-                <span class="text-xs text-slate-400 font-medium">Akses Portal:</span>
+                <span class="text-xs text-slate-400 font-medium">Divisi Staf:</span>
                 <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    Logistics Operator
+                    Logistik Ekspor Santos
                 </span>
             </div>
 
