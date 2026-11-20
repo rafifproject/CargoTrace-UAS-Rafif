@@ -36,79 +36,57 @@
                     <span class="text-[11px] text-slate-400">Pilihan ini menentukan daftar simpul logistik & estimasi tarif</span>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {{-- Opsi Kapal Laut --}}
-                    <div id="mode-card-sea" onclick="setTransportMode('SEA')" class="cursor-pointer relative p-3.5 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
-                        <div class="flex items-start justify-between mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg shadow-sm">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {{-- Opsi 1: Multimoda Laut + Udara Domestik (Standar Ekspor Biji Kopi Brazil Santos) --}}
+                    <div id="mode-card-sea" onclick="setTransportMode('SEA')" class="cursor-pointer relative p-4 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
+                        <div class="flex items-start justify-between mb-2.5">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-9 h-9 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl shadow-sm">
                                     🚢
                                 </div>
                                 <div>
-                                    <h4 class="text-xs font-bold text-slate-800 dark:text-white">Kapal Laut</h4>
-                                    <span class="text-[9px] text-slate-400">Maritime Container</span>
+                                    <h4 class="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+                                        <span>Multimoda Samudra + Pesawat Domestik</span>
+                                        <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 font-bold">Rekomendasi Ekspor</span>
+                                    </h4>
+                                    <span class="text-[10px] text-slate-400">Kapal Kontainer Samudera ➔ Lanjut Pesawat Domestik ➔ Mobil Kurir</span>
                                 </div>
                             </div>
-                            <span id="badge-sea" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full border">
+                            <span id="badge-sea" class="text-[9px] font-bold px-2 py-0.5 rounded-full border">
                                 Terpilih
                             </span>
                         </div>
-                        <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug mb-2">
-                            Simpul <strong>Pelabuhan Santos (Brazil)</strong> ke pelabuhan dunia.
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
+                            Kontainer kargo diekspor via <strong>Kapal Laut dari Pelabuhan Santos (Brazil)</strong> melintasi samudra ke pelabuhan hub negara tujuan. Setibanya di negara tujuan, kargo dilanjutkan via <strong>Pesawat Kargo Domestik (Air Feeder)</strong> ke kota pemesan & mobil kurir ke alamat kafe.
                         </p>
-                        <div class="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px]">
-                            <span class="text-slate-400">Tarif Basis:</span>
-                            <span class="font-bold text-emerald-600 dark:text-emerald-400">~$0.35 / kg</span>
+                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+                            <span class="text-slate-400">Tarif Basis Multimoda:</span>
+                            <span class="font-bold text-emerald-600 dark:text-emerald-400">~$0.35 / kg &bull; Kapasitas Kontainer Penuh</span>
                         </div>
                     </div>
 
-                    {{-- Opsi Pesawat Udara --}}
-                    <div id="mode-card-air" onclick="setTransportMode('AIR')" class="cursor-pointer relative p-3.5 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
-                        <div class="flex items-start justify-between mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-lg bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg shadow-sm">
+                    {{-- Opsi 2: Pesawat Kargo Kilat (Full Air Express) --}}
+                    <div id="mode-card-air" onclick="setTransportMode('AIR')" class="cursor-pointer relative p-4 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
+                        <div class="flex items-start justify-between mb-2.5">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-9 h-9 rounded-lg bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xl shadow-sm">
                                     ✈️
                                 </div>
                                 <div>
-                                    <h4 class="text-xs font-bold text-slate-800 dark:text-white">Pesawat Udara</h4>
-                                    <span class="text-[9px] text-slate-400">Air Cargo Express</span>
+                                    <h4 class="text-xs font-bold text-slate-800 dark:text-white">Pesawat Kargo Kilat (Air Cargo Express)</h4>
+                                    <span class="text-[10px] text-slate-400">Bandara GRU São Paulo Direct Air Cargo ➔ Mobil Kurir</span>
                                 </div>
                             </div>
-                            <span id="badge-air" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full border">
+                            <span id="badge-air" class="text-[9px] font-bold px-2 py-0.5 rounded-full border">
                                 Pilih
                             </span>
                         </div>
-                        <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug mb-2">
-                            Simpul <strong>Bandara São Paulo (GRU)</strong> untuk sampel & pesanan kilat.
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
+                            Penerbangan kargo udara kilat dari <strong>Bandara Internasional São Paulo (GRU)</strong> langsung ke bandara internasional negara tujuan untuk batch sampel biji kopi pesanan khusus dan prioritas tinggi.
                         </p>
-                        <div class="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px]">
-                            <span class="text-slate-400">Tarif Basis:</span>
-                            <span class="font-bold text-purple-600 dark:text-purple-400">~$2.80 / kg</span>
-                        </div>
-                    </div>
-
-                    {{-- Opsi Mobil / Truk Kargo (Darat) --}}
-                    <div id="mode-card-land" onclick="setTransportMode('LAND')" class="cursor-pointer relative p-3.5 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
-                        <div class="flex items-start justify-between mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-lg bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg shadow-sm">
-                                    🚚
-                                </div>
-                                <div>
-                                    <h4 class="text-xs font-bold text-slate-800 dark:text-white">Mobil / Truk</h4>
-                                    <span class="text-[9px] text-slate-400">Ground / Last-Mile</span>
-                                </div>
-                            </div>
-                            <span id="badge-land" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full border">
-                                Pilih
-                            </span>
-                        </div>
-                        <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug mb-2">
-                            Armada mobil kurir & truk kargo pengantaran langsung ke alamat tujuan.
-                        </p>
-                        <div class="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px]">
-                            <span class="text-slate-400">Tarif Basis:</span>
-                            <span class="font-bold text-amber-600 dark:text-amber-400">~$0.85 / kg</span>
+                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+                            <span class="text-slate-400">Tarif Basis Udara Kilat:</span>
+                            <span class="font-bold text-purple-600 dark:text-purple-400">~$2.80 / kg &bull; Estimasi Cepat 3-5 Hari</span>
                         </div>
                     </div>
                 </div>
@@ -213,6 +191,48 @@
                         Pusat Eksportir Kopi Santos ✓
                     </span>
                     <input type="hidden" name="origin_location_id" id="origin-select" value="{{ old('origin_location_id', 39) }}" data-lat="-23.9610" data-lng="-46.3020">
+                </div>
+
+                {{-- VISUAL ALUR MULTIMODA LOGISTIK EKSPOR (Santos ➔ Negara Tujuan ➔ Pesawat Domestik ➔ Mobil Kurir) --}}
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                            <i data-lucide="git-merge" class="w-3.5 h-3.5 text-cyan-500"></i>
+                            <span>Alur Multimoda Realistis (Keberangkatan Brazil ➔ Pelabuhan ➔ Pesawat Kargo ➔ Kurir)</span>
+                        </span>
+                        <span class="text-[10px] font-semibold text-cyan-600 dark:text-cyan-400">Rantai Pasok Standar Industri</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div class="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 flex items-center gap-2.5 shadow-2xs">
+                            <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg flex-shrink-0">
+                                🚢
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-[11px] font-bold text-slate-800 dark:text-slate-100">1. Pelayaran Samudra</div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate">Pelabuhan Santos ➔ Hub Tujuan</div>
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 flex items-center gap-2.5 shadow-2xs">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg flex-shrink-0">
+                                ✈️
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-[11px] font-bold text-slate-800 dark:text-slate-100">2. Pesawat Domestik</div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate">Hub Masuk ➔ Bandara Kota</div>
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 flex items-center gap-2.5 shadow-2xs">
+                            <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg flex-shrink-0">
+                                🚚
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-[11px] font-bold text-slate-800 dark:text-slate-100">3. Mobil Kurir Paket</div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate">Bandara ➔ Alamat Kafe/Toko</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- FORM TUJUAN PENGANTARAN LENGKAP --}}
@@ -627,14 +647,14 @@
         });
 
         if (mode === 'AIR') {
-            if (cardAir) cardAir.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-purple-500 bg-purple-50/40 dark:bg-purple-950/20 shadow-sm flex flex-col justify-between';
+            if (cardAir) cardAir.className = 'cursor-pointer relative p-4 rounded-xl border-2 border-purple-500 bg-purple-50/40 dark:bg-purple-950/20 shadow-sm flex flex-col justify-between';
             if (badgeAir) {
-                badgeAir.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-600 text-white border-purple-600';
+                badgeAir.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white border-purple-600';
                 badgeAir.textContent = 'Terpilih ✓';
             }
 
-            if (heading) heading.innerHTML = '3. Rute Kargo Udara (Bandara São Paulo GRU & Bandara Transit Tujuan)';
-            if (destLabel) destLabel.innerHTML = '2. Bandara Transit Tujuan <span class="text-rose-500">*</span>';
+            if (heading) heading.innerHTML = '3. Rute Kargo Udara Kilat (Bandara São Paulo GRU & Bandara Tujuan)';
+            if (destLabel) destLabel.innerHTML = '2. Bandara Internasional Masuk Negara Tujuan <span class="text-rose-500">*</span>';
             if (originIcon) originIcon.textContent = '✈️';
             if (originText) originText.textContent = 'Sao Paulo/Guarulhos International Cargo (GRU) — Brasil';
             if (originInput) {
@@ -643,76 +663,45 @@
                 originInput.setAttribute('data-lng', '-46.4731');
             }
 
-            if (mapTitle) mapTitle.textContent = 'Pratinjau Rute Udara (Air Corridor)';
-            if (mapCaption) mapCaption.textContent = 'Garis busur ungu menunjukkan estimasi lintasan udara dari Bandara São Paulo GRU ke Bandara Internasional tujuan.';
+            if (mapTitle) mapTitle.textContent = 'Pratinjau Rute Udara (Air Corridor Express)';
+            if (mapCaption) mapCaption.textContent = 'Penerbangan kargo udara langsung dari Bandara São Paulo GRU ke Bandara Internasional tujuan, dilanjutkan mobil kurir ke alamat toko.';
             if (summaryPill) {
                 summaryPill.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300';
                 summaryPill.textContent = '✈️ Pesawat Udara (Air Express)';
             }
 
-            // Atur default tanggal tiba kilat (1-3 hari)
+            // Atur default tanggal tiba kilat (2-3 hari)
             const depVal = document.getElementById('expected_departure').value;
             if (depVal) {
                 const depDate = new Date(depVal);
-                depDate.setDate(depDate.getDate() + 2);
-                document.getElementById('expected_arrival').value = depDate.toISOString().split('T')[0];
-            }
-        } else if (mode === 'LAND') {
-            if (cardLand) cardLand.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-amber-500 bg-amber-50/40 dark:bg-amber-950/20 shadow-sm flex flex-col justify-between';
-            if (badgeLand) {
-                badgeLand.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-600 text-white border-amber-600';
-                badgeLand.textContent = 'Terpilih ✓';
-            }
-
-            if (heading) heading.innerHTML = '3. Rute Pengantaran Kargo Darat (Hub Logistik & Alamat Tujuan)';
-            if (destLabel) destLabel.innerHTML = '2. Hub Logistik Transit Tujuan <span class="text-rose-500">*</span>';
-            if (originIcon) originIcon.textContent = '🚚';
-            if (originText) originText.textContent = 'Hub Distribusi Kopi Santos (Santos, Brasil)';
-            if (originInput) {
-                originInput.value = '39';
-                originInput.setAttribute('data-lat', '-23.9610');
-                originInput.setAttribute('data-lng', '-46.3020');
-            }
-
-            if (mapTitle) mapTitle.textContent = 'Pratinjau Pengantaran Mobil Kargo (Darat / Last-Mile)';
-            if (mapCaption) mapCaption.textContent = 'Rute mobil kurir kargo pengantaran langsung menuju ke alamat penerima.';
-            if (summaryPill) {
-                summaryPill.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300';
-                summaryPill.textContent = '🚚 Mobil / Truk Kargo (Darat)';
-            }
-
-            // Atur default tanggal tiba kilat darat (1 hari)
-            const depVal = document.getElementById('expected_departure').value;
-            if (depVal) {
-                const depDate = new Date(depVal);
-                depDate.setDate(depDate.getDate() + 1);
+                depDate.setDate(depDate.getDate() + 3);
                 document.getElementById('expected_arrival').value = depDate.toISOString().split('T')[0];
             }
         } else {
-            if (cardSea) cardSea.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-blue-500 bg-blue-50/40 dark:bg-blue-950/20 shadow-sm flex flex-col justify-between';
+            if (cardSea) cardSea.className = 'cursor-pointer relative p-4 rounded-xl border-2 border-blue-500 bg-blue-50/40 dark:bg-blue-950/20 shadow-sm flex flex-col justify-between';
             if (badgeSea) {
-                badgeSea.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-600 text-white border-blue-600';
+                badgeSea.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-600 text-white border-blue-600';
                 badgeSea.textContent = 'Terpilih ✓';
             }
 
-            if (heading) heading.innerHTML = '3. Rute Pelayaran Maritim (Pelabuhan Santos Brazil & Pelabuhan Tujuan)';
-            if (destLabel) destLabel.innerHTML = '2. Pelabuhan Laut Transit Tujuan <span class="text-rose-500">*</span>';
+            if (heading) heading.innerHTML = '3. Rute Multimoda Terpadu (Pelabuhan Santos ➔ Hub Tujuan ➔ Pesawat Domestik ➔ Mobil Kurir)';
+            if (destLabel) destLabel.innerHTML = '2. Pelabuhan Laut Masuk Negara Tujuan <span class="text-rose-500">*</span>';
             if (originIcon) originIcon.textContent = '🚢';
-            if (originText) originText.textContent = 'Port of Santos (Santos, Brasil)';
+            if (originText) originText.textContent = 'Port of Santos (Santos, Brasil) — Simpul Ekspor Maritim Kopi';
             if (originInput) {
                 originInput.value = '39';
                 originInput.setAttribute('data-lat', '-23.9610');
                 originInput.setAttribute('data-lng', '-46.3020');
             }
 
-            if (mapTitle) mapTitle.textContent = 'Pratinjau Rute Maritim (Pelabuhan)';
-            if (mapCaption) mapCaption.textContent = 'Garis putus-putus menunjukkan rute estimasi pelayaran kapal kontainer dari Pelabuhan Santos ke Pelabuhan transit tujuan.';
+            if (mapTitle) mapTitle.textContent = 'Pratinjau Multimoda (Samudra + Pesawat Domestik)';
+            if (mapCaption) mapCaption.textContent = 'Kapal kontainer berlayar dari Pelabuhan Santos ke pelabuhan hub negara tujuan, dilanjutkan pesawat kargo domestik ke kota pemesan & mobil kurir ke alamat kafe.';
             if (summaryPill) {
                 summaryPill.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300';
-                summaryPill.textContent = '🚢 Kapal Laut (Maritime)';
+                summaryPill.textContent = '🚢 Multimoda Samudra + Pesawat Domestik';
             }
 
-            // Atur default tanggal tiba laut (14 hari)
+            // Atur default tanggal tiba laut (14-18 hari)
             const depVal = document.getElementById('expected_departure').value;
             if (depVal) {
                 const depDate = new Date(depVal);

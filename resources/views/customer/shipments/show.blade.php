@@ -72,11 +72,11 @@
             <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-{{ $statusColor }}-100 text-{{ $statusColor }}-700 dark:bg-{{ $statusColor }}-900/40 dark:text-{{ $statusColor }}-300">{{ $statusLabel }}</span>
             @if(($shipment->transport_mode ?? 'SEA') === 'AIR')
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 flex items-center gap-1">
-                    ✈️ Kargo Udara (Air Express)
+                    ✈️ Kargo Udara Kilat (Air Express)
                 </span>
             @else
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 flex items-center gap-1">
-                    🚢 Kargo Laut (Maritime)
+                    🚢 Multimoda Samudra + Pesawat Domestik
                 </span>
             @endif
             @if($shipment->delay_minutes > 0)
@@ -353,6 +353,17 @@ function initDetailMap() {
         return Math.round((brng + 360) % 360);
     }
 
+    function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
     const shipSvg = `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 78" width="28" height="58" style="filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));">
             <path d="M19 2 C27 12, 33 24, 33 48 C33 66, 30 74, 19 75 C8 74, 5 66, 5 48 C5 24, 11 12, 19 2 Z" fill="#0f172a" opacity="0.35" transform="translate(1.5, 2.5)"/>
@@ -421,8 +432,48 @@ function initDetailMap() {
         const devLng = {{ $shipment->delivery_lng }};
         boundsPoints.push([devLat, devLng]);
 
-        // Garis jalan darat pengantaran mobil kurir
-        L.polyline([[dLat, dLng], [devLat, devLng]], { color: '#f59e0b', weight: 3.5, dashArray: '5, 6', opacity: 0.95 }).addTo(map);
+        const distKm = calculateDistanceKm(dLat, dLng, devLat, devLng);
+        const isDomesticFeederAir = distKm > 35;
+
+        if (isDomesticFeederAir) {
+            // Koridor Penerbangan Domestik dari Pelabuhan Hub ke Kota Tujuan
+            const feederPoints = [];
+            for (let i = 0; i <= 20; i++) {
+                const t = i / 20;
+                const fLat = (1 - t) * dLat + t * devLat + Math.sin(t * Math.PI) * 0.4;
+                const fLng = (1 - t) * dLng + t * devLng + Math.sin(t * Math.PI) * 0.4;
+                feederPoints.push([fLat, fLng]);
+            }
+            L.polyline(feederPoints, { color: '#00F0FF', weight: 4, dashArray: '6, 6', opacity: 0.95 }).addTo(map);
+
+            @if($shipment->is_last_mile || $shipment->status === 'DELIVERED')
+                const planeLat = dLat + (devLat - dLat) * 0.52;
+                const planeLng = dLng + (devLng - dLng) * 0.52;
+                const planeHeading = calculateBearing([dLat, dLng], [devLat, devLng]);
+
+                const feederPlaneDivIcon = L.divIcon({
+                    className: 'cargo-real-vehicle-marker',
+                    html: `
+                        <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${planeHeading}deg);" title="Pesawat Kargo Domestik Feeder: {{ $shipment->shipment_number }}">
+                            ${planeSvg}
+                        </div>
+                        <div class="cargo-vehicle-tag" style="white-space:nowrap; margin-top:-2px;">
+                            <span class="cargo-tag-dot" style="background:#00F0FF;"></span>
+                            <span>✈️ Feeder: {{ $shipment->shipment_number }}</span>
+                        </div>
+                    `,
+                    iconSize: [42, 42],
+                    iconAnchor: [21, 21],
+                    popupAnchor: [0, -25]
+                });
+                L.marker([planeLat, planeLng], { icon: feederPlaneDivIcon, zIndexOffset: 1400 })
+                    .addTo(map)
+                    .bindPopup('<b>✈️ Pesawat Kargo Domestik:</b> Penerbangan lanjutan dari pelabuhan hub {{ $shipment->destination?->name }} ke bandara kota {{ $shipment->delivery_city }}');
+            @endif
+        } else {
+            // Garis jalan darat pengantaran mobil kurir langsung
+            L.polyline([[dLat, dLng], [devLat, devLng]], { color: '#f59e0b', weight: 3.5, dashArray: '5, 6', opacity: 0.95 }).addTo(map);
+        }
 
         // Pin Alamat Penerima (📍)
         const destPin = L.divIcon({
@@ -434,9 +485,10 @@ function initDetailMap() {
         L.marker([devLat, devLng], { icon: destPin }).addTo(map)
             .bindPopup('<b>🚚 Alamat Pengantaran:</b> {{ $shipment->delivery_address }}<br><span style="font-size:11px; color:#92400e;">{{ $shipment->delivery_district ? $shipment->delivery_district . ", " : "" }}{{ $shipment->delivery_city }} ({{ $shipment->delivery_country }})</span>');
 
-        @if($shipment->is_last_mile)
-            const vanLat = dLat + (devLat - dLat) * 0.65;
-            const vanLng = dLng + (devLng - dLng) * 0.65;
+        @if($shipment->is_last_mile || $shipment->status === 'DELIVERED')
+            const vanFraction = isDomesticFeederAir ? 0.88 : 0.65;
+            const vanLat = dLat + (devLat - dLat) * vanFraction;
+            const vanLng = dLng + (devLng - dLng) * vanFraction;
             const vanHeading = calculateBearing([dLat, dLng], [devLat, devLng]);
             const vanPlate = '{{ $shipment->courier_vehicle ? (str_contains($shipment->courier_vehicle, "(") ? str_replace(")", "", explode("(", $shipment->courier_vehicle)[1]) : $shipment->shipment_number) : $shipment->shipment_number }}';
 
@@ -456,8 +508,7 @@ function initDetailMap() {
                 popupAnchor: [0, -32]
             });
             L.marker([vanLat, vanLng], { icon: vanIcon, zIndexOffset: 1500 }).addTo(map)
-                .bindPopup('<b>🚚 Armada Kurir Paket:</b> {{ $shipment->courier_name ?? "Mobil Van Paket" }}<br><span style="font-size:11px; color:#d97706; font-weight:700;">{{ $shipment->courier_vehicle ?? "Van Kurir" }}</span>')
-                .openPopup();
+                .bindPopup('<b>🚚 Armada Kurir Paket:</b> {{ $shipment->courier_name ?? "Mobil Van Paket" }}<br><span style="font-size:11px; color:#d97706; font-weight:700;">{{ $shipment->courier_vehicle ?? "Van Kurir" }}</span>');
         @endif
     @endif
 

@@ -27,6 +27,23 @@ class BrazilSantosShipmentSeeder extends Seeder
         $rotterdam = Location::where('name', 'like', '%Rotterdam%')->first();
         $jfk = Location::where('name', 'like', '%Kennedy%')->first() ?? Location::where('name', 'like', '%JFK%')->first();
         $haneda = Location::where('name', 'like', '%Haneda%')->first() ?? Location::where('name', 'like', '%Tokyo%')->first();
+        $busanPort = Location::where('name', 'like', '%Busan%')->first() 
+            ?? Location::where('country', 'like', '%Korea%')->where('location_type', 'PORT')->first();
+
+        if (! $busanPort) {
+            $busanPort = Location::firstOrCreate(
+                ['name' => 'Port of Busan'],
+                [
+                    'city' => 'Busan',
+                    'country' => 'Korea Selatan',
+                    'address' => 'Busan Port International Container Terminal, South Korea',
+                    'location_type' => Location::TYPE_PORT,
+                    'latitude' => 35.102,
+                    'longitude' => 129.040,
+                    'status' => Location::STATUS_ACTIVE,
+                ]
+            );
+        }
 
         if (! $santosPort || ! $gruAirport) {
             $this->command->warn('Santos Port or GRU Airport not found.');
@@ -167,9 +184,29 @@ class BrazilSantosShipmentSeeder extends Seeder
                 'delivery_lng' => 112.7541,
                 'courier_name' => 'Armada Kurir Mobil Kopi Santos Jawa Timur',
                 'courier_vehicle' => 'Mobil Van Paket Box (L 8192 CT)',
-                'notes' => 'Kapal kargo tiba di Pelabuhan Tanjung Perak dari Pelabuhan Santos. Kargo karung kopi di-oper ke mobil van paket kurir menuju Kafe Gubeng Surabaya.',
+                'notes' => 'Kapal Kontainer Samudera berlayar dari Pelabuhan Santos (Brazil) ke Pelabuhan Tanjung Priok (Jakarta). Setibanya di Tanjung Priok, kargo dilanjutkan via Pesawat Kargo Domestik (Jakarta ➔ Bandara Juanda Surabaya), lalu diantar oleh Mobil Van Kurir ke Kafe Gubeng Surabaya.',
                 'dep_days_ago' => 21,
                 'arr_hours_ahead' => 1,
+            ],
+            [
+                'shipment_number' => 'CT-2026-007',
+                'transport_mode' => 'SEA',
+                'origin_id' => $santosPort->id,
+                'dest_id' => $busanPort->id,
+                'is_last_mile' => true,
+                'coffee_variety' => 'Brazil Santos Yellow Catuai Natural Micro-lot',
+                'coffee_grade' => 'Specialty Grade 1 (SCA Score 84+)',
+                'delivery_country' => 'Korea Selatan',
+                'delivery_city' => 'Suwon',
+                'delivery_district' => 'Gwonseon-gu',
+                'delivery_address' => 'Gwonseon-ro 52, Roastery Kopi Santos Suwon, Gyeonggi-do',
+                'delivery_lat' => 37.2575,
+                'delivery_lng' => 127.0145,
+                'courier_name' => 'Santos Express Korea Logistics',
+                'courier_vehicle' => 'Mobil Van Paket Kargo (KR-7821-CT)',
+                'notes' => 'Kapal Kontainer Samudera tiba di Port of Busan dari Pelabuhan Santos (Brazil). Kargo dilanjutkan via Pesawat Kargo Domestik (Busan ➔ Bandara Gimpo/Suwon), lalu diantar oleh Mobil Van Kurir ke Gwonseon-gu Suwon.',
+                'dep_days_ago' => 22,
+                'arr_hours_ahead' => 2,
             ]
         ];
 
@@ -212,28 +249,22 @@ class BrazilSantosShipmentSeeder extends Seeder
                 // Generalized Brazil Santos Coffee export shipment
                 $variety = $varieties[$index % count($varieties)];
                 $grade = $grades[$index % count($grades)];
-                $isAir = ($shipment->transport_mode === 'AIR');
 
-                $shipment->origin_location_id = $isAir ? $gruAirport->id : $santosPort->id;
+                // Seluruh kargo ekspor biji kopi berangkat via Kapal Kontainer Laut Samudera dari Santos (Brazil)
+                $shipment->transport_mode = 'SEA';
+                $shipment->origin_location_id = $santosPort->id;
                 $shipment->current_location_id = null;
                 $shipment->is_last_mile = false;
                 $shipment->coffee_variety = $variety;
                 $shipment->coffee_grade = $grade;
                 $shipment->cargo_type = 'Kopi Ekspor Brazil Santos: ' . $variety;
-                $shipment->notes = 'Ekspor Resmi Kopi Brazil Santos — Santos Coffee Exporters S.A. Kemasan kantong hermetis GrainPro 60kg.';
+                $shipment->notes = 'Ekspor Resmi Kopi Brazil Santos via Kapal Kontainer Laut Samudera — Santos Coffee Exporters S.A. Kemasan kantong hermetis GrainPro 60kg.';
 
                 // Staggered departure and arrival schedule so no two shipments share the same spot
-                if ($isAir) {
-                    $depHours = 4 + (($index * 7) % 36);
-                    $arrHours = 6 + (($index * 5) % 24);
-                    $dep = Carbon::now()->subHours($depHours);
-                    $arr = Carbon::now()->addHours($arrHours);
-                } else {
-                    $depDays = 3 + (($index * 3) % 18);
-                    $arrDays = 4 + (($index * 2) % 16);
-                    $dep = Carbon::now()->subDays($depDays);
-                    $arr = Carbon::now()->addDays($arrDays);
-                }
+                $depDays = 3 + (($index * 3) % 18);
+                $arrDays = 4 + (($index * 2) % 16);
+                $dep = Carbon::now()->subDays($depDays);
+                $arr = Carbon::now()->addDays($arrDays);
 
                 $shipment->expected_departure = $dep;
                 $shipment->actual_departure = $dep;

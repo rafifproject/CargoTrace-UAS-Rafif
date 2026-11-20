@@ -376,6 +376,7 @@
                 it.remainingPoly?.setStyle({ color: '#38BDF8', weight: 5, opacity: 1, dashArray: '8, 8' });
                 it.directPoly?.setStyle({ color: '#00F0FF', weight: 5.5, opacity: 1 });
                 it.deliveryPoly?.setStyle({ color: '#f59e0b', weight: 6, opacity: 1 });
+                it.feederFlightPoly?.setStyle({ color: '#00F0FF', weight: 5.5, opacity: 1 });
 
                 // Menonjolkan titik asal dan akhir
                 it.originMarker?.setRadius(11).setStyle({ fillColor: '#10B981', color: '#ffffff', weight: 3.5, fillOpacity: 1 });
@@ -390,6 +391,15 @@
                     it.courierVanMarker.setZIndexOffset(10000);
                     const el = it.courierVanMarker.getElement();
                     if (el) el.classList.remove('marker-dimmed');
+                }
+                if (it.feederPlaneMarker) {
+                    it.feederPlaneMarker.setZIndexOffset(10000);
+                    const el = it.feederPlaneMarker.getElement();
+                    if (el) {
+                        el.classList.remove('marker-dimmed');
+                        const wrap = el.querySelector('.cargo-real-vehicle-wrapper');
+                        if (wrap) wrap.classList.add('vehicle-focused');
+                    }
                 }
 
                 // Menonjolkan icon kendaraan kargo
@@ -422,6 +432,7 @@
                 it.remainingPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.12, dashArray: '4, 6' });
                 it.directPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.15 });
                 it.deliveryPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.15 });
+                it.feederFlightPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.15, dashArray: '4, 6' });
                 it.originMarker?.setRadius(5).setStyle({ opacity: 0.25, fillOpacity: 0.25 });
                 it.destMarker?.setRadius(5).setStyle({ opacity: 0.25, fillOpacity: 0.25 });
 
@@ -434,6 +445,15 @@
                     it.courierVanMarker.setZIndexOffset(100);
                     const el = it.courierVanMarker.getElement();
                     if (el) el.classList.add('marker-dimmed');
+                }
+                if (it.feederPlaneMarker) {
+                    it.feederPlaneMarker.setZIndexOffset(100);
+                    const el = it.feederPlaneMarker.getElement();
+                    if (el) {
+                        el.classList.add('marker-dimmed');
+                        const wrap = el.querySelector('.cargo-real-vehicle-wrapper');
+                        if (wrap) wrap.classList.remove('vehicle-focused');
+                    }
                 }
 
                 if (it.vehicleMarker) {
@@ -458,6 +478,7 @@
             it.remainingPoly?.setStyle({ color: '#38bdf8', weight: 2.5, opacity: 0.8, dashArray: '6, 8' });
             it.directPoly?.setStyle({ color: '#0284c7', weight: 3, dashArray: '6, 6', opacity: 0.85 });
             it.deliveryPoly?.setStyle({ color: '#f59e0b', weight: 3.5, opacity: 0.95 });
+            it.feederFlightPoly?.setStyle({ color: '#00F0FF', weight: 3.5, opacity: 0.9, dashArray: '6, 6' });
 
             it.originMarker?.setRadius(7).setStyle({ fillColor: '#10B981', color: '#fff', weight: 2.5, fillOpacity: 1, opacity: 1 });
             it.destMarker?.setRadius(7).setStyle({ fillColor: '#EF4444', color: '#fff', weight: 2.5, fillOpacity: 1, opacity: 1 });
@@ -471,6 +492,15 @@
                 it.courierVanMarker.setZIndexOffset(1500);
                 const el = it.courierVanMarker.getElement();
                 if (el) el.classList.remove('marker-dimmed');
+            }
+            if (it.feederPlaneMarker) {
+                it.feederPlaneMarker.setZIndexOffset(1400);
+                const el = it.feederPlaneMarker.getElement();
+                if (el) {
+                    el.classList.remove('marker-dimmed');
+                    const wrap = el.querySelector('.cargo-real-vehicle-wrapper');
+                    if (wrap) wrap.classList.remove('vehicle-focused');
+                }
             }
 
             if (it.vehicleMarker) {
@@ -1180,8 +1210,8 @@
                 };
             }
 
-            // 1. Truk / Mobil Paket Domestik (Hanya untuk pengiriman darat dalam satu negara)
-            if (s.transport_mode === 'LAND' || s.is_last_mile) {
+            // 1. Truk / Mobil Paket Domestik (Hanya jika moda adalah LAND khusus tanpa laut)
+            if (s.transport_mode === 'LAND') {
                 return {
                     type: 'van',
                     label: 'Mobil Pengantaran Kurir (Last-Mile Delivery)',
@@ -1295,8 +1325,29 @@
         function generateShipmentPopupContent(s, vehicle, curLoc, progress = 0.45) {
             const isAir = (s.transport_mode === 'AIR') || (vehicle.type === 'AIR');
             const pct = Math.round(progress * 100);
+
+            const hasDelivery = !!(s.delivery_lat && s.delivery_lng);
+            let multimodalHtml = '';
+            if (hasDelivery && s.destination) {
+                const devLat = parseFloat(s.delivery_lat);
+                const devLng = parseFloat(s.delivery_lng);
+                const distKm = (!isNaN(devLat) && !isNaN(devLng)) ? calculateDistanceKm(parseFloat(s.destination.latitude), parseFloat(s.destination.longitude), devLat, devLng) : 0;
+                const isDomesticAir = distKm > 35;
+
+                multimodalHtml = `
+                    <div style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:8px; padding:6px 8px; margin-bottom:8px; font-size:10.5px; line-height:1.45;">
+                        <div style="font-weight:800; color:#0369a1; margin-bottom:3px; display:flex; align-items:center; gap:4px;">
+                            <span>🔄</span> <span>Alur Multimoda (Brazil ➔ Pelabuhan ➔ Pesawat ➔ Kurir):</span>
+                        </div>
+                        <div>🚢 <b>1. Samudra:</b> ${s.origin?.name || 'Pelabuhan Santos'} ➔ ${s.destination?.name || 'Pelabuhan Hub'}</div>
+                        ${isDomesticAir ? `<div>✈️ <b>2. Pesawat Domestik:</b> Pelabuhan Hub ➔ Bandara <b>${s.delivery_city}</b></div>` : ''}
+                        <div>🚚 <b>${isDomesticAir ? '3' : '2'}. Kurir Terakhir:</b> Mobil Paket menuju <b>${s.delivery_address || s.delivery_city}</b></div>
+                    </div>
+                `;
+            }
+
             return `
-                <div style="font-family:'Outfit',sans-serif; min-width:260px; padding:2px;">
+                <div style="font-family:'Outfit',sans-serif; min-width:265px; padding:2px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #e2e8f0; padding-bottom:6px;">
                         <span style="font-weight:900; font-size:13px; color:#0284c7;">${s.shipment_number}</span>
                         <span style="font-weight:800; font-size:10px; color:#15803d; background:#dcfce7; padding:2px 7px; border-radius:5px;">${s.status}</span>
@@ -1312,6 +1363,8 @@
                             <div style="width:${pct}%; height:100%; background:linear-gradient(90deg, #10b981, #06b6d4); border-radius:999px;"></div>
                         </div>
                     </div>
+
+                    ${multimodalHtml}
 
                     <div style="font-size:11px; color:#334155; line-height:1.5; margin-bottom:8px;">
                         <div>🛫 <b>Asal:</b> ${s.origin?.name || '-'} (${s.origin?.city || '-'})</div>
@@ -1435,6 +1488,8 @@
                 if (curPt) routePoints.push(curPt);
 
                 let deliveryPoly = null;
+                let feederFlightPoly = null;
+                let feederPlaneMarker = null;
                 let destPinMarker = null;
                 let courierVanMarker = null;
 
@@ -1447,11 +1502,58 @@
                         allBounds.push(devCoords);
                         routePoints.push(devCoords);
 
-                        // Orange dashed line from arrival port/airport to doorstep
-                        deliveryPoly = L.polyline([destPt, devCoords], {
-                            color: '#f59e0b', weight: 3.5, dashArray: '5, 6', opacity: 0.95, lineCap: 'round', cursor: 'pointer'
-                        }).bindPopup(popupHtml).addTo(trackingLayerGroup);
-                        deliveryPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+                        const distPortToCityKm = calculateDistanceKm(destPt[0], destPt[1], devLat, devLng);
+                        const isDomesticFeederAir = distPortToCityKm > 35;
+
+                        if (isDomesticFeederAir) {
+                            // ✈️ Koridor Penerbangan Domestik (Pelabuhan Masuk ➔ Kota Tujuan)
+                            const flightPath = createCurvedPath(destPt, devCoords, 20, 0.12);
+                            feederFlightPoly = L.polyline(flightPath, {
+                                color: '#00F0FF', weight: 3.5, dashArray: '6, 6', opacity: 0.95, lineCap: 'round', cursor: 'pointer'
+                            }).bindPopup(popupHtml).addTo(trackingLayerGroup);
+                            feederFlightPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+
+                            // Pesawat Kargo Domestik (Feeder Flight)
+                            if (s.is_last_mile || s.status === 'DELIVERED') {
+                                const planeLat = destPt[0] + (devCoords[0] - destPt[0]) * 0.52;
+                                const planeLng = destPt[1] + (devCoords[1] - destPt[1]) * 0.52;
+                                const planeHeading = calculateBearing(destPt, devCoords);
+                                const feederPlaneSvg = `
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="38" height="38" style="filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));">
+                                        <path d="M32 2 C30 2, 28 6, 28 14 L28 24 L2 35 L2 40 L28 34 L28 50 L18 56 L18 60 L32 58 L46 60 L46 56 L36 50 L36 34 L62 40 L62 35 L36 24 L36 14 C36 6, 34 2, 32 2 Z" fill="#00F0FF" stroke="#0284c7" stroke-width="1.2"/>
+                                        <path d="M32 4 C31 4, 29.5 8, 29.5 16 L29.5 54 L34.5 54 L34.5 16 C34.5 8, 33 4, 32 4 Z" fill="#ffffff"/>
+                                        <rect x="14" y="27" width="4.5" height="11" rx="2" fill="#334155"/>
+                                        <rect x="45.5" y="27" width="4.5" height="11" rx="2" fill="#334155"/>
+                                    </svg>
+                                `;
+
+                                feederPlaneMarker = L.marker([planeLat, planeLng], {
+                                    icon: L.divIcon({
+                                        className: 'cargo-real-vehicle-marker',
+                                        html: `
+                                            <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${planeHeading}deg);" title="Pesawat Kargo Domestik: ${s.shipment_number}">
+                                                ${feederPlaneSvg}
+                                            </div>
+                                            <div class="cargo-vehicle-tag" style="white-space:nowrap; margin-top:-2px;">
+                                                <span class="cargo-tag-dot" style="background:#00F0FF;"></span>
+                                                <span>✈️ Pesawat Domestik: ${s.shipment_number}</span>
+                                            </div>
+                                        `,
+                                        iconSize: [42, 42],
+                                        iconAnchor: [21, 21],
+                                        popupAnchor: [0, -25]
+                                    }),
+                                    zIndexOffset: 1400
+                                }).bindPopup(popupHtml).addTo(trackingLayerGroup);
+                                feederPlaneMarker.on('click', () => focusCargoShipment(s.id, [planeLat, planeLng]));
+                            }
+                        } else {
+                            // Jalur Darat Langsung Dekat (Metropolitan Area)
+                            deliveryPoly = L.polyline([destPt, devCoords], {
+                                color: '#f59e0b', weight: 3.5, dashArray: '5, 6', opacity: 0.95, lineCap: 'round', cursor: 'pointer'
+                            }).bindPopup(popupHtml).addTo(trackingLayerGroup);
+                            deliveryPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+                        }
 
                         // Pin Alamat Penerima (📍)
                         const destPin = L.divIcon({
@@ -1466,10 +1568,11 @@
                             .addTo(trackingLayerGroup);
                         destPinMarker.on('click', () => focusCargoShipment(s.id, devCoords));
 
-                        // Mobil Van Kurir Paket
+                        // 🚚 Mobil Van Kurir Paket Pengantaran Terakhir ke Alamat
                         if (s.is_last_mile || s.status === 'DELIVERED') {
-                            const vanLat = destPt[0] + (devCoords[0] - destPt[0]) * 0.65;
-                            const vanLng = destPt[1] + (devCoords[1] - destPt[1]) * 0.65;
+                            const vanFraction = isDomesticFeederAir ? 0.88 : 0.65;
+                            const vanLat = destPt[0] + (devCoords[0] - destPt[0]) * vanFraction;
+                            const vanLng = destPt[1] + (devCoords[1] - destPt[1]) * vanFraction;
                             const vanHeading = calculateBearing(destPt, devCoords);
                             const vanPlate = s.courier_vehicle ? (s.courier_vehicle.split('(')[1]?.replace(')','') || s.shipment_number) : s.shipment_number;
 
@@ -1526,6 +1629,8 @@
                     directPoly,
                     vehicleMarker,
                     deliveryPoly,
+                    feederFlightPoly,
+                    feederPlaneMarker,
                     deliveryMarker: destPinMarker,
                     courierVanMarker,
                     bounds: shipmentBounds
