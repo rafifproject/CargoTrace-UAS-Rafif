@@ -186,24 +186,18 @@
                                 <span>Peta Pengiriman</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="{{ route('customer.carriers.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.carriers.index') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
-                                <i data-lucide="building-2" class="w-4 h-4 {{ request()->routeIs('customer.carriers.index') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Mitra Ekspedisi</span>
-                            </a>
-                        </li>
                     </ul>
                 </div>
 
-                <!-- Group 3: STATUS & KENDALA -->
+                <!-- Group 3: KENDALA & BANTUAN -->
                 <div>
-                    <div class="px-3 mb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Kendala & Informasi</div>
+                    <div class="px-3 mb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Kendala & Bantuan</div>
                     <ul class="space-y-1">
                         <li>
                             <a href="{{ route('customer.exceptions.index') }}" class="flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.exceptions.index') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
                                 <div class="flex items-center gap-3">
                                     <i data-lucide="alert-triangle" class="w-4 h-4 {{ request()->routeIs('customer.exceptions.index') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                    <span>Pengecualian</span>
+                                    <span>Pengecualian / Kendala</span>
                                 </div>
                                 @php
                                     $myShipmentIds = auth()->user()->shipments()->pluck('id');
@@ -214,48 +208,6 @@
                                 @if($custOpenExceptions > 0)
                                     <span class="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">{{ $custOpenExceptions }}</span>
                                 @endif
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('customer.intelligence.weather') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.intelligence.weather') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
-                                <i data-lucide="cloud-sun" class="w-4 h-4 {{ request()->routeIs('customer.intelligence.weather') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Pemantauan Cuaca</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('customer.intelligence.currency') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.intelligence.currency') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
-                                <i data-lucide="coins" class="w-4 h-4 {{ request()->routeIs('customer.intelligence.currency') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Kurs Mata Uang</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('customer.intelligence.economy') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.intelligence.economy') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
-                                <i data-lucide="trending-up" class="w-4 h-4 {{ request()->routeIs('customer.intelligence.economy') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Indikator Ekonomi</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('customer.intelligence.ports') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.intelligence.ports') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
-                                <i data-lucide="anchor" class="w-4 h-4 {{ request()->routeIs('customer.intelligence.ports') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Direktori Pelabuhan</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('customer.intelligence.airports') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.intelligence.airports') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
-                                <i data-lucide="plane" class="w-4 h-4 {{ request()->routeIs('customer.intelligence.airports') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Bandara Kargo Global</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('customer.intelligence.news') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.intelligence.news') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
-                                <i data-lucide="newspaper" class="w-4 h-4 {{ request()->routeIs('customer.intelligence.news') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Berita Logistik</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('customer.intelligence.comparison') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.intelligence.comparison') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
-                                <i data-lucide="scale" class="w-4 h-4 {{ request()->routeIs('customer.intelligence.comparison') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Perbandingan Negara</span>
                             </a>
                         </li>
                     </ul>

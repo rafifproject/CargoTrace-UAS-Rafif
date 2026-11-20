@@ -191,21 +191,20 @@ Route::middleware(['auth', 'role:CUSTOMER'])->prefix('customer')->name('customer
     // 08. Informasi Pengecualian
     Route::get('/exceptions', [CustomerExceptionController::class, 'index'])->name('exceptions.index');
 
-    // Fitur Ekspedisi - Peta Sebaran Titik Ekspedisi Global
-    Route::get('/carriers', [CustomerCarrierController::class, 'index'])->name('carriers.index');
+    // Redirect rute intelijen tambahan customer ke dashboard agar alur customer ramping & fokus
+    Route::get('/carriers', function () {
+        return redirect()->route('customer.dashboard');
+    })->name('carriers.index');
 
-    // 09-14. Layanan Intelijen & Informasi Global
     Route::prefix('intelligence')->name('intelligence.')->group(function () {
-        Route::get('/weather', [CustomerIntelligenceController::class, 'weather'])->name('weather');
-        Route::get('/currency', [CustomerIntelligenceController::class, 'currency'])->name('currency');
-        Route::get('/economy', [CustomerIntelligenceController::class, 'economy'])->name('economy');
-        Route::get('/news', [CustomerIntelligenceController::class, 'news'])->name('news');
-        Route::get('/ports', [CustomerIntelligenceController::class, 'ports'])->name('ports');
-        Route::get('/airports', [CustomerIntelligenceController::class, 'airports'])->name('airports');
-        Route::get('/comparison', [CustomerIntelligenceController::class, 'comparison'])->name('comparison');
-        Route::get('/risk', function () {
-            return redirect()->route('customer.intelligence.weather');
-        })->name('risk');
+        Route::get('/weather', function () { return redirect()->route('customer.dashboard'); })->name('weather');
+        Route::get('/currency', function () { return redirect()->route('customer.dashboard'); })->name('currency');
+        Route::get('/economy', function () { return redirect()->route('customer.dashboard'); })->name('economy');
+        Route::get('/news', function () { return redirect()->route('customer.dashboard'); })->name('news');
+        Route::get('/ports', function () { return redirect()->route('customer.dashboard'); })->name('ports');
+        Route::get('/airports', function () { return redirect()->route('customer.dashboard'); })->name('airports');
+        Route::get('/comparison', function () { return redirect()->route('customer.dashboard'); })->name('comparison');
+        Route::get('/risk', function () { return redirect()->route('customer.dashboard'); })->name('risk');
     });
 
     // 12. Notifikasi
