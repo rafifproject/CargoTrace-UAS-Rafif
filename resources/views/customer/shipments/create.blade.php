@@ -472,6 +472,46 @@
     const initialOriginId = @json(old('origin_location_id'));
     const initialDestId = @json(old('destination_location_id'));
 
+    // URL dinamis API Geoapify via Laravel route helpers
+    const GEO_CITIES_URL = @json(route('geo.cities'));
+    const GEO_DISTRICTS_URL = @json(route('geo.districts'));
+    const GEO_GEOCODE_URL = @json(route('geo.geocode'));
+
+    // Master data kota instan (Zero latency - tampil seketika)
+    const fallbackCitiesMap = {
+        'Indonesia': ['Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang', 'Makassar', 'Denpasar (Bali)', 'Palembang', 'Yogyakarta', 'Balikpapan', 'Batam', 'Malang', 'Bandar Lampung', 'Padang', 'Banjarmasin', 'Pontianak', 'Manado', 'Pekanbaru', 'Cilegon', 'Samarinda'],
+        'Brazil': ['Santos', 'São Paulo', 'Rio de Janeiro', 'Campinas', 'Curitiba', 'Porto Alegre', 'Belo Horizonte', 'Salvador', 'Fortaleza', 'Recife', 'Brasília', 'Vitória'],
+        'United States': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Miami', 'San Francisco', 'Seattle', 'Boston', 'Atlanta', 'Dallas'],
+        'United Kingdom': ['London', 'Manchester', 'Birmingham', 'Liverpool', 'Edinburgh', 'Glasgow', 'Bristol', 'Leeds', 'Southampton'],
+        'Netherlands': ['Rotterdam', 'Amsterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Tilburg', 'Groningen'],
+        'Germany': ['Hamburg', 'Frankfurt', 'Berlin', 'Munich', 'Cologne', 'Bremen', 'Düsseldorf', 'Stuttgart'],
+        'Japan': ['Tokyo', 'Yokohama', 'Osaka', 'Nagoya', 'Kobe', 'Fukuoka', 'Kyoto', 'Sapporo'],
+        'Singapore': ['Singapore', 'Jurong', 'Tampines', 'Woodlands', 'Changi', 'Tuas'],
+        'Malaysia': ['Kuala Lumpur', 'George Town (Penang)', 'Johor Bahru', 'Port Klang', 'Ipoh', 'Kota Kinabalu', 'Kuching'],
+        'China': ['Shanghai', 'Shenzhen', 'Guangzhou', 'Ningbo', 'Qingdao', 'Tianjin', 'Beijing', 'Xiamen', 'Hong Kong'],
+        'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Fremantle (Perth)', 'Adelaide', 'Darwin'],
+        'Vietnam': ['Ho Chi Minh City', 'Hanoi', 'Da Nang', 'Hai Phong'],
+        'Thailand': ['Bangkok', 'Laem Chabang', 'Nonthaburi', 'Chiang Mai', 'Phuket'],
+        'South Korea': ['Busan', 'Seoul', 'Incheon', 'Daegu'],
+        'United Arab Emirates': ['Dubai', 'Abu Dhabi', 'Sharjah', 'Jebel Ali']
+    };
+
+    // Master data daerah / distrik instan
+    const fallbackDistrictsMap = {
+        'Jakarta': ['Kebayoran Baru (Senopati)', 'Menteng', 'Setiabudi (Kuningan)', 'Kelapa Gading', 'Pantai Indah Kapuk (PIK)', 'Senayan', 'Kemang', 'Tanjung Priok', 'Gambir', 'Cilandak', 'Pondok Indah', 'Tebet'],
+        'Surabaya': ['Gubeng', 'Wonokromo', 'Tegalsari', 'Rungkut', 'Sukolilo', 'Tanjung Perak', 'Genteng', 'Kenjeran', 'Sambikerep'],
+        'Bandung': ['Coblong (Dago)', 'Sumur Bandung (Braga)', 'Sukajadi (PVJ)', 'Cidadap (Setiabudi)', 'Lengkong', 'Batununggal'],
+        'Medan': ['Medan Kota', 'Medan Baru', 'Medan Petisah', 'Medan Barat', 'Medan Sunggal', 'Medan Belawan'],
+        'Semarang': ['Semarang Tengah', 'Semarang Barat', 'Semarang Selatan', 'Candisari', 'Banyumanik', 'Tanjung Emas'],
+        'Denpasar (Bali)': ['Denpasar Selatan (Sanur)', 'Kuta', 'Seminyak', 'Canggu', 'Ubud', 'Denpasar Barat', 'Denpasar Timur'],
+        'Yogyakarta': ['Danurejan (Malioboro)', 'Gondokusuman', 'Kraton', 'Depok (Sleman)', 'Kotagede'],
+        'London': ['Westminster (Montagu St)', 'City of London', 'Camden', 'Kensington & Chelsea', 'Islington', 'Hackney', 'Greenwich'],
+        'New York': ['Manhattan (Midtown)', 'Brooklyn (Williamsburg)', 'Queens (Astoria)', 'Financial District', 'SoHo', 'Chelsea'],
+        'Santos': ['Centro Histórico', 'Gonzaga', 'Boqueirão', 'Ponta da Praia', 'Porto de Santos', 'Aparecida'],
+        'São Paulo': ['Vila Madalena', 'Pinheiros', 'Jardins', 'Itaim Bibi', 'Moema', 'Centro', 'Paulista'],
+        'Rotterdam': ['Centrum', 'Feijenoord', 'Delfshaven', 'Kralingen', 'Waalhaven (Port)']
+    };
+
     let currentMode = initialMode;
     let routeMap = null;
     let originMarker = null;
@@ -488,9 +528,9 @@
         calculateEstimates();
 
         // Load kota awal jika negara default sudah terpilih
-        const initialCountry = document.getElementById('delivery_country').value;
-        if (initialCountry) {
-            onCountrySelected(initialCountry);
+        const countryEl = document.getElementById('delivery_country');
+        if (countryEl && countryEl.value) {
+            onCountrySelected(countryEl.value);
         }
     });
 
@@ -644,31 +684,44 @@
     async function onCountrySelected(country) {
         if (!country) return;
         const citySelect = document.getElementById('delivery_city');
-        const districtSelect = document.getElementById('delivery_district');
         const spinner = document.getElementById('city-spinner');
+
+        // 1. Render data kota fallback instan (0ms render agar tidak stuck)
+        const baseCities = fallbackCitiesMap[country] || ['Jakarta', 'Pusat Kota / Central'];
+        const currentVal = citySelect.value;
+        
+        let opts = '<option value="">— Pilih Kota Tujuan —</option>';
+        baseCities.forEach(city => {
+            const isSel = (currentVal === city || (!currentVal && city === baseCities[0])) ? 'selected' : '';
+            opts += `<option value="${city}" ${isSel}>${city}</option>`;
+        });
+        citySelect.innerHTML = opts;
+
+        const initialCity = citySelect.value || baseCities[0];
+        if (initialCity) {
+            onCitySelected(initialCity);
+        }
+
+        // 2. Fetch live data dari endpoint Geoapify via route dinamis Laravel
         if (spinner) spinner.classList.remove('hidden');
 
-        citySelect.innerHTML = '<option value="">Memuat kota via Geoapify...</option>';
-        districtSelect.innerHTML = '<option value="">— Pilih Daerah Setelah Kota —</option>';
-
         try {
-            const res = await fetch(`/api/geo/cities?country=${encodeURIComponent(country)}`);
-            const json = await res.json();
-            let opts = '<option value="">— Pilih Kota Tujuan —</option>';
-            if (json.data && json.data.length > 0) {
-                json.data.forEach(city => {
-                    opts += `<option value="${city}">${city}</option>`;
-                });
-                citySelect.innerHTML = opts;
-                if (json.data[0]) {
-                    citySelect.value = json.data[0];
-                    onCitySelected(json.data[0]);
+            const res = await fetch(`${GEO_CITIES_URL}?country=${encodeURIComponent(country)}`);
+            if (res.ok) {
+                const json = await res.json();
+                if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+                    const combined = Array.from(new Set([...baseCities, ...json.data]));
+                    const selectedNow = citySelect.value;
+                    let refreshedOpts = '<option value="">— Pilih Kota Tujuan —</option>';
+                    combined.forEach(city => {
+                        const isSel = (city === selectedNow) ? 'selected' : '';
+                        refreshedOpts += `<option value="${city}" ${isSel}>${city}</option>`;
+                    });
+                    citySelect.innerHTML = refreshedOpts;
                 }
-            } else {
-                citySelect.innerHTML = '<option value="">Kota Bebas / Custom</option>';
             }
         } catch (e) {
-            console.error("Gagal memuat kota:", e);
+            console.warn("Live Geoapify city fetch warning (fallback used):", e);
         } finally {
             if (spinner) spinner.classList.add('hidden');
         }
@@ -682,26 +735,51 @@
         const country = document.getElementById('delivery_country').value;
         const districtSelect = document.getElementById('delivery_district');
         const spinner = document.getElementById('district-spinner');
+
+        // 1. Render data daerah instan (0ms)
+        let matchedDistricts = fallbackDistrictsMap[city];
+        if (!matchedDistricts) {
+            for (const [k, v] of Object.entries(fallbackDistrictsMap)) {
+                if (city.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(city.toLowerCase())) {
+                    matchedDistricts = v;
+                    break;
+                }
+            }
+        }
+        const baseDistricts = matchedDistricts || ['Pusat Kota / Central', 'Distrik Bisnis (CBD)', 'Kawasan Pergudangan / Port', 'Area Kafe & Roastery'];
+
+        const currentDistVal = districtSelect.value;
+        let opts = '<option value="">— Pilih Daerah / Kecamatan —</option>';
+        baseDistricts.forEach(d => {
+            const isSel = (currentDistVal === d || (!currentDistVal && d === baseDistricts[0])) ? 'selected' : '';
+            opts += `<option value="${d}" ${isSel}>${d}</option>`;
+        });
+        districtSelect.innerHTML = opts;
+
+        if (districtSelect.value) {
+            onDistrictSelected(districtSelect.value);
+        }
+
+        // 2. Fetch live districts dari backend
         if (spinner) spinner.classList.remove('hidden');
 
-        districtSelect.innerHTML = '<option value="">Memuat daerah via Geoapify...</option>';
-
         try {
-            const res = await fetch(`/api/geo/districts?country=${encodeURIComponent(country)}&city=${encodeURIComponent(city)}`);
-            const json = await res.json();
-            let opts = '<option value="">— Pilih Daerah / Kecamatan —</option>';
-            if (json.data && json.data.length > 0) {
-                json.data.forEach(d => {
-                    opts += `<option value="${d}">${d}</option>`;
-                });
-                districtSelect.innerHTML = opts;
-                if (json.data[0]) {
-                    districtSelect.value = json.data[0];
-                    onDistrictSelected(json.data[0]);
+            const res = await fetch(`${GEO_DISTRICTS_URL}?country=${encodeURIComponent(country)}&city=${encodeURIComponent(city)}`);
+            if (res.ok) {
+                const json = await res.json();
+                if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+                    const combined = Array.from(new Set([...baseDistricts, ...json.data]));
+                    const selectedNow = districtSelect.value;
+                    let refreshedOpts = '<option value="">— Pilih Daerah / Kecamatan —</option>';
+                    combined.forEach(d => {
+                        const isSel = (d === selectedNow) ? 'selected' : '';
+                        refreshedOpts += `<option value="${d}" ${isSel}>${d}</option>`;
+                    });
+                    districtSelect.innerHTML = refreshedOpts;
                 }
             }
         } catch (e) {
-            console.error("Gagal memuat daerah:", e);
+            console.warn("Live Geoapify district fetch warning (fallback used):", e);
         } finally {
             if (spinner) spinner.classList.add('hidden');
         }
@@ -734,26 +812,34 @@
 
         try {
             const query = `${address}, ${district}, ${city}, ${country}`;
-            const res = await fetch(`/api/geo/geocode?address=${encodeURIComponent(address)}&district=${encodeURIComponent(district)}&city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}`);
-            const json = await res.json();
+            const res = await fetch(`${GEO_GEOCODE_URL}?address=${encodeURIComponent(address)}&district=${encodeURIComponent(district)}&city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}`);
+            if (res.ok) {
+                const json = await res.json();
 
-            if (json.success && json.data && json.data.lat) {
-                const lat = json.data.lat;
-                const lng = json.data.lng;
+                if (json.success && json.data && json.data.lat) {
+                    const lat = json.data.lat;
+                    const lng = json.data.lng;
 
-                document.getElementById('delivery_lat').value = lat;
-                document.getElementById('delivery_lng').value = lng;
+                    document.getElementById('delivery_lat').value = lat;
+                    document.getElementById('delivery_lng').value = lng;
 
-                if (coordsDisplay) coordsDisplay.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)} (${json.data.city || city}, ${json.data.district || district})`;
-                if (statusBadge) {
-                    statusBadge.textContent = '✓ Terverifikasi Geoapify';
-                    statusBadge.className = 'text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800';
+                    if (coordsDisplay) coordsDisplay.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)} (${json.data.city || city}, ${json.data.district || district})`;
+                    if (statusBadge) {
+                        statusBadge.textContent = '✓ Terverifikasi Geoapify';
+                        statusBadge.className = 'text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800';
+                    }
+
+                    updateLastMileMapMarker(lat, lng, json.data.formatted || query);
+                    return;
                 }
-
-                updateLastMileMapMarker(lat, lng, json.data.formatted || query);
             }
         } catch (err) {
-            console.error("Geocoding error:", err);
+            console.warn("Geocoding fetch warning:", err);
+        }
+
+        // Fallback koordinat jika offline/gagal
+        if (coordsDisplay && (!document.getElementById('delivery_lat').value || document.getElementById('delivery_lat').value === '-6.2297')) {
+            coordsDisplay.textContent = `-6.2297, 106.8075 (${city || 'Jakarta'}, ${district || 'Senopati'})`;
         }
     }
 

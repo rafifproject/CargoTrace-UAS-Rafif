@@ -78,6 +78,11 @@ class GeoService
                 }
             }
 
+            // Filter out country name itself or empty strings
+            $cities = array_values(array_filter($cities, function ($city) use ($countryClean) {
+                return !empty($city) && strcasecmp(trim($city), $countryClean) !== 0;
+            }));
+
             sort($cities);
             return $cities;
         });
