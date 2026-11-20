@@ -51,6 +51,24 @@
         border-radius: 50%;
         display: inline-block;
     }
+    /* Highlight & Focus Styles on Click */
+    .cargo-real-vehicle-wrapper.vehicle-focused {
+        filter: drop-shadow(0 0 16px rgba(0, 240, 255, 0.95)) drop-shadow(0 8px 20px rgba(0, 0, 0, 0.7)) !important;
+        transform: scale(1.3) !important;
+        z-index: 99999 !important;
+    }
+    .cargo-vehicle-tag.tag-focused {
+        background: rgba(2, 132, 199, 0.95) !important;
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.9) !important;
+        font-weight: 800 !important;
+    }
+    .cargo-real-vehicle-marker.marker-dimmed,
+    .cargo-destination-pin.marker-dimmed {
+        opacity: 0.2 !important;
+        filter: grayscale(80%) !important;
+        transition: opacity 0.3s ease, filter 0.3s ease;
+    }
 </style>
 @endpush
 
@@ -359,8 +377,130 @@ new Chart(trendCtx, {
 // ==========================================
 let customerDashboardMap = null;
 let dashboardBounds = [];
+let cargoShipmentItems = [];
+let activeCargoId = null;
 
 const dashboardShipments = @json($mapShipments);
+
+function focusCargoShipment(targetId, targetLatLng) {
+    activeCargoId = targetId;
+
+    cargoShipmentItems.forEach(it => {
+        if (it.id === targetId) {
+            // Menonjolkan jalur yang dipilih (High-contrast cyan glowing)
+            it.traveledPoly?.setStyle({ color: '#00F0FF', weight: 6.5, opacity: 1 });
+            it.remainingPoly?.setStyle({ color: '#38BDF8', weight: 5, opacity: 1, dashArray: '8, 8' });
+            it.deliveryPoly?.setStyle({ color: '#f59e0b', weight: 6, opacity: 1 });
+
+            // Menonjolkan titik asal dan akhir
+            it.originMarker?.setRadius(11).setStyle({ fillColor: '#10B981', color: '#ffffff', weight: 3.5, fillOpacity: 1 });
+            it.destMarker?.setRadius(11).setStyle({ fillColor: '#EF4444', color: '#ffffff', weight: 3.5, fillOpacity: 1 });
+
+            if (it.deliveryMarker) {
+                it.deliveryMarker.setZIndexOffset(10000);
+                const el = it.deliveryMarker.getElement();
+                if (el) el.classList.remove('marker-dimmed');
+            }
+            if (it.courierVanMarker) {
+                it.courierVanMarker.setZIndexOffset(10000);
+                const el = it.courierVanMarker.getElement();
+                if (el) el.classList.remove('marker-dimmed');
+            }
+
+            // Menonjolkan icon kendaraan kargo
+            if (it.vehicleMarker) {
+                it.vehicleMarker.setZIndexOffset(10000);
+                const el = it.vehicleMarker.getElement();
+                if (el) {
+                    el.classList.remove('marker-dimmed');
+                    const wrap = el.querySelector('.cargo-real-vehicle-wrapper');
+                    if (wrap) wrap.classList.add('vehicle-focused');
+                    const tag = el.querySelector('.cargo-vehicle-tag');
+                    if (tag) tag.classList.add('tag-focused');
+                }
+                it.vehicleMarker.openPopup();
+            } else if (it.courierVanMarker) {
+                it.courierVanMarker.openPopup();
+            } else if (it.traveledPoly) {
+                it.traveledPoly.openPopup(targetLatLng || (it.bounds ? it.bounds.getCenter() : null));
+            }
+
+            // Zoom / Fit bounds ke seluruh lintasan rute kargo tersebut
+            if (it.bounds && customerDashboardMap) {
+                customerDashboardMap.fitBounds(it.bounds, { padding: [60, 60], maxZoom: 10, duration: 1 });
+            }
+        } else {
+            // Meredupkan kargo lain agar rute terpilih benar-benar menonjol
+            it.traveledPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.15 });
+            it.remainingPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.12, dashArray: '4, 6' });
+            it.deliveryPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.15 });
+            it.originMarker?.setRadius(5).setStyle({ opacity: 0.25, fillOpacity: 0.25 });
+            it.destMarker?.setRadius(5).setStyle({ opacity: 0.25, fillOpacity: 0.25 });
+
+            if (it.deliveryMarker) {
+                it.deliveryMarker.setZIndexOffset(100);
+                const el = it.deliveryMarker.getElement();
+                if (el) el.classList.add('marker-dimmed');
+            }
+            if (it.courierVanMarker) {
+                it.courierVanMarker.setZIndexOffset(100);
+                const el = it.courierVanMarker.getElement();
+                if (el) el.classList.add('marker-dimmed');
+            }
+
+            if (it.vehicleMarker) {
+                it.vehicleMarker.setZIndexOffset(100);
+                const el = it.vehicleMarker.getElement();
+                if (el) {
+                    el.classList.add('marker-dimmed');
+                    const wrap = el.querySelector('.cargo-real-vehicle-wrapper');
+                    if (wrap) wrap.classList.remove('vehicle-focused');
+                    const tag = el.querySelector('.cargo-vehicle-tag');
+                    if (tag) tag.classList.remove('tag-focused');
+                }
+            }
+        }
+    });
+}
+
+function resetCargoShipmentFocus() {
+    activeCargoId = null;
+    cargoShipmentItems.forEach(it => {
+        it.traveledPoly?.setStyle({ color: '#0284c7', weight: 3.5, opacity: 0.9 });
+        it.remainingPoly?.setStyle({ color: '#38bdf8', weight: 2.5, opacity: 0.8, dashArray: '6, 8' });
+        it.deliveryPoly?.setStyle({ color: '#f59e0b', weight: 3.5, opacity: 0.95 });
+
+        it.originMarker?.setRadius(7).setStyle({ fillColor: '#10B981', color: '#fff', weight: 2.5, fillOpacity: 1, opacity: 1 });
+        it.destMarker?.setRadius(7).setStyle({ fillColor: '#EF4444', color: '#fff', weight: 2.5, fillOpacity: 1, opacity: 1 });
+
+        if (it.deliveryMarker) {
+            it.deliveryMarker.setZIndexOffset(1200);
+            const el = it.deliveryMarker.getElement();
+            if (el) el.classList.remove('marker-dimmed');
+        }
+        if (it.courierVanMarker) {
+            it.courierVanMarker.setZIndexOffset(1500);
+            const el = it.courierVanMarker.getElement();
+            if (el) el.classList.remove('marker-dimmed');
+        }
+
+        if (it.vehicleMarker) {
+            it.vehicleMarker.setZIndexOffset(1000);
+            const el = it.vehicleMarker.getElement();
+            if (el) {
+                el.classList.remove('marker-dimmed');
+                const wrap = el.querySelector('.cargo-real-vehicle-wrapper');
+                if (wrap) wrap.classList.remove('vehicle-focused');
+                const tag = el.querySelector('.cargo-vehicle-tag');
+                if (tag) tag.classList.remove('tag-focused');
+            }
+        }
+    });
+    if (customerDashboardMap) customerDashboardMap.closePopup();
+}
+
+window.focusCargoShipment = focusCargoShipment;
+window.resetCustomerShipmentFocus = resetCargoShipmentFocus;
 
 function getShipmentRealtimeProgress(s) {
     const now = Date.now();
@@ -640,40 +780,49 @@ function initCustomerDashboardMap() {
                             <div>🏢 <b>Ekspedisi:</b> ${s.carrier?.name || '-'}</div>
                             <div>📦 <b>Kargo:</b> ${s.cargo_type}</div>
                         </div>
-                        <a href="/customer/shipments/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:700; padding:5px; border-radius:6px; text-decoration:none; font-size:11px;">
-                            Buka Detail Kargo →
-                        </a>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <a href="/customer/shipments/${s.id}" style="flex:1; text-align:center; background:#0284c7; color:#fff; font-weight:700; padding:6px 10px; border-radius:8px; text-decoration:none; font-size:11px; box-shadow:0 2px 4px rgba(2,132,199,0.3);">
+                                Lihat Detail Kargo →
+                            </a>
+                            <button type="button" onclick="window.resetCustomerShipmentFocus()" style="background:#f1f5f9; color:#475569; font-weight:700; padding:6px 10px; border-radius:8px; border:1px solid #cbd5e1; font-size:11px; cursor:pointer;" title="Kembalikan semua rute">
+                                🔄 Reset
+                            </button>
+                        </div>
                     </div>
                 `;
 
                 // Origin Marker (🟢 Green with white border)
-                L.circleMarker(originPt, {
+                const originMarker = L.circleMarker(originPt, {
                     radius: 7, fillColor: '#10B981', color: '#fff', weight: 2.5, fillOpacity: 1
                 }).bindPopup(popupHtml).addTo(customerDashboardMap);
+                originMarker.on('click', () => focusCargoShipment(s.id, originPt));
 
                 // Dest Marker (🔴 Red with white border)
-                L.circleMarker(destPt, {
+                const destMarker = L.circleMarker(destPt, {
                     radius: 7, fillColor: '#EF4444', color: '#fff', weight: 2.5, fillOpacity: 1
                 }).bindPopup(popupHtml).addTo(customerDashboardMap);
+                destMarker.on('click', () => focusCargoShipment(s.id, destPt));
 
                 // Traveled Path
                 const traveledPath = createCurvedPath(originPt, curPt, 16, 0.1);
-                L.polyline(traveledPath, {
-                    color: '#0284c7', weight: 3.5, opacity: 0.9, lineCap: 'round', lineJoin: 'round'
+                const traveledPoly = L.polyline(traveledPath, {
+                    color: '#0284c7', weight: 3.5, opacity: 0.9, lineCap: 'round', lineJoin: 'round', cursor: 'pointer'
                 }).bindPopup(popupHtml).addTo(customerDashboardMap);
+                traveledPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
                 // Remaining Path
                 const remainingPath = createCurvedPath(curPt, destPt, 16, 0.1);
-                L.polyline(remainingPath, {
-                    color: '#38bdf8', weight: 2.5, dashArray: '6, 8', opacity: 0.8, lineCap: 'round', lineJoin: 'round'
+                const remainingPoly = L.polyline(remainingPath, {
+                    color: '#38bdf8', weight: 2.5, dashArray: '6, 8', opacity: 0.8, lineCap: 'round', lineJoin: 'round', cursor: 'pointer'
                 }).bindPopup(popupHtml).addTo(customerDashboardMap);
+                remainingPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
                 // Vehicle Marker with rotation
                 const heading = calculateBearing(curPt, destPt);
                 const vW = vehicle.iconW || 44;
                 const vH = vehicle.iconH || 68;
 
-                L.marker(curPt, {
+                const vehicleMarker = L.marker(curPt, {
                     icon: L.divIcon({
                         className: 'cargo-real-vehicle-marker',
                         html: `
@@ -691,6 +840,12 @@ function initCustomerDashboardMap() {
                     }),
                     zIndexOffset: 1000
                 }).bindPopup(popupHtml).addTo(customerDashboardMap);
+                vehicleMarker.on('click', () => focusCargoShipment(s.id, curPt));
+
+                const routePoints = [originPt, destPt, curPt];
+                let deliveryPoly = null;
+                let destPinMarker = null;
+                let courierVanMarker = null;
 
                 // If customer has last-mile delivery address / courier van
                 if (s.delivery_lat && s.delivery_lng) {
@@ -699,11 +854,13 @@ function initCustomerDashboardMap() {
                     if (!isNaN(devLat) && !isNaN(devLng)) {
                         const devCoords = [devLat, devLng];
                         dashboardBounds.push(devCoords);
+                        routePoints.push(devCoords);
 
                         // Orange dashed line from arrival port/airport to doorstep
-                        L.polyline([destPt, devCoords], {
-                            color: '#f59e0b', weight: 3.5, dashArray: '5, 6', opacity: 0.95, lineCap: 'round'
+                        deliveryPoly = L.polyline([destPt, devCoords], {
+                            color: '#f59e0b', weight: 3.5, dashArray: '5, 6', opacity: 0.95, lineCap: 'round', cursor: 'pointer'
                         }).bindPopup(popupHtml).addTo(customerDashboardMap);
+                        deliveryPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
                         // Pin Alamat Penerima (📍)
                         const destPin = L.divIcon({
@@ -713,9 +870,10 @@ function initCustomerDashboardMap() {
                             iconAnchor: [13, 26],
                             popupAnchor: [0, -28]
                         });
-                        L.marker(devCoords, { icon: destPin, zIndexOffset: 1200 })
+                        destPinMarker = L.marker(devCoords, { icon: destPin, zIndexOffset: 1200 })
                             .bindPopup(popupHtml)
                             .addTo(customerDashboardMap);
+                        destPinMarker.on('click', () => focusCargoShipment(s.id, devCoords));
 
                         // Mobil Van Kurir Paket
                         if (s.is_last_mile || s.status === 'DELIVERED') {
@@ -757,13 +915,37 @@ function initCustomerDashboardMap() {
                                 popupAnchor: [0, -32]
                             });
 
-                            L.marker([vanLat, vanLng], { icon: courierVanDivIcon, zIndexOffset: 1500 })
+                            courierVanMarker = L.marker([vanLat, vanLng], { icon: courierVanDivIcon, zIndexOffset: 1500 })
                                 .bindPopup(popupHtml)
                                 .addTo(customerDashboardMap);
+                            courierVanMarker.on('click', () => focusCargoShipment(s.id, [vanLat, vanLng]));
                         }
                     }
                 }
+
+                const shipmentBounds = L.latLngBounds(routePoints);
+                cargoShipmentItems.push({
+                    id: s.id,
+                    s,
+                    vehicle,
+                    originMarker,
+                    destMarker,
+                    traveledPoly,
+                    remainingPoly,
+                    vehicleMarker,
+                    deliveryPoly,
+                    deliveryMarker: destPinMarker,
+                    courierVanMarker,
+                    bounds: shipmentBounds
+                });
             }
+        }
+    });
+
+    // Klik di area peta kosong mengembalikan fokus rute ke normal
+    customerDashboardMap.on('click', function(e) {
+        if (activeCargoId) {
+            resetCargoShipmentFocus();
         }
     });
 
