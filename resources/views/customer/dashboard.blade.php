@@ -415,22 +415,133 @@ function calculateBearing(start, end) {
 }
 
 function getVehicleConfig(s) {
-    const mode = (s.transport_mode || 'SEA').toUpperCase();
-    if (mode === 'AIR') {
+    const carrierName = (s.carrier?.name || '').toLowerCase();
+    const carrierCode = (s.carrier?.code || '').toUpperCase();
+    const originType  = (s.origin?.location_type || '').toUpperCase();
+    const destType    = (s.destination?.location_type || '').toUpperCase();
+    const originName  = (s.origin?.name || '').toLowerCase();
+    const destName    = (s.destination?.name || '').toLowerCase();
+    const cargo       = (s.cargo_type || '').toLowerCase();
+
+    // 0. Pesawat Kargo Udara (Real Jet Freighter Top-Down)
+    if (s.transport_mode === 'AIR' || originType === 'AIRPORT' || destType === 'AIRPORT' ||
+        originName.includes('bandara') || originName.includes('airport') ||
+        destName.includes('bandara') || destName.includes('airport') ||
+        carrierCode === 'FDX' || carrierName.includes('fedex') || carrierName.includes('express air') ||
+        cargo.includes('air') || cargo.includes('avionics') || cargo.includes('vaccine') || cargo.includes('pharmaceutical')) {
         return {
-            type: 'AIR', label: 'Pesawat Kargo', color: '#38BDF8',
-            realSvg: `<svg width="38" height="38" viewBox="0 0 64 64" fill="none"><path d="M32 6L36 24L58 34V40L36 32V48L42 54V58L32 54L22 58V54L28 48V32L6 40V34L28 24L32 6Z" fill="#0284c7" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/></svg>`
+            type: 'plane',
+            label: 'Pesawat Kargo Udara (Air Cargo)',
+            emoji: '✈️',
+            accentColor: '#38bdf8',
+            iconW: 46,
+            iconH: 60,
+            realSvg: `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="44" height="44" style="filter: drop-shadow(0 8px 12px rgba(0,0,0,0.6));">
+                    <!-- Aircraft Silhouette & Shadow -->
+                    <path d="M32 2 C30 2, 28 6, 28 14 L28 24 L2 35 L2 40 L28 34 L28 50 L18 56 L18 60 L32 58 L46 60 L46 56 L36 50 L36 34 L62 40 L62 35 L36 24 L36 14 C36 6, 34 2, 32 2 Z" fill="#0f172a" opacity="0.3" transform="translate(1.5, 3)"/>
+                    <!-- Main Fuselage and Swept Wings -->
+                    <path d="M32 2 C30 2, 28 6, 28 14 L28 24 L2 35 L2 40 L28 34 L28 50 L18 56 L18 60 L32 58 L46 60 L46 56 L36 50 L36 34 L62 40 L62 35 L36 24 L36 14 C36 6, 34 2, 32 2 Z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/>
+                    <!-- Fuselage Highlight Spine -->
+                    <path d="M32 4 C31 4, 29.5 8, 29.5 16 L29.5 54 L34.5 54 L34.5 16 C34.5 8, 33 4, 32 4 Z" fill="#ffffff"/>
+                    <!-- Cockpit Glass Window -->
+                    <path d="M30 6 Q32 4.5 34 6 L33.5 8.5 Q32 7.5 30.5 8.5 Z" fill="#0284c7"/>
+                    <!-- Livery Speed Strip (Cyan & Navy) -->
+                    <path d="M12 34 L26 31 L26 33 L12 36 Z" fill="#0284c7"/>
+                    <path d="M52 34 L38 31 L38 33 L52 36 Z" fill="#0284c7"/>
+                    <!-- Jet Turbines (Twin Engines) -->
+                    <rect x="14" y="27" width="4.5" height="11" rx="2" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+                    <ellipse cx="16.2" cy="28" rx="1.6" ry="1.2" fill="#38bdf8"/>
+                    <rect x="45.5" y="27" width="4.5" height="11" rx="2" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+                    <ellipse cx="47.8" cy="28" rx="1.6" ry="1.2" fill="#38bdf8"/>
+                    <!-- Tail Fin Stripe (Orange Express Accent) -->
+                    <path d="M30 52 L34 52 L33 58 L31 58 Z" fill="#ea580c"/>
+                </svg>
+            `
         };
     }
-    if (mode === 'LAND' || mode === 'ROAD') {
+
+    // 1. Truk / Mobil Paket Domestik (Hanya untuk pengiriman darat dalam satu negara)
+    if (s.transport_mode === 'LAND' || s.is_last_mile) {
         return {
-            type: 'LAND', label: 'Mobil / Truk Kargo', color: '#F59E0B',
-            realSvg: `<svg width="38" height="38" viewBox="0 0 64 64" fill="none"><rect x="8" y="20" width="36" height="26" rx="3" fill="#0284c7" stroke="#ffffff" stroke-width="2"/><path d="M44 26L54 32V46H44V26Z" fill="#38bdf8" stroke="#ffffff" stroke-width="2"/><circle cx="18" cy="46" r="5" fill="#1e293b" stroke="#ffffff" stroke-width="2"/><circle cx="44" cy="46" r="5" fill="#1e293b" stroke="#ffffff" stroke-width="2"/></svg>`
+            type: 'van',
+            label: 'Mobil Pengantaran Kurir (Last-Mile Delivery)',
+            emoji: '🚚',
+            accentColor: '#f59e0b',
+            iconW: 36,
+            iconH: 56,
+            realSvg: `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 68" width="30" height="54" style="filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));">
+                    <!-- Bayangan Mobil -->
+                    <rect x="4" y="3" width="30" height="62" rx="6" fill="#0f172a" opacity="0.35" transform="translate(1.5, 2.5)"/>
+                    <!-- Roda Mobil (4 Roda) -->
+                    <rect x="3" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
+                    <rect x="32" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
+                    <rect x="3" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
+                    <rect x="32" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
+                    <!-- Bodi Utama Mobil Van Paket (Putih Bersih) -->
+                    <rect x="5" y="4" width="28" height="60" rx="5" fill="#f8fafc" stroke="#64748b" stroke-width="1.2"/>
+                    <!-- Kabin Depan Pengemudi -->
+                    <rect x="7" y="6" width="24" height="15" rx="3" fill="#e2e8f0"/>
+                    <!-- Kaca Depan (Windshield) -->
+                    <path d="M8 8 Q19 6 30 8 L29 15 Q19 13.5 9 15 Z" fill="#0284c7"/>
+                    <!-- Kaca Samping -->
+                    <rect x="6.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
+                    <rect x="29.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
+                    <!-- Spion -->
+                    <rect x="3" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
+                    <rect x="32.5" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
+                    <!-- Boks Muatan Paket Belakang (Warna Oranye Ekspedisi) -->
+                    <rect x="6.5" y="23" width="25" height="39" rx="2.5" fill="#f59e0b" stroke="#d97706" stroke-width="0.8"/>
+                    <!-- Simbol Paket / Parcel Kurir -->
+                    <rect x="9.5" y="27" width="19" height="2" fill="#fde68a"/>
+                    <text x="19" y="42" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="sans-serif">📦</text>
+                    <text x="19" y="54" font-size="5" font-weight="800" fill="#78350f" text-anchor="middle" font-family="sans-serif">KURIR PAKET</text>
+                </svg>
+            `
         };
     }
+
+    // 2. Default: Kapal Kontainer Samudera (Real Cargo Container Vessel Top-Down)
     return {
-        type: 'SEA', label: 'Kapal Kontainer', color: '#00D2FF',
-        realSvg: `<svg width="40" height="40" viewBox="0 0 64 64" fill="none"><path d="M6 38L14 50H50L58 38L54 28H10L6 38Z" fill="#0284c7" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/><rect x="18" y="20" width="8" height="8" rx="1.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5"/><rect x="28" y="20" width="8" height="8" rx="1.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5"/><rect x="38" y="20" width="8" height="8" rx="1.5" fill="#10b981" stroke="#ffffff" stroke-width="1.5"/></svg>`
+        type: 'ship',
+        label: 'Kapal Kontainer Samudera (Cargo Vessel)',
+        emoji: '🚢',
+        accentColor: '#38bdf8',
+        iconW: 38,
+        iconH: 72,
+        realSvg: `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 78" width="28" height="58" style="filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));">
+                <!-- Hull Shadow -->
+                <path d="M19 2 C27 12, 33 24, 33 48 C33 66, 30 74, 19 75 C8 74, 5 66, 5 48 C5 24, 11 12, 19 2 Z" fill="#0f172a" opacity="0.35" transform="translate(1.5, 2.5)"/>
+                <!-- Main Hull (Dark Navy Blue Maritime Steel) -->
+                <path d="M19 2 C27 12, 33 24, 33 48 C33 66, 30 74, 19 75 C8 74, 5 66, 5 48 C5 24, 11 12, 19 2 Z" fill="#0f172a" stroke="#475569" stroke-width="1.2"/>
+                <!-- Red Waterline Bow Bulb Accent -->
+                <path d="M19 2 C22 7, 25 12, 25 17 L13 17 C13 12, 16 7, 19 2 Z" fill="#e11d48"/>
+                <circle cx="19" cy="9" r="1.5" fill="#ffffff"/>
+                <!-- Cargo Bay Background Deck -->
+                <rect x="9" y="19" width="20" height="38" rx="2" fill="#1e293b"/>
+                <!-- Real Stacked ISO Containers (Color-coded) -->
+                <rect x="10" y="20" width="8.5" height="5" rx="0.5" fill="#0284c7" stroke="#0369a1" stroke-width="0.5"/>
+                <rect x="19.5" y="20" width="8.5" height="5" rx="0.5" fill="#e11d48" stroke="#be123c" stroke-width="0.5"/>
+                <rect x="10" y="26" width="8.5" height="5" rx="0.5" fill="#ea580c" stroke="#c2410c" stroke-width="0.5"/>
+                <rect x="19.5" y="26" width="8.5" height="5" rx="0.5" fill="#059669" stroke="#047857" stroke-width="0.5"/>
+                <rect x="10" y="32" width="8.5" height="5" rx="0.5" fill="#eab308" stroke="#ca8a04" stroke-width="0.5"/>
+                <rect x="19.5" y="32" width="8.5" height="5" rx="0.5" fill="#0284c7" stroke="#0369a1" stroke-width="0.5"/>
+                <rect x="10" y="38" width="8.5" height="5" rx="0.5" fill="#059669" stroke="#047857" stroke-width="0.5"/>
+                <rect x="19.5" y="38" width="8.5" height="5" rx="0.5" fill="#ea580c" stroke="#c2410c" stroke-width="0.5"/>
+                <rect x="10" y="44" width="8.5" height="5" rx="0.5" fill="#e11d48" stroke="#be123c" stroke-width="0.5"/>
+                <rect x="19.5" y="44" width="8.5" height="5" rx="0.5" fill="#eab308" stroke="#ca8a04" stroke-width="0.5"/>
+                <rect x="10" y="50" width="8.5" height="5" rx="0.5" fill="#0284c7" stroke="#0369a1" stroke-width="0.5"/>
+                <rect x="19.5" y="50" width="8.5" height="5" rx="0.5" fill="#059669" stroke="#047857" stroke-width="0.5"/>
+                <!-- Superstructure / Wheelhouse (Bridge) -->
+                <rect x="10" y="58" width="18" height="9" rx="1.5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.8"/>
+                <rect x="12" y="59.5" width="14" height="2" rx="0.5" fill="#0284c7"/>
+                <!-- Funnel & Radar Mast -->
+                <circle cx="19" cy="63" r="1.5" fill="#0f172a"/>
+                <rect x="17.5" y="68" width="3" height="3" rx="0.8" fill="#e11d48"/>
+            </svg>
+        `
     };
 }
 
@@ -535,46 +646,123 @@ function initCustomerDashboardMap() {
                     </div>
                 `;
 
-                // Origin Marker
+                // Origin Marker (🟢 Green with white border)
                 L.circleMarker(originPt, {
-                    radius: 6, fillColor: '#10B981', color: '#fff', weight: 2, fillOpacity: 1
+                    radius: 7, fillColor: '#10B981', color: '#fff', weight: 2.5, fillOpacity: 1
                 }).bindPopup(popupHtml).addTo(customerDashboardMap);
 
-                // Dest Marker
+                // Dest Marker (🔴 Red with white border)
                 L.circleMarker(destPt, {
-                    radius: 6, fillColor: '#EF4444', color: '#fff', weight: 2, fillOpacity: 1
+                    radius: 7, fillColor: '#EF4444', color: '#fff', weight: 2.5, fillOpacity: 1
                 }).bindPopup(popupHtml).addTo(customerDashboardMap);
 
                 // Traveled Path
                 const traveledPath = createCurvedPath(originPt, curPt, 16, 0.1);
                 L.polyline(traveledPath, {
-                    color: '#0284c7', weight: 3, opacity: 0.9
+                    color: '#0284c7', weight: 3.5, opacity: 0.9, lineCap: 'round', lineJoin: 'round'
                 }).bindPopup(popupHtml).addTo(customerDashboardMap);
 
                 // Remaining Path
                 const remainingPath = createCurvedPath(curPt, destPt, 16, 0.1);
                 L.polyline(remainingPath, {
-                    color: '#38bdf8', weight: 2, dashArray: '5, 5', opacity: 0.8
+                    color: '#38bdf8', weight: 2.5, dashArray: '6, 8', opacity: 0.8, lineCap: 'round', lineJoin: 'round'
                 }).bindPopup(popupHtml).addTo(customerDashboardMap);
 
                 // Vehicle Marker with rotation
                 const heading = calculateBearing(curPt, destPt);
+                const vW = vehicle.iconW || 44;
+                const vH = vehicle.iconH || 68;
+
                 L.marker(curPt, {
                     icon: L.divIcon({
                         className: 'cargo-real-vehicle-marker',
                         html: `
-                            <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${heading}deg);">
+                            <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${heading}deg);" title="${vehicle.label} &bull; ${s.shipment_number}">
                                 ${vehicle.realSvg}
                             </div>
-                            <div class="cargo-vehicle-tag">
-                                <span class="cargo-tag-dot" style="background:${vehicle.color};"></span>
+                            <div class="cargo-vehicle-tag" style="white-space:nowrap; margin-top:-2px;">
+                                <span class="cargo-tag-dot" style="background:${vehicle.accentColor || vehicle.color || '#38bdf8'};"></span>
                                 <span>${s.shipment_number}</span>
                             </div>
                         `,
-                        iconSize: [40, 40],
-                        iconAnchor: [20, 20]
-                    })
+                        iconSize: [vW, vH],
+                        iconAnchor: [vW / 2, vH / 2],
+                        popupAnchor: [0, -(vH / 2 + 5)]
+                    }),
+                    zIndexOffset: 1000
                 }).bindPopup(popupHtml).addTo(customerDashboardMap);
+
+                // If customer has last-mile delivery address / courier van
+                if (s.delivery_lat && s.delivery_lng) {
+                    const devLat = parseFloat(s.delivery_lat);
+                    const devLng = parseFloat(s.delivery_lng);
+                    if (!isNaN(devLat) && !isNaN(devLng)) {
+                        const devCoords = [devLat, devLng];
+                        dashboardBounds.push(devCoords);
+
+                        // Orange dashed line from arrival port/airport to doorstep
+                        L.polyline([destPt, devCoords], {
+                            color: '#f59e0b', weight: 3.5, dashArray: '5, 6', opacity: 0.95, lineCap: 'round'
+                        }).bindPopup(popupHtml).addTo(customerDashboardMap);
+
+                        // Pin Alamat Penerima (📍)
+                        const destPin = L.divIcon({
+                            className: 'cargo-destination-pin',
+                            html: `<div style="font-size:26px; line-height:1; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.5)); transform:translate(-2px, -14px); cursor:pointer;" title="Alamat Pengantaran: ${s.delivery_address || s.delivery_city}">📍</div>`,
+                            iconSize: [26, 26],
+                            iconAnchor: [13, 26],
+                            popupAnchor: [0, -28]
+                        });
+                        L.marker(devCoords, { icon: destPin, zIndexOffset: 1200 })
+                            .bindPopup(popupHtml)
+                            .addTo(customerDashboardMap);
+
+                        // Mobil Van Kurir Paket
+                        if (s.is_last_mile || s.status === 'DELIVERED') {
+                            const vanLat = destPt[0] + (devCoords[0] - destPt[0]) * 0.65;
+                            const vanLng = destPt[1] + (devCoords[1] - destPt[1]) * 0.65;
+                            const vanHeading = calculateBearing(destPt, devCoords);
+                            const vanPlate = s.courier_vehicle ? (s.courier_vehicle.split('(')[1]?.replace(')','') || s.shipment_number) : s.shipment_number;
+
+                            const courierVanDivIcon = L.divIcon({
+                                className: 'cargo-real-vehicle-marker',
+                                html: `
+                                    <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${vanHeading}deg);" title="${s.courier_name || 'Mobil Paket Kurir'} &bull; ${s.shipment_number}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 68" width="30" height="54" style="filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));">
+                                            <rect x="4" y="3" width="30" height="62" rx="6" fill="#0f172a" opacity="0.35" transform="translate(1.5, 2.5)"/>
+                                            <rect x="3" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
+                                            <rect x="32" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
+                                            <rect x="3" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
+                                            <rect x="32" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
+                                            <rect x="5" y="4" width="28" height="60" rx="5" fill="#f8fafc" stroke="#64748b" stroke-width="1.2"/>
+                                            <rect x="7" y="6" width="24" height="15" rx="3" fill="#e2e8f0"/>
+                                            <path d="M8 8 Q19 6 30 8 L29 15 Q19 13.5 9 15 Z" fill="#0284c7"/>
+                                            <rect x="6.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
+                                            <rect x="29.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
+                                            <rect x="3" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
+                                            <rect x="32.5" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
+                                            <rect x="6.5" y="23" width="25" height="39" rx="2.5" fill="#f59e0b" stroke="#d97706" stroke-width="0.8"/>
+                                            <rect x="9.5" y="27" width="19" height="2" fill="#fde68a"/>
+                                            <text x="19" y="42" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="sans-serif">📦</text>
+                                            <text x="19" y="54" font-size="5" font-weight="800" fill="#78350f" text-anchor="middle" font-family="sans-serif">KURIR PAKET</text>
+                                        </svg>
+                                    </div>
+                                    <div class="cargo-vehicle-tag" style="white-space:nowrap; margin-top:-2px;">
+                                        <span class="cargo-tag-dot" style="background:#f59e0b;"></span>
+                                        <span>Mobil Paket: ${vanPlate}</span>
+                                    </div>
+                                `,
+                                iconSize: [36, 56],
+                                iconAnchor: [18, 28],
+                                popupAnchor: [0, -32]
+                            });
+
+                            L.marker([vanLat, vanLng], { icon: courierVanDivIcon, zIndexOffset: 1500 })
+                                .bindPopup(popupHtml)
+                                .addTo(customerDashboardMap);
+                        }
+                    }
+                }
             }
         }
     });

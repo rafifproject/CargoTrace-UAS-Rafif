@@ -2,6 +2,58 @@
 
 @section('title', 'Detail Pengiriman – ' . $shipment->shipment_number)
 
+@push('styles')
+<style>
+    /* Realistic Vehicle Markers for Cargo Tracker */
+    .cargo-real-vehicle-marker {
+        background: transparent !important;
+        border: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+    }
+    .cargo-real-vehicle-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
+    }
+    .cargo-real-vehicle-marker:hover .cargo-real-vehicle-wrapper {
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px rgba(56, 189, 248, 0.8));
+        transform: scale(1.22) !important;
+        z-index: 99999 !important;
+    }
+    .cargo-vehicle-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 4px;
+        padding: 2px 7px;
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 6px;
+        color: #ffffff;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 10px;
+        line-height: 1.2;
+        white-space: nowrap;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+        pointer-events: none;
+    }
+    .cargo-tag-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+</style>
+@endpush
+
 @section('content')
 {{-- Breadcrumbs & Header (Mockup 05) --}}
 <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
@@ -291,6 +343,79 @@ function initDetailMap() {
 
     const boundsPoints = [[oLat, oLng], [dLat, dLng]];
 
+    function calculateBearing(p1, p2) {
+        const lat1 = p1[0] * Math.PI / 180;
+        const lat2 = p2[0] * Math.PI / 180;
+        const dLng = (p2[1] - p1[1]) * Math.PI / 180;
+        const y = Math.sin(dLng) * Math.cos(lat2);
+        const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(dLng);
+        const brng = Math.atan2(y, x) * 180 / Math.PI;
+        return Math.round((brng + 360) % 360);
+    }
+
+    const shipSvg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 78" width="28" height="58" style="filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));">
+            <path d="M19 2 C27 12, 33 24, 33 48 C33 66, 30 74, 19 75 C8 74, 5 66, 5 48 C5 24, 11 12, 19 2 Z" fill="#0f172a" opacity="0.35" transform="translate(1.5, 2.5)"/>
+            <path d="M19 2 C27 12, 33 24, 33 48 C33 66, 30 74, 19 75 C8 74, 5 66, 5 48 C5 24, 11 12, 19 2 Z" fill="#0f172a" stroke="#475569" stroke-width="1.2"/>
+            <path d="M19 2 C22 7, 25 12, 25 17 L13 17 C13 12, 16 7, 19 2 Z" fill="#e11d48"/>
+            <circle cx="19" cy="9" r="1.5" fill="#ffffff"/>
+            <rect x="9" y="19" width="20" height="38" rx="2" fill="#1e293b"/>
+            <rect x="10" y="20" width="8.5" height="5" rx="0.5" fill="#0284c7" stroke="#0369a1" stroke-width="0.5"/>
+            <rect x="19.5" y="20" width="8.5" height="5" rx="0.5" fill="#e11d48" stroke="#be123c" stroke-width="0.5"/>
+            <rect x="10" y="26" width="8.5" height="5" rx="0.5" fill="#ea580c" stroke="#c2410c" stroke-width="0.5"/>
+            <rect x="19.5" y="26" width="8.5" height="5" rx="0.5" fill="#059669" stroke="#047857" stroke-width="0.5"/>
+            <rect x="10" y="32" width="8.5" height="5" rx="0.5" fill="#eab308" stroke="#ca8a04" stroke-width="0.5"/>
+            <rect x="19.5" y="32" width="8.5" height="5" rx="0.5" fill="#0284c7" stroke="#0369a1" stroke-width="0.5"/>
+            <rect x="10" y="38" width="8.5" height="5" rx="0.5" fill="#059669" stroke="#047857" stroke-width="0.5"/>
+            <rect x="19.5" y="38" width="8.5" height="5" rx="0.5" fill="#ea580c" stroke="#c2410c" stroke-width="0.5"/>
+            <rect x="10" y="44" width="8.5" height="5" rx="0.5" fill="#e11d48" stroke="#be123c" stroke-width="0.5"/>
+            <rect x="19.5" y="44" width="8.5" height="5" rx="0.5" fill="#eab308" stroke="#ca8a04" stroke-width="0.5"/>
+            <rect x="10" y="50" width="8.5" height="5" rx="0.5" fill="#0284c7" stroke="#0369a1" stroke-width="0.5"/>
+            <rect x="19.5" y="50" width="8.5" height="5" rx="0.5" fill="#059669" stroke="#047857" stroke-width="0.5"/>
+            <rect x="10" y="58" width="18" height="9" rx="1.5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.8"/>
+            <rect x="12" y="59.5" width="14" height="2" rx="0.5" fill="#0284c7"/>
+            <circle cx="19" cy="63" r="1.5" fill="#0f172a"/>
+            <rect x="17.5" y="68" width="3" height="3" rx="0.8" fill="#e11d48"/>
+        </svg>
+    `;
+
+    const planeSvg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="44" height="44" style="filter: drop-shadow(0 8px 12px rgba(0,0,0,0.6));">
+            <path d="M32 2 C30 2, 28 6, 28 14 L28 24 L2 35 L2 40 L28 34 L28 50 L18 56 L18 60 L32 58 L46 60 L46 56 L36 50 L36 34 L62 40 L62 35 L36 24 L36 14 C36 6, 34 2, 32 2 Z" fill="#0f172a" opacity="0.3" transform="translate(1.5, 3)"/>
+            <path d="M32 2 C30 2, 28 6, 28 14 L28 24 L2 35 L2 40 L28 34 L28 50 L18 56 L18 60 L32 58 L46 60 L46 56 L36 50 L36 34 L62 40 L62 35 L36 24 L36 14 C36 6, 34 2, 32 2 Z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/>
+            <path d="M32 4 C31 4, 29.5 8, 29.5 16 L29.5 54 L34.5 54 L34.5 16 C34.5 8, 33 4, 32 4 Z" fill="#ffffff"/>
+            <path d="M30 6 Q32 4.5 34 6 L33.5 8.5 Q32 7.5 30.5 8.5 Z" fill="#0284c7"/>
+            <path d="M12 34 L26 31 L26 33 L12 36 Z" fill="#0284c7"/>
+            <path d="M52 34 L38 31 L38 33 L52 36 Z" fill="#0284c7"/>
+            <rect x="14" y="27" width="4.5" height="11" rx="2" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+            <ellipse cx="16.2" cy="28" rx="1.6" ry="1.2" fill="#38bdf8"/>
+            <rect x="45.5" y="27" width="4.5" height="11" rx="2" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+            <ellipse cx="47.8" cy="28" rx="1.6" ry="1.2" fill="#38bdf8"/>
+            <path d="M30 52 L34 52 L33 58 L31 58 Z" fill="#ea580c"/>
+        </svg>
+    `;
+
+    const vanSvg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 68" width="30" height="54" style="filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));">
+            <rect x="4" y="3" width="30" height="62" rx="6" fill="#0f172a" opacity="0.35" transform="translate(1.5, 2.5)"/>
+            <rect x="3" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
+            <rect x="32" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
+            <rect x="3" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
+            <rect x="32" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
+            <rect x="5" y="4" width="28" height="60" rx="5" fill="#f8fafc" stroke="#64748b" stroke-width="1.2"/>
+            <rect x="7" y="6" width="24" height="15" rx="3" fill="#e2e8f0"/>
+            <path d="M8 8 Q19 6 30 8 L29 15 Q19 13.5 9 15 Z" fill="#0284c7"/>
+            <rect x="6.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
+            <rect x="29.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
+            <rect x="3" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
+            <rect x="32.5" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
+            <rect x="6.5" y="23" width="25" height="39" rx="2.5" fill="#f59e0b" stroke="#d97706" stroke-width="0.8"/>
+            <rect x="9.5" y="27" width="19" height="2" fill="#fde68a"/>
+            <text x="19" y="42" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="sans-serif">📦</text>
+            <text x="19" y="54" font-size="5" font-weight="800" fill="#78350f" text-anchor="middle" font-family="sans-serif">KURIR PAKET</text>
+        </svg>
+    `;
+
     @if($shipment->delivery_lat && $shipment->delivery_lng)
         const devLat = {{ $shipment->delivery_lat }};
         const devLng = {{ $shipment->delivery_lng }};
@@ -302,7 +427,7 @@ function initDetailMap() {
         // Pin Alamat Penerima (📍)
         const destPin = L.divIcon({
             className: 'cargo-destination-pin',
-            html: `<div style="font-size:26px; line-height:1; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.5)); transform:translate(-2px, -14px);" title="{{ $shipment->delivery_address }}">📍</div>`,
+            html: `<div style="font-size:26px; line-height:1; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.5)); transform:translate(-2px, -14px); cursor:pointer;" title="{{ $shipment->delivery_address }}">📍</div>`,
             iconSize: [26, 26],
             iconAnchor: [13, 26]
         });
@@ -312,13 +437,25 @@ function initDetailMap() {
         @if($shipment->is_last_mile)
             const vanLat = dLat + (devLat - dLat) * 0.65;
             const vanLng = dLng + (devLng - dLng) * 0.65;
+            const vanHeading = calculateBearing([dLat, dLng], [devLat, devLng]);
+            const vanPlate = '{{ $shipment->courier_vehicle ? (str_contains($shipment->courier_vehicle, "(") ? str_replace(")", "", explode("(", $shipment->courier_vehicle)[1]) : $shipment->shipment_number) : $shipment->shipment_number }}';
+
             const vanIcon = L.divIcon({
-                className: 'cargo-v-van',
-                html: `<div style="background:#f59e0b; color:#fff; width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 3px 10px rgba(245,158,11,0.6); border:2px solid #fff;">🚚</div>`,
-                iconSize: [34, 34],
-                iconAnchor: [17, 17]
+                className: 'cargo-real-vehicle-marker',
+                html: `
+                    <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${vanHeading}deg);" title="{{ $shipment->courier_name ?? 'Mobil Paket Kurir' }} &bull; {{ $shipment->shipment_number }}">
+                        ${vanSvg}
+                    </div>
+                    <div class="cargo-vehicle-tag" style="white-space:nowrap; margin-top:-2px;">
+                        <span class="cargo-tag-dot" style="background:#f59e0b;"></span>
+                        <span>Mobil Paket: ${vanPlate}</span>
+                    </div>
+                `,
+                iconSize: [36, 56],
+                iconAnchor: [18, 28],
+                popupAnchor: [0, -32]
             });
-            L.marker([vanLat, vanLng], { icon: vanIcon }).addTo(map)
+            L.marker([vanLat, vanLng], { icon: vanIcon, zIndexOffset: 1500 }).addTo(map)
                 .bindPopup('<b>🚚 Armada Kurir Paket:</b> {{ $shipment->courier_name ?? "Mobil Van Paket" }}<br><span style="font-size:11px; color:#d97706; font-weight:700;">{{ $shipment->courier_vehicle ?? "Van Kurir" }}</span>')
                 .openPopup();
         @endif
@@ -329,25 +466,36 @@ function initDetailMap() {
         const cLng = {{ $shipment->currentLocation->longitude }};
         boundsPoints.push([cLat, cLng]);
 
-        L.polyline([[oLat, oLng], [cLat, cLng]], { color: '#00F0FF', weight: 4.5, opacity: 0.95 }).addTo(map);
-        L.polyline([[cLat, cLng], [dLat, dLng]], { color: '#38BDF8', weight: 3.5, dashArray: '6, 8', opacity: 0.85 }).addTo(map);
+        L.polyline([[oLat, oLng], [cLat, cLng]], { color: '#0284c7', weight: 4.5, opacity: 0.95 }).addTo(map);
+        L.polyline([[cLat, cLng], [dLat, dLng]], { color: '#38bdf8', weight: 3.5, dashArray: '6, 8', opacity: 0.85 }).addTo(map);
+
+        const isAir = '{{ $shipment->transport_mode }}' === 'AIR';
+        const heading = calculateBearing([cLat, cLng], [dLat, dLng]);
+        const vehicleSvg = isAir ? planeSvg : shipSvg;
+        const vW = isAir ? 46 : 38;
+        const vH = isAir ? 60 : 72;
 
         const vIcon = L.divIcon({
-            className: 'cargo-v-icon',
+            className: 'cargo-real-vehicle-marker',
             html: `
-                <div style="background:#0284c7; color:#fff; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 0 14px rgba(0,240,255,0.9); border:2.5px solid #fff;">
-                    {{ $shipment->transport_mode === 'AIR' ? '✈️' : '🚢' }}
+                <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${heading}deg);" title="{{ $shipment->shipment_number }}">
+                    ${vehicleSvg}
+                </div>
+                <div class="cargo-vehicle-tag" style="white-space:nowrap; margin-top:-2px;">
+                    <span class="cargo-tag-dot" style="background:${isAir ? '#38bdf8' : '#00d2ff'};"></span>
+                    <span>{{ $shipment->shipment_number }}</span>
                 </div>
             `,
-            iconSize: [34, 34],
-            iconAnchor: [17, 17]
+            iconSize: [vW, vH],
+            iconAnchor: [vW / 2, vH / 2],
+            popupAnchor: [0, -(vH / 2 + 5)]
         });
 
-        L.marker([cLat, cLng], { icon: vIcon })
+        L.marker([cLat, cLng], { icon: vIcon, zIndexOffset: 1000 })
             .addTo(map)
             .bindPopup('<b>📍 Lokasi Saat Ini:</b> {{ $shipment->currentLocation->name }}<br><span style="font-size:11px; color:#0284c7; font-weight:700;">Status: {{ $shipment->status }}</span>');
     @else
-        L.polyline([[oLat, oLng], [dLat, dLng]], { color: '#00F0FF', weight: 3.5, opacity: 0.85 }).addTo(map);
+        L.polyline([[oLat, oLng], [dLat, dLng]], { color: '#0284c7', weight: 3.5, opacity: 0.85 }).addTo(map);
     @endif
 
     map.fitBounds(boundsPoints, { padding: [50, 50] });
