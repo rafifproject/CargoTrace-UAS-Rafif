@@ -2,6 +2,58 @@
 
 @section('title', 'Beranda Customer')
 
+@push('styles')
+<style>
+    /* Realistic Vehicle Markers for Cargo Tracker */
+    .cargo-real-vehicle-marker {
+        background: transparent !important;
+        border: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+    }
+    .cargo-real-vehicle-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
+    }
+    .cargo-real-vehicle-marker:hover .cargo-real-vehicle-wrapper {
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 10px rgba(56, 189, 248, 0.8));
+        transform: scale(1.22) !important;
+        z-index: 99999 !important;
+    }
+    .cargo-vehicle-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 4px;
+        padding: 2px 7px;
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 6px;
+        color: #ffffff;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 10px;
+        line-height: 1.2;
+        white-space: nowrap;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+        pointer-events: none;
+    }
+    .cargo-tag-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+</style>
+@endpush
+
 @section('content')
 {{-- Header Sambutan (Mockup 03) --}}
 <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
@@ -104,6 +156,61 @@
     <div class="lg:col-span-3 bg-white dark:bg-[#0A1128] rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
         <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Tren Pengiriman (30 Hari)</h3>
         <canvas id="trendChart" height="85"></canvas>
+    </div>
+</div>
+
+{{-- Peta Pemantauan Kargo Aktif Saya --}}
+<div class="mb-6 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+    <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+            <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="map-pin" class="w-4 h-4 text-cyan-500"></i>
+                <span>Peta Pemantauan Kargo Aktif Saya</span>
+            </h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pemantauan visual posisi kapal, pesawat, dan armada kargo Anda di rute logistik global secara real-time.</p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-50 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800">
+                <span class="w-2 h-2 rounded-full bg-cyan-500 animate-ping"></span>
+                {{ count($mapShipments) }} Kargo Terpantau
+            </span>
+            <button type="button" onclick="resetDashboardMap()" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-xs flex items-center gap-1">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span>Reset View</span>
+            </button>
+            <a href="{{ route('customer.shipments.map') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-600 hover:bg-cyan-500 text-white transition-colors shadow-xs flex items-center gap-1">
+                <span>Peta Rute Lengkap</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="relative">
+        <div id="customerDashboardMap" class="w-full h-[450px] z-10"></div>
+
+        <!-- Floating Legend Badge -->
+        <div class="absolute bottom-4 left-4 z-20 px-3.5 py-2 rounded-xl bg-slate-900/90 backdrop-blur-md border border-slate-700/80 text-white shadow-xl flex items-center gap-4 text-xs">
+            <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <span class="text-slate-300 text-[11px]">Asal</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                <span class="text-slate-300 text-[11px]">Tujuan</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <span class="text-[12px]">🚢</span>
+                <span class="text-slate-300 text-[11px]">Kapal</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <span class="text-[12px]">✈️</span>
+                <span class="text-slate-300 text-[11px]">Pesawat</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <span class="text-[12px]">🚚</span>
+                <span class="text-slate-300 text-[11px]">Darat</span>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -245,6 +352,257 @@ new Chart(trendCtx, {
             y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 }, stepSize: 1 }, beginAtZero: true },
         }
     }
+});
+
+// ==========================================
+// PETA PEMANTAUAN KARGO AKTIF CUSTOMER (LEAFLET)
+// ==========================================
+let customerDashboardMap = null;
+let dashboardBounds = [];
+
+const dashboardShipments = @json($mapShipments);
+
+function getShipmentRealtimeProgress(s) {
+    const now = Date.now();
+    const depTime = s.actual_departure ? new Date(s.actual_departure).getTime() : (s.expected_departure ? new Date(s.expected_departure).getTime() : null);
+    const arrTime = s.estimated_time_arrival ? new Date(s.estimated_time_arrival).getTime() : (s.expected_arrival ? new Date(s.expected_arrival).getTime() : null);
+
+    if (s.status === 'DELIVERED') return 1.0;
+
+    if (depTime && arrTime && arrTime > depTime) {
+        const frac = (now - depTime) / (arrTime - depTime);
+        if (frac >= 0.08 && frac <= 0.95) return frac;
+    }
+
+    if (s.status === 'IN_TRANSIT') {
+        const seed = (s.id * 37 + (s.shipment_number ? s.shipment_number.charCodeAt(s.shipment_number.length - 1) : 10));
+        return ((seed % 55) + 25) / 100;
+    }
+
+    return 0.35;
+}
+
+function createCurvedPath(start, end, numPoints = 20, bendFactor = 0.12) {
+    const pts = [];
+    const lat1 = start[0], lon1 = start[1];
+    const lat2 = end[0], lon2 = end[1];
+    const midLat = (lat1 + lat2) / 2;
+    const midLon = (lon1 + lon2) / 2;
+    const dLon = lon2 - lon1;
+    const dLat = lat2 - lat1;
+    const dist = Math.sqrt(dLat * dLat + dLon * dLon);
+    const ctrlLat = midLat + (-dLon / (dist || 1)) * dist * bendFactor;
+    const ctrlLon = midLon + (dLat / (dist || 1)) * dist * bendFactor;
+
+    for (let i = 0; i <= numPoints; i++) {
+        const t = i / numPoints;
+        const lat = (1 - t) * (1 - t) * lat1 + 2 * (1 - t) * t * ctrlLat + t * t * lat2;
+        const lon = (1 - t) * (1 - t) * lon1 + 2 * (1 - t) * t * ctrlLon + t * t * lon2;
+        pts.push([lat, lon]);
+    }
+    return pts;
+}
+
+function calculateBearing(start, end) {
+    const lat1 = start[0] * Math.PI / 180;
+    const lon1 = start[1] * Math.PI / 180;
+    const lat2 = end[0] * Math.PI / 180;
+    const lon2 = end[1] * Math.PI / 180;
+    const y = Math.sin(lon2 - lon1) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+    const brng = Math.atan2(y, x) * 180 / Math.PI;
+    return (brng + 360) % 360;
+}
+
+function getVehicleConfig(s) {
+    const mode = (s.transport_mode || 'SEA').toUpperCase();
+    if (mode === 'AIR') {
+        return {
+            type: 'AIR', label: 'Pesawat Kargo', color: '#38BDF8',
+            realSvg: `<svg width="38" height="38" viewBox="0 0 64 64" fill="none"><path d="M32 6L36 24L58 34V40L36 32V48L42 54V58L32 54L22 58V54L28 48V32L6 40V34L28 24L32 6Z" fill="#0284c7" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/></svg>`
+        };
+    }
+    if (mode === 'LAND' || mode === 'ROAD') {
+        return {
+            type: 'LAND', label: 'Mobil / Truk Kargo', color: '#F59E0B',
+            realSvg: `<svg width="38" height="38" viewBox="0 0 64 64" fill="none"><rect x="8" y="20" width="36" height="26" rx="3" fill="#0284c7" stroke="#ffffff" stroke-width="2"/><path d="M44 26L54 32V46H44V26Z" fill="#38bdf8" stroke="#ffffff" stroke-width="2"/><circle cx="18" cy="46" r="5" fill="#1e293b" stroke="#ffffff" stroke-width="2"/><circle cx="44" cy="46" r="5" fill="#1e293b" stroke="#ffffff" stroke-width="2"/></svg>`
+        };
+    }
+    return {
+        type: 'SEA', label: 'Kapal Kontainer', color: '#00D2FF',
+        realSvg: `<svg width="40" height="40" viewBox="0 0 64 64" fill="none"><path d="M6 38L14 50H50L58 38L54 28H10L6 38Z" fill="#0284c7" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/><rect x="18" y="20" width="8" height="8" rx="1.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5"/><rect x="28" y="20" width="8" height="8" rx="1.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5"/><rect x="38" y="20" width="8" height="8" rx="1.5" fill="#10b981" stroke="#ffffff" stroke-width="1.5"/></svg>`
+    };
+}
+
+function initCustomerDashboardMap() {
+    const mapEl = document.getElementById('customerDashboardMap');
+    if (!mapEl) return;
+
+    customerDashboardMap = L.map('customerDashboardMap', {
+        center: [15, 100],
+        zoom: 3,
+        minZoom: 2,
+        maxZoom: 18
+    });
+
+    const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: '&copy; Google Maps Satelit'
+    });
+
+    const googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: '&copy; Google Maps'
+    });
+
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+    });
+
+    googleHybrid.addTo(customerDashboardMap);
+
+    L.control.layers({
+        "🛰️ Satelit Hybrid": googleHybrid,
+        "🗺️ Peta Jalan": googleStreets,
+        "🌐 OpenStreetMap": osm
+    }, null, { position: 'topright' }).addTo(customerDashboardMap);
+
+    dashboardBounds = [];
+
+    dashboardShipments.forEach(s => {
+        if (s.origin && s.destination) {
+            const oLat = parseFloat(s.origin.latitude);
+            const oLng = parseFloat(s.origin.longitude);
+            const dLat = parseFloat(s.destination.latitude);
+            const dLng = parseFloat(s.destination.longitude);
+
+            if (!isNaN(oLat) && !isNaN(oLng) && !isNaN(dLat) && !isNaN(dLng)) {
+                const originPt = [oLat, oLng];
+                const destPt = [dLat, dLng];
+                dashboardBounds.push(originPt, destPt);
+
+                const progress = getShipmentRealtimeProgress(s);
+                let curPt = null;
+
+                if (s.current_location && s.current_location.latitude && s.current_location.longitude) {
+                    const cLat = parseFloat(s.current_location.latitude);
+                    const cLng = parseFloat(s.current_location.longitude);
+                    if (!isNaN(cLat) && !isNaN(cLng)) {
+                        curPt = [cLat, cLng];
+                    }
+                }
+
+                if (!curPt) {
+                    const numPoints = 30;
+                    const path = createCurvedPath(originPt, destPt, numPoints, 0.12);
+                    const idx = Math.min(numPoints, Math.max(0, Math.round(progress * numPoints)));
+                    curPt = path[idx] || originPt;
+                }
+
+                dashboardBounds.push(curPt);
+
+                const vehicle = getVehicleConfig(s);
+                const pct = Math.round(progress * 100);
+                const isAir = (vehicle.type === 'AIR');
+
+                const popupHtml = `
+                    <div style="font-family:'Outfit',sans-serif; min-width:240px; padding:2px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; border-bottom:1px solid #e2e8f0; padding-bottom:5px;">
+                            <span style="font-weight:900; font-size:12px; color:#0284c7;">${s.shipment_number}</span>
+                            <span style="font-weight:800; font-size:10px; color:#15803d; background:#dcfce7; padding:2px 6px; border-radius:4px;">${s.status}</span>
+                        </div>
+                        <div style="background:#F0FDF4; border:1px solid #BBF7D0; padding:5px 7px; border-radius:6px; margin-bottom:6px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:800; font-size:10px; color:#15803d; margin-bottom:2px;">
+                                <span>${isAir ? '✈️ Penerbangan:' : '🚢 Pelayaran:'}</span>
+                                <span>${pct}%</span>
+                            </div>
+                            <div style="width:100%; height:4px; background:#dcfce7; border-radius:999px; overflow:hidden;">
+                                <div style="width:${pct}%; height:100%; background:linear-gradient(90deg, #10b981, #06b6d4); border-radius:999px;"></div>
+                            </div>
+                        </div>
+                        <div style="font-size:11px; color:#334155; line-height:1.45; margin-bottom:6px;">
+                            <div>🛫 <b>Asal:</b> ${s.origin?.city || s.origin?.name}</div>
+                            <div>🛬 <b>Tujuan:</b> ${s.destination?.city || s.destination?.name}</div>
+                            <div>🏢 <b>Ekspedisi:</b> ${s.carrier?.name || '-'}</div>
+                            <div>📦 <b>Kargo:</b> ${s.cargo_type}</div>
+                        </div>
+                        <a href="/customer/shipments/${s.id}" style="display:block; text-align:center; background:#0284c7; color:#fff; font-weight:700; padding:5px; border-radius:6px; text-decoration:none; font-size:11px;">
+                            Buka Detail Kargo →
+                        </a>
+                    </div>
+                `;
+
+                // Origin Marker
+                L.circleMarker(originPt, {
+                    radius: 6, fillColor: '#10B981', color: '#fff', weight: 2, fillOpacity: 1
+                }).bindPopup(popupHtml).addTo(customerDashboardMap);
+
+                // Dest Marker
+                L.circleMarker(destPt, {
+                    radius: 6, fillColor: '#EF4444', color: '#fff', weight: 2, fillOpacity: 1
+                }).bindPopup(popupHtml).addTo(customerDashboardMap);
+
+                // Traveled Path
+                const traveledPath = createCurvedPath(originPt, curPt, 16, 0.1);
+                L.polyline(traveledPath, {
+                    color: '#0284c7', weight: 3, opacity: 0.9
+                }).bindPopup(popupHtml).addTo(customerDashboardMap);
+
+                // Remaining Path
+                const remainingPath = createCurvedPath(curPt, destPt, 16, 0.1);
+                L.polyline(remainingPath, {
+                    color: '#38bdf8', weight: 2, dashArray: '5, 5', opacity: 0.8
+                }).bindPopup(popupHtml).addTo(customerDashboardMap);
+
+                // Vehicle Marker with rotation
+                const heading = calculateBearing(curPt, destPt);
+                L.marker(curPt, {
+                    icon: L.divIcon({
+                        className: 'cargo-real-vehicle-marker',
+                        html: `
+                            <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${heading}deg);">
+                                ${vehicle.realSvg}
+                            </div>
+                            <div class="cargo-vehicle-tag">
+                                <span class="cargo-tag-dot" style="background:${vehicle.color};"></span>
+                                <span>${s.shipment_number}</span>
+                            </div>
+                        `,
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 20]
+                    })
+                }).bindPopup(popupHtml).addTo(customerDashboardMap);
+            }
+        }
+    });
+
+    if (dashboardBounds.length > 0) {
+        customerDashboardMap.fitBounds(dashboardBounds, { padding: [40, 40], maxZoom: 6 });
+    }
+
+    setTimeout(() => {
+        if (customerDashboardMap) customerDashboardMap.invalidateSize();
+    }, 250);
+
+    window.addEventListener('resize', () => {
+        if (customerDashboardMap) customerDashboardMap.invalidateSize();
+    });
+}
+
+function resetDashboardMap() {
+    if (!customerDashboardMap) return;
+    if (dashboardBounds.length > 0) {
+        customerDashboardMap.fitBounds(dashboardBounds, { padding: [40, 40], maxZoom: 6 });
+    } else {
+        customerDashboardMap.flyTo([15, 100], 3, { duration: 1 });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    initCustomerDashboardMap();
 });
 </script>
 @endpush

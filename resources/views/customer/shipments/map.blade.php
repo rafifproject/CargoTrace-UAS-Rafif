@@ -118,16 +118,17 @@
             </form>
 
             <div class="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-            <button type="button" id="tab-btn-tracking" onclick="switchMapMode('tracking')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-400 shadow-xs">
-                <i data-lucide="radio" class="w-3.5 h-3.5 text-cyan-500 animate-pulse"></i>
-                <span>Pengiriman Saya Aktif</span>
-                <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-300 font-mono">{{ count($mapShipments) }}</span>
-            </button>
-            <button type="button" id="tab-btn-routetrace" onclick="switchMapMode('routetrace')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
-                <i data-lucide="route" class="w-3.5 h-3.5 text-amber-500"></i>
-                <span>Simulator Route Trace (Asal ➔ Tujuan)</span>
-                <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 font-bold">Interaktif</span>
-            </button>
+                <button type="button" id="tab-btn-tracking" onclick="switchMapMode('tracking')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-400 shadow-xs">
+                    <i data-lucide="radio" class="w-3.5 h-3.5 text-cyan-500 animate-pulse"></i>
+                    <span>Pengiriman Saya Aktif</span>
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-300 font-mono">{{ count($mapShipments) }}</span>
+                </button>
+                <button type="button" id="tab-btn-routetrace" onclick="switchMapMode('routetrace')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                    <i data-lucide="route" class="w-3.5 h-3.5 text-amber-500"></i>
+                    <span>Simulator Route Trace (Asal ➔ Tujuan)</span>
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 font-bold">Interaktif</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -476,6 +477,14 @@
         });
 
         trackingLayerGroup.addTo(map);
+
+        setTimeout(() => {
+            if (map) map.invalidateSize();
+        }, 200);
+
+        window.addEventListener('resize', () => {
+            if (map) map.invalidateSize();
+        });
     }
 
     function switchMapMode(mode) {
@@ -493,6 +502,7 @@
 
             map.removeLayer(routeTraceLayerGroup);
             trackingLayerGroup.addTo(map);
+            setTimeout(() => { if (map) map.invalidateSize(); }, 100);
             map.flyTo([15, 100], 3, { duration: 1 });
         } else {
             tabTrace.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 shadow-xs';
@@ -503,6 +513,7 @@
             map.removeLayer(trackingLayerGroup);
             routeTraceLayerGroup.addTo(map);
             buildRouteTraceLayer();
+            setTimeout(() => { if (map) map.invalidateSize(); }, 100);
             map.flyTo([20, 20], 2.2, { duration: 1 });
         }
     }

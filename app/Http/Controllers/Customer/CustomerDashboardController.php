@@ -60,6 +60,21 @@ class CustomerDashboardController extends Controller
             ->limit(3)
             ->get();
 
+        // Active and monitored shipments for the customer dashboard map
+        $mapShipments = (clone $shipmentQuery)
+            ->with(['carrier', 'origin', 'destination', 'currentLocation'])
+            ->whereIn('status', [Shipment::STATUS_IN_TRANSIT, Shipment::STATUS_PICKED_UP, Shipment::STATUS_BOOKED])
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        if ($mapShipments->isEmpty()) {
+            $mapShipments = (clone $shipmentQuery)
+                ->with(['carrier', 'origin', 'destination', 'currentLocation'])
+                ->orderBy('updated_at', 'desc')
+                ->limit(6)
+                ->get();
+        }
+
         return view('customer.dashboard', compact(
             'user',
             'totalShipments',
@@ -70,7 +85,8 @@ class CustomerDashboardController extends Controller
             'trendDates',
             'trendValues',
             'recentShipments',
-            'activeExceptions'
+            'activeExceptions',
+            'mapShipments'
         ));
     }
 }
