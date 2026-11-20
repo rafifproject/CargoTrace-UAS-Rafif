@@ -181,44 +181,15 @@
                 </div>
             </div>
 
-            {{-- Rute Pengiriman: Dinamis sesuai pilihan Kapal Laut, Pesawat, atau Truk Darat --}}
-            <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                        <i data-lucide="map-pin" class="w-4 h-4 text-cyan-500"></i>
-                        <span id="route-heading">3. Rute Pelayaran Maritim (Pelabuhan Laut)</span>
-                    </h3>
-                    <span id="node-count-badge" class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                        {{ count($portLocations) }} Lokasi
-                    </span>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label id="origin-label" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Pelabuhan Asal <span class="text-rose-500">*</span></label>
-                        <select name="origin_location_id" id="origin-select" onchange="updateMap()" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('origin_location_id') border-rose-400 @enderror">
-                            <option value="">— Pilih Titik Asal —</option>
-                        </select>
-                        @error('origin_location_id')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
-                    </div>
-                    <div>
-                        <label id="dest-label" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Pelabuhan Tujuan <span class="text-rose-500">*</span></label>
-                        <select name="destination_location_id" id="dest-select" onchange="updateMap()" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('destination_location_id') border-rose-400 @enderror">
-                            <option value="">— Pilih Titik Tujuan —</option>
-                        </select>
-                        @error('destination_location_id')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
-                    </div>
-                </div>
-            </div>
-
-            {{-- 4. ALAMAT LENGKAP PENGANTARAN MOBIL / KURIR (CASCADING DROPDOWN: NEGARA -> KOTA -> DAERAH) --}}
-            <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
+            {{-- 3. RUTE EKSPOR & ALAMAT LENGKAP PENGANTARAN (SANTOS BRAZIL -> NEGARA & KOTA TUJUAN) --}}
+            <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                     <div>
                         <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                            <i data-lucide="truck" class="w-4 h-4 text-amber-500"></i>
-                            <span>4. Alamat Lengkap Pengantaran Mobil / Kurir ke Lokasi Penerima</span>
+                            <i data-lucide="map-pin" class="w-4 h-4 text-cyan-500"></i>
+                            <span id="route-heading">3. Rute Pengiriman Global & Alamat Tujuan Penerima</span>
                         </h3>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Cascading selector: pilih negara, kota, hingga daerah tujuan pengantaran langsung ke kafe/gudang.</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Pengiriman kargo kopi bermula langsung dari <strong>Pusat Ekspor Kopi Brazil Santos</strong> menuju pelabuhan dan alamat kafe/roastery tujuan.</p>
                     </div>
                     <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -226,11 +197,32 @@
                     </span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-                    {{-- Dropdown 1: Negara Tujuan --}}
+                {{-- TITIK ASAL EKSPOR TERKUNCI (SANTOS, BRAZIL) --}}
+                <div class="p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-800/80 bg-emerald-50/50 dark:bg-emerald-950/20 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div id="origin-icon-badge" class="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-lg shadow-sm">
+                            🚢
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                                <span>Titik Keberangkatan Kargo (Pusat Kopi Santos Brazil)</span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            </div>
+                            <div id="origin-display-text" class="text-xs font-bold text-slate-800 dark:text-white">Port of Santos (Santos, Brasil)</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60 px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-700">
+                        Pusat Eksportir Kopi Santos ✓
+                    </span>
+                    <input type="hidden" name="origin_location_id" id="origin-select" value="{{ old('origin_location_id', 39) }}" data-lat="-23.9610" data-lng="-46.3020">
+                </div>
+
+                {{-- FORM TUJUAN PENGANTARAN LENGKAP --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
+                    {{-- 1. Negara Tujuan --}}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                            1. Negara Tujuan <span class="text-rose-500">*</span>
+                            1. Negara Tujuan Kargo <span class="text-rose-500">*</span>
                         </label>
                         <select name="delivery_country" id="delivery_country" onchange="onCountrySelected(this.value)" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                             <option value="">— Pilih Negara Tujuan —</option>
@@ -242,11 +234,25 @@
                         </select>
                     </div>
 
-                    {{-- Dropdown 2: Kota Tujuan (Cascading dari Negara) --}}
+                    {{-- 2. Simpul Transit / Pelabuhan / Bandara Tujuan (Otomatis Filter Sesuai Negara) --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label id="dest-label" class="block text-xs font-semibold text-slate-600 dark:text-slate-400">
+                                2. Pelabuhan Laut Transit Tujuan <span class="text-rose-500">*</span>
+                            </label>
+                            <span class="text-[10px] text-cyan-500 font-semibold">Otomatis Terhubung</span>
+                        </div>
+                        <select name="destination_location_id" id="dest-select" onchange="updateMap()" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('destination_location_id') border-rose-400 @enderror" required>
+                            <option value="">— Pilih Simpul Transit Tujuan —</option>
+                        </select>
+                        @error('destination_location_id')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+
+                    {{-- 3. Kota Tujuan (Cascading dari Negara) --}}
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
                             <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">
-                                2. Kota Tujuan <span class="text-rose-500">*</span>
+                                3. Kota Tujuan Pengantaran <span class="text-rose-500">*</span>
                             </label>
                             <span id="city-spinner" class="hidden text-[10px] text-cyan-500 animate-pulse">Memuat kota...</span>
                         </div>
@@ -255,11 +261,11 @@
                         </select>
                     </div>
 
-                    {{-- Dropdown 3: Daerah / Kecamatan (Cascading dari Kota) --}}
+                    {{-- 4. Daerah / Distrik (Cascading dari Kota) --}}
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
                             <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">
-                                3. Daerah / Distrik <span class="text-rose-500">*</span>
+                                4. Daerah / Distrik / Suburb <span class="text-rose-500">*</span>
                             </label>
                             <span id="district-spinner" class="hidden text-[10px] text-cyan-500 animate-pulse">Memuat daerah...</span>
                         </div>
@@ -269,13 +275,13 @@
                     </div>
                 </div>
 
-                {{-- Detail Alamat Jalan / Kafe / Roastery --}}
-                <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                {{-- Detail Alamat Jalan / Kafe / Roastery & Geocoding --}}
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
                     <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                        Alamat Spesifik Penerima (Nama Kafe / Roastery / Jalan & Nomor Gedung)
+                        5. Alamat Spesifik Penerima (Nama Kafe / Roastery / Jalan & Nomor Gedung)
                     </label>
                     <div class="flex gap-2">
-                        <input type="text" name="delivery_address" id="delivery_address" oninput="triggerGeocodeDebounce()" value="{{ old('delivery_address', 'Jl. Senopati No. 42, Roastery Kopi Santos') }}" placeholder="cth. 38 Upper Montagu Street, Westminster Roastery atau Jl. Senopati No. 42" class="flex-1 px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <input type="text" name="delivery_address" id="delivery_address" oninput="triggerGeocodeDebounce()" value="{{ old('delivery_address', 'Jl. Senopati No. 42, Roastery Kopi Santos') }}" placeholder="cth. Jl. Senopati No. 42 atau 38 Upper Montagu Street" class="flex-1 px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                         <button type="button" onclick="verifyAddressWithGeoapify()" class="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-cyan-600 hover:bg-cyan-500 transition-colors flex items-center gap-1.5 shadow-sm">
                             <i data-lucide="locate-fixed" class="w-3.5 h-3.5"></i>
                             <span>Verifikasi Geoapify</span>
@@ -291,17 +297,17 @@
                         <div class="flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                             <span class="text-slate-500 dark:text-slate-400">Koordinat Pengantaran Mobil:</span>
-                            <span id="geocode-coords-display" class="font-mono font-bold text-slate-800 dark:text-slate-200">-6.2297, 106.8075</span>
+                            <span id="geocode-coords-display" class="font-mono font-bold text-slate-800 dark:text-slate-200">-6.2297, 106.8075 (Jakarta, Senopati)</span>
                         </div>
                         <span id="geocode-status-badge" class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
-                            ✓ Tergeocoding Presisi
+                            ✓ Terverifikasi Geoapify
                         </span>
                     </div>
 
                     <div class="mt-3 flex items-center gap-2">
                         <input type="checkbox" name="is_last_mile" id="is_last_mile" value="1" checked class="w-4 h-4 text-cyan-600 rounded border-slate-300 focus:ring-cyan-500">
                         <label for="is_last_mile" class="text-xs text-slate-700 dark:text-slate-300 font-medium">
-                            Aktifkan Layanan Pengantaran Mobil Kurir (Last-Mile Delivery) langsung ke alamat toko/kafe
+                            Aktifkan Layanan Pengantaran Mobil Kurir (Last-Mile Delivery) langsung dari pelabuhan/bandara ke alamat kafe/toko tujuan
                         </label>
                     </div>
                 </div>
@@ -521,6 +527,7 @@ let destMarker = null;
 let routeLine = null;
 let planeMarker = null;
 let deliveryMarker = null;
+let lastMileLine = null;
 let geocodeTimeout = null;
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -546,9 +553,10 @@ function setTransportMode(mode, resetSelections = true) {
     const badgeAir = document.getElementById('badge-air');
     const badgeLand = document.getElementById('badge-land');
     const heading = document.getElementById('route-heading');
-    const badgeCount = document.getElementById('node-count-badge');
-    const originLabel = document.getElementById('origin-label');
     const destLabel = document.getElementById('dest-label');
+    const originIcon = document.getElementById('origin-icon-badge');
+    const originText = document.getElementById('origin-display-text');
+    const originInput = document.getElementById('origin-select');
 
     // Reset all cards
     [cardSea, cardAir, cardLand].forEach(c => {
@@ -562,70 +570,135 @@ function setTransportMode(mode, resetSelections = true) {
     });
 
     if (mode === 'AIR') {
-        cardAir.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-purple-500 bg-purple-50/40 dark:bg-purple-950/20 shadow-sm flex flex-col justify-between';
-        badgeAir.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-600 text-white border-purple-600';
-        badgeAir.textContent = 'Terpilih ✓';
+        if (cardAir) cardAir.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-purple-500 bg-purple-50/40 dark:bg-purple-950/20 shadow-sm flex flex-col justify-between';
+        if (badgeAir) {
+            badgeAir.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-600 text-white border-purple-600';
+            badgeAir.textContent = 'Terpilih ✓';
+        }
 
-        heading.innerHTML = '3. Rute Penerbangan Kargo Udara (Bandara São Paulo GRU & Tujuan)';
-        badgeCount.textContent = `${airportLocations.length} Bandara`;
-        originLabel.innerHTML = 'Bandara Asal <span class="text-rose-500">*</span>';
-        destLabel.innerHTML = 'Bandara Tujuan <span class="text-rose-500">*</span>';
-
-        populateDropdowns(airportLocations, resetSelections ? null : initialOriginId, resetSelections ? null : initialDestId, 'Bandara');
+        if (heading) heading.innerHTML = '3. Rute Penerbangan Kargo Udara (Bandara São Paulo GRU & Bandara Transit Tujuan)';
+        if (destLabel) destLabel.innerHTML = '2. Bandara Transit Tujuan <span class="text-rose-500">*</span>';
+        if (originIcon) originIcon.textContent = '✈️';
+        if (originText) originText.textContent = 'Sao Paulo/Guarulhos International Cargo (GRU) — Brasil';
+        if (originInput) {
+            originInput.value = '93';
+            originInput.setAttribute('data-lat', '-23.4356');
+            originInput.setAttribute('data-lng', '-46.4731');
+        }
     } else if (mode === 'LAND') {
-        cardLand.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-amber-500 bg-amber-50/40 dark:bg-amber-950/20 shadow-sm flex flex-col justify-between';
-        badgeLand.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-600 text-white border-amber-600';
-        badgeLand.textContent = 'Terpilih ✓';
+        if (cardLand) cardLand.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-amber-500 bg-amber-50/40 dark:bg-amber-950/20 shadow-sm flex flex-col justify-between';
+        if (badgeLand) {
+            badgeLand.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-600 text-white border-amber-600';
+            badgeLand.textContent = 'Terpilih ✓';
+        }
 
-        heading.innerHTML = '3. Hub Logistik Darat & Pengantaran Mobil Kopi';
-        badgeCount.textContent = `${portLocations.length + airportLocations.length} Hub Logistik`;
-        originLabel.innerHTML = 'Hub Transit Asal <span class="text-rose-500">*</span>';
-        destLabel.innerHTML = 'Depot Distribusi Tujuan <span class="text-rose-500">*</span>';
-
-        populateDropdowns(portLocations.concat(airportLocations), resetSelections ? null : initialOriginId, resetSelections ? null : initialDestId, 'Hub Logistik');
+        if (heading) heading.innerHTML = '3. Hub Logistik Darat & Pengantaran Mobil Kopi Santos';
+        if (destLabel) destLabel.innerHTML = '2. Hub Logistik Transit Tujuan <span class="text-rose-500">*</span>';
+        if (originIcon) originIcon.textContent = '🚚';
+        if (originText) originText.textContent = 'Hub Distribusi Kopi Santos (Santos, Brasil)';
+        if (originInput) {
+            originInput.value = '39';
+            originInput.setAttribute('data-lat', '-23.9610');
+            originInput.setAttribute('data-lng', '-46.3020');
+        }
     } else {
-        cardSea.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-blue-500 bg-blue-50/40 dark:bg-blue-950/20 shadow-sm flex flex-col justify-between';
-        badgeSea.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-600 text-white border-blue-600';
-        badgeSea.textContent = 'Terpilih ✓';
+        if (cardSea) cardSea.className = 'cursor-pointer relative p-3.5 rounded-xl border-2 border-blue-500 bg-blue-50/40 dark:bg-blue-950/20 shadow-sm flex flex-col justify-between';
+        if (badgeSea) {
+            badgeSea.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-600 text-white border-blue-600';
+            badgeSea.textContent = 'Terpilih ✓';
+        }
 
-        heading.innerHTML = '3. Rute Pelayaran Maritim (Pelabuhan Santos ke Dunia)';
-        badgeCount.textContent = `${portLocations.length} Pelabuhan`;
-        originLabel.innerHTML = 'Pelabuhan Asal <span class="text-rose-500">*</span>';
-        destLabel.innerHTML = 'Pelabuhan Tujuan <span class="text-rose-500">*</span>';
-
-        populateDropdowns(portLocations, resetSelections ? null : initialOriginId, resetSelections ? null : initialDestId, 'Pelabuhan');
+        if (heading) heading.innerHTML = '3. Rute Pelayaran Maritim (Pelabuhan Santos ke Dunia)';
+        if (destLabel) destLabel.innerHTML = '2. Pelabuhan Laut Transit Tujuan <span class="text-rose-500">*</span>';
+        if (originIcon) originIcon.textContent = '🚢';
+        if (originText) originText.textContent = 'Port of Santos (Santos, Brasil)';
+        if (originInput) {
+            originInput.value = '39';
+            originInput.setAttribute('data-lat', '-23.9610');
+            originInput.setAttribute('data-lng', '-46.3020');
+        }
     }
 
     if (window.lucide) {
         window.lucide.createIcons();
     }
 
-    updateMap();
+    const countryEl = document.getElementById('delivery_country');
+    if (countryEl && countryEl.value) {
+        updateDestinationNodesByCountry(countryEl.value);
+    } else {
+        updateMap();
+    }
 }
 
-function populateDropdowns(locations, selOriginId, selDestId, nodeName) {
-    const originSel = document.getElementById('origin-select');
-    const destSel = document.getElementById('dest-select');
+/**
+ * Filter Simpul Transit Tujuan Berdasarkan Negara
+ */
+function updateDestinationNodesByCountry(selectedCountry) {
+    if (!selectedCountry) return;
+    const destSelect = document.getElementById('dest-select');
+    if (!destSelect) return;
 
-    let originHtml = `<option value="">— Pilih ${nodeName} Asal —</option>`;
-    let destHtml = `<option value="">— Pilih ${nodeName} Tujuan —</option>`;
+    const isAir = (currentMode === 'AIR');
+    const pool = isAir ? airportLocations : (currentMode === 'LAND' ? portLocations.concat(airportLocations) : portLocations);
+    const cleanC = selectedCountry.toLowerCase().trim();
 
-    locations.forEach(loc => {
-        const oSel = (selOriginId && String(loc.id) === String(selOriginId)) ? 'selected' : '';
-        const dSel = (selDestId && String(loc.id) === String(selDestId)) ? 'selected' : '';
-        const text = `${loc.name} (${loc.city ? loc.city + ', ' : ''}${loc.country})`;
-
-        originHtml += `<option value="${loc.id}" data-lat="${loc.latitude}" data-lng="${loc.longitude}" ${oSel}>${text}</option>`;
-        destHtml += `<option value="${loc.id}" data-lat="${loc.latitude}" data-lng="${loc.longitude}" ${dSel}>${text}</option>`;
+    let matching = pool.filter(loc => {
+        const locC = (loc.country || '').toLowerCase().trim();
+        return locC === cleanC || locC.includes(cleanC) || cleanC.includes(locC);
     });
 
-    originSel.innerHTML = originHtml;
-    destSel.innerHTML = destHtml;
+    if (matching.length === 0) {
+        matching = pool;
+    }
+
+    let html = '';
+    matching.forEach((loc, idx) => {
+        const isSel = (initialDestId && String(loc.id) === String(initialDestId)) || idx === 0;
+        html += `<option value="${loc.id}" data-lat="${loc.latitude}" data-lng="${loc.longitude}" data-country="${loc.country}" data-city="${loc.city}" ${isSel ? 'selected' : ''}>${loc.name} (${loc.city ? loc.city + ', ' : ''}${loc.country})</option>`;
+    });
+
+    destSelect.innerHTML = html;
+    if (matching.length > 0) {
+        const currentVal = destSelect.value;
+        if (!currentVal || !matching.some(m => String(m.id) === String(currentVal))) {
+            destSelect.value = matching[0].id;
+        }
+    }
+
+    const cityEl = document.getElementById('delivery_city');
+    if (cityEl && cityEl.value) {
+        alignPortWithCity(cityEl.value);
+    } else {
+        updateMap();
+    }
+}
+
+/**
+ * Smart Port Alignment
+ */
+function alignPortWithCity(cityName) {
+    const destSelect = document.getElementById('dest-select');
+    if (!destSelect || !cityName) return;
+    const cleanCity = cityName.toLowerCase().trim();
+
+    for (let opt of destSelect.options) {
+        const portCity = (opt.getAttribute('data-city') || '').toLowerCase().trim();
+        const portText = opt.textContent.toLowerCase();
+        if ((portCity && (portCity.includes(cleanCity) || cleanCity.includes(portCity))) || portText.includes(cleanCity)) {
+            destSelect.value = opt.value;
+            break;
+        }
+    }
+    updateMap();
 }
 
 async function onCountrySelected(country) {
     if (!country) return;
+    updateDestinationNodesByCountry(country);
+
     const citySelect = document.getElementById('delivery_city');
+    const districtSelect = document.getElementById('delivery_district');
     const spinner = document.getElementById('city-spinner');
 
     // Cari daftar kota yang benar-benar cocok dengan negara yang dipilih
@@ -650,7 +723,7 @@ async function onCountrySelected(country) {
         onCitySelected(baseCities[0]);
     } else {
         citySelect.innerHTML = `<option value="">Memuat kota ${country} via Geoapify...</option>`;
-        districtSelect.innerHTML = '<option value="">— Pilih Daerah Setelah Kota —</option>';
+        if (districtSelect) districtSelect.innerHTML = '<option value="">— Pilih Daerah Setelah Kota —</option>';
     }
 
     // Fetch data live dari Geoapify Search API melalui route dinamis Laravel
@@ -684,6 +757,8 @@ async function onCountrySelected(country) {
 
 async function onCitySelected(city) {
     if (!city) return;
+    alignPortWithCity(city);
+
     const country = document.getElementById('delivery_country').value;
     const districtSelect = document.getElementById('delivery_district');
     const spinner = document.getElementById('district-spinner');
@@ -801,34 +876,80 @@ function updateLastMileMapMarker(lat, lng, label) {
     if (deliveryMarker) routeMap.removeLayer(deliveryMarker);
 
     const truckIcon = L.divIcon({
-        html: '<div style="font-size:22px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6));">🚚📍</div>',
+        html: '<div style="font-size:20px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6));">🚚📍</div>',
         className: 'delivery-truck-pin',
-        iconSize: [30, 30],
-        iconAnchor: [15, 25]
+        iconSize: [28, 28],
+        iconAnchor: [14, 24]
     });
 
     deliveryMarker = L.marker([lat, lng], { icon: truckIcon })
         .bindPopup(`<b>Alamat Pengantaran Mobil Kopi Santos:</b><br>${label}`)
         .addTo(routeMap);
+
+    // Update garis last mile dari simpul transit (pelabuhan/bandara) ke mobil kurir
+    const destSelect = document.getElementById('dest-select');
+    if (destSelect && destSelect.selectedIndex >= 0) {
+        const destOpt = destSelect.options[destSelect.selectedIndex];
+        if (destOpt && destOpt.value) {
+            const dLat = parseFloat(destOpt.getAttribute('data-lat'));
+            const dLng = parseFloat(destOpt.getAttribute('data-lng'));
+            if (dLat && dLng) {
+                if (lastMileLine) routeMap.removeLayer(lastMileLine);
+                lastMileLine = L.polyline([[dLat, dLng], [lat, lng]], {
+                    color: '#F59E0B',
+                    weight: 2.5,
+                    dashArray: '3, 4',
+                    opacity: 0.95
+                }).addTo(routeMap);
+            }
+        }
+    }
 }
 
 function updateMap() {
     if (!routeMap) return;
 
-    const originSel = document.getElementById('origin-select');
+    const originInput = document.getElementById('origin-select');
     const destSel = document.getElementById('dest-select');
-    const originOpt = originSel.options[originSel.selectedIndex];
-    const destOpt = destSel.options[destSel.selectedIndex];
+
+    let oLat = -23.9610;
+    let oLng = -46.3020;
+    let originText = 'Port of Santos (Santos, Brasil)';
+
+    if (originInput) {
+        if (originInput.tagName === 'SELECT') {
+            const originOpt = originInput.options[originInput.selectedIndex];
+            if (originOpt && originOpt.value) {
+                oLat = parseFloat(originOpt.dataset.lat);
+                oLng = parseFloat(originOpt.dataset.lng);
+                originText = originOpt.text;
+            }
+        } else {
+            oLat = parseFloat(originInput.getAttribute('data-lat')) || -23.9610;
+            oLng = parseFloat(originInput.getAttribute('data-lng')) || -46.3020;
+            const disp = document.getElementById('origin-display-text');
+            if (disp) originText = disp.textContent;
+        }
+    }
+
+    let dLat = null;
+    let dLng = null;
+    let destText = '';
+
+    if (destSel && destSel.selectedIndex >= 0) {
+        const destOpt = destSel.options[destSel.selectedIndex];
+        if (destOpt && destOpt.value) {
+            dLat = parseFloat(destOpt.dataset.lat);
+            dLng = parseFloat(destOpt.dataset.lng);
+            destText = destOpt.text;
+        }
+    }
 
     if (originMarker) routeMap.removeLayer(originMarker);
     if (destMarker) routeMap.removeLayer(destMarker);
     if (routeLine) routeMap.removeLayer(routeLine);
     if (planeMarker) routeMap.removeLayer(planeMarker);
-
-    const oLat = originOpt && originOpt.value ? parseFloat(originOpt.dataset.lat) : null;
-    const oLng = originOpt && originOpt.value ? parseFloat(originOpt.dataset.lng) : null;
-    const dLat = destOpt && destOpt.value ? parseFloat(destOpt.dataset.lat) : null;
-    const dLng = destOpt && destOpt.value ? parseFloat(destOpt.dataset.lng) : null;
+    if (lastMileLine) routeMap.removeLayer(lastMileLine);
 
     const isAir = (currentMode === 'AIR');
     const isLand = (currentMode === 'LAND');
@@ -837,8 +958,8 @@ function updateMap() {
     const lineColor = isAir ? '#C084FC' : (isLand ? '#f59e0b' : '#06b6d4');
 
     if (oLat && dLat) {
-        originMarker = L.circleMarker([oLat, oLng], { radius: 8, color: originColor, fillColor: originColor, fillOpacity: 1 }).addTo(routeMap).bindPopup(`<b>Titik Asal:</b><br>${originOpt.text}`);
-        destMarker = L.circleMarker([dLat, dLng], { radius: 8, color: destColor, fillColor: destColor, fillOpacity: 1 }).addTo(routeMap).bindPopup(`<b>Titik Tujuan:</b><br>${destOpt.text}`);
+        originMarker = L.circleMarker([oLat, oLng], { radius: 8, color: originColor, fillColor: originColor, fillOpacity: 1 }).addTo(routeMap).bindPopup(`<b>Titik Keberangkatan (${isAir ? 'Bandara GRU' : 'Pelabuhan Santos'}):</b><br>${originText}`);
+        destMarker = L.circleMarker([dLat, dLng], { radius: 8, color: destColor, fillColor: destColor, fillOpacity: 1 }).addTo(routeMap).bindPopup(`<b>Simpul Transit Tujuan:</b><br>${destText}`);
         routeLine = L.polyline([[oLat, oLng], [dLat, dLng]], { color: lineColor, weight: 3, dashArray: isAir ? '4,6' : (isLand ? '2,4' : '8,6') }).addTo(routeMap);
 
         const midLat = (oLat + dLat) / 2;
@@ -851,6 +972,18 @@ function updateMap() {
             icon: L.divIcon({ html: iconHtml, className: 'route-vehicle-icon', iconSize: [20, 20], iconAnchor: [10, 10] })
         }).addTo(routeMap);
 
+        // Hubungkan simpul transit ke alamat mobil kurir
+        const deliveryLat = parseFloat(document.getElementById('delivery_lat')?.value);
+        const deliveryLng = parseFloat(document.getElementById('delivery_lng')?.value);
+        if (deliveryLat && deliveryLng && dLat && dLng) {
+            lastMileLine = L.polyline([[dLat, dLng], [deliveryLat, deliveryLng]], {
+                color: '#F59E0B',
+                weight: 2.5,
+                dashArray: '3, 4',
+                opacity: 0.95
+            }).addTo(routeMap);
+        }
+
         routeMap.fitBounds([[oLat, oLng], [dLat, dLng]], { padding: [40, 40] });
 
         const dLatRad = (dLat - oLat) * Math.PI / 180;
@@ -860,7 +993,7 @@ function updateMap() {
         const distKM = Math.round(6371 * c);
 
         document.getElementById('route-distance-badge').textContent = isAir ? `Rute Udara: ~${distKM} km` : (isLand ? `Rute Darat: ~${distKM} km` : `Rute Laut: ~${Math.round(distKM * 0.5399)} NM`);
-        document.getElementById('route-map-footer').textContent = `Terpilih: ${originOpt.text} ➔ ${destOpt.text}`;
+        document.getElementById('route-map-footer').textContent = `Terpilih: ${originText} ➔ ${destText}`;
     } else if (oLat) {
         originMarker = L.circleMarker([oLat, oLng], { radius: 8, color: originColor, fillColor: originColor, fillOpacity: 1 }).addTo(routeMap);
         routeMap.setView([oLat, oLng], 5);
