@@ -37,30 +37,39 @@ class GeoService
             return [];
         }
 
-        $cacheKey = 'geo_cities_' . md5(strtolower($countryClean));
+        $cacheKey = 'geo_cities_v2_' . md5(strtolower($countryClean));
 
         return Cache::remember($cacheKey, 86400, function () use ($countryClean) {
             $apiKey = config('services.geoapify.key', env('GEOAPIFY_API_KEY', '11121e44a86f40d593e90176dda45e95'));
             $baseUrl = rtrim(config('services.geoapify.url', env('GEOAPIFY_BASE_URL', 'https://api.geoapify.com/v1')), '/');
 
             $cities = [];
+            $iso = $this->getCountryIso($countryClean);
 
-            // 1. Coba ambil kota-kota utama secara live dari Geoapify
+            // 1. Ambil kota-kota secara live dari Geoapify Search API
             if (!empty($apiKey)) {
                 try {
-                    $response = Http::timeout(5)->retry(2, 100)->get("{$baseUrl}/geocode/search", [
-                        'text' => $countryClean,
-                        'type' => 'city',
-                        'limit' => 20,
+                    $params = [
                         'apiKey' => $apiKey,
-                    ]);
+                        'limit'  => 20,
+                    ];
+
+                    if ($iso) {
+                        $params['text'] = 'town';
+                        $params['filter'] = 'countrycode:' . strtolower($iso);
+                    } else {
+                        $params['text'] = $countryClean;
+                        $params['type'] = 'city';
+                    }
+
+                    $response = Http::timeout(5)->retry(2, 100)->get("{$baseUrl}/geocode/search", $params);
 
                     if ($response->successful()) {
                         $features = $response->json()['features'] ?? [];
                         foreach ($features as $f) {
                             $prop = $f['properties'] ?? [];
                             $city = $prop['city'] ?? $prop['name'] ?? null;
-                            if ($city && !in_array($city, $cities, true)) {
+                            if ($city && !in_array($city, $cities, true) && strcasecmp(trim($city), $countryClean) !== 0) {
                                 $cities[] = $city;
                             }
                         }
@@ -70,7 +79,7 @@ class GeoService
                 }
             }
 
-            // 2. Gabungkan dengan master curated kota global (menjamin 100% ketersediaan instan)
+            // 2. Gabungkan dengan master curated kota riil per negara
             $fallbackCities = $this->getCuratedCitiesByCountry($countryClean);
             foreach ($fallbackCities as $fc) {
                 if (!in_array($fc, $cities, true)) {
@@ -86,6 +95,23 @@ class GeoService
             sort($cities);
             return $cities;
         });
+    }
+
+    /**
+     * Dapatkan kode ISO dari nama negara
+     */
+    public function getCountryIso(string $country): ?string
+    {
+        $countries = $this->getCountries();
+        $clean = strtolower(trim($country));
+        foreach ($countries as $c) {
+            $cName = strtolower($c['name']);
+            $cCode = strtolower($c['code']);
+            if ($cName === $clean || $cCode === $clean || str_contains($cName, $clean) || str_contains($clean, $cName)) {
+                return strtolower($c['iso'] ?? $c['code']);
+            }
+        }
+        return null;
     }
 
     /**
@@ -228,34 +254,92 @@ class GeoService
         $c = strtolower(trim($country));
 
         $database = [
-            'brazil' => ['Santos', 'São Paulo', 'Rio de Janeiro', 'Campinas', 'Belo Horizonte', 'Curitiba', 'Porto Alegre', 'Salvador', 'Recife', 'Brasília', 'Vitória', 'Paranaguá'],
-            'indonesia' => ['Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang', 'Makassar', 'Denpasar (Bali)', 'Yogyakarta', 'Palembang', 'Balikpapan', 'Batam', 'Malang'],
-            'united kingdom' => ['London', 'Manchester', 'Birmingham', 'Liverpool', 'Edinburgh', 'Glasgow', 'Bristol', 'Leeds', 'Southampton', 'Newcastle'],
-            'inggris' => ['London', 'Manchester', 'Birmingham', 'Liverpool', 'Edinburgh', 'Glasgow', 'Bristol', 'Leeds', 'Southampton', 'Newcastle'],
-            'united states' => ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Miami', 'Seattle', 'San Francisco', 'Boston', 'Atlanta', 'Dallas'],
-            'amerika serikat' => ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Miami', 'Seattle', 'San Francisco', 'Boston', 'Atlanta', 'Dallas'],
-            'germany' => ['Hamburg', 'Berlin', 'Munich', 'Frankfurt', 'Cologne', 'Stuttgart', 'Düsseldorf', 'Bremen', 'Hannover', 'Leipzig'],
-            'jerman' => ['Hamburg', 'Berlin', 'Munich', 'Frankfurt', 'Cologne', 'Stuttgart', 'Düsseldorf', 'Bremen', 'Hannover', 'Leipzig'],
-            'netherlands' => ['Rotterdam', 'Amsterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Groningen', 'Tilburg', 'Almere', 'Breda', 'Nijmegen'],
-            'belanda' => ['Rotterdam', 'Amsterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Groningen', 'Tilburg', 'Almere', 'Breda', 'Nijmegen'],
-            'japan' => ['Tokyo', 'Yokohama', 'Osaka', 'Nagoya', 'Sapporo', 'Fukuoka', 'Kobe', 'Kyoto', 'Kawasaki', 'Hiroshima'],
-            'jepang' => ['Tokyo', 'Yokohama', 'Osaka', 'Nagoya', 'Sapporo', 'Fukuoka', 'Kobe', 'Kyoto', 'Kawasaki', 'Hiroshima'],
-            'china' => ['Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen', 'Ningbo', 'Tianjin', 'Qingdao', 'Xiamen', 'Hong Kong', 'Chengdu'],
-            'tiongkok' => ['Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen', 'Ningbo', 'Tianjin', 'Qingdao', 'Xiamen', 'Hong Kong', 'Chengdu'],
-            'singapore' => ['Singapore', 'Jurong', 'Changi', 'Tampines', 'Woodlands', 'Marina Bay', 'Tuas'],
-            'singapura' => ['Singapore', 'Jurong', 'Changi', 'Tampines', 'Woodlands', 'Marina Bay', 'Tuas'],
-            'malaysia' => ['Kuala Lumpur', 'George Town (Penang)', 'Johor Bahru', 'Port Klang', 'Kota Kinabalu', 'Kuching', 'Ipoh', 'Melaka'],
-            'australia' => ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Fremantle', 'Darwin', 'Hobart', 'Canberra'],
-            'russia' => ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Vladivostok', 'Krasnoyarsk', 'Yekaterinburg', 'Kazan', 'Nizhny Novgorod', 'Samara', 'Novorossiysk'],
-            'rusia' => ['Moskow', 'Saint Petersburg', 'Novosibirsk', 'Vladivostok', 'Krasnoyarsk', 'Yekaterinburg', 'Kazan', 'Nizhny Novgorod', 'Samara', 'Novorossiysk'],
-            'france' => ['Paris', 'Marseille', 'Le Havre', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Bordeaux', 'Lille', 'Strasbourg'],
-            'prancis' => ['Paris', 'Marseille', 'Le Havre', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Bordeaux', 'Lille', 'Strasbourg'],
-            'italy' => ['Rome', 'Milan', 'Genoa', 'Naples', 'Turin', 'Palermo', 'Bologna', 'Florence', 'Trieste', 'Venice'],
-            'italia' => ['Roma', 'Milan', 'Genoa', 'Napoli', 'Turin', 'Palermo', 'Bologna', 'Florence', 'Trieste', 'Venesia'],
-            'united arab emirates' => ['Dubai', 'Abu Dhabi', 'Sharjah', 'Jebel Ali', 'Ajman', 'Ras Al Khaimah', 'Fujairah'],
-            'uni emirat arab' => ['Dubai', 'Abu Dhabi', 'Sharjah', 'Jebel Ali', 'Ajman', 'Ras Al Khaimah', 'Fujairah'],
-            'south korea' => ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon', 'Gwangju', 'Ulsan', 'Suwon'],
-            'korea selatan' => ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon', 'Gwangju', 'Ulsan', 'Suwon'],
+            // ASEAN / Asia Tenggara
+            'indonesia'             => ['Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang', 'Makassar', 'Denpasar (Bali)', 'Palembang', 'Yogyakarta', 'Balikpapan', 'Batam', 'Malang', 'Pekanbaru', 'Bandar Lampung', 'Banjarmasin', 'Pontianak', 'Manado', 'Cilegon', 'Samarinda'],
+            'brunei'                => ['Bandar Seri Begawan', 'Kuala Belait', 'Seria', 'Tutong', 'Bangar', 'Muara', 'Jerudong', 'Gadong', 'Sengkurong', 'Berakas', 'Lumut', 'Sungai Liang'],
+            'brunei darussalam'     => ['Bandar Seri Begawan', 'Kuala Belait', 'Seria', 'Tutong', 'Bangar', 'Muara', 'Jerudong', 'Gadong', 'Sengkurong', 'Berakas', 'Lumut', 'Sungai Liang'],
+            'malaysia'              => ['Kuala Lumpur', 'George Town (Penang)', 'Johor Bahru', 'Port Klang', 'Ipoh', 'Kota Kinabalu', 'Kuching', 'Shah Alam', 'Melaka', 'Petaling Jaya', 'Alor Setar', 'Kuantan', 'Miri', 'Sandakan'],
+            'singapura'             => ['Singapore', 'Jurong', 'Changi', 'Tampines', 'Woodlands', 'Marina Bay', 'Tuas', 'Bedok', 'Yishun', 'Ang Mo Kio'],
+            'singapore'             => ['Singapore', 'Jurong', 'Changi', 'Tampines', 'Woodlands', 'Marina Bay', 'Tuas', 'Bedok', 'Yishun', 'Ang Mo Kio'],
+            'thailand'              => ['Bangkok', 'Nonthaburi', 'Chiang Mai', 'Phuket', 'Pattaya', 'Chonburi', 'Hat Yai', 'Nakhon Ratchasima', 'Udon Thani', 'Laem Chabang', 'Samut Prakan'],
+            'vietnam'               => ['Ho Chi Minh City', 'Hanoi', 'Da Nang', 'Hai Phong', 'Can Tho', 'Bien Hoa', 'Nha Trang', 'Vung Tau', 'Hue', 'Buon Ma Thuot'],
+            'filipina'              => ['Manila', 'Quezon City', 'Davao City', 'Cebu City', 'Caloocan', 'Zamboanga', 'Taguig', 'Pasig', 'Cagayan de Oro', 'Makati'],
+            'philippines'           => ['Manila', 'Quezon City', 'Davao City', 'Cebu City', 'Caloocan', 'Zamboanga', 'Taguig', 'Pasig', 'Cagayan de Oro', 'Makati'],
+            'myanmar'               => ['Yangon', 'Mandalay', 'Naypyidaw', 'Mawlamyine', 'Bago', 'Pathein', 'Monywa', 'Sittwe', 'Taunggyi'],
+            'kamboja'               => ['Phnom Penh', 'Siem Reap', 'Battambang', 'Sihanoukville', 'Kampong Cham', 'Poipet', 'Kampot'],
+            'cambodia'              => ['Phnom Penh', 'Siem Reap', 'Battambang', 'Sihanoukville', 'Kampong Cham', 'Poipet', 'Kampot'],
+            'laos'                  => ['Vientiane', 'Luang Prabang', 'Pakse', 'Savannakhet', 'Thakhek', 'Vang Vieng'],
+            'timor leste'           => ['Dili', 'Baucau', 'Maliana', 'Suai', 'Ermera', 'Liquiçá', 'Lospalos', 'Ainaro', 'Oecusse'],
+
+            // Asia Timur & Selatan
+            'tiongkok'              => ['Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen', 'Ningbo', 'Tianjin', 'Qingdao', 'Xiamen', 'Hong Kong', 'Chengdu', 'Hangzhou', 'Wuhan', 'Chongqing', 'Dalian'],
+            'china'                 => ['Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen', 'Ningbo', 'Tianjin', 'Qingdao', 'Xiamen', 'Hong Kong', 'Chengdu', 'Hangzhou', 'Wuhan', 'Chongqing', 'Dalian'],
+            'jepang'                => ['Tokyo', 'Yokohama', 'Osaka', 'Nagoya', 'Sapporo', 'Fukuoka', 'Kobe', 'Kyoto', 'Kawasaki', 'Hiroshima', 'Sendai', 'Kitakyushu'],
+            'japan'                 => ['Tokyo', 'Yokohama', 'Osaka', 'Nagoya', 'Sapporo', 'Fukuoka', 'Kobe', 'Kyoto', 'Kawasaki', 'Hiroshima', 'Sendai', 'Kitakyushu'],
+            'korea selatan'         => ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon', 'Gwangju', 'Ulsan', 'Suwon', 'Changwon', 'Seongnam', 'Goyang'],
+            'south korea'           => ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon', 'Gwangju', 'Ulsan', 'Suwon', 'Changwon', 'Seongnam', 'Goyang'],
+            'taiwan'                => ['Taipei', 'Kaohsiung', 'Taichung', 'Tainan', 'Taoyuan', 'Hsinchu', 'Keelung'],
+            'hong kong'             => ['Central', 'Kowloon', 'Tsuen Wan', 'Sha Tin', 'Tuen Mun', 'Kwun Tong', 'Wan Chai'],
+            'makau'                 => ['Sé', 'Nossa Senhora de Fátima', 'Taipa', 'Coloane', 'Cotai'],
+            'mongolia'              => ['Ulaanbaatar', 'Erdenet', 'Darkhan', 'Choibalsan', 'Moron'],
+            'korea utara'           => ['Pyongyang', 'Hamhung', 'Chongjin', 'Nampo', 'Wonsan'],
+            'india'                 => ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata', 'Hyderabad', 'Ahmedabad', 'Pune', 'Surat', 'Kochi', 'Visakhapatnam'],
+            'pakistan'              => ['Karachi', 'Lahore', 'Faisalabad', 'Rawalpindi', 'Gujranwala', 'Peshawar', 'Multan', 'Islamabad', 'Gwadar', 'Quetta'],
+            'bangladesh'            => ['Dhaka', 'Chittagong', 'Khulna', 'Rajshahi', 'Sylhet', 'Gazipur', 'Barisal', 'Rangpur'],
+            'sri lanka'             => ['Colombo', 'Kandy', 'Galle', 'Jaffna', 'Negombo', 'Hambantota', 'Trincomalee'],
+            'nepal'                 => ['Kathmandu', 'Pokhara', 'Lalitpur', 'Bharatpur', 'Biratnagar', 'Birgunj'],
+            'maladewa'              => ['Malé', 'Hulhumalé', 'Addu City', 'Fuvahmulah'],
+
+            // Timur Tengah
+            'arab saudi'            => ['Riyadh', 'Jeddah', 'Dammam', 'Mecca', 'Medina', 'Khobar', 'Jubail', 'Yanbu', 'Tabuk', 'Abha'],
+            'saudi arabia'          => ['Riyadh', 'Jeddah', 'Dammam', 'Mecca', 'Medina', 'Khobar', 'Jubail', 'Yanbu', 'Tabuk', 'Abha'],
+            'uni emirat arab'       => ['Dubai', 'Abu Dhabi', 'Sharjah', 'Jebel Ali', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Al Ain'],
+            'united arab emirates'  => ['Dubai', 'Abu Dhabi', 'Sharjah', 'Jebel Ali', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Al Ain'],
+            'qatar'                 => ['Doha', 'Al Rayyan', 'Al Wakrah', 'Al Khor', 'Mesaieed', 'Lusail'],
+            'kuwait'                => ['Kuwait City', 'Al Ahmadi', 'Hawalli', 'Salmiya', 'Sabah Al Salem', 'Shuwaikh'],
+            'oman'                  => ['Muscat', 'Salalah', 'Sohar', 'Seeb', 'Nizwa', 'Sur', 'Duqm'],
+            'bahrain'               => ['Manama', 'Riffa', 'Muharraq', 'Hamad Town', 'Sitra'],
+            'irak'                  => ['Baghdad', 'Basra', 'Erbil', 'Mosul', 'Sulaymaniyah', 'Najaf', 'Karbala', 'Umm Qasr'],
+            'iran'                  => ['Tehran', 'Mashhad', 'Isfahan', 'Shiraz', 'Tabriz', 'Ahvaz', 'Bandar Abbas', 'Bushehr'],
+            'turki'                 => ['Istanbul', 'Ankara', 'Izmir', 'Bursa', 'Antalya', 'Adana', 'Mersin', 'Gaziantep', 'Trabzon'],
+            'turkey'                => ['Istanbul', 'Ankara', 'Izmir', 'Bursa', 'Antalya', 'Adana', 'Mersin', 'Gaziantep', 'Trabzon'],
+            'yordania'              => ['Amman', 'Zarqa', 'Irbid', 'Aqaba'],
+            'lebanon'               => ['Beirut', 'Tripoli', 'Sidon', 'Tyre'],
+            'israel'                => ['Tel Aviv', 'Jerusalem', 'Haifa', 'Ashdod', 'Beersheba'],
+            'palestina'             => ['Gaza City', 'Ramallah', 'Hebron', 'Nablus'],
+
+            // Eropa
+            'inggris raya'          => ['London', 'Manchester', 'Birmingham', 'Liverpool', 'Edinburgh', 'Glasgow', 'Bristol', 'Leeds', 'Southampton', 'Newcastle', 'Belfast', 'Cardiff'],
+            'united kingdom'        => ['London', 'Manchester', 'Birmingham', 'Liverpool', 'Edinburgh', 'Glasgow', 'Bristol', 'Leeds', 'Southampton', 'Newcastle', 'Belfast', 'Cardiff'],
+            'belanda'               => ['Rotterdam', 'Amsterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Groningen', 'Tilburg', 'Almere', 'Breda', 'Nijmegen', 'Maastricht'],
+            'netherlands'           => ['Rotterdam', 'Amsterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Groningen', 'Tilburg', 'Almere', 'Breda', 'Nijmegen', 'Maastricht'],
+            'jerman'                => ['Hamburg', 'Berlin', 'Munich', 'Frankfurt', 'Cologne', 'Stuttgart', 'Düsseldorf', 'Bremen', 'Hannover', 'Leipzig', 'Nuremberg', 'Dresden'],
+            'germany'               => ['Hamburg', 'Berlin', 'Munich', 'Frankfurt', 'Cologne', 'Stuttgart', 'Düsseldorf', 'Bremen', 'Hannover', 'Leipzig', 'Nuremberg', 'Dresden'],
+            'prancis'               => ['Paris', 'Marseille', 'Le Havre', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Bordeaux', 'Lille', 'Strasbourg', 'Montpellier'],
+            'france'                => ['Paris', 'Marseille', 'Le Havre', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Bordeaux', 'Lille', 'Strasbourg', 'Montpellier'],
+            'italia'                => ['Rome', 'Milan', 'Genoa', 'Naples', 'Turin', 'Palermo', 'Bologna', 'Florence', 'Trieste', 'Venice', 'Verona', 'Bari'],
+            'italy'                 => ['Rome', 'Milan', 'Genoa', 'Naples', 'Turin', 'Palermo', 'Bologna', 'Florence', 'Trieste', 'Venice', 'Verona', 'Bari'],
+            'spanyol'               => ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza', 'Malaga', 'Bilbao', 'Alicante', 'Cadiz', 'Algeciras'],
+            'spain'                 => ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza', 'Malaga', 'Bilbao', 'Alicante', 'Cadiz', 'Algeciras'],
+            'portugal'              => ['Lisbon', 'Porto', 'Sines', 'Braga', 'Coimbra', 'Setubal', 'Faro'],
+            'belgia'                => ['Brussels', 'Antwerp', 'Ghent', 'Charleroi', 'Liège', 'Bruges'],
+            'swiss'                 => ['Zurich', 'Geneva', 'Basel', 'Bern', 'Lausanne', 'Lucerne'],
+            'austria'               => ['Vienna', 'Graz', 'Linz', 'Salzburg', 'Innsbruck'],
+            'irlandia'              => ['Dublin', 'Cork', 'Limerick', 'Galway', 'Waterford'],
+            'swedia'                => ['Stockholm', 'Gothenburg', 'Malmö', 'Uppsala', 'Helsingborg'],
+            'norwegia'              => ['Oslo', 'Bergen', 'Trondheim', 'Stavanger', 'Drammen'],
+            'denmark'               => ['Copenhagen', 'Aarhus', 'Odense', 'Aalborg'],
+            'finlandia'             => ['Helsinki', 'Espoo', 'Tampere', 'Vantaa', 'Oulu', 'Turku'],
+            'polandia'              => ['Warsaw', 'Krakow', 'Lodz', 'Wroclaw', 'Poznan', 'Gdansk'],
+            'yunani'                => ['Athens', 'Thessaloniki', 'Patras', 'Heraklion', 'Piraeus'],
+            'rusia'                 => ['Moskow', 'Saint Petersburg', 'Novosibirsk', 'Vladivostok', 'Krasnoyarsk', 'Yekaterinburg', 'Kazan', 'Nizhny Novgorod', 'Samara', 'Novorossiysk'],
+            'russia'                => ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Vladivostok', 'Krasnoyarsk', 'Yekaterinburg', 'Kazan', 'Nizhny Novgorod', 'Samara', 'Novorossiysk'],
+
+            // Benua Amerika & Australia
+            'brazil'                => ['Santos', 'São Paulo', 'Rio de Janeiro', 'Campinas', 'Belo Horizonte', 'Curitiba', 'Porto Alegre', 'Salvador', 'Recife', 'Brasília', 'Vitória', 'Paranaguá', 'Fortaleza', 'Manaus', 'Belém'],
+            'amerika serikat'       => ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Miami', 'Seattle', 'San Francisco', 'Boston', 'Atlanta', 'Dallas', 'Philadelphia', 'Washington D.C.', 'New Orleans'],
+            'united states'         => ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Miami', 'Seattle', 'San Francisco', 'Boston', 'Atlanta', 'Dallas', 'Philadelphia', 'Washington D.C.', 'New Orleans'],
+            'australia'             => ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Fremantle', 'Darwin', 'Hobart', 'Canberra', 'Newcastle'],
         ];
 
         foreach ($database as $key => $cities) {
@@ -264,13 +348,7 @@ class GeoService
             }
         }
 
-        // Default kota metropolitan umum jika negara baru
-        return [
-            ucwords($country) . ' Capital City',
-            ucwords($country) . ' Port Hub',
-            ucwords($country) . ' Commercial Center',
-            ucwords($country) . ' International Logistics Zone',
-        ];
+        return [];
     }
 
     /**
@@ -281,22 +359,42 @@ class GeoService
         $c = strtolower(trim($city));
 
         $database = [
-            'santos' => ['Gonzaga', 'Ponta da Praia', 'Porto de Santos Terminal', 'Vila Mathias', 'Boqueirão', 'Embaré', 'Aparecida', 'Centro Histórico'],
-            'são paulo' => ['Jardins', 'Pinheiros', 'Itaim Bibi', 'Vila Madalena', 'Moema', 'Bela Vista', 'Morumbi', 'Santana', 'Tatuapé', 'Guarulhos Cargo Zone'],
-            'jakarta' => ['Kebayoran Baru (Senopati)', 'Menteng', 'SCBD Sudirman', 'Kelapa Gading', 'Pantai Indah Kapuk (PIK)', 'Tanjung Priok Port Area', 'Cilandak', 'Kemang', 'Pondok Indah', 'Tanah Abang'],
-            'surabaya' => ['Tanjung Perak Port Basin', 'Gubeng', 'Tegalsari', 'Rungkut Industri', 'Wonokromo', 'Kenjeran', 'Sambikerep', 'Sukolilo'],
-            'bandung' => ['Dago', 'Riau (LLRE Martadinata)', 'Ciumbuleuit', 'Buahbatu', 'Sukajadi', 'Pasirkaliki', 'Gedebage Logistics Hub'],
-            'london' => ['Westminster (Upper Montagu)', 'City of London', 'Camden', 'Shoreditch', 'Kensington & Chelsea', 'Canary Wharf', 'Greenwich', 'Soho', 'Hackney'],
-            'rotterdam' => ['Centrum', 'Maasvlakte Logistics Hub', 'Kralingen', 'Delfshaven', 'Feijenoord', 'Kop van Zuid', 'Prins Alexander'],
-            'amsterdam' => ['Centrum', 'Zuid (Zuidas)', 'De Pijp', 'Jordaan', 'Westpoort Port Area', 'Oost', 'Noord'],
-            'hamburg' => ['Altona', 'HafenCity', 'Hamburg-Mitte', 'Eimsbüttel', 'Wandsbek', 'Harburg Port Zone', 'Bergedorf', 'St. Pauli'],
-            'tokyo' => ['Shibuya Specialty District', 'Shinjuku', 'Ginza (Chuo)', 'Roppongi (Minato)', 'Ota (Haneda Air Logistics)', 'Akihabara', 'Koto Port Hub'],
-            'new york' => ['Manhattan (Midtown)', 'Brooklyn (DUMBO)', 'Queens (Long Island City)', 'SoHo', 'Tribeca', 'Williamsburg', 'Financial District'],
-            'los angeles' => ['Downtown LA (DTLA)', 'Santa Monica', 'San Pedro (Port of LA)', 'Long Beach Harbor', 'Beverly Hills', 'Hollywood', 'Culver City'],
-            'singapore' => ['Tanjong Pagar', 'Orchard', 'Marina Bay', 'Changi Air Freight Center', 'Jurong Industrial Estate', 'Bugis', 'Tiong Bahru'],
-            'dubai' => ['Downtown Dubai', 'Dubai Marina', 'Jebel Ali Free Zone (JAFZA)', 'Business Bay', 'Deira', 'Al Quoz Industrial Roasteries'],
-            'moscow' => ['Tverskoy Central', 'Arbat', 'Presnensky (Moscow City)', 'Khamovniki', 'Basmanny', 'Danilovsky Logistics Zone', 'Sheremetyevo Hub'],
-            'moskow' => ['Tverskoy Central', 'Arbat', 'Presnensky (Moscow City)', 'Khamovniki', 'Basmanny', 'Danilovsky Logistics Zone', 'Sheremetyevo Hub'],
+            // Brunei
+            'bandar seri begawan'   => ['Kiulap', 'Gadong Commercial Area', 'Berakas', 'Kumbang Pasang', 'Mabohai', 'Bandar Central', 'Muara Port Basin', 'Kota Batu', 'Pangkalan Gadong', 'Tasek Lama'],
+            'kuala belait'          => ['KB Town', 'Pandan', 'Mumong', 'Kuala Balai', 'Sungai Liang', 'Labi Industrial Hub'],
+            'seria'                 => ['Pekan Seria', 'Lorong Tiga', 'Badas', 'Anduki Airfield', 'Panaga'],
+            'tutong'                => ['Pekan Tutong', 'Telisai', 'Tanjong Maya', 'Keriam', 'Kiudang', 'Lamunin'],
+            'muara'                 => ['Muara Town Terminal', 'Serasa Port Zone', 'Pelabuhan Muara', 'Kapok', 'Meragang'],
+            'bangar'                => ['Pekan Bangar', 'Labu Estate', 'Batu Apoi', 'Amo', 'Bokok'],
+            'jerudong'              => ['Jerudong Park Area', 'Sengkurong', 'Tanjong Bunut', 'Mulaut'],
+            'gadong'                => ['Gadong Central', 'Menglait', 'Pangkalan Gadong', 'Kiulap Commercial Hub'],
+
+            // Indonesia
+            'jakarta'               => ['Kebayoran Baru (Senopati)', 'Menteng', 'SCBD Sudirman', 'Kelapa Gading', 'Pantai Indah Kapuk (PIK)', 'Tanjung Priok Port Area', 'Cilandak', 'Kemang', 'Pondok Indah', 'Tanah Abang', 'Setiabudi (Kuningan)'],
+            'surabaya'              => ['Tanjung Perak Port Basin', 'Gubeng', 'Tegalsari', 'Rungkut Industri', 'Wonokromo', 'Kenjeran', 'Sambikerep', 'Sukolilo', 'Genteng'],
+            'bandung'               => ['Dago (Coblong)', 'Braga (Sumur Bandung)', 'Riau (LLRE Martadinata)', 'Ciumbuleuit', 'Buahbatu', 'Sukajadi (PVJ)', 'Pasirkaliki', 'Gedebage Logistics Hub'],
+            'medan'                 => ['Medan Kota', 'Medan Baru', 'Medan Petisah', 'Medan Barat', 'Medan Sunggal', 'Belawan Port Area'],
+            'semarang'              => ['Semarang Tengah', 'Tanjung Emas Port', 'Semarang Barat', 'Semarang Selatan', 'Candisari', 'Banyumanik'],
+            'denpasar (bali)'       => ['Sanur (Denpasar Selatan)', 'Kuta', 'Seminyak', 'Canggu', 'Ubud', 'Denpasar Barat', 'Denpasar Timur'],
+
+            // Malaysia & Singapura
+            'kuala lumpur'          => ['KLCC Bukit Bintang', 'Bangsar', 'Mont Kiara', 'Damansara', 'Cheras', 'Sentul', 'Port Klang Gateway'],
+            'singapore'             => ['Tanjong Pagar', 'Orchard', 'Marina Bay', 'Changi Air Freight Center', 'Jurong Industrial Estate', 'Bugis', 'Tiong Bahru', 'Tuas Port Hub'],
+            'bangkok'               => ['Sukhumvit', 'Silom', 'Sathorn', 'Chatuchak', 'Bang Na Logistics Hub', 'Khlong Toei Port Area'],
+
+            // Brazil & Global
+            'santos'                => ['Gonzaga', 'Ponta da Praia', 'Porto de Santos Terminal', 'Vila Mathias', 'Boqueirão', 'Embaré', 'Aparecida', 'Centro Histórico'],
+            'são paulo'             => ['Jardins', 'Pinheiros', 'Itaim Bibi', 'Vila Madalena', 'Moema', 'Bela Vista', 'Morumbi', 'Santana', 'Tatuapé', 'Guarulhos Cargo Zone'],
+            'london'                => ['Westminster (Upper Montagu)', 'City of London', 'Camden', 'Shoreditch', 'Kensington & Chelsea', 'Canary Wharf', 'Greenwich', 'Soho', 'Hackney'],
+            'rotterdam'             => ['Centrum', 'Maasvlakte Logistics Hub', 'Kralingen', 'Delfshaven', 'Feijenoord', 'Kop van Zuid', 'Prins Alexander'],
+            'amsterdam'             => ['Centrum', 'Zuid (Zuidas)', 'De Pijp', 'Jordaan', 'Westpoort Port Area', 'Oost', 'Noord'],
+            'hamburg'               => ['Altona', 'HafenCity', 'Hamburg-Mitte', 'Eimsbüttel', 'Wandsbek', 'Harburg Port Zone', 'Bergedorf', 'St. Pauli'],
+            'tokyo'                 => ['Shibuya Specialty District', 'Shinjuku', 'Ginza (Chuo)', 'Roppongi (Minato)', 'Ota (Haneda Air Logistics)', 'Akihabara', 'Koto Port Hub'],
+            'new york'              => ['Manhattan (Midtown)', 'Brooklyn (DUMBO)', 'Queens (Long Island City)', 'SoHo', 'Tribeca', 'Williamsburg', 'Financial District'],
+            'los angeles'           => ['Downtown LA (DTLA)', 'Santa Monica', 'San Pedro (Port of LA)', 'Long Beach Harbor', 'Beverly Hills', 'Hollywood', 'Culver City'],
+            'dubai'                 => ['Downtown Dubai', 'Dubai Marina', 'Jebel Ali Free Zone (JAFZA)', 'Business Bay', 'Deira', 'Al Quoz Industrial Roasteries'],
+            'moscow'                => ['Tverskoy Central', 'Arbat', 'Presnensky (Moscow City)', 'Khamovniki', 'Basmanny', 'Danilovsky Logistics Zone', 'Sheremetyevo Hub'],
+            'moskow'                => ['Tverskoy Central', 'Arbat', 'Presnensky (Moscow City)', 'Khamovniki', 'Basmanny', 'Danilovsky Logistics Zone', 'Sheremetyevo Hub'],
         ];
 
         foreach ($database as $key => $districts) {

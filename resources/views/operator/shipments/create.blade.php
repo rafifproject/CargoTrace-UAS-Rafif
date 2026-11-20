@@ -419,34 +419,94 @@ const GEO_CITIES_URL = @json(route('geo.cities'));
 const GEO_DISTRICTS_URL = @json(route('geo.districts'));
 const GEO_GEOCODE_URL = @json(route('geo.geocode'));
 
-// Master data kota instan (Zero latency - tampil seketika)
+// Master data kota instan (Zero latency - tampil seketika sesuai negara yang dipilih)
 const fallbackCitiesMap = {
-    'Indonesia': ['Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang', 'Makassar', 'Denpasar (Bali)', 'Palembang', 'Yogyakarta', 'Balikpapan', 'Batam', 'Malang', 'Bandar Lampung', 'Padang', 'Banjarmasin', 'Pontianak', 'Manado', 'Pekanbaru', 'Cilegon', 'Samarinda'],
-    'Brazil': ['Santos', 'São Paulo', 'Rio de Janeiro', 'Campinas', 'Curitiba', 'Porto Alegre', 'Belo Horizonte', 'Salvador', 'Fortaleza', 'Recife', 'Brasília', 'Vitória'],
-    'United States': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Miami', 'San Francisco', 'Seattle', 'Boston', 'Atlanta', 'Dallas'],
-    'United Kingdom': ['London', 'Manchester', 'Birmingham', 'Liverpool', 'Edinburgh', 'Glasgow', 'Bristol', 'Leeds', 'Southampton'],
-    'Netherlands': ['Rotterdam', 'Amsterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Tilburg', 'Groningen'],
-    'Germany': ['Hamburg', 'Frankfurt', 'Berlin', 'Munich', 'Cologne', 'Bremen', 'Düsseldorf', 'Stuttgart'],
-    'Japan': ['Tokyo', 'Yokohama', 'Osaka', 'Nagoya', 'Kobe', 'Fukuoka', 'Kyoto', 'Sapporo'],
-    'Singapore': ['Singapore', 'Jurong', 'Tampines', 'Woodlands', 'Changi', 'Tuas'],
-    'Malaysia': ['Kuala Lumpur', 'George Town (Penang)', 'Johor Bahru', 'Port Klang', 'Ipoh', 'Kota Kinabalu', 'Kuching'],
-    'China': ['Shanghai', 'Shenzhen', 'Guangzhou', 'Ningbo', 'Qingdao', 'Tianjin', 'Beijing', 'Xiamen', 'Hong Kong'],
-    'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Fremantle (Perth)', 'Adelaide', 'Darwin'],
-    'Vietnam': ['Ho Chi Minh City', 'Hanoi', 'Da Nang', 'Hai Phong'],
-    'Thailand': ['Bangkok', 'Laem Chabang', 'Nonthaburi', 'Chiang Mai', 'Phuket'],
-    'South Korea': ['Busan', 'Seoul', 'Incheon', 'Daegu'],
-    'United Arab Emirates': ['Dubai', 'Abu Dhabi', 'Sharjah', 'Jebel Ali']
+    'Indonesia': ['Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang', 'Makassar', 'Denpasar (Bali)', 'Palembang', 'Yogyakarta', 'Balikpapan', 'Batam', 'Malang', 'Pekanbaru', 'Bandar Lampung', 'Banjarmasin', 'Pontianak', 'Manado', 'Cilegon', 'Samarinda'],
+    'Brunei Darussalam': ['Bandar Seri Begawan', 'Kuala Belait', 'Seria', 'Tutong', 'Bangar', 'Muara', 'Jerudong', 'Gadong', 'Sengkurong', 'Berakas', 'Lumut', 'Sungai Liang'],
+    'Brunei': ['Bandar Seri Begawan', 'Kuala Belait', 'Seria', 'Tutong', 'Bangar', 'Muara', 'Jerudong', 'Gadong', 'Sengkurong', 'Berakas', 'Lumut', 'Sungai Liang'],
+    'Malaysia': ['Kuala Lumpur', 'George Town (Penang)', 'Johor Bahru', 'Port Klang', 'Ipoh', 'Kota Kinabalu', 'Kuching', 'Shah Alam', 'Melaka', 'Petaling Jaya', 'Alor Setar', 'Kuantan', 'Miri', 'Sandakan'],
+    'Singapura': ['Singapore', 'Jurong', 'Changi', 'Tampines', 'Woodlands', 'Marina Bay', 'Tuas', 'Bedok', 'Yishun', 'Ang Mo Kio'],
+    'Singapore': ['Singapore', 'Jurong', 'Changi', 'Tampines', 'Woodlands', 'Marina Bay', 'Tuas', 'Bedok', 'Yishun', 'Ang Mo Kio'],
+    'Thailand': ['Bangkok', 'Nonthaburi', 'Chiang Mai', 'Phuket', 'Pattaya', 'Chonburi', 'Hat Yai', 'Nakhon Ratchasima', 'Udon Thani', 'Laem Chabang', 'Samut Prakan'],
+    'Vietnam': ['Ho Chi Minh City', 'Hanoi', 'Da Nang', 'Hai Phong', 'Can Tho', 'Bien Hoa', 'Nha Trang', 'Vung Tau', 'Hue', 'Buon Ma Thuot'],
+    'Filipina': ['Manila', 'Quezon City', 'Davao City', 'Cebu City', 'Caloocan', 'Zamboanga', 'Taguig', 'Pasig', 'Cagayan de Oro', 'Makati'],
+    'Philippines': ['Manila', 'Quezon City', 'Davao City', 'Cebu City', 'Caloocan', 'Zamboanga', 'Taguig', 'Pasig', 'Cagayan de Oro', 'Makati'],
+    'Myanmar': ['Yangon', 'Mandalay', 'Naypyidaw', 'Mawlamyine', 'Bago', 'Pathein', 'Monywa', 'Sittwe', 'Taunggyi'],
+    'Kamboja': ['Phnom Penh', 'Siem Reap', 'Battambang', 'Sihanoukville', 'Kampong Cham', 'Poipet', 'Kampot'],
+    'Cambodia': ['Phnom Penh', 'Siem Reap', 'Battambang', 'Sihanoukville', 'Kampong Cham', 'Poipet', 'Kampot'],
+    'Laos': ['Vientiane', 'Luang Prabang', 'Pakse', 'Savannakhet', 'Thakhek', 'Vang Vieng'],
+    'Timor Leste': ['Dili', 'Baucau', 'Maliana', 'Suai', 'Ermera', 'Liquiçá', 'Lospalos', 'Ainaro', 'Oecusse'],
+    'Tiongkok': ['Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen', 'Ningbo', 'Tianjin', 'Qingdao', 'Xiamen', 'Hong Kong', 'Chengdu', 'Hangzhou', 'Wuhan', 'Chongqing', 'Dalian'],
+    'China': ['Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen', 'Ningbo', 'Tianjin', 'Qingdao', 'Xiamen', 'Hong Kong', 'Chengdu', 'Hangzhou', 'Wuhan', 'Chongqing', 'Dalian'],
+    'Jepang': ['Tokyo', 'Yokohama', 'Osaka', 'Nagoya', 'Sapporo', 'Fukuoka', 'Kobe', 'Kyoto', 'Kawasaki', 'Hiroshima', 'Sendai', 'Kitakyushu'],
+    'Japan': ['Tokyo', 'Yokohama', 'Osaka', 'Nagoya', 'Sapporo', 'Fukuoka', 'Kobe', 'Kyoto', 'Kawasaki', 'Hiroshima', 'Sendai', 'Kitakyushu'],
+    'Korea Selatan': ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon', 'Gwangju', 'Ulsan', 'Suwon', 'Changwon', 'Seongnam', 'Goyang'],
+    'South Korea': ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon', 'Gwangju', 'Ulsan', 'Suwon', 'Changwon', 'Seongnam', 'Goyang'],
+    'Taiwan': ['Taipei', 'Kaohsiung', 'Taichung', 'Tainan', 'Taoyuan', 'Hsinchu', 'Keelung'],
+    'Hong Kong': ['Central', 'Kowloon', 'Tsuen Wan', 'Sha Tin', 'Tuen Mun', 'Kwun Tong', 'Wan Chai'],
+    'India': ['Mumbai', 'Delhi', 'Bengaluru', 'Chennai', 'Kolkata', 'Hyderabad', 'Ahmedabad', 'Pune', 'Surat', 'Kochi', 'Visakhapatnam'],
+    'Pakistan': ['Karachi', 'Lahore', 'Faisalabad', 'Rawalpindi', 'Gujranwala', 'Peshawar', 'Multan', 'Islamabad', 'Gwadar', 'Quetta'],
+    'Bangladesh': ['Dhaka', 'Chittagong', 'Khulna', 'Rajshahi', 'Sylhet', 'Gazipur', 'Barisal', 'Rangpur'],
+    'Sri Lanka': ['Colombo', 'Kandy', 'Galle', 'Jaffna', 'Negombo', 'Hambantota', 'Trincomalee'],
+    'Arab Saudi': ['Riyadh', 'Jeddah', 'Dammam', 'Mecca', 'Medina', 'Khobar', 'Jubail', 'Yanbu', 'Tabuk', 'Abha'],
+    'Uni Emirat Arab': ['Dubai', 'Abu Dhabi', 'Sharjah', 'Jebel Ali', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Al Ain'],
+    'United Arab Emirates': ['Dubai', 'Abu Dhabi', 'Sharjah', 'Jebel Ali', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Al Ain'],
+    'Qatar': ['Doha', 'Al Rayyan', 'Al Wakrah', 'Al Khor', 'Mesaieed', 'Lusail'],
+    'Kuwait': ['Kuwait City', 'Al Ahmadi', 'Hawalli', 'Salmiya', 'Sabah Al Salem', 'Shuwaikh'],
+    'Oman': ['Muscat', 'Salalah', 'Sohar', 'Seeb', 'Nizwa', 'Sur', 'Duqm'],
+    'Bahrain': ['Manama', 'Riffa', 'Muharraq', 'Hamad Town', 'Sitra'],
+    'Turki': ['Istanbul', 'Ankara', 'Izmir', 'Bursa', 'Antalya', 'Adana', 'Mersin', 'Gaziantep', 'Trabzon'],
+    'Inggris Raya': ['London', 'Manchester', 'Birmingham', 'Liverpool', 'Edinburgh', 'Glasgow', 'Bristol', 'Leeds', 'Southampton', 'Newcastle', 'Belfast', 'Cardiff'],
+    'United Kingdom': ['London', 'Manchester', 'Birmingham', 'Liverpool', 'Edinburgh', 'Glasgow', 'Bristol', 'Leeds', 'Southampton', 'Newcastle', 'Belfast', 'Cardiff'],
+    'Belanda': ['Rotterdam', 'Amsterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Groningen', 'Tilburg', 'Almere', 'Breda', 'Nijmegen', 'Maastricht'],
+    'Netherlands': ['Rotterdam', 'Amsterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Groningen', 'Tilburg', 'Almere', 'Breda', 'Nijmegen', 'Maastricht'],
+    'Jerman': ['Hamburg', 'Berlin', 'Munich', 'Frankfurt', 'Cologne', 'Stuttgart', 'Düsseldorf', 'Bremen', 'Hannover', 'Leipzig', 'Nuremberg', 'Dresden'],
+    'Germany': ['Hamburg', 'Berlin', 'Munich', 'Frankfurt', 'Cologne', 'Stuttgart', 'Düsseldorf', 'Bremen', 'Hannover', 'Leipzig', 'Nuremberg', 'Dresden'],
+    'Prancis': ['Paris', 'Marseille', 'Le Havre', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Bordeaux', 'Lille', 'Strasbourg', 'Montpellier'],
+    'France': ['Paris', 'Marseille', 'Le Havre', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Bordeaux', 'Lille', 'Strasbourg', 'Montpellier'],
+    'Italia': ['Rome', 'Milan', 'Genoa', 'Naples', 'Turin', 'Palermo', 'Bologna', 'Florence', 'Trieste', 'Venice', 'Verona', 'Bari'],
+    'Italy': ['Rome', 'Milan', 'Genoa', 'Naples', 'Turin', 'Palermo', 'Bologna', 'Florence', 'Trieste', 'Venice', 'Verona', 'Bari'],
+    'Spanyol': ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza', 'Malaga', 'Bilbao', 'Alicante', 'Cadiz', 'Algeciras'],
+    'Spain': ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza', 'Malaga', 'Bilbao', 'Alicante', 'Cadiz', 'Algeciras'],
+    'Portugal': ['Lisbon', 'Porto', 'Sines', 'Braga', 'Coimbra', 'Setubal', 'Faro'],
+    'Belgia': ['Brussels', 'Antwerp', 'Ghent', 'Charleroi', 'Liège', 'Bruges'],
+    'Swiss': ['Zurich', 'Geneva', 'Basel', 'Bern', 'Lausanne', 'Lucerne'],
+    'Rusia': ['Moskow', 'Saint Petersburg', 'Novosibirsk', 'Vladivostok', 'Krasnoyarsk', 'Yekaterinburg', 'Kazan', 'Nizhny Novgorod', 'Samara', 'Novorossiysk'],
+    'Russia': ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Vladivostok', 'Krasnoyarsk', 'Yekaterinburg', 'Kazan', 'Nizhny Novgorod', 'Samara', 'Novorossiysk'],
+    'Brazil': ['Santos', 'São Paulo', 'Rio de Janeiro', 'Campinas', 'Belo Horizonte', 'Curitiba', 'Porto Alegre', 'Salvador', 'Recife', 'Brasília', 'Vitória', 'Paranaguá', 'Fortaleza', 'Manaus', 'Belém'],
+    'Amerika Serikat': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Miami', 'Seattle', 'San Francisco', 'Boston', 'Atlanta', 'Dallas', 'Philadelphia', 'Washington D.C.', 'New Orleans'],
+    'United States': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Miami', 'Seattle', 'San Francisco', 'Boston', 'Atlanta', 'Dallas', 'Philadelphia', 'Washington D.C.', 'New Orleans'],
+    'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Fremantle', 'Darwin', 'Hobart', 'Canberra', 'Newcastle']
 };
 
 // Master data daerah / distrik instan
 const fallbackDistrictsMap = {
+    // Brunei
+    'Bandar Seri Begawan': ['Kiulap', 'Gadong Commercial Area', 'Berakas', 'Kumbang Pasang', 'Mabohai', 'Bandar Central', 'Muara Port Basin', 'Kota Batu', 'Pangkalan Gadong', 'Tasek Lama'],
+    'Kuala Belait': ['KB Town', 'Pandan', 'Mumong', 'Kuala Balai', 'Sungai Liang', 'Labi Industrial Hub'],
+    'Seria': ['Pekan Seria', 'Lorong Tiga', 'Badas', 'Anduki Airfield', 'Panaga'],
+    'Tutong': ['Pekan Tutong', 'Telisai', 'Tanjong Maya', 'Keriam', 'Kiudang', 'Lamunin'],
+    'Muara': ['Muara Town Terminal', 'Serasa Port Zone', 'Pelabuhan Muara', 'Kapok', 'Meragang'],
+    'Bangar': ['Pekan Bangar', 'Labu Estate', 'Batu Apoi', 'Amo', 'Bokok'],
+    'Jerudong': ['Jerudong Park Area', 'Sengkurong', 'Tanjong Bunut', 'Mulaut'],
+    'Gadong': ['Gadong Central', 'Menglait', 'Pangkalan Gadong', 'Kiulap Commercial Hub'],
+
+    // Indonesia
     'Jakarta': ['Kebayoran Baru (Senopati)', 'Menteng', 'Setiabudi (Kuningan)', 'Kelapa Gading', 'Pantai Indah Kapuk (PIK)', 'Senayan', 'Kemang', 'Tanjung Priok', 'Gambir', 'Cilandak', 'Pondok Indah', 'Tebet'],
-    'Surabaya': ['Gubeng', 'Wonokromo', 'Tegalsari', 'Rungkut', 'Sukolilo', 'Tanjung Perak', 'Genteng', 'Kenjeran', 'Sambikerep'],
-    'Bandung': ['Coblong (Dago)', 'Sumur Bandung (Braga)', 'Sukajadi (PVJ)', 'Cidadap (Setiabudi)', 'Lengkong', 'Batununggal'],
-    'Medan': ['Medan Kota', 'Medan Baru', 'Medan Petisah', 'Medan Barat', 'Medan Sunggal', 'Medan Belawan'],
-    'Semarang': ['Semarang Tengah', 'Semarang Barat', 'Semarang Selatan', 'Candisari', 'Banyumanik', 'Tanjung Emas'],
+    'Surabaya': ['Gubeng', 'Wonokromo', 'Tegalsari', 'Rungkut Industri', 'Sukolilo', 'Tanjung Perak Port', 'Genteng', 'Kenjeran', 'Sambikerep'],
+    'Bandung': ['Coblong (Dago)', 'Sumur Bandung (Braga)', 'Sukajadi (PVJ)', 'Cidadap (Setiabudi)', 'Lengkong', 'Batununggal', 'Gedebage'],
+    'Medan': ['Medan Kota', 'Medan Baru', 'Medan Petisah', 'Medan Barat', 'Medan Sunggal', 'Belawan Port Area'],
+    'Semarang': ['Semarang Tengah', 'Semarang Barat', 'Semarang Selatan', 'Candisari', 'Banyumanik', 'Tanjung Emas Port'],
     'Denpasar (Bali)': ['Denpasar Selatan (Sanur)', 'Kuta', 'Seminyak', 'Canggu', 'Ubud', 'Denpasar Barat', 'Denpasar Timur'],
     'Yogyakarta': ['Danurejan (Malioboro)', 'Gondokusuman', 'Kraton', 'Depok (Sleman)', 'Kotagede'],
+
+    // Malaysia, Singapura & Thailand
+    'Kuala Lumpur': ['KLCC Bukit Bintang', 'Bangsar', 'Mont Kiara', 'Damansara', 'Cheras', 'Sentul', 'Port Klang Gateway'],
+    'George Town (Penang)': ['Gurney Drive', 'Bayan Lepas', 'Georgetown Heritage', 'Tanjung Bungah', 'Batu Ferringhi'],
+    'Singapore': ['Tanjong Pagar', 'Orchard', 'Marina Bay', 'Changi Air Freight Center', 'Jurong Industrial Estate', 'Bugis', 'Tiong Bahru', 'Tuas Port Hub'],
+    'Bangkok': ['Sukhumvit', 'Silom', 'Sathorn', 'Chatuchak', 'Bang Na Logistics Hub', 'Khlong Toei Port Area'],
+
+    // Global
     'London': ['Westminster (Montagu St)', 'City of London', 'Camden', 'Kensington & Chelsea', 'Islington', 'Hackney', 'Greenwich'],
     'New York': ['Manhattan (Midtown)', 'Brooklyn (Williamsburg)', 'Queens (Astoria)', 'Financial District', 'SoHo', 'Chelsea'],
     'Santos': ['Centro Histórico', 'Gonzaga', 'Boqueirão', 'Ponta da Praia', 'Porto de Santos', 'Aparecida'],
@@ -568,23 +628,32 @@ async function onCountrySelected(country) {
     const citySelect = document.getElementById('delivery_city');
     const spinner = document.getElementById('city-spinner');
 
-    // 1. Render data kota fallback instan (0ms render agar tidak stuck)
-    const baseCities = fallbackCitiesMap[country] || ['Jakarta', 'Pusat Kota / Central'];
-    const currentVal = citySelect.value;
-    
-    let opts = '<option value="">— Pilih Kota Tujuan —</option>';
-    baseCities.forEach(city => {
-        const isSel = (currentVal === city || (!currentVal && city === baseCities[0])) ? 'selected' : '';
-        opts += `<option value="${city}" ${isSel}>${city}</option>`;
-    });
-    citySelect.innerHTML = opts;
-
-    const initialCity = citySelect.value || baseCities[0];
-    if (initialCity) {
-        onCitySelected(initialCity);
+    // Cari daftar kota yang benar-benar cocok dengan negara yang dipilih
+    let baseCities = null;
+    const cleanCountry = country.toLowerCase().trim();
+    for (const [k, v] of Object.entries(fallbackCitiesMap)) {
+        const kLower = k.toLowerCase();
+        if (cleanCountry === kLower || cleanCountry.includes(kLower) || kLower.includes(cleanCountry)) {
+            baseCities = v;
+            break;
+        }
     }
 
-    // 2. Fetch live data dari endpoint Geoapify via route dinamis Laravel
+    if (baseCities && baseCities.length > 0) {
+        let opts = '<option value="">— Pilih Kota Tujuan —</option>';
+        baseCities.forEach((city, idx) => {
+            const isSel = (idx === 0) ? 'selected' : '';
+            opts += `<option value="${city}" ${isSel}>${city}</option>`;
+        });
+        citySelect.innerHTML = opts;
+        citySelect.value = baseCities[0];
+        onCitySelected(baseCities[0]);
+    } else {
+        citySelect.innerHTML = `<option value="">Memuat kota ${country} via Geoapify...</option>`;
+        districtSelect.innerHTML = '<option value="">— Pilih Daerah Setelah Kota —</option>';
+    }
+
+    // Fetch data live dari Geoapify Search API melalui route dinamis Laravel
     if (spinner) spinner.classList.remove('hidden');
 
     try {
@@ -592,18 +661,22 @@ async function onCountrySelected(country) {
         if (res.ok) {
             const json = await res.json();
             if (json.data && Array.isArray(json.data) && json.data.length > 0) {
-                const combined = Array.from(new Set([...baseCities, ...json.data]));
+                const citiesList = json.data;
                 const selectedNow = citySelect.value;
                 let refreshedOpts = '<option value="">— Pilih Kota Tujuan —</option>';
-                combined.forEach(city => {
+                citiesList.forEach(city => {
                     const isSel = (city === selectedNow) ? 'selected' : '';
                     refreshedOpts += `<option value="${city}" ${isSel}>${city}</option>`;
                 });
                 citySelect.innerHTML = refreshedOpts;
+                if (!citySelect.value && citiesList[0]) {
+                    citySelect.value = citiesList[0];
+                    onCitySelected(citiesList[0]);
+                }
             }
         }
     } catch (e) {
-        console.warn("Live Geoapify city fetch warning (fallback used):", e);
+        console.warn("Live Geoapify city fetch warning:", e);
     } finally {
         if (spinner) spinner.classList.add('hidden');
     }
@@ -615,31 +688,31 @@ async function onCitySelected(city) {
     const districtSelect = document.getElementById('delivery_district');
     const spinner = document.getElementById('district-spinner');
 
-    // 1. Render data daerah instan (0ms)
-    let matchedDistricts = fallbackDistrictsMap[city];
-    if (!matchedDistricts) {
-        for (const [k, v] of Object.entries(fallbackDistrictsMap)) {
-            if (city.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(city.toLowerCase())) {
-                matchedDistricts = v;
-                break;
-            }
+    // Cari daftar distrik/kecamatan yang cocok dengan kota
+    let matchedDistricts = null;
+    const cityClean = city.toLowerCase().trim();
+    for (const [k, v] of Object.entries(fallbackDistrictsMap)) {
+        const kLower = k.toLowerCase();
+        if (cityClean === kLower || cityClean.includes(kLower) || kLower.includes(cityClean)) {
+            matchedDistricts = v;
+            break;
         }
     }
-    const baseDistricts = matchedDistricts || ['Pusat Kota / Central', 'Distrik Bisnis (CBD)', 'Kawasan Pergudangan / Port', 'Area Kafe & Roastery'];
 
-    const currentDistVal = districtSelect.value;
-    let opts = '<option value="">— Pilih Daerah / Kecamatan —</option>';
-    baseDistricts.forEach(d => {
-        const isSel = (currentDistVal === d || (!currentDistVal && d === baseDistricts[0])) ? 'selected' : '';
-        opts += `<option value="${d}" ${isSel}>${d}</option>`;
-    });
-    districtSelect.innerHTML = opts;
-
-    if (districtSelect.value) {
-        onDistrictSelected(districtSelect.value);
+    if (matchedDistricts && matchedDistricts.length > 0) {
+        let opts = '<option value="">— Pilih Daerah / Kecamatan —</option>';
+        matchedDistricts.forEach((d, idx) => {
+            const isSel = (idx === 0) ? 'selected' : '';
+            opts += `<option value="${d}" ${isSel}>${d}</option>`;
+        });
+        districtSelect.innerHTML = opts;
+        districtSelect.value = matchedDistricts[0];
+        onDistrictSelected(matchedDistricts[0]);
+    } else {
+        districtSelect.innerHTML = `<option value="">Memuat daerah ${city} via Geoapify...</option>`;
     }
 
-    // 2. Fetch live districts dari backend
+    // Fetch live districts via backend
     if (spinner) spinner.classList.remove('hidden');
 
     try {
@@ -647,18 +720,22 @@ async function onCitySelected(city) {
         if (res.ok) {
             const json = await res.json();
             if (json.data && Array.isArray(json.data) && json.data.length > 0) {
-                const combined = Array.from(new Set([...baseDistricts, ...json.data]));
+                const districtsList = json.data;
                 const selectedNow = districtSelect.value;
                 let refreshedOpts = '<option value="">— Pilih Daerah / Kecamatan —</option>';
-                combined.forEach(d => {
+                districtsList.forEach(d => {
                     const isSel = (d === selectedNow) ? 'selected' : '';
                     refreshedOpts += `<option value="${d}" ${isSel}>${d}</option>`;
                 });
                 districtSelect.innerHTML = refreshedOpts;
+                if (!districtSelect.value && districtsList[0]) {
+                    districtSelect.value = districtsList[0];
+                    onDistrictSelected(districtsList[0]);
+                }
             }
         }
     } catch (e) {
-        console.warn("Live Geoapify district fetch warning (fallback used):", e);
+        console.warn("Live Geoapify district fetch warning:", e);
     } finally {
         if (spinner) spinner.classList.add('hidden');
     }
