@@ -15,6 +15,18 @@ class ExceptionController extends Controller
     {
         $query = ShipmentException::with(['shipment.carrier', 'shipment.origin', 'shipment.destination', 'reporter', 'resolver']);
 
+        // Search
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                    ->orWhere('exception_type', 'like', "%{$search}%")
+                    ->orWhere('resolution_notes', 'like', "%{$search}%")
+                    ->orWhereHas('shipment', function ($sq) use ($search) {
+                        $sq->where('shipment_number', 'like', "%{$search}%");
+                    });
+            });
+        }
+
         // Filter Status
         if ($status = $request->input('status')) {
             $query->where('status', $status);

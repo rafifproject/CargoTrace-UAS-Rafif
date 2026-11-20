@@ -326,10 +326,10 @@
             <header class="h-16 bg-white dark:bg-[#0A1128] border-b border-slate-200 dark:border-slate-800 px-6 flex items-center justify-between z-20 flex-shrink-0 transition-colors">
                 <!-- Search Bar -->
                 <div class="flex items-center gap-3 flex-1 max-w-md">
-                    <div class="relative w-full">
+                    <form method="GET" action="{{ route('admin.shipments.index') }}" class="relative w-full">
                         <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-                        <input type="text" placeholder="Cari No. Resi, Pelanggan, Ekspedisi, atau Lokasi..." class="w-full pl-10 pr-4 py-1.5 text-xs bg-slate-100 dark:bg-slate-900/60 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 placeholder-slate-400 transition-colors">
-                    </div>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari No. Resi, Pelanggan, Ekspedisi, atau Rute..." class="w-full pl-10 pr-4 py-1.5 text-xs bg-slate-100 dark:bg-slate-900/60 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 placeholder-slate-400 transition-colors">
+                    </form>
                 </div>
 
                 <!-- Right Actions: Live Clock, Theme Toggle, Notification Bell, User Menu -->

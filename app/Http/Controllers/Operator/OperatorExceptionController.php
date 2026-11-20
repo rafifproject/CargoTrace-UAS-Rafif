@@ -46,7 +46,12 @@ class OperatorExceptionController extends Controller
         }
 
         if ($search = $request->input('search')) {
-            $query->whereHas('shipment', fn ($q) => $q->where('shipment_number', 'like', "%{$search}%"));
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                    ->orWhere('exception_type', 'like', "%{$search}%")
+                    ->orWhere('resolution_notes', 'like', "%{$search}%")
+                    ->orWhereHas('shipment', fn ($sq) => $sq->where('shipment_number', 'like', "%{$search}%"));
+            });
         }
 
         $exceptions = $query->paginate(10)->withQueryString();

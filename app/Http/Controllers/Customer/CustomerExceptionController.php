@@ -21,6 +21,15 @@ class CustomerExceptionController extends Controller
             ->whereIn('shipment_id', $myShipmentIds)
             ->orderBy('created_at', 'desc');
 
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                    ->orWhere('exception_type', 'like', "%{$search}%")
+                    ->orWhere('resolution_notes', 'like', "%{$search}%")
+                    ->orWhereHas('shipment', fn ($sq) => $sq->where('shipment_number', 'like', "%{$search}%"));
+            });
+        }
+
         if ($status = $request->input('status')) {
             $query->where('status', $status);
         }

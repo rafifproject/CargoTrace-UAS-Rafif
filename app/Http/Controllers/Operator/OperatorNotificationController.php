@@ -17,6 +17,14 @@ class OperatorNotificationController extends Controller
 
         $query = Notification::orderBy('created_at', 'desc');
 
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('message', 'like', "%{$search}%")
+                    ->orWhereHas('shipment', fn ($sq) => $sq->where('shipment_number', 'like', "%{$search}%"));
+            });
+        }
+
         if ($tab === 'unread') {
             $query->where('is_read', false);
         } elseif ($tab === 'read') {

@@ -29,8 +29,31 @@ class OperatorShipmentController extends Controller
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('shipment_number', 'like', "%{$search}%")
-                    ->orWhereHas('customer', fn ($c) => $c->where('name', 'like', "%{$search}%"))
-                    ->orWhere('cargo_type', 'like', "%{$search}%");
+                    ->orWhere('cargo_type', 'like', "%{$search}%")
+                    ->orWhere('coffee_variety', 'like', "%{$search}%")
+                    ->orWhere('delivery_city', 'like', "%{$search}%")
+                    ->orWhere('delivery_address', 'like', "%{$search}%")
+                    ->orWhere('courier_name', 'like', "%{$search}%")
+                    ->orWhere('courier_vehicle', 'like', "%{$search}%")
+                    ->orWhereHas('customer', function ($c) use ($search) {
+                        $c->where('name', 'like', "%{$search}%")
+                            ->orWhere('company_name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('carrier', function ($c) use ($search) {
+                        $c->where('name', 'like', "%{$search}%")
+                            ->orWhere('code', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('origin', function ($o) use ($search) {
+                        $o->where('name', 'like', "%{$search}%")
+                            ->orWhere('city', 'like', "%{$search}%")
+                            ->orWhere('country', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('destination', function ($d) use ($search) {
+                        $d->where('name', 'like', "%{$search}%")
+                            ->orWhere('city', 'like', "%{$search}%")
+                            ->orWhere('country', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -292,7 +315,14 @@ class OperatorShipmentController extends Controller
     {
         $selectedShipment = null;
         if ($shipmentId = $request->input('shipment_id')) {
-            $selectedShipment = Shipment::with(['origin', 'destination', 'carrier', 'customer'])->find($shipmentId);
+            $selectedShipment = Shipment::with(['origin', 'destination', 'carrier', 'customer'])
+                ->where(function ($q) use ($shipmentId) {
+                    if (is_numeric($shipmentId)) {
+                        $q->where('id', $shipmentId)->orWhere('shipment_number', $shipmentId);
+                    } else {
+                        $q->where('shipment_number', $shipmentId);
+                    }
+                })->first();
         }
 
         $allShipments = Shipment::orderBy('shipment_number', 'asc')->get();

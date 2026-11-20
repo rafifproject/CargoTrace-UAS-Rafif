@@ -15,6 +15,14 @@ class NotificationController extends Controller
 
         $query = Notification::with('shipment');
 
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('message', 'like', "%{$search}%")
+                    ->orWhereHas('shipment', fn ($sq) => $sq->where('shipment_number', 'like', "%{$search}%"));
+            });
+        }
+
         if ($filter === 'unread') {
             $query->where('is_read', false);
         } elseif ($filter === 'read') {
