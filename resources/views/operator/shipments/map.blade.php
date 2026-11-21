@@ -1333,12 +1333,13 @@
                 const originType = (s.origin?.location_type || '').toUpperCase();
                 const destType   = (s.destination?.location_type || '').toUpperCase();
                 const isAirCargo = (s.transport_mode === 'AIR') || (originType === 'AIRPORT' || destType === 'AIRPORT');
-                const isLandCargo = (s.transport_mode === 'LAND') || (s.courier_vehicle && !isAirCargo);
+                const isLastMile = !!s.is_last_mile || (s.courier_vehicle && (s.status === 'IN_TRANSIT' || s.status === 'DELIVERED'));
+                const isLandCargo = (s.transport_mode === 'LAND') || isLastMile;
 
                 if (cargoTransportFilter !== 'ALL') {
                     if (cargoTransportFilter === 'LAND' && !isLandCargo) return;
-                    if (cargoTransportFilter === 'AIR' && (!isAirCargo || s.transport_mode === 'LAND')) return;
-                    if (cargoTransportFilter === 'SEA' && (isAirCargo || s.transport_mode === 'LAND')) return;
+                    if (cargoTransportFilter === 'AIR' && (!isAirCargo || isLastMile)) return;
+                    if (cargoTransportFilter === 'SEA' && (isAirCargo || isLastMile)) return;
                 }
                 visibleCount++;
 
@@ -1350,7 +1351,10 @@
 
                 const originPt = [oLat, oLng];
                 const destPt = [dLat, dLng];
-                allBounds.push(originPt, destPt);
+                if (cargoTransportFilter !== 'LAND') {
+                    allBounds.push(originPt);
+                }
+                allBounds.push(destPt);
 
                 const vehicle = getShipmentVehicle(s);
                 const isAir = (s.transport_mode === 'AIR') || (vehicle.type === 'plane') || isAirCargo;
@@ -1367,10 +1371,10 @@
                     Math.abs(parseFloat(curLoc.longitude) - oLng) < 0.25;
 
                 let curPt = null;
-                if (curLoc && curLoc.latitude && curLoc.longitude && !isAtOrigin && s.status !== 'DELIVERED') {
-                    curPt = [parseFloat(curLoc.latitude), parseFloat(curLoc.longitude)];
-                } else if (s.status === 'DELIVERED') {
+                if (isLastMile || s.status === 'DELIVERED') {
                     curPt = destPt;
+                } else if (curLoc && curLoc.latitude && curLoc.longitude && !isAtOrigin) {
+                    curPt = [parseFloat(curLoc.latitude), parseFloat(curLoc.longitude)];
                 } else {
                     const fullCurve = createCurvedPath(originPt, destPt, 40, laneCurvature, laneShift);
                     const idx = Math.min(40, Math.max(0, Math.round(progress * 40)));
@@ -1378,9 +1382,11 @@
                 }
                 allBounds.push(curPt);
 
-                const displayCurLoc = (!isAtOrigin && curLoc?.name) ? curLoc : {
+                const displayCurLoc = isLastMile ? {
+                    name: `Tiba di ${s.destination.name} • Di-oper ke Mobil Paket Kurir`
+                } : ((!isAtOrigin && curLoc?.name) ? curLoc : {
                     name: isAir ? `Di Udara (Koridor Udara Internasional - FL360)` : `Di Laut Lepas (Jalur Maritim Samudra)`
-                };
+                });
 
                 const popupHtml = generateShipmentPopupContent(s, vehicle, displayCurLoc, progress);
 
@@ -1401,7 +1407,18 @@
                 let directPoly = null;
                 let vehicleMarker = null;
 
-                if (curPt) {
+                if (isLastMile) {
+                    // Kargo sudah sampai di pelabuhan tujuan & dioper ke mobil kurir lokal!
+                    // Lintasan samudra ditampilkan penuh sebagai rute yang telah selesai ditempuh
+                    const fullCurve = createCurvedPath(originPt, destPt, 40, laneCurvature, laneShift);
+                    traveledPoly = L.polyline(fullCurve, {
+                        color: isAirCargo ? '#0284c7' : '#0369a1', weight: 3, opacity: 0.65, cursor: 'pointer'
+                    }).bindPopup(popupHtml).addTo(trackingLayerGroup);
+                    traveledPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+                    
+                    // PENTING: TIDAK ADA KENDARAAN (KAPAL/PESAWAT) TERAPUNG DI LAUT/UDARA!
+                    // Karena armada laut/udara sudah selesai berlayar dan kontainer sudah di-oper ke mobil kurir di darat.
+                } else if (curPt) {
                     const traveledPath = createCurvedPath(originPt, curPt, 16, laneCurvature, laneShift);
                     traveledPoly = L.polyline(traveledPath, {
                         color: isAirCargo ? '#0284c7' : '#0369a1', weight: 3.5, opacity: 0.9, cursor: 'pointer'
@@ -1486,7 +1503,7 @@
                             }).bindPopup(popupHtml).addTo(trackingLayerGroup);
                             feederFlightPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
-                            if (s.is_last_mile || s.status === 'DELIVERED') {
+                            if ((s.is_last_mile || s.status === 'DELIVERED') && cargoTransportFilter !== 'LAND') {
                                 const planeLat = destPt[0] + (devCoords[0] - destPt[0]) * 0.52;
                                 const planeLng = destPt[1] + (devCoords[1] - destPt[1]) * 0.52;
                                 const planeHeading = calculateBearing(destPt, devCoords);
