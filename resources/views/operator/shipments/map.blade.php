@@ -116,6 +116,7 @@
             </button>
         </div>
     </div>
+    </div>
 
     <!-- Map Container -->
     <div class="relative rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
@@ -353,10 +354,27 @@
                 it.remainingPoly?.setStyle({ color: '#38BDF8', weight: 5, opacity: 1, dashArray: '8, 8' });
                 it.directPoly?.setStyle({ color: '#00F0FF', weight: 5.5, opacity: 1 });
                 it.deliveryPoly?.setStyle({ color: '#f59e0b', weight: 6, opacity: 1 });
+                it.feederFlightPoly?.setStyle({ color: '#00F0FF', weight: 5.5, opacity: 1 });
 
                 // Menonjolkan titik asal dan akhir
                 it.originMarker?.setRadius(11).setStyle({ fillColor: '#10B981', color: '#ffffff', weight: 3.5, fillOpacity: 1 });
                 it.destMarker?.setRadius(11).setStyle({ fillColor: '#EF4444', color: '#ffffff', weight: 3.5, fillOpacity: 1 });
+
+                if (it.deliveryMarker) {
+                    it.deliveryMarker.setZIndexOffset(10000);
+                    const el = it.deliveryMarker.getElement();
+                    if (el) el.classList.remove('marker-dimmed');
+                }
+                if (it.courierVanMarker) {
+                    it.courierVanMarker.setZIndexOffset(10000);
+                    const el = it.courierVanMarker.getElement();
+                    if (el) el.classList.remove('marker-dimmed');
+                }
+                if (it.feederPlaneMarker) {
+                    it.feederPlaneMarker.setZIndexOffset(10000);
+                    const el = it.feederPlaneMarker.getElement();
+                    if (el) el.classList.remove('marker-dimmed');
+                }
 
                 // Menonjolkan icon kendaraan kargo
                 if (it.vehicleMarker) {
@@ -386,8 +404,25 @@
                 it.remainingPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.12, dashArray: '4, 6' });
                 it.directPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.15 });
                 it.deliveryPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.15 });
+                it.feederFlightPoly?.setStyle({ color: '#64748b', weight: 1.5, opacity: 0.15, dashArray: '4, 6' });
                 it.originMarker?.setRadius(5).setStyle({ opacity: 0.25, fillOpacity: 0.25 });
                 it.destMarker?.setRadius(5).setStyle({ opacity: 0.25, fillOpacity: 0.25 });
+
+                if (it.deliveryMarker) {
+                    it.deliveryMarker.setZIndexOffset(100);
+                    const el = it.deliveryMarker.getElement();
+                    if (el) el.classList.add('marker-dimmed');
+                }
+                if (it.courierVanMarker) {
+                    it.courierVanMarker.setZIndexOffset(100);
+                    const el = it.courierVanMarker.getElement();
+                    if (el) el.classList.add('marker-dimmed');
+                }
+                if (it.feederPlaneMarker) {
+                    it.feederPlaneMarker.setZIndexOffset(100);
+                    const el = it.feederPlaneMarker.getElement();
+                    if (el) el.classList.add('marker-dimmed');
+                }
 
                 if (it.vehicleMarker) {
                     it.vehicleMarker.setZIndexOffset(100);
@@ -411,9 +446,26 @@
             it.remainingPoly?.setStyle({ color: '#38bdf8', weight: 2.5, opacity: 0.8, dashArray: '6, 6' });
             it.directPoly?.setStyle({ color: '#0284c7', weight: 3, dashArray: '6, 6', opacity: 0.85 });
             it.deliveryPoly?.setStyle({ color: '#f59e0b', weight: 3.5, opacity: 0.95 });
+            it.feederFlightPoly?.setStyle({ color: '#00F0FF', weight: 3.5, opacity: 0.9, dashArray: '6, 6' });
 
             it.originMarker?.setRadius(7).setStyle({ fillColor: '#10B981', color: '#fff', weight: 2, fillOpacity: 1, opacity: 1 });
             it.destMarker?.setRadius(7).setStyle({ fillColor: '#EF4444', color: '#fff', weight: 2, fillOpacity: 1, opacity: 1 });
+
+            if (it.deliveryMarker) {
+                it.deliveryMarker.setZIndexOffset(1200);
+                const el = it.deliveryMarker.getElement();
+                if (el) el.classList.remove('marker-dimmed');
+            }
+            if (it.courierVanMarker) {
+                it.courierVanMarker.setZIndexOffset(1500);
+                const el = it.courierVanMarker.getElement();
+                if (el) el.classList.remove('marker-dimmed');
+            }
+            if (it.feederPlaneMarker) {
+                it.feederPlaneMarker.setZIndexOffset(1400);
+                const el = it.feederPlaneMarker.getElement();
+                if (el) el.classList.remove('marker-dimmed');
+            }
 
             if (it.vehicleMarker) {
                 it.vehicleMarker.setZIndexOffset(1000);
@@ -1263,6 +1315,136 @@
 
                 const routePoints = [originPt, destPt];
                 if (curPt) routePoints.push(curPt);
+
+                // Delivery / Courier & Feeder Flight
+                let deliveryMarker = null;
+                let deliveryPoly = null;
+                let feederFlightPoly = null;
+                let feederPlaneMarker = null;
+                let courierVanMarker = null;
+
+                if (s.delivery_lat && s.delivery_lng) {
+                    const devLat = parseFloat(s.delivery_lat);
+                    const devLng = parseFloat(s.delivery_lng);
+                    if (!isNaN(devLat) && !isNaN(devLng)) {
+                        const devCoords = [devLat, devLng];
+                        routePoints.push(devCoords);
+                        allBounds.push(devCoords);
+
+                        const distKm = calculateDistanceKm(destPt[0], destPt[1], devLat, devLng);
+                        const isFeederAir = distKm > 35;
+
+                        if (isFeederAir) {
+                            const flightPath = createCurvedPath(destPt, devCoords, 20, 0.12);
+                            feederFlightPoly = L.polyline(flightPath, {
+                                color: '#00F0FF', weight: 3.5, dashArray: '6, 6', opacity: 0.95, lineCap: 'round', cursor: 'pointer'
+                            }).bindPopup(popupHtml).addTo(trackingLayerGroup);
+                            feederFlightPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+
+                            if (s.is_last_mile || s.status === 'DELIVERED') {
+                                const planeLat = destPt[0] + (devCoords[0] - destPt[0]) * 0.52;
+                                const planeLng = destPt[1] + (devCoords[1] - destPt[1]) * 0.52;
+                                const planeHeading = calculateBearing(destPt, devCoords);
+                                const feederPlaneSvg = `
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="38" height="38" style="filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));">
+                                        <path d="M32 2 C30 2, 28 6, 28 14 L28 24 L2 35 L2 40 L28 34 L28 50 L18 56 L18 60 L32 58 L46 60 L46 56 L36 50 L36 34 L62 40 L62 35 L36 24 L36 14 C36 6, 34 2, 32 2 Z" fill="#00F0FF" stroke="#0284c7" stroke-width="1.2"/>
+                                        <path d="M32 4 C31 4, 29.5 8, 29.5 16 L29.5 54 L34.5 54 L34.5 16 C34.5 8, 33 4, 32 4 Z" fill="#ffffff"/>
+                                        <rect x="14" y="27" width="4.5" height="11" rx="2" fill="#334155"/>
+                                        <rect x="45.5" y="27" width="4.5" height="11" rx="2" fill="#334155"/>
+                                    </svg>
+                                `;
+
+                                feederPlaneMarker = L.marker([planeLat, planeLng], {
+                                    icon: L.divIcon({
+                                        className: 'cargo-real-vehicle-marker',
+                                        html: `
+                                            <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${planeHeading}deg);" title="Pesawat Kargo Domestik: ${s.shipment_number}">
+                                                ${feederPlaneSvg}
+                                            </div>
+                                            <div class="cargo-vehicle-tag" style="white-space:nowrap; margin-top:-2px;">
+                                                <span class="cargo-tag-dot" style="background:#00F0FF;"></span>
+                                                <span>✈️ Pesawat Domestik: ${s.shipment_number}</span>
+                                            </div>
+                                        `,
+                                        iconSize: [42, 42],
+                                        iconAnchor: [21, 21],
+                                        popupAnchor: [0, -25]
+                                    }),
+                                    zIndexOffset: 1400
+                                }).bindPopup(popupHtml).addTo(trackingLayerGroup);
+                                feederPlaneMarker.on('click', () => focusCargoShipment(s.id, [planeLat, planeLng]));
+                            }
+                        }
+
+                        deliveryPoly = L.polyline([destPt, devCoords], {
+                            color: '#f59e0b', weight: 3.5, dashArray: '5, 6', opacity: 0.95, lineCap: 'round', cursor: 'pointer'
+                        }).bindPopup(popupHtml).addTo(trackingLayerGroup);
+                        deliveryPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
+
+                        if (s.is_last_mile || s.status === 'DELIVERED') {
+                            const vanFraction = isFeederAir ? 0.88 : 0.65;
+                            const vanLat = destPt[0] + (devCoords[0] - destPt[0]) * vanFraction;
+                            const vanLng = destPt[1] + (devCoords[1] - destPt[1]) * vanFraction;
+                            const vanHeading = calculateBearing(destPt, devCoords);
+
+                            const courierVanDivIcon = L.divIcon({
+                                className: 'cargo-real-vehicle-marker',
+                                html: `
+                                    <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${vanHeading}deg);" title="${s.courier_name || 'Mobil Paket Kurir'} &bull; ${s.shipment_number}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 68" width="30" height="54" style="filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));">
+                                            <rect x="4" y="3" width="30" height="62" rx="6" fill="#0f172a" opacity="0.35" transform="translate(1.5, 2.5)"/>
+                                            <rect x="3" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
+                                            <rect x="32" y="12" width="3" height="8" rx="1" fill="#0f172a"/>
+                                            <rect x="3" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
+                                            <rect x="32" y="48" width="3" height="9" rx="1" fill="#0f172a"/>
+                                            <rect x="5" y="4" width="28" height="60" rx="5" fill="#f8fafc" stroke="#64748b" stroke-width="1.2"/>
+                                            <rect x="7" y="6" width="24" height="15" rx="3" fill="#e2e8f0"/>
+                                            <path d="M8 8 Q19 6 30 8 L29 15 Q19 13.5 9 15 Z" fill="#0284c7"/>
+                                            <rect x="6.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
+                                            <rect x="29.5" y="9.5" width="2" height="7" rx="0.5" fill="#0284c7"/>
+                                            <rect x="3" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
+                                            <rect x="32.5" y="10" width="2.5" height="4" rx="0.8" fill="#334155"/>
+                                            <rect x="6.5" y="23" width="25" height="39" rx="2.5" fill="#f59e0b" stroke="#d97706" stroke-width="0.8"/>
+                                            <rect x="9.5" y="27" width="19" height="2" fill="#fde68a"/>
+                                            <text x="19" y="42" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="sans-serif">📦</text>
+                                            <text x="19" y="54" font-size="5" font-weight="800" fill="#78350f" text-anchor="middle" font-family="sans-serif">KURIR PAKET</text>
+                                        </svg>
+                                    </div>
+                                    <div class="cargo-vehicle-tag" style="white-space:nowrap; margin-top:-2px;">
+                                        <span class="cargo-tag-dot" style="background:#f59e0b;"></span>
+                                        <span>Mobil Paket: ${s.courier_vehicle ? (s.courier_vehicle.split('(')[1]?.replace(')','') || s.shipment_number) : s.shipment_number}</span>
+                                    </div>
+                                `,
+                                iconSize: [36, 56],
+                                iconAnchor: [18, 28],
+                                popupAnchor: [0, -32]
+                            });
+
+                            courierVanMarker = L.marker([vanLat, vanLng], { icon: courierVanDivIcon, zIndexOffset: 1500 })
+                                .bindPopup(popupHtml)
+                                .addTo(trackingLayerGroup);
+                            courierVanMarker.on('click', () => focusCargoShipment(s.id, [vanLat, vanLng]));
+                        }
+
+                        const destPinIcon = L.divIcon({
+                            className: 'cargo-destination-pin',
+                            html: `
+                                <div style="font-size:26px; line-height:1; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.5)); transform:translate(-2px, -14px); cursor:pointer;" title="Alamat Pengantaran: ${s.delivery_address || s.delivery_city}">
+                                    📍
+                                </div>
+                            `,
+                            iconSize: [26, 26],
+                            iconAnchor: [13, 26],
+                            popupAnchor: [0, -28]
+                        });
+
+                        deliveryMarker = L.marker(devCoords, { icon: destPinIcon, zIndexOffset: 1200 })
+                            .bindPopup(popupHtml)
+                            .addTo(trackingLayerGroup);
+                        deliveryMarker.on('click', () => focusCargoShipment(s.id, devCoords));
+                    }
+                }
+
                 const shipmentBounds = L.latLngBounds(routePoints);
 
                 cargoShipmentItems.push({
@@ -1274,16 +1456,16 @@
                     traveledPoly,
                     remainingPoly,
                     directPoly,
+                    feederFlightPoly,
+                    feederPlaneMarker,
+                    deliveryPoly,
+                    deliveryMarker,
+                    courierVanMarker,
                     vehicleMarker,
                     bounds: shipmentBounds
                 });
             }
         });
-
-        if (allBounds.length > 0) {
-            map.fitBounds(allBounds, { padding: [50, 50], maxZoom: 5 });
-        }
-    }
 
         if (allBounds.length > 0) {
             map.fitBounds(allBounds, { padding: [50, 50], maxZoom: 5 });
