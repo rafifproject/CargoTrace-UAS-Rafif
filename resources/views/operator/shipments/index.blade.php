@@ -129,6 +129,11 @@
                     </td>
                     <td class="px-3 py-3.5">
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-{{ $statusColor }}-100 text-{{ $statusColor }}-700 dark:bg-{{ $statusColor }}-900/40 dark:text-{{ $statusColor }}-300">{{ $statusLabel }}</span>
+                        @if($shipment->payment_status === 'PAID')
+                            <span class="block mt-1 text-[9px] font-bold text-emerald-600 dark:text-emerald-400">Settled ✓</span>
+                        @else
+                            <span class="block mt-1 text-[9px] font-bold text-amber-600 dark:text-amber-400">Unpaid 💳</span>
+                        @endif
                     </td>
                     <td class="px-3 py-3.5 text-slate-500 dark:text-slate-400">
                         {{ $shipment->estimated_time_arrival ? \Carbon\Carbon::parse($shipment->estimated_time_arrival)->format('d M Y') : '-' }}

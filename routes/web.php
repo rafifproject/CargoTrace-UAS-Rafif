@@ -184,6 +184,7 @@ Route::middleware(['auth', 'role:CUSTOMER'])->prefix('customer')->name('customer
     Route::post('/shipments', [CustomerShipmentController::class, 'store'])->name('shipments.store');
     Route::get('/shipments/map', [CustomerShipmentController::class, 'map'])->name('shipments.map');
     Route::get('/shipments/{shipment}', [CustomerShipmentController::class, 'show'])->name('shipments.show');
+    Route::post('/shipments/{shipment}/pay', [CustomerShipmentController::class, 'pay'])->name('shipments.pay');
 
     // 06. Riwayat Pelacakan
     Route::get('/tracking', [CustomerShipmentController::class, 'tracking'])->name('tracking.index');

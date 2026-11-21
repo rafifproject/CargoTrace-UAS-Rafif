@@ -233,5 +233,41 @@ class CustomerWorkflowTest extends TestCase
             'status' => Shipment::STATUS_BOOKED,
         ]);
     }
+
+    /**
+     * Skenario 9: Customer dapat melakukan simulasi pelunasan Bank Wire Transfer (T/T via SWIFT)
+     */
+    public function test_customer_can_simulate_bank_wire_payment_for_proforma_invoice(): void
+    {
+        $this->shipmentA->payment_status = 'UNPAID';
+        $this->shipmentA->save();
+
+        $response = $this->actingAs($this->customerA)
+            ->post(route('customer.shipments.pay', $this->shipmentA->id));
+
+        $response->assertRedirect(route('customer.shipments.show', $this->shipmentA->id));
+        $response->assertSessionHas('status');
+
+        $this->shipmentA->refresh();
+        $this->assertEquals('PAID', $this->shipmentA->payment_status);
+        $this->assertEquals('T/T Bank Wire (SWIFT Transfer)', $this->shipmentA->payment_method);
+        $this->assertNotNull($this->shipmentA->paid_at);
+
+        $this->assertDatabaseHas('tracking_events', [
+            'shipment_id' => $this->shipmentA->id,
+            'event_type' => \App\Models\TrackingEvent::TYPE_STATUS_CHANGE,
+        ]);
+    }
+
+    /**
+     * Skenario 10: Anti-IDOR: Customer A tidak dapat membayar shipment milik Customer B
+     */
+    public function test_customer_cannot_pay_shipment_belonging_to_another_customer(): void
+    {
+        $response = $this->actingAs($this->customerA)
+            ->post(route('customer.shipments.pay', $this->shipmentB->id));
+
+        $response->assertStatus(404);
+    }
 }
 

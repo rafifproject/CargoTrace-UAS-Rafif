@@ -26,6 +26,13 @@ class DashboardController extends Controller
             ShipmentException::STATUS_INVESTIGATING,
         ])->count();
 
+        // Financial & Export Turnover Metrics (Santos Coffee Logistics B2B)
+        $totalCommodityValue = \App\Models\ShipmentItem::sum('declared_value');
+        $totalFreightRevenue = Shipment::where('payment_status', 'PAID')->sum('shipping_cost');
+        $paidInvoicesCount = Shipment::where('payment_status', 'PAID')->count();
+        $unpaidInvoicesCount = Shipment::where('payment_status', 'UNPAID')->count();
+        $settlementRate = $totalShipments > 0 ? round(($paidInvoicesCount / $totalShipments) * 100, 1) : 100;
+
         // Status Breakdown for Donut Chart
         $statusCounts = [
             'CREATED' => Shipment::where('status', Shipment::STATUS_CREATED)->count(),
@@ -124,7 +131,12 @@ class DashboardController extends Controller
             'globalPorts',
             'globalAirports',
             'weatherHubs',
-            'countriesList'
+            'countriesList',
+            'totalCommodityValue',
+            'totalFreightRevenue',
+            'paidInvoicesCount',
+            'unpaidInvoicesCount',
+            'settlementRate'
         ));
     }
 }

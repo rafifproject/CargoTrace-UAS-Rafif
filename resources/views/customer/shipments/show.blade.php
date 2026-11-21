@@ -82,6 +82,15 @@
             @if($shipment->delay_minutes > 0)
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300">Terlambat +{{ round($shipment->delay_minutes/60) }} jam</span>
             @endif
+            @if($shipment->payment_status === 'PAID')
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 flex items-center gap-1">
+                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Invoice Lunas (Settled)
+                </span>
+            @else
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 flex items-center gap-1">
+                    <i data-lucide="clock" class="w-3.5 h-3.5"></i> Menunggu Pembayaran
+                </span>
+            @endif
         </div>
     </div>
 </div>
@@ -182,8 +191,97 @@
             </div>
         </div>
 
-        {{-- Sisi Kanan: Jadwal & Lokasi --}}
+        {{-- Sisi Kanan: Jadwal, Lokasi & Proforma Invoice B2B --}}
         <div class="space-y-6">
+            {{-- Proforma Invoice & Settlement Card (B2B Coffee Export) --}}
+            <div class="bg-white dark:bg-[#0A1128] rounded-2xl border {{ $shipment->payment_status === 'PAID' ? 'border-emerald-200 dark:border-emerald-900/50' : 'border-amber-200 dark:border-amber-900/50 ring-1 ring-amber-500/20' }} p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-3.5">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Proforma Invoice B2B</span>
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-white font-mono mt-0.5">{{ $shipment->invoice_number ?? 'INV-2026-' . str_pad($shipment->id, 4, '0', STR_PAD_LEFT) }}</h3>
+                    </div>
+                    @if($shipment->payment_status === 'PAID')
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                            LUNAS (SETTLED) ✓
+                        </span>
+                    @else
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-800 animate-pulse">
+                            UNPAID 💳
+                        </span>
+                    @endif
+                </div>
+
+                <div class="space-y-2.5 text-xs pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                        <span>Nilai Komoditas (Biji Kopi Santos)</span>
+                        <span class="font-mono font-semibold">${{ number_format($shipment->total_commodity_value, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                        <span>Tarif Freight & Handling Ekspor</span>
+                        <span class="font-mono font-semibold">${{ number_format($shipment->shipping_cost, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-dashed border-slate-200 dark:border-slate-700">
+                        <span class="font-bold text-slate-800 dark:text-white">Total Tagihan (USD)</span>
+                        <span class="font-mono font-extrabold text-sm text-cyan-600 dark:text-cyan-400">${{ number_format($shipment->total_invoice_amount, 2) }}</span>
+                    </div>
+                </div>
+
+                @if($shipment->payment_status === 'PAID')
+                    <div class="mt-3 bg-emerald-50/60 dark:bg-emerald-950/20 rounded-xl p-3 border border-emerald-100 dark:border-emerald-900/40 text-[11px] space-y-1.5">
+                        <div class="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-semibold">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+                            <span>Settlement Dana Terkonfirmasi</span>
+                        </div>
+                        <div class="text-slate-500 dark:text-slate-400 text-[10px]">
+                            Metode: <strong class="text-slate-700 dark:text-slate-200">{{ $shipment->payment_method ?? 'T/T Bank Wire (SWIFT Transfer)' }}</strong>
+                        </div>
+                        <div class="text-slate-500 dark:text-slate-400 text-[10px]">
+                            Waktu Verifikasi: <strong class="text-slate-700 dark:text-slate-200">{{ $shipment->paid_at ? \Carbon\Carbon::parse($shipment->paid_at)->format('d M Y, H:i') : '-' }}</strong>
+                        </div>
+                    </div>
+                    <button onclick="window.print()" class="mt-3 w-full py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors">
+                        <i data-lucide="printer" class="w-3.5 h-3.5"></i> Cetak / Simpan Proforma Invoice
+                    </button>
+                @else
+                    {{-- Instruksi Bank Wire SWIFT --}}
+                    <div class="mt-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl p-3 border border-slate-100 dark:border-slate-800 text-[10px] space-y-1">
+                        <span class="font-bold text-slate-700 dark:text-slate-300 block mb-1">🏛️ Rekening Penerima Ekspor Santos (T/T via SWIFT):</span>
+                        <div class="flex justify-between text-slate-500 dark:text-slate-400">
+                            <span>Beneficiary:</span>
+                            <span class="font-semibold text-slate-700 dark:text-slate-200">Santos Coffee Exporters S.A.</span>
+                        </div>
+                        <div class="flex justify-between text-slate-500 dark:text-slate-400">
+                            <span>Bank:</span>
+                            <span class="font-semibold text-slate-700 dark:text-slate-200">Banco do Brasil S.A. (São Paulo)</span>
+                        </div>
+                        <div class="flex justify-between text-slate-500 dark:text-slate-400">
+                            <span>SWIFT / BIC:</span>
+                            <span class="font-mono font-bold text-slate-800 dark:text-white">BRASBRRJSPO</span>
+                        </div>
+                        <div class="flex justify-between text-slate-500 dark:text-slate-400">
+                            <span>IBAN / A/C:</span>
+                            <span class="font-mono text-slate-700 dark:text-slate-300">BR82 0000 0012 3456 7890 1234</span>
+                        </div>
+                        <div class="flex justify-between text-slate-500 dark:text-slate-400">
+                            <span>Reference:</span>
+                            <span class="font-mono text-cyan-600 dark:text-cyan-400 font-bold">{{ $shipment->invoice_number }}</span>
+                        </div>
+                    </div>
+
+                    {{-- Form Simulasi Pembayaran B2B --}}
+                    <form method="POST" action="{{ route('customer.shipments.pay', $shipment->id) }}" class="mt-3.5" onsubmit="return confirm('Konfirmasi simulasi pembayaran T/T Bank Wire untuk Invoice {{ $shipment->invoice_number }} senilai ${{ number_format($shipment->total_invoice_amount, 2) }}?');">
+                        @csrf
+                        <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="check-check" class="w-4 h-4"></i>
+                            <span>Simulasikan Pembayaran Bank Wire (T/T)</span>
+                        </button>
+                    </form>
+                    <p class="text-[9px] text-slate-400 text-center mt-1.5 italic">
+                        * Simulasi pelunasan invoice ekspor B2B internasional. Tidak ada pemotongan kartu komersial nyata.
+                    </p>
+                @endif
+            </div>
+
             <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
                 <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Waktu & Lokasi Perjalanan</h3>
                 <div class="space-y-3 text-xs">

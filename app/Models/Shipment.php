@@ -55,6 +55,11 @@ class Shipment extends Model
         'actual_departure',
         'actual_arrival',
         'status',
+        'invoice_number',
+        'shipping_cost',
+        'payment_status',
+        'payment_method',
+        'paid_at',
         'estimated_time_arrival',
         'delay_minutes',
         'delay_severity',
@@ -69,8 +74,10 @@ class Shipment extends Model
             'actual_departure' => 'datetime',
             'actual_arrival' => 'datetime',
             'estimated_time_arrival' => 'datetime',
+            'paid_at' => 'datetime',
             'weight' => 'float',
             'volume' => 'float',
+            'shipping_cost' => 'float',
             'delay_minutes' => 'integer',
             'is_last_mile' => 'boolean',
             'delivery_lat' => 'float',
@@ -171,6 +178,21 @@ class Shipment extends Model
     public function isDelayed(): bool
     {
         return $this->delay_minutes > 0;
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->payment_status === 'PAID';
+    }
+
+    public function getTotalCommodityValueAttribute(): float
+    {
+        return (float) $this->items->sum('declared_value');
+    }
+
+    public function getTotalInvoiceAmountAttribute(): float
+    {
+        return (float) ($this->total_commodity_value + ($this->shipping_cost ?? 0));
     }
 
     public function getFormattedDelayAttribute(): string

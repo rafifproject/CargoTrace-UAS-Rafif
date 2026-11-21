@@ -30,6 +30,15 @@
             @if($shipment->delay_minutes > 0)
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300">Terlambat +{{ round($shipment->delay_minutes/60) }} jam</span>
             @endif
+            @if($shipment->payment_status === 'PAID')
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 flex items-center gap-1">
+                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Settled (Lunas)
+                </span>
+            @else
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 flex items-center gap-1">
+                    <i data-lucide="clock" class="w-3.5 h-3.5"></i> Unpaid
+                </span>
+            @endif
         </div>
     </div>
     <div class="flex items-center gap-2">
@@ -139,8 +148,62 @@
             </div>
         </div>
 
-        {{-- Sched & Rute --}}
+        {{-- Sched, Rute & Verifikasi Finansial B2B --}}
         <div class="space-y-6">
+            {{-- Proforma Invoice & Settlement Status (Operator View) --}}
+            <div class="bg-white dark:bg-[#0A1128] rounded-2xl border {{ $shipment->payment_status === 'PAID' ? 'border-emerald-200 dark:border-emerald-900/50' : 'border-amber-200 dark:border-amber-900/50 ring-1 ring-amber-500/20' }} p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Verifikasi Settlement B2B</span>
+                        <h4 class="text-xs font-bold text-slate-800 dark:text-white font-mono mt-0.5">{{ $shipment->invoice_number ?? 'INV-2026-' . str_pad($shipment->id, 4, '0', STR_PAD_LEFT) }}</h4>
+                    </div>
+                    @if($shipment->payment_status === 'PAID')
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                            SETTLED (LUNAS) ✓
+                        </span>
+                    @else
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-800 animate-pulse">
+                            AWAITING PAYMENT ⏳
+                        </span>
+                    @endif
+                </div>
+
+                <div class="space-y-2 text-xs pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                        <span>Nilai Komoditas Kopi:</span>
+                        <span class="font-mono font-semibold">${{ number_format($shipment->total_commodity_value, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                        <span>Biaya Freight Logistik:</span>
+                        <span class="font-mono font-semibold">${{ number_format($shipment->shipping_cost, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-1.5 border-t border-dashed border-slate-200 dark:border-slate-700">
+                        <span class="font-bold text-slate-800 dark:text-white">Total Tagihan:</span>
+                        <span class="font-mono font-extrabold text-sm text-cyan-600 dark:text-cyan-400">${{ number_format($shipment->total_invoice_amount, 2) }}</span>
+                    </div>
+                </div>
+
+                <div class="mt-3 text-[11px] space-y-1">
+                    @if($shipment->payment_status === 'PAID')
+                        <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
+                            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                            <span>Transfer Bank Wire (T/T via SWIFT) Terverifikasi</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400">
+                            Settlement dana logistik tuntas. Operator dapat menjadwalkan booking, pickup gudang, dan pemuatan armada.
+                        </p>
+                    @else
+                        <div class="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold">
+                            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                            <span>Menunggu Transfer Pelanggan</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400">
+                            Pelanggan belum mengonfirmasi transfer T/T via SWIFT untuk Proforma Invoice ini.
+                        </p>
+                    @endif
+                </div>
+            </div>
+
             <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
                 <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4">Jadwal & Rute</h3>
                 <div class="space-y-3 text-xs">

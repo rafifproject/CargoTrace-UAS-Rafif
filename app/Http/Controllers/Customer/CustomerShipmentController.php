@@ -177,6 +177,24 @@ class CustomerShipmentController extends Controller
         $shipment->cargo_type = $validated['cargo_type'];
         $shipment->weight = $validated['weight'];
         $shipment->volume = $validated['volume'];
+
+        // Hitung estimasi biaya pengiriman/freight transparan berdasarkan moda & berat
+        $transMode = $validated['transport_mode'] ?? Shipment::TRANSPORT_SEA;
+        $weightVal = (float) $validated['weight'];
+        if ($transMode === Shipment::TRANSPORT_AIR) {
+            $ratePerKg = 2.80;
+            $handlingFee = 250.00;
+        } elseif ($transMode === Shipment::TRANSPORT_LAND) {
+            $ratePerKg = 0.85;
+            $handlingFee = 150.00;
+        } else {
+            $ratePerKg = 0.35;
+            $handlingFee = 250.00;
+        }
+        $shipment->shipping_cost = round(($weightVal * $ratePerKg) + $handlingFee, 2);
+        $shipment->invoice_number = 'INV-' . date('Y') . '-' . strtoupper(\Illuminate\Support\Str::random(6));
+        $shipment->payment_status = 'UNPAID';
+
         $shipment->expected_departure = $validated['expected_departure'];
         $shipment->expected_arrival = $validated['expected_arrival'];
         $shipment->estimated_time_arrival = $validated['expected_arrival'];
@@ -327,5 +345,74 @@ class CustomerShipmentController extends Controller
         $countriesList = app(\App\Services\GlobalIntelligenceService::class)->getCountriesMaster();
 
         return view('customer.shipments.map', compact('mapShipments', 'myShipments', 'allShipments', 'carriers', 'selectedShipmentId', 'selectedCarrierId', 'selectedTransportMode', 'routeHubs', 'countriesList'));
+    }
+
+    /**
+     * Simulasi Pembayaran Proforma Invoice Ekspor B2B via Bank Wire Transfer (T/T SWIFT)
+     */
+    public function pay(Request $request, int|string $id): RedirectResponse
+    {
+        $shipment = $request->user()->shipments()
+            ->where(function ($q) use ($id) {
+                if (is_numeric($id)) {
+                    $q->where('id', $id)->orWhere('shipment_number', $id);
+                } else {
+                    $q->where('shipment_number', $id);
+                }
+            })
+            ->firstOrFail();
+
+        if ($shipment->payment_status === 'PAID') {
+            return back()->with('info', "Proforma Invoice #{$shipment->invoice_number} sudah berstatus LUNAS.");
+        }
+
+        $shipment->payment_status = 'PAID';
+        $shipment->payment_method = 'T/T Bank Wire (SWIFT Transfer)';
+        $shipment->paid_at = now();
+        $shipment->save();
+
+        $origin = Location::find($shipment->origin_location_id);
+
+        TrackingEvent::create([
+            'shipment_id' => $shipment->id,
+            'event_type' => TrackingEvent::TYPE_STATUS_CHANGE,
+            'location_id' => $shipment->origin_location_id,
+            'latitude' => $origin ? $origin->latitude : null,
+            'longitude' => $origin ? $origin->longitude : null,
+            'event_time' => now(),
+            'shipment_status_at_event' => $shipment->status,
+            'description' => "Pembayaran Proforma Invoice #{$shipment->invoice_number} terverifikasi via Bank Wire Transfer (T/T via SWIFT). Dana freight & komoditas settled. Kargo siap diproses oleh operator.",
+            'created_by' => $request->user()->id,
+        ]);
+
+        Notification::create([
+            'user_id' => $request->user()->id,
+            'shipment_id' => $shipment->id,
+            'type' => Notification::TYPE_STATUS_UPDATE,
+            'severity' => Notification::SEVERITY_SUCCESS,
+            'title' => "Pembayaran Invoice Terverifikasi: {$shipment->invoice_number}",
+            'message' => "Proforma Invoice kargo #{$shipment->shipment_number} berhasil diselesaikan. Operator logistik sedang menyiapkan proses pemuatan kargo.",
+            'is_read' => false,
+        ]);
+
+        AuditLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'PAYMENT_SETTLED',
+            'entity_type' => 'Shipment',
+            'entity_id' => (string) $shipment->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'description' => "Pelanggan {$request->user()->name} menyelesaikan pembayaran Proforma Invoice #{$shipment->invoice_number} via T/T Bank Wire",
+            'new_values' => [
+                'payment_status' => 'PAID',
+                'payment_method' => 'T/T Bank Wire (SWIFT Transfer)',
+                'paid_at' => now()->toIso8601String(),
+                'total_amount' => $shipment->total_invoice_amount,
+            ],
+            'created_at' => now(),
+        ]);
+
+        return redirect()->route('customer.shipments.show', $shipment->id)
+            ->with('status', "Pembayaran Proforma Invoice #{$shipment->invoice_number} berhasil diverifikasi! Dana Freight telah diselesaikan (Settled).");
     }
 }

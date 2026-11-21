@@ -244,6 +244,17 @@ class BrazilSantosShipmentSeeder extends Seeder
                 $shipment->expected_arrival = $arr;
                 $shipment->estimated_time_arrival = $arr;
 
+                // B2B Proforma Invoice & Settlement Data
+                $shipment->invoice_number = 'INV-2026-' . str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT);
+                $modeVal = $shipment->transport_mode ?? 'SEA';
+                $weightVal = (float) ($shipment->weight > 0 ? $shipment->weight : 1500);
+                $rateVal = ($modeVal === 'AIR') ? 2.80 : (($modeVal === 'LAND') ? 0.85 : 0.35);
+                $feeVal = ($modeVal === 'LAND') ? 150.00 : 250.00;
+                $shipment->shipping_cost = round(($weightVal * $rateVal) + $feeVal, 2);
+                $shipment->payment_status = 'PAID';
+                $shipment->payment_method = 'T/T Bank Wire (SWIFT Transfer)';
+                $shipment->paid_at = $dep->copy()->subDay();
+
                 $shipment->save();
             } else {
                 // Generalized Brazil Santos Coffee export shipment
@@ -270,6 +281,14 @@ class BrazilSantosShipmentSeeder extends Seeder
                 $shipment->actual_departure = $dep;
                 $shipment->expected_arrival = $arr;
                 $shipment->estimated_time_arrival = $arr;
+
+                // B2B Proforma Invoice & Settlement Data
+                $shipment->invoice_number = 'INV-2026-' . str_pad((string) ($index + 1), 4, '0', STR_PAD_LEFT);
+                $weightVal = (float) ($shipment->weight > 0 ? $shipment->weight : 2000);
+                $shipment->shipping_cost = round(($weightVal * 0.35) + 250.00, 2);
+                $shipment->payment_status = 'PAID';
+                $shipment->payment_method = 'T/T Bank Wire (SWIFT Transfer)';
+                $shipment->paid_at = $dep->copy()->subDay();
 
                 $shipment->save();
             }

@@ -262,6 +262,43 @@
         </div>
     </div>
 
+    <!-- Ringkasan Finansial Ekspor Santos & Omset Freight Logistik (Benang Merah B2B) -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm text-white">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xl font-bold">
+                    ☕
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Ikhtisar Finansial Ekspor Kopi Santos (B2B)</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">T/T Wire Settled</span>
+                    </div>
+                    <p class="text-xs text-slate-300 mt-0.5">Pemantauan nilai komoditas biji kopi Brazil Santos & omset freight logistik global</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-6 text-xs">
+                <div>
+                    <span class="text-[10px] uppercase tracking-wider text-slate-400 block">Total Nilai Komoditas (FOB)</span>
+                    <span class="font-mono text-base font-extrabold text-white">${{ number_format($totalCommodityValue, 2) }}</span>
+                </div>
+                <div class="hidden sm:block h-8 w-px bg-slate-800"></div>
+                <div>
+                    <span class="text-[10px] uppercase tracking-wider text-slate-400 block">Pendapatan Freight Terkumpul</span>
+                    <span class="font-mono text-base font-extrabold text-cyan-400">${{ number_format($totalFreightRevenue, 2) }}</span>
+                </div>
+                <div class="hidden sm:block h-8 w-px bg-slate-800"></div>
+                <div>
+                    <span class="text-[10px] uppercase tracking-wider text-slate-400 block">Tingkat Settlement Proforma</span>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="font-mono text-base font-extrabold text-emerald-400">{{ $settlementRate }}%</span>
+                        <span class="text-[10px] text-slate-400">({{ $paidInvoicesCount }}/{{ $totalShipments }} Lunas)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Charts Row: Donut Chart Status & Line Chart 30 Days Trend -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Status Breakdown Donut Chart -->
