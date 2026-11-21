@@ -135,7 +135,7 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Varietas Kopi Brazil Santos</label>
-                        <select name="coffee_variety" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <select name="coffee_variety" onchange="calculateEstimates()" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                             <option value="Kopi Brazil Santos Bourbon Specialty" {{ old('coffee_variety') === 'Kopi Brazil Santos Bourbon Specialty' ? 'selected' : '' }}>Kopi Brazil Santos Bourbon Specialty</option>
                             <option value="Brazil Santos Strictly Soft Fine Cup (SSFC)" {{ old('coffee_variety') === 'Brazil Santos Strictly Soft Fine Cup (SSFC)' ? 'selected' : '' }}>Brazil Santos Strictly Soft Fine Cup (SSFC)</option>
                             <option value="Brazil Santos Yellow Catuai Natural Micro-lot" {{ old('coffee_variety') === 'Brazil Santos Yellow Catuai Natural Micro-lot' ? 'selected' : '' }}>Brazil Santos Yellow Catuai Natural Micro-lot</option>
@@ -145,14 +145,53 @@
                         </select>
                     </div>
 
-                    <div class="col-span-2">
+                    <div>
                         <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Grade / Kualitas Kopi Ekspor</label>
-                        <select name="coffee_grade" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <select name="coffee_grade" onchange="calculateEstimates()" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                             <option value="Specialty Grade 1 (SCA Score 84+)" {{ old('coffee_grade') === 'Specialty Grade 1 (SCA Score 84+)' ? 'selected' : '' }}>Specialty Grade 1 (SCA Score 84+) — Premium Green Beans</option>
                             <option value="Strictly Soft Fine Cup NY 2/3" {{ old('coffee_grade') === 'Strictly Soft Fine Cup NY 2/3' ? 'selected' : '' }}>Strictly Soft Fine Cup NY 2/3 — Export Standard</option>
                             <option value="Exclusive Micro-Lot Nano Batch" {{ old('coffee_grade') === 'Exclusive Micro-Lot Nano Batch' ? 'selected' : '' }}>Exclusive Micro-Lot Nano Batch — Roasted / Green</option>
                             <option value="Commercial Export Grade A" {{ old('coffee_grade') === 'Commercial Export Grade A' ? 'selected' : '' }}>Commercial Export Grade A</option>
                         </select>
+                    </div>
+
+                    {{-- JUMLAH PEMESANAN KOPI (BERAT KG) LANGSUNG DI BAGIAN 2 --}}
+                    <div class="col-span-1 md:col-span-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                Jumlah Pesanan Biji Kopi (kg) <span class="text-rose-500">*</span>
+                            </label>
+                            <span class="text-[10px] text-cyan-600 dark:text-cyan-400 font-medium">Standar Ekspor Santos (@60 kg / Karung Goni)</span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <div class="relative flex-1">
+                                <input type="number" step="10" min="10" name="weight" id="cargo-weight-input" oninput="calculateEstimates()" value="{{ old('weight', 1000) }}" placeholder="1000" required class="w-full px-3 py-2 text-xs font-bold border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('weight') border-rose-400 @enderror">
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">kg</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <button type="button" onclick="setQuickWeight(500)" class="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-slate-100 hover:bg-cyan-50 hover:text-cyan-600 dark:bg-slate-800 dark:hover:bg-cyan-950/60 dark:text-slate-300 transition-colors">500 kg</button>
+                                <button type="button" onclick="setQuickWeight(1000)" class="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-slate-100 hover:bg-cyan-50 hover:text-cyan-600 dark:bg-slate-800 dark:hover:bg-cyan-950/60 dark:text-slate-300 transition-colors">1 Ton</button>
+                                <button type="button" onclick="setQuickWeight(3000)" class="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-slate-100 hover:bg-cyan-50 hover:text-cyan-600 dark:bg-slate-800 dark:hover:bg-cyan-950/60 dark:text-slate-300 transition-colors">3 Ton</button>
+                                <button type="button" onclick="setQuickWeight(5000)" class="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-slate-100 hover:bg-cyan-50 hover:text-cyan-600 dark:bg-slate-800 dark:hover:bg-cyan-950/60 dark:text-slate-300 transition-colors">5 Ton</button>
+                            </div>
+                        </div>
+                        @error('weight')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
+
+                        {{-- LIVE STATS CHIPS OTOMATIS --}}
+                        <div class="grid grid-cols-3 gap-2 mt-3">
+                            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-center">
+                                <div class="text-[10px] text-slate-400">📦 Total Kemasan:</div>
+                                <div id="stat-bags-display" class="text-xs font-bold text-slate-800 dark:text-slate-100 mt-0.5">17 Karung Goni</div>
+                            </div>
+                            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-center">
+                                <div class="text-[10px] text-slate-400">📐 Est. Volume:</div>
+                                <div id="stat-volume-display" class="text-xs font-bold text-slate-800 dark:text-slate-100 mt-0.5">1.60 m³</div>
+                            </div>
+                            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-center">
+                                <div class="text-[10px] text-slate-400">💵 Est. Nilai Kargo:</div>
+                                <div id="stat-value-display" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">$15,000 USD</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -331,67 +370,122 @@
                 </div>
             </div>
 
-            {{-- Spesifikasi Fisik & Jadwal --}}
-            <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
-                <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2">
-                    <i data-lucide="scale" class="w-4 h-4 text-cyan-500"></i>
-                    <span>4. Spesifikasi Kargo & Jadwal Keberangkatan</span>
-                </h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {{-- 4. JADWAL KEBERANGKATAN & ESTIMASI TIBA (OTOMATIS BERDASARKAN PROSES GUDANG SANTOS & DURASI RUTE) --}}
+            <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Total Bobot (kg) <span class="text-rose-500">*</span></label>
-                        <input type="number" step="0.01" name="weight" id="cargo-weight-input" oninput="calculateEstimates()" value="{{ old('weight', 1000) }}" placeholder="1000" required class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('weight') border-rose-400 @enderror">
-                        @error('weight')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
+                        <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                            <i data-lucide="calendar-clock" class="w-4 h-4 text-cyan-500"></i>
+                            <span>4. Jadwal Keberangkatan & Estimasi Tiba (Otomatis)</span>
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Dihitung otomatis: waktu sortir/packing di gudang Santos + durasi rute pelayaran ke negara tujuan.</p>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Volume (m³) <span class="text-rose-500">*</span></label>
-                        <input type="number" step="0.01" name="volume" value="{{ old('volume', 10) }}" placeholder="10" required class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('volume') border-rose-400 @enderror">
-                        @error('volume')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Rencana Berangkat <span class="text-rose-500">*</span></label>
-                        <input type="date" name="expected_departure" id="expected_departure" value="{{ old('expected_departure', date('Y-m-d')) }}" required class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('expected_departure') border-rose-400 @enderror">
-                        @error('expected_departure')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Estimasi Tiba <span class="text-rose-500">*</span></label>
-                        <input type="date" name="expected_arrival" id="expected_arrival" value="{{ old('expected_arrival', date('Y-m-d', strtotime('+14 days'))) }}" required class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 @error('expected_arrival') border-rose-400 @enderror">
-                        @error('expected_arrival')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
-                    </div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800">
+                        Otomatis Sistem ✓
+                    </span>
                 </div>
-            </div>
 
-            {{-- Detail Barang / Item Pertama (Opsional) --}}
-            <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
-                <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2">
-                    <i data-lucide="boxes" class="w-4 h-4 text-cyan-500"></i>
-                    <span>5. Rincian Barang Kargo (Manifest Item)</span>
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nama Item / Produk</label>
-                        <input type="text" name="item_name" value="{{ old('item_name') }}" placeholder="cth. Grade A Arabica Coffee Beans" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Kode HS (Harmonized)</label>
-                        <input type="text" name="hs_code" value="{{ old('hs_code') }}" placeholder="cth. 0901.11.00" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 font-mono">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Kuantitas (Unit/Box)</label>
-                        <input type="number" name="item_qty" value="{{ old('item_qty', 100) }}" min="1" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Nilai Deklarasi Barang (USD $)</label>
-                        <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">$</span>
-                            <input type="number" step="0.01" name="item_value" value="{{ old('item_value', 15000) }}" placeholder="15000.00" class="w-full pl-7 pr-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                {{-- TIMELINE 3-LANGKAH JADWAL LOGISTIK REALISTIS --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {{-- STEP 1: HARI INI (PEMESANAN) --}}
+                    <div class="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Langkah 1 &bull; Hari Ini</span>
+                                <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded">Order Masuk</span>
+                            </div>
+                            <div id="timeline-order-date" class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ date('d M Y') }}</div>
+                            <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                                Pemesanan kargo tercatat ke antrian ekspedisi ekspor Santos Brazil.
+                            </div>
                         </div>
                     </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Instruksi Khusus / Catatan Penanganan</label>
-                        <input type="text" name="notes" value="{{ old('notes') }}" placeholder="cth. Suhu kontainer 20°C, perlakukan dengan hati-hati..." class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+
+                    {{-- STEP 2: RENCANA BERANGKAT (ETD SANTOS) --}}
+                    <div class="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/20 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Langkah 2 &bull; Berangkat (ETD)</span>
+                                <span id="timeline-packing-badge" class="text-[10px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/50 px-1.5 py-0.5 rounded">Packing 2 Hari</span>
+                            </div>
+                            <div id="timeline-departure-display" class="text-sm font-bold text-amber-900 dark:text-amber-200">{{ date('d M Y', strtotime('+2 days')) }}</div>
+                            <div id="timeline-departure-note" class="text-[10px] text-amber-700/90 dark:text-amber-400/90 mt-1.5 leading-relaxed">
+                                Sortir mutu SCA, pengemasan karung goni, & stuffing kontainer di Pelabuhan Santos.
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- STEP 3: ESTIMASI TIBA (ETA TUJUAN) --}}
+                    <div class="p-3.5 rounded-xl border border-cyan-200 dark:border-cyan-900/60 bg-cyan-50/50 dark:bg-cyan-950/20 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-700 dark:text-cyan-400">Langkah 3 &bull; Tiba (ETA)</span>
+                                <span id="timeline-transit-badge" class="text-[10px] font-semibold text-cyan-700 dark:text-cyan-300 bg-cyan-100 dark:bg-cyan-900/50 px-1.5 py-0.5 rounded">Pelayaran ~21 Hari</span>
+                            </div>
+                            <div id="timeline-arrival-display" class="text-sm font-bold text-cyan-900 dark:text-cyan-200">{{ date('d M Y', strtotime('+23 days')) }}</div>
+                            <div id="timeline-arrival-note" class="text-[10px] text-cyan-700/90 dark:text-cyan-400/90 mt-1.5 leading-relaxed">
+                                Estimasi kapal tiba di pelabuhan tujuan & dilanjutkan pengantaran ke alamat kafe.
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                {{-- HIDDEN INPUTS JADWAL & VOLUME UNTUK VALIDASI CONTROLLER --}}
+                <input type="hidden" name="expected_departure" id="expected_departure" value="{{ old('expected_departure', date('Y-m-d', strtotime('+2 days'))) }}">
+                <input type="hidden" name="expected_arrival" id="expected_arrival" value="{{ old('expected_arrival', date('Y-m-d', strtotime('+23 days'))) }}">
+                <input type="hidden" name="volume" id="volume-input" value="{{ old('volume', 1.6) }}">
+            </div>
+
+            {{-- 5. MANIFEST EKSPOR BEA CUKAI & CATATAN KHUSUS (TERINTEGRASI DENGAN PEMESANAN KOPI) --}}
+            <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                            <i data-lucide="file-check-2" class="w-4 h-4 text-cyan-500"></i>
+                            <span>5. Manifest Dokumen Ekspor & Catatan Penanganan</span>
+                        </h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Rincian deklarasi bea cukai diterbitkan otomatis mengikuti pilihan biji kopi & berat pesanan di Bagian 2.</p>
+                    </div>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-200 dark:border-emerald-800">
+                        HS Code 0901.11.00 ✓
+                    </span>
+                </div>
+
+                {{-- KARTU RINGKASAN MANIFEST OTOMATIS --}}
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block mb-0.5">Komoditas Manifest:</span>
+                            <span id="manifest-item-name-text" class="font-bold text-slate-800 dark:text-slate-200">Kopi Brazil Santos Bourbon Specialty</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block mb-0.5">Klasifikasi Bea Cukai:</span>
+                            <span class="font-mono font-bold text-cyan-600 dark:text-cyan-400">0901.11.00 (Green Coffee)</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block mb-0.5">Satuan Kemasan:</span>
+                            <span id="manifest-qty-text" class="font-bold text-slate-800 dark:text-slate-200">17 Karung Goni (@60 kg)</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block mb-0.5">Deklarasi Nilai Kargo:</span>
+                            <span id="manifest-val-text" class="font-bold text-emerald-600 dark:text-emerald-400">$15,000.00 USD</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- SATU-SATUNYA INPUT USER: INSTRUKSI KHUSUS / CATATAN --}}
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
+                        Instruksi Khusus / Catatan Penanganan Kargo (Opsional)
+                    </label>
+                    <input type="text" name="notes" id="notes" value="{{ old('notes') }}" placeholder="cth. Suhu kontainer dijaga 18-20°C, kelembaban udara < 12%, perlakukan dengan hati-hati..." class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                </div>
+
+                {{-- HIDDEN INPUTS MANIFEST UNTUK CONTROLLER & DATABASE --}}
+                <input type="hidden" name="item_name" id="item-name-input" value="{{ old('item_name', 'Kopi Brazil Santos (Specialty Coffee)') }}">
+                <input type="hidden" name="hs_code" id="hs-code-input" value="{{ old('hs_code', '0901.11.00') }}">
+                <input type="hidden" name="item_qty" id="item-qty-input" value="{{ old('item_qty', 17) }}">
+                <input type="hidden" name="item_value" id="item-value-input" value="{{ old('item_value', 15000) }}">
             </div>
         </div>
 
@@ -669,14 +763,6 @@
                 summaryPill.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300';
                 summaryPill.textContent = '✈️ Pesawat Udara (Air Express)';
             }
-
-            // Atur default tanggal tiba kilat (2-3 hari)
-            const depVal = document.getElementById('expected_departure').value;
-            if (depVal) {
-                const depDate = new Date(depVal);
-                depDate.setDate(depDate.getDate() + 3);
-                document.getElementById('expected_arrival').value = depDate.toISOString().split('T')[0];
-            }
         } else {
             if (cardSea) cardSea.className = 'cursor-pointer relative p-4 rounded-xl border-2 border-blue-500 bg-blue-50/40 dark:bg-blue-950/20 shadow-sm flex flex-col justify-between';
             if (badgeSea) {
@@ -699,14 +785,6 @@
             if (summaryPill) {
                 summaryPill.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300';
                 summaryPill.textContent = '🚢 Multimoda Samudra + Pesawat Domestik';
-            }
-
-            // Atur default tanggal tiba laut (14-18 hari)
-            const depVal = document.getElementById('expected_departure').value;
-            if (depVal) {
-                const depDate = new Date(depVal);
-                depDate.setDate(depDate.getDate() + 14);
-                document.getElementById('expected_arrival').value = depDate.toISOString().split('T')[0];
             }
         }
 
@@ -1014,12 +1092,109 @@
     }
 
     /**
-     * Hitung Estimasi Biaya & Durasi Kargo Secara Transparan
+     * Set Berat Kargo Cepat (Pills 500kg, 1 Ton, 3 Ton, 5 Ton)
+     */
+    function setQuickWeight(kg) {
+        const input = document.getElementById('cargo-weight-input');
+        if (input) {
+            input.value = kg;
+            calculateEstimates();
+        }
+    }
+
+    function formatDateIndo(dateObj) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        const m = months[dateObj.getMonth()];
+        const y = dateObj.getFullYear();
+        return `${d} ${m} ${y}`;
+    }
+
+    /**
+     * Hitung Estimasi Biaya, Jadwal Otomatis & Manifest Kargo Santos
      */
     function calculateEstimates() {
         const weightInput = document.getElementById('cargo-weight-input');
-        const weight = parseFloat(weightInput.value) || 0;
+        const weight = Math.max(1, parseFloat(weightInput ? weightInput.value : 1000) || 1000);
 
+        // 1. Hitung Kemasan Karung Goni, Volume Kontainer, & Nilai Deklarasi
+        const bags = Math.max(1, Math.ceil(weight / 60));
+        const volume = Math.max(0.1, +(weight * 0.0016).toFixed(2));
+
+        const varietySelect = document.querySelector('select[name="coffee_variety"]');
+        const gradeSelect = document.querySelector('select[name="coffee_grade"]');
+        const varietyName = varietySelect ? varietySelect.value : 'Kopi Brazil Santos Bourbon Specialty';
+        const gradeName = gradeSelect ? gradeSelect.value : 'Specialty Grade 1 (SCA Score 84+)';
+
+        let pricePerKg = 15.00;
+        if (gradeName.includes('Micro-Lot')) pricePerKg = 22.50;
+        else if (gradeName.includes('Strictly Soft')) pricePerKg = 12.00;
+        else if (gradeName.includes('Commercial')) pricePerKg = 8.50;
+
+        const totalDeclaredVal = +(weight * pricePerKg).toFixed(2);
+
+        // Update live stats & manifest UI
+        const statBags = document.getElementById('stat-bags-display');
+        const statVol = document.getElementById('stat-volume-display');
+        const statVal = document.getElementById('stat-value-display');
+        if (statBags) statBags.textContent = `${bags} Karung Goni`;
+        if (statVol) statVol.textContent = `${volume.toFixed(2)} m³`;
+        if (statVal) statVal.textContent = `$${totalDeclaredVal.toLocaleString('en-US')} USD`;
+
+        const manifestItemText = document.getElementById('manifest-item-name-text');
+        const manifestQtyText = document.getElementById('manifest-qty-text');
+        const manifestValText = document.getElementById('manifest-val-text');
+        if (manifestItemText) manifestItemText.textContent = `${varietyName}`;
+        if (manifestQtyText) manifestQtyText.textContent = `${bags} Karung Goni (@60 kg)`;
+        if (manifestValText) manifestValText.textContent = `$${totalDeclaredVal.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD`;
+
+        // Update hidden inputs untuk validasi controller
+        const volInput = document.getElementById('volume-input');
+        const qtyInput = document.getElementById('item-qty-input');
+        const valInput = document.getElementById('item-value-input');
+        const nameInput = document.getElementById('item-name-input');
+        if (volInput) volInput.value = volume;
+        if (qtyInput) qtyInput.value = bags;
+        if (valInput) valInput.value = totalDeclaredVal;
+        if (nameInput) nameInput.value = `${varietyName} (${gradeName})`;
+
+        // 2. Hitung Jadwal Otomatis:
+        // Waktu packing di Santos: <= 2000kg: 2 hari; <= 5000kg: 3 hari; > 5000kg: 4 hari
+        const packingDays = (weight > 5000) ? 4 : ((weight > 2000) ? 3 : 2);
+        const transitDays = (currentMode === 'AIR') ? 3 : 21;
+
+        const today = new Date();
+        const departureDate = new Date();
+        departureDate.setDate(today.getDate() + packingDays);
+
+        const arrivalDate = new Date(departureDate);
+        arrivalDate.setDate(departureDate.getDate() + transitDays);
+
+        const depIso = departureDate.toISOString().split('T')[0];
+        const arrIso = arrivalDate.toISOString().split('T')[0];
+
+        const depHidden = document.getElementById('expected_departure');
+        const arrHidden = document.getElementById('expected_arrival');
+        if (depHidden) depHidden.value = depIso;
+        if (arrHidden) arrHidden.value = arrIso;
+
+        const depDisplay = document.getElementById('timeline-departure-display');
+        const arrDisplay = document.getElementById('timeline-arrival-display');
+        const packingBadge = document.getElementById('timeline-packing-badge');
+        const transitBadge = document.getElementById('timeline-transit-badge');
+        const depNote = document.getElementById('timeline-departure-note');
+
+        if (depDisplay) depDisplay.textContent = formatDateIndo(departureDate);
+        if (arrDisplay) arrDisplay.textContent = formatDateIndo(arrivalDate);
+        if (packingBadge) packingBadge.textContent = `Packing ${packingDays} Hari`;
+        if (transitBadge) transitBadge.textContent = (currentMode === 'AIR') ? 'Penerbangan Kilat ~3 Hari' : 'Pelayaran Samudra ~21 Hari';
+        if (depNote) {
+            depNote.textContent = (weight > 5000) 
+                ? 'Sortir muatan besar (>5 Ton), bagging karung goni, & stuffing kontainer pelabuhan.' 
+                : 'Sortir mutu SCA, pengemasan karung goni, & stuffing kontainer di Pelabuhan Santos.';
+        }
+
+        // 3. Hitung Biaya Tarif Kargo di Panel Kanan
         const ratePerKgText = document.getElementById('rate-per-kg-text');
         const handlingFeeText = document.getElementById('handling-fee-text');
         const leadTimeText = document.getElementById('lead-time-text');
@@ -1028,28 +1203,28 @@
 
         let ratePerKg = 0.35;
         let handlingFee = 250;
-        let leadTime = '7 - 21 Hari';
+        let leadTime = `${packingDays + transitDays} Hari Total`;
         let note = 'Pengiriman kontainer laut ekonomis (Santos Port)';
 
         if (currentMode === 'AIR') {
-            ratePerKg = 2.80;      // Kargo udara kilat
-            handlingFee = 450;     // Airport handling & security
-            leadTime = '1 - 3 Hari (Super Kilat)';
+            ratePerKg = 2.80;
+            handlingFee = 450;
+            leadTime = `${packingDays + transitDays} Hari (Super Kilat)`;
             note = 'Pengiriman udara prioritas kilat (GRU Airport)';
         } else if (currentMode === 'LAND') {
-            ratePerKg = 0.85;      // Kargo darat / mobil pengantaran
-            handlingFee = 120;     // Ground logistics
+            ratePerKg = 0.85;
+            handlingFee = 120;
             leadTime = 'Same-Day / 1 - 2 Hari';
             note = 'Pengantaran langsung armada mobil kargo kopi';
         }
 
         const totalCost = (weight * ratePerKg) + handlingFee;
 
-        ratePerKgText.textContent = `$${ratePerKg.toFixed(2)} / kg`;
-        handlingFeeText.textContent = `$${handlingFee.toFixed(2)}`;
-        leadTimeText.textContent = leadTime;
-        costNoteText.textContent = note;
-        totalCostEstimate.textContent = `$${totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (ratePerKgText) ratePerKgText.textContent = `$${ratePerKg.toFixed(2)} / kg`;
+        if (handlingFeeText) handlingFeeText.textContent = `$${handlingFee.toFixed(2)}`;
+        if (leadTimeText) leadTimeText.textContent = leadTime;
+        if (costNoteText) costNoteText.textContent = note;
+        if (totalCostEstimate) totalCostEstimate.textContent = `$${totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
 
     /**
