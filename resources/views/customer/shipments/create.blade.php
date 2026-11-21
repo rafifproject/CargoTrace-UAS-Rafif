@@ -39,54 +39,81 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     {{-- Opsi 1: Multimoda Laut + Udara Domestik (Standar Ekspor Biji Kopi Brazil Santos) --}}
                     <div id="mode-card-sea" onclick="setTransportMode('SEA')" class="cursor-pointer relative p-4 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
-                        <div class="flex items-start justify-between mb-2.5">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-9 h-9 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl shadow-sm">
-                                    🚢
+                        <div>
+                            <div class="flex items-start justify-between mb-2">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl shadow-2xs">
+                                        🚢
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+                                            <span>Multimoda Samudra</span>
+                                            <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 font-bold">Rekomendasi</span>
+                                        </h4>
+                                        <span class="text-[10px] text-slate-400">Santos ➔ Hub Masuk ➔ Kurir Kafe</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 class="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
-                                        <span>Multimoda Samudra + Pesawat Domestik</span>
-                                        <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 font-bold">Rekomendasi Ekspor</span>
-                                    </h4>
-                                    <span class="text-[10px] text-slate-400">Kapal Kontainer Samudera ➔ Lanjut Pesawat Domestik ➔ Mobil Kurir</span>
+                                <span id="badge-sea" class="text-[9px] font-bold px-2 py-0.5 rounded-full border">
+                                    Terpilih
+                                </span>
+                            </div>
+
+                            {{-- Highlight Pills --}}
+                            <div class="grid grid-cols-2 gap-2 my-2.5">
+                                <div class="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 text-[11px]">
+                                    <span class="text-slate-400 block text-[9px] uppercase font-bold">Estimasi Durasi</span>
+                                    <span class="font-bold text-slate-700 dark:text-slate-200">⏱️ 18 - 24 Hari</span>
+                                </div>
+                                <div class="px-2.5 py-1.5 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 text-[11px]">
+                                    <span class="text-emerald-600 dark:text-emerald-400 block text-[9px] uppercase font-bold">Tarif Dasar</span>
+                                    <span class="font-bold text-emerald-700 dark:text-emerald-300">💰 $0.35 / kg</span>
                                 </div>
                             </div>
-                            <span id="badge-sea" class="text-[9px] font-bold px-2 py-0.5 rounded-full border">
-                                Terpilih
-                            </span>
                         </div>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
-                            Kontainer kargo diekspor via <strong>Kapal Laut dari Pelabuhan Santos (Brazil)</strong> melintasi samudra ke pelabuhan hub negara tujuan. Setibanya di negara tujuan, kargo dilanjutkan via <strong>Pesawat Kargo Domestik (Air Feeder)</strong> ke kota pemesan & mobil kurir ke alamat kafe.
-                        </p>
-                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
-                            <span class="text-slate-400">Tarif Basis Multimoda:</span>
-                            <span class="font-bold text-emerald-600 dark:text-emerald-400">~$0.35 / kg &bull; Kapasitas Kontainer Penuh</span>
+
+                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 flex items-center justify-between">
+                            <span>Kapasitas Kontainer Penuh (FCL/LCL)</span>
+                            <span class="text-emerald-600 dark:text-emerald-400 font-semibold">Paling Ekonomis ✓</span>
                         </div>
                     </div>
 
                     {{-- Opsi 2: Pesawat Kargo Kilat (Full Air Express) --}}
                     <div id="mode-card-air" onclick="setTransportMode('AIR')" class="cursor-pointer relative p-4 rounded-xl border-2 transition-all duration-200 flex flex-col justify-between hover:shadow-md">
-                        <div class="flex items-start justify-between mb-2.5">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-9 h-9 rounded-lg bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xl shadow-sm">
-                                    ✈️
+                        <div>
+                            <div class="flex items-start justify-between mb-2">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xl shadow-2xs">
+                                        ✈️
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5">
+                                            <span>Pesawat Kargo Kilat</span>
+                                            <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300 font-bold">Air Express</span>
+                                        </h4>
+                                        <span class="text-[10px] text-slate-400">Bandara GRU Direct Air ➔ Kurir Kafe</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 class="text-xs font-bold text-slate-800 dark:text-white">Pesawat Kargo Kilat (Air Cargo Express)</h4>
-                                    <span class="text-[10px] text-slate-400">Bandara GRU São Paulo Direct Air Cargo ➔ Mobil Kurir</span>
+                                <span id="badge-air" class="text-[9px] font-bold px-2 py-0.5 rounded-full border">
+                                    Pilih
+                                </span>
+                            </div>
+
+                            {{-- Highlight Pills --}}
+                            <div class="grid grid-cols-2 gap-2 my-2.5">
+                                <div class="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 text-[11px]">
+                                    <span class="text-slate-400 block text-[9px] uppercase font-bold">Estimasi Durasi</span>
+                                    <span class="font-bold text-slate-700 dark:text-slate-200">⚡ 3 - 5 Hari</span>
+                                </div>
+                                <div class="px-2.5 py-1.5 rounded-lg bg-purple-50/60 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/50 text-[11px]">
+                                    <span class="text-purple-600 dark:text-purple-400 block text-[9px] uppercase font-bold">Tarif Kilat</span>
+                                    <span class="font-bold text-purple-700 dark:text-purple-300">💰 $2.80 / kg</span>
                                 </div>
                             </div>
-                            <span id="badge-air" class="text-[9px] font-bold px-2 py-0.5 rounded-full border">
-                                Pilih
-                            </span>
                         </div>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
-                            Penerbangan kargo udara kilat dari <strong>Bandara Internasional São Paulo (GRU)</strong> langsung ke bandara internasional negara tujuan untuk batch sampel biji kopi pesanan khusus dan prioritas tinggi.
-                        </p>
-                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
-                            <span class="text-slate-400">Tarif Basis Udara Kilat:</span>
-                            <span class="font-bold text-purple-600 dark:text-purple-400">~$2.80 / kg &bull; Estimasi Cepat 3-5 Hari</span>
+
+                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 flex items-center justify-between">
+                            <span>Sampel Roastery & Order Cepat</span>
+                            <span class="text-purple-600 dark:text-purple-400 font-semibold">Prioritas Kilat ✓</span>
                         </div>
                     </div>
                 </div>
