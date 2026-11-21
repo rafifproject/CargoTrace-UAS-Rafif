@@ -91,35 +91,31 @@
 
         <!-- Filter Moda & Mode Toggle Tabs -->
         <div class="flex items-center gap-2 flex-wrap">
-            <form method="GET" action="{{ route('operator.shipments.map') }}" class="flex items-center gap-1.5">
-                @if(request('shipment_id'))
-                    <input type="hidden" name="shipment_id" value="{{ request('shipment_id') }}">
-                @endif
-                <select name="transport_mode" onchange="this.form.submit()" class="px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500 shadow-xs">
-                    <option value="">Semua Moda Pengiriman</option>
-                    <option value="SEA" {{ request('transport_mode') === 'SEA' ? 'selected' : '' }}>🚢 Kapal Laut Saja</option>
-                    <option value="AIR" {{ request('transport_mode') === 'AIR' ? 'selected' : '' }}>✈️ Pesawat Udara Saja</option>
-                    <option value="LAND" {{ request('transport_mode') === 'LAND' ? 'selected' : '' }}>🚚 Mobil / Truk Kargo (Darat)</option>
-                </select>
-            </form>
+            <!-- Sub-filter moda pengiriman client-side persis Admin -->
+            <div id="cargo-mode-subfilter" class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs">
+                <button type="button" onclick="setCargoTransportFilter('ALL')" id="filter-cargo-all" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-cyan-600 text-white shadow-xs transition-all">Semua</button>
+                <button type="button" onclick="setCargoTransportFilter('SEA')" id="filter-cargo-sea" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all">🚢 Laut</button>
+                <button type="button" onclick="setCargoTransportFilter('AIR')" id="filter-cargo-air" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all">✈️ Udara</button>
+                <button type="button" onclick="setCargoTransportFilter('LAND')" id="filter-cargo-land" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all">🚚 Mobil / Kurir</button>
+            </div>
 
             <div class="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-            <button type="button" id="tab-btn-tracking" onclick="switchMapMode('tracking')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-400 shadow-xs">
-                <i data-lucide="radio" class="w-3.5 h-3.5 text-cyan-500 animate-pulse"></i>
-                <span>Pemantauan Kargo Aktif</span>
-                <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-300 font-mono">{{ count($mapShipments) }}</span>
-            </button>
-            <button type="button" id="tab-btn-routetrace" onclick="switchMapMode('routetrace')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
-                <i data-lucide="route" class="w-3.5 h-3.5 text-amber-500"></i>
-                <span>Simulator Route Trace (Asal ➔ Tujuan)</span>
-                <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 font-bold">Interaktif</span>
-            </button>
+                <button type="button" id="tab-btn-tracking" onclick="switchMapMode('tracking')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-400 shadow-xs">
+                    <i data-lucide="radio" class="w-3.5 h-3.5 text-cyan-500 animate-pulse"></i>
+                    <span>Pemantauan Kargo Aktif</span>
+                    <span id="badge-total-shipments" class="px-1.5 py-0.2 rounded-full text-[10px] bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-300 font-mono">{{ count($allShipments ?? $mapShipments) }}</span>
+                </button>
+                <button type="button" id="tab-btn-routetrace" onclick="switchMapMode('routetrace')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                    <i data-lucide="route" class="w-3.5 h-3.5 text-amber-500"></i>
+                    <span>Simulator Route Trace (Asal ➔ Tujuan)</span>
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 font-bold">Interaktif</span>
+                </button>
+            </div>
         </div>
-    </div>
     </div>
 
     <!-- Map Container -->
-    <div class="relative rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+    <div class="relative rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
         <!-- ROUTE TRACKER 2-STEP INTERACTIVE BANNER (Ref Screenshot 1 & 2: media_1794417156910_bd4e5b31.jpg & media_1794417172832_e6df78b9.jpg) -->
         <div id="route-step-banner" class="hidden px-4 py-2.5 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between shadow-xs transition-all duration-200">
             <!-- Kiri: Mode Switcher Pelabuhan Laut vs Bandara Udara -->
@@ -151,55 +147,16 @@
         <!-- Interactive Leaflet Map -->
         <div id="operatorMap" class="w-full h-[650px] z-10"></div>
 
-        <!-- PANEL 1: Floating Info Box for Active Shipments (Visible in 'tracking' mode) -->
-        <div id="tracking-panel" class="absolute top-4 right-4 z-20 w-80 p-4 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-slate-700/80 text-white shadow-2xl transition-all">
-            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-                <span class="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
-                    <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
-                    <span>Informasi Rute Kargo Aktif</span>
-                </span>
-                <span class="text-[10px] text-slate-400 font-mono">{{ count($mapShipments) }} Terdaftar</span>
-            </div>
-            
-            <div class="mt-3 space-y-2 text-xs">
-                @if($selectedShipmentId && count($mapShipments) > 0)
-                    @php $focused = $mapShipments->first(); @endphp
-                    <div>
-                        <span class="text-[10px] text-slate-400 uppercase font-semibold">No. Pengiriman</span>
-                        <div class="font-bold text-cyan-400">{{ $focused->shipment_number }}</div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <span class="text-[10px] text-slate-400 uppercase font-semibold">Pelabuhan Asal</span>
-                            <div class="font-medium text-slate-200">{{ $focused->origin?->name }} ({{ $focused->origin?->city }})</div>
-                        </div>
-                        <div>
-                            <span class="text-[10px] text-slate-400 uppercase font-semibold">Pelabuhan Tujuan</span>
-                            <div class="font-medium text-slate-200">{{ $focused->destination?->name }} ({{ $focused->destination?->city }})</div>
-                        </div>
-                    </div>
-                    <div>
-                        <span class="text-[10px] text-slate-400 uppercase font-semibold">Ekspedisi & Status</span>
-                        <div class="font-medium text-slate-200">{{ $focused->carrier?->name }} &bull; {{ $focused->status }}</div>
-                    </div>
-                    <div>
-                        <span class="text-[10px] text-slate-400 uppercase font-semibold">Status Ketepatan</span>
-                        <div class="{{ $focused->isDelayed() ? 'text-rose-400 font-bold' : 'text-emerald-400 font-medium' }}">
-                            {{ $focused->isDelayed() ? 'Terlambat ' . $focused->formatted_delay : 'Tepat Waktu' }}
-                        </div>
-                    </div>
-                @else
-                    <p class="text-xs text-slate-300">Menampilkan seluruh rute perjalanan kargo aktif di peta dunia.</p>
-                    <div class="pt-2 text-[11px] text-slate-400 space-y-1.5 border-t border-slate-800">
-                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Titik Keberangkatan (Asal)</div>
-                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Titik Kedatangan (Tujuan)</div>
-                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-full bg-cyan-600 inline-flex items-center justify-center text-[9px] text-white">🚢</span> Kapal Kontainer Laut</div>
-                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded-full bg-sky-500 inline-flex items-center justify-center text-[9px] text-white">✈️</span> Pesawat Kargo Udara</div>
-                        <div class="flex items-center gap-2"><span class="w-5 h-0.5 bg-cyan-500 inline-block"></span> Jalur Telah Ditempuh</div>
-                        <div class="flex items-center gap-2"><span class="w-5 h-0.5 border-b border-dashed border-cyan-400 inline-block"></span> Estimasi Sisa Rute</div>
-                    </div>
-                @endif
-            </div>
+        <!-- Legend Footer Bar (Posisi di Bawah Peta Persis Admin) -->
+        <div id="map-legend" class="flex items-center gap-4 px-4 py-2.5 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 flex-wrap">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block border border-white"></span>Hub Asal (Santos Brazil)</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block border border-white"></span>Pelabuhan / Bandara Transit</span>
+            <span class="flex items-center gap-1.5"><span class="text-sm leading-none">📍</span>Alamat Pengantaran Mobil (Last-Mile)</span>
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-cyan-600 inline-flex items-center justify-center text-[9px] text-white">🚢</span>Kapal Kontainer Samudera</span>
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-sky-500 inline-flex items-center justify-center text-[9px] text-white">✈️</span>Pesawat Kargo Udara</span>
+            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-amber-500 inline-flex items-center justify-center text-[9px] text-white">🚚</span>Mobil Kurir Paket</span>
+            <span class="flex items-center gap-1.5"><span class="w-5 h-0.5 bg-cyan-500 inline-block"></span>Jalur Telah Ditempuh</span>
+            <span class="flex items-center gap-1.5"><span class="w-5 h-0.5 border-b border-dashed border-cyan-400 inline-block"></span>Estimasi Sisa Rute</span>
         </div>
     </div>
 </div>
@@ -321,12 +278,41 @@
 <script>
     // Master Route Hubs & Countries Dataset from Controller
     const rawRouteHubs = {!! json_encode($routeHubs ?? []) !!};
-    const shipments = {!! json_encode($mapShipments) !!};
+    const shipments = {!! json_encode($allShipments ?? $mapShipments) !!};
     const countriesData = {!! json_encode($countriesList) !!};
 
     let map = null;
     let currentMapMode = 'tracking'; // 'tracking' or 'routetrace'
     let traceTransportMode = 'PORT'; // 'PORT' (Laut) or 'AIR' (Udara)
+    let cargoTransportFilter = 'ALL'; // 'ALL', 'SEA', 'AIR', 'LAND'
+
+    // ── SUB-FILTER MODA TRANSPORTASI (PERSIS ADMIN DASHBOARD) ────────
+    function setCargoTransportFilter(mode) {
+        cargoTransportFilter = mode;
+        const btnAll = document.getElementById('filter-cargo-all');
+        const btnSea = document.getElementById('filter-cargo-sea');
+        const btnAir = document.getElementById('filter-cargo-air');
+        const btnLand = document.getElementById('filter-cargo-land');
+
+        [btnAll, btnSea, btnAir, btnLand].forEach(b => {
+            if (b) {
+                b.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all';
+            }
+        });
+
+        if (mode === 'SEA') {
+            if (btnSea) btnSea.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-xs transition-all';
+        } else if (mode === 'AIR') {
+            if (btnAir) btnAir.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-600 text-white shadow-xs transition-all';
+        } else if (mode === 'LAND') {
+            if (btnLand) btnLand.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-600 text-white shadow-xs transition-all';
+        } else {
+            if (btnAll) btnAll.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-cyan-600 text-white shadow-xs transition-all';
+        }
+
+        buildTrackingMode();
+    }
+    window.setCargoTransportFilter = setCargoTransportFilter;
 
     // Route Trace 2-Step Interactive State
     let traceOrigin = null;
@@ -636,30 +622,45 @@
         currentMapMode = mode;
         const tabTracking = document.getElementById('tab-btn-tracking');
         const tabTrace = document.getElementById('tab-btn-routetrace');
-        const panelTracking = document.getElementById('tracking-panel');
         const routeStepBanner = document.getElementById('route-step-banner');
+        const cargoSubfilter = document.getElementById('cargo-mode-subfilter');
+        const mapLegend = document.getElementById('map-legend');
 
         if (mode === 'tracking') {
             tabTracking.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-400 shadow-xs';
             tabTrace.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
-            if (panelTracking) panelTracking.classList.remove('hidden');
+            if (cargoSubfilter) cargoSubfilter.classList.remove('hidden');
             if (routeStepBanner) routeStepBanner.classList.add('hidden');
+            if (mapLegend) {
+                mapLegend.innerHTML = `
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block border border-white"></span>Hub Asal (Santos Brazil)</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block border border-white"></span>Pelabuhan / Bandara Transit</span>
+                    <span class="flex items-center gap-1.5"><span class="text-sm leading-none">📍</span>Alamat Pengantaran Mobil (Last-Mile)</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-cyan-600 inline-flex items-center justify-center text-[9px] text-white">🚢</span>Kapal Kontainer Samudera</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-sky-500 inline-flex items-center justify-center text-[9px] text-white">✈️</span>Pesawat Kargo Udara</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-amber-500 inline-flex items-center justify-center text-[9px] text-white">🚚</span>Mobil Kurir Paket</span>
+                    <span class="flex items-center gap-1.5"><span class="w-5 h-0.5 bg-cyan-500 inline-block"></span>Jalur Telah Ditempuh</span>
+                    <span class="flex items-center gap-1.5"><span class="w-5 h-0.5 border-b border-dashed border-cyan-400 inline-block"></span>Estimasi Sisa Rute</span>
+                `;
+            }
 
             map.removeLayer(routeTraceLayerGroup);
-            // Klik di area peta kosong mengembalikan fokus rute ke normal
-        map.on('click', function(e) {
-            if (activeCargoId) {
-                resetCargoShipmentFocus();
-            }
-        });
-
-        trackingLayerGroup.addTo(map);
+            trackingLayerGroup.addTo(map);
+            buildTrackingMode();
             map.flyTo([15, 100], 3, { duration: 1 });
         } else {
             tabTrace.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 shadow-xs';
             tabTracking.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
-            if (panelTracking) panelTracking.classList.add('hidden');
+            if (cargoSubfilter) cargoSubfilter.classList.add('hidden');
             if (routeStepBanner) routeStepBanner.classList.remove('hidden');
+            if (mapLegend) {
+                mapLegend.innerHTML = `
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block border border-white"></span>Titik Asal Terpilih</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block border border-white"></span>Titik Tujuan Terpilih</span>
+                    <span class="flex items-center gap-1.5"><span class="w-5 h-0.5 bg-purple-500 inline-block"></span>Kalkulasi Koridor Optimal</span>
+                    <span class="flex items-center gap-1.5 text-slate-400">Pilih titik asal lalu titik tujuan untuk simulasi rute</span>
+                `;
+            }
 
             map.removeLayer(trackingLayerGroup);
             routeTraceLayerGroup.addTo(map);
@@ -1094,11 +1095,11 @@
             return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
         }
 
-        function createCurvedPath(p1, p2, numPoints = 20, curvature = 0.12) {
+        function createCurvedPath(p1, p2, numPoints = 20, curvature = 0.12, laneShift = 0) {
             const lat1 = p1[0], lng1 = p1[1];
             const lat2 = p2[0], lng2 = p2[1];
             let dLng = lng2 - lng1;
-            if (dLng > 180) dLng -= 360;
+            if (dLng > 180)  dLng -= 360;
             if (dLng < -180) dLng += 360;
             const dLat = lat2 - lat1;
             const dist = Math.sqrt(dLat * dLat + dLng * dLng);
@@ -1107,22 +1108,22 @@
             const midLat = (lat1 + lat2) / 2;
             const midLng = lng1 + dLng / 2;
             const nx = -dLng / dist;
-            const ny = dLat / dist;
-            const arcHeight = Math.min(12, Math.max(1.8, dist * curvature));
+            const ny =  dLat / dist;
+            const arcHeight = Math.min(12, Math.max(1.8, dist * curvature)) + laneShift;
             const sign = (dLng >= 0) ? 1 : -1;
             const hemisphereFactor = midLat >= 0 ? 1 : -1;
 
             const controlLat = midLat + nx * arcHeight * sign * (hemisphereFactor * 0.4 + 0.6);
-            let controlLng = midLng + ny * arcHeight * sign;
-            if (controlLng > 180) controlLng -= 360;
+            let   controlLng = midLng + ny * arcHeight * sign;
+            if (controlLng >  180) controlLng -= 360;
             if (controlLng < -180) controlLng += 360;
 
             const points = [];
             for (let i = 0; i <= numPoints; i++) {
                 const t = i / numPoints;
                 const lat = (1 - t) * (1 - t) * lat1 + 2 * (1 - t) * t * controlLat + t * t * lat2;
-                let lng = (1 - t) * (1 - t) * lng1 + 2 * (1 - t) * t * controlLng + t * t * (lng1 + dLng);
-                if (lng > 180) lng -= 360;
+                let   lng = (1 - t) * (1 - t) * lng1 + 2 * (1 - t) * t * controlLng + t * t * (lng1 + dLng);
+                if (lng >  180) lng -= 360;
                 if (lng < -180) lng += 360;
                 points.push([lat, lng]);
             }
@@ -1131,20 +1132,123 @@
 
         window.createCurvedPath = createCurvedPath;
 
+        // ── HELPER: GET REAL VEHICLE VISUAL PER SHIPMENT (PERSIS ADMIN) ─────────
         function getShipmentVehicle(s) {
-            const cargo = (s.cargo_type || '').toLowerCase();
-            const originType = s.origin ? (s.origin.location_type || '').toUpperCase() : '';
-            const destType   = s.destination ? (s.destination.location_type || '').toUpperCase() : '';
+            const carrierName = (s.carrier?.name || '').toLowerCase();
+            const carrierCode = (s.carrier?.code || '').toUpperCase();
+            const originType  = (s.origin?.location_type || '').toUpperCase();
+            const destType    = (s.destination?.location_type || '').toUpperCase();
+            const originName  = (s.origin?.name || '').toLowerCase();
+            const destName    = (s.destination?.name || '').toLowerCase();
+            const cargo       = (s.cargo_type || '').toLowerCase();
 
-            if (s.transport_mode === 'AIR' || originType === 'AIRPORT' || destType === 'AIRPORT' || cargo.includes('air') || cargo.includes('express')) {
+            // 0. Pesawat Kargo Udara (Real Jet Freighter Top-Down)
+            if (s.transport_mode === 'AIR' || originType === 'AIRPORT' || destType === 'AIRPORT' ||
+                originName.includes('bandara') || originName.includes('airport') ||
+                destName.includes('bandara') || destName.includes('airport') ||
+                carrierCode === 'FDX' || carrierName.includes('fedex') || carrierName.includes('express air') ||
+                cargo.includes('avionics') || cargo.includes('vaccine') || cargo.includes('pharmaceutical')) {
                 return {
-                    type: 'AIR', label: 'Pesawat Kargo', color: '#38bdf8',
-                    realSvg: `<svg width="36" height="36" viewBox="0 0 48 48" fill="none"><path d="M24 2L28 16L44 24L28 26L27 40L33 44L24 43L15 44L21 40L20 26L4 24L20 16L24 2Z" fill="#38bdf8" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/></svg>`
+                    type: 'plane',
+                    label: 'Pesawat Kargo Udara (Air Cargo)',
+                    emoji: '✈️',
+                    accentColor: '#38bdf8',
+                    iconW: 46,
+                    iconH: 60,
+                    realSvg: `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="44" height="44" style="filter: drop-shadow(0 8px 12px rgba(0,0,0,0.6));">
+                            <!-- Aircraft Silhouette & Shadow -->
+                            <path d="M32 2 C30 2, 28 6, 28 14 L28 24 L2 35 L2 40 L28 34 L28 50 L18 56 L18 60 L32 58 L46 60 L46 56 L36 50 L36 34 L62 40 L62 35 L36 24 L36 14 C36 6, 34 2, 32 2 Z" fill="#0f172a" opacity="0.3" transform="translate(1.5, 3)"/>
+                            <!-- Main Fuselage and Swept Wings -->
+                            <path d="M32 2 C30 2, 28 6, 28 14 L28 24 L2 35 L2 40 L28 34 L28 50 L18 56 L18 60 L32 58 L46 60 L46 56 L36 50 L36 34 L62 40 L62 35 L36 24 L36 14 C36 6, 34 2, 32 2 Z" fill="#f8fafc" stroke="#64748b" stroke-width="1"/>
+                            <!-- Fuselage Highlight Spine -->
+                            <path d="M32 4 C31 4, 29.5 8, 29.5 16 L29.5 54 L34.5 54 L34.5 16 C34.5 8, 33 4, 32 4 Z" fill="#ffffff"/>
+                            <!-- Cockpit Glass Window -->
+                            <path d="M30 6 Q32 4.5 34 6 L33.5 8.5 Q32 7.5 30.5 8.5 Z" fill="#0284c7"/>
+                            <!-- Livery Speed Strip (Cyan & Navy) -->
+                            <path d="M12 34 L26 31 L26 33 L12 36 Z" fill="#0284c7"/>
+                            <path d="M52 34 L38 31 L38 33 L52 36 Z" fill="#0284c7"/>
+                            <!-- Jet Turbines (Twin Engines) -->
+                            <rect x="14" y="27" width="4.5" height="11" rx="2" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+                            <ellipse cx="16.2" cy="28" rx="1.6" ry="1.2" fill="#38bdf8"/>
+                            <rect x="45.5" y="27" width="4.5" height="11" rx="2" fill="#334155" stroke="#cbd5e1" stroke-width="0.7"/>
+                            <ellipse cx="47.8" cy="28" rx="1.6" ry="1.2" fill="#38bdf8"/>
+                            <!-- Tail Fin Stripe (Orange Express Accent) -->
+                            <path d="M30 52 L34 52 L33 58 L31 58 Z" fill="#ea580c"/>
+                        </svg>
+                    `
                 };
             }
+
+            // 1. Truk / Mobil Paket Domestik (Hanya untuk pengiriman darat dalam satu negara)
+            if (s.transport_mode === 'LAND' && (s.origin?.country && s.destination?.country && s.origin.country === s.destination.country)) {
+                return {
+                    type: 'van',
+                    label: 'Mobil Pengantaran Kurir (Last-Mile Delivery)',
+                    emoji: '🚚',
+                    accentColor: '#f59e0b',
+                    iconW: 36,
+                    iconH: 52,
+                    realSvg: `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 64" width="28" height="48" style="filter: drop-shadow(0 6px 10px rgba(0,0,0,0.55));">
+                            <rect x="5" y="4" width="26" height="56" rx="4" fill="#0f172a" opacity="0.3" transform="translate(1, 2)"/>
+                            <rect x="5" y="6" width="26" height="52" rx="4" fill="#f59e0b" stroke="#d97706" stroke-width="1.2"/>
+                            <rect x="7" y="7" width="22" height="15" rx="2" fill="#1e293b"/>
+                            <path d="M8 9 Q18 7 28 9 L27 15 Q18 13 9 15 Z" fill="#38bdf8"/>
+                            <rect x="4" y="11" width="2.5" height="4" rx="1" fill="#0f172a"/>
+                            <rect x="29.5" y="11" width="2.5" height="4" rx="1" fill="#0f172a"/>
+                            <rect x="7" y="24" width="22" height="32" rx="2" fill="#fbbf24" stroke="#d97706" stroke-width="0.8"/>
+                            <text x="18" y="40" font-size="6" font-weight="bold" fill="#78350f" text-anchor="middle" font-family="sans-serif">SANTOS</text>
+                            <text x="18" y="48" font-size="4.5" font-weight="bold" fill="#92400e" text-anchor="middle" font-family="sans-serif">☕ COFFEE</text>
+                            <rect x="4" y="18" width="2" height="7" rx="0.5" fill="#0f172a"/>
+                            <rect x="30" y="18" width="2" height="7" rx="0.5" fill="#0f172a"/>
+                            <rect x="4" y="48" width="2" height="7" rx="0.5" fill="#0f172a"/>
+                            <rect x="30" y="48" width="2" height="7" rx="0.5" fill="#0f172a"/>
+                        </svg>
+                    `
+                };
+            }
+
+            // 2. Default: Kapal Kontainer Samudera (Real Cargo Container Vessel Top-Down)
             return {
-                type: 'SEA', label: 'Kapal Kontainer', color: '#00D2FF',
-                realSvg: `<svg width="40" height="40" viewBox="0 0 64 64" fill="none"><path d="M6 38L14 50H50L58 38L54 28H10L6 38Z" fill="#0284c7" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/><rect x="18" y="20" width="8" height="8" rx="1.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5"/><rect x="28" y="20" width="8" height="8" rx="1.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5"/><rect x="38" y="20" width="8" height="8" rx="1.5" fill="#10b981" stroke="#ffffff" stroke-width="1.5"/></svg>`
+                type: 'ship',
+                label: 'Kapal Kontainer Samudera (Cargo Vessel)',
+                emoji: '🚢',
+                accentColor: '#38bdf8',
+                iconW: 38,
+                iconH: 72,
+                realSvg: `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 78" width="28" height="58" style="filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));">
+                        <!-- Hull Shadow -->
+                        <path d="M19 2 C27 12, 33 24, 33 48 C33 66, 30 74, 19 75 C8 74, 5 66, 5 48 C5 24, 11 12, 19 2 Z" fill="#0f172a" opacity="0.35" transform="translate(1.5, 2.5)"/>
+                        <!-- Main Hull (Dark Navy Blue Maritime Steel) -->
+                        <path d="M19 2 C27 12, 33 24, 33 48 C33 66, 30 74, 19 75 C8 74, 5 66, 5 48 C5 24, 11 12, 19 2 Z" fill="#0f172a" stroke="#475569" stroke-width="1.2"/>
+                        <!-- Red Waterline Bow Bulb Accent -->
+                        <path d="M19 2 C22 7, 25 12, 25 17 L13 17 C13 12, 16 7, 19 2 Z" fill="#e11d48"/>
+                        <circle cx="19" cy="9" r="1.5" fill="#ffffff"/>
+                        <!-- Cargo Bay Background Deck -->
+                        <rect x="9" y="19" width="20" height="38" rx="2" fill="#1e293b"/>
+                        <!-- Real Stacked ISO Containers (Color-coded) -->
+                        <rect x="10" y="20" width="8.5" height="5" rx="0.5" fill="#0284c7" stroke="#0369a1" stroke-width="0.5"/>
+                        <rect x="19.5" y="20" width="8.5" height="5" rx="0.5" fill="#e11d48" stroke="#be123c" stroke-width="0.5"/>
+                        <rect x="10" y="26" width="8.5" height="5" rx="0.5" fill="#ea580c" stroke="#c2410c" stroke-width="0.5"/>
+                        <rect x="19.5" y="26" width="8.5" height="5" rx="0.5" fill="#059669" stroke="#047857" stroke-width="0.5"/>
+                        <rect x="10" y="32" width="8.5" height="5" rx="0.5" fill="#eab308" stroke="#ca8a04" stroke-width="0.5"/>
+                        <rect x="19.5" y="32" width="8.5" height="5" rx="0.5" fill="#0284c7" stroke="#0369a1" stroke-width="0.5"/>
+                        <rect x="10" y="38" width="8.5" height="5" rx="0.5" fill="#059669" stroke="#047857" stroke-width="0.5"/>
+                        <rect x="19.5" y="38" width="8.5" height="5" rx="0.5" fill="#ea580c" stroke="#c2410c" stroke-width="0.5"/>
+                        <rect x="10" y="44" width="8.5" height="5" rx="0.5" fill="#e11d48" stroke="#be123c" stroke-width="0.5"/>
+                        <rect x="19.5" y="44" width="8.5" height="5" rx="0.5" fill="#eab308" stroke="#ca8a04" stroke-width="0.5"/>
+                        <rect x="10" y="50" width="8.5" height="5" rx="0.5" fill="#0284c7" stroke="#0369a1" stroke-width="0.5"/>
+                        <rect x="19.5" y="50" width="8.5" height="5" rx="0.5" fill="#059669" stroke="#047857" stroke-width="0.5"/>
+                        <!-- Superstructure / Wheelhouse (Bridge) -->
+                        <rect x="10" y="58" width="18" height="9" rx="1.5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="0.8"/>
+                        <rect x="12" y="59.5" width="14" height="2" rx="0.5" fill="#0284c7"/>
+                        <!-- Funnel & Radar Mast -->
+                        <circle cx="19" cy="63" r="1.5" fill="#0f172a"/>
+                        <rect x="17.5" y="68" width="3" height="3" rx="0.8" fill="#e11d48"/>
+                    </svg>
+                `
             };
         }
 
@@ -1220,8 +1324,24 @@
             `;
         }
 
+        let visibleCount = 0;
+        const occupiedVehicleCoords = [];
+
         shipments.forEach(s => {
             if (s.origin && s.destination) {
+                // Sub-filter moda transportasi (Semua / Laut / Udara / Mobil Kurir)
+                const originType = (s.origin?.location_type || '').toUpperCase();
+                const destType   = (s.destination?.location_type || '').toUpperCase();
+                const isAirCargo = (s.transport_mode === 'AIR') || (originType === 'AIRPORT' || destType === 'AIRPORT');
+                const isLandCargo = (s.transport_mode === 'LAND') || (s.courier_vehicle && !isAirCargo);
+
+                if (cargoTransportFilter !== 'ALL') {
+                    if (cargoTransportFilter === 'LAND' && !isLandCargo) return;
+                    if (cargoTransportFilter === 'AIR' && (!isAirCargo || s.transport_mode === 'LAND')) return;
+                    if (cargoTransportFilter === 'SEA' && (isAirCargo || s.transport_mode === 'LAND')) return;
+                }
+                visibleCount++;
+
                 const oLat = parseFloat(s.origin.latitude);
                 const oLng = parseFloat(s.origin.longitude);
                 const dLat = parseFloat(s.destination.latitude);
@@ -1233,8 +1353,13 @@
                 allBounds.push(originPt, destPt);
 
                 const vehicle = getShipmentVehicle(s);
-                const isAir = (s.transport_mode === 'AIR') || (vehicle.type === 'AIR');
+                const isAir = (s.transport_mode === 'AIR') || (vehicle.type === 'plane') || isAirCargo;
                 const progress = getShipmentRealtimeProgress(s);
+
+                // Lane separation
+                const laneSeed = ((s.id * 11) % 9) - 4;
+                const laneShift = laneSeed * 1.6;
+                const laneCurvature = (isAirCargo ? 0.16 : 0.11) + (laneSeed * 0.012);
 
                 const curLoc = s.current_location || s.currentLocation;
                 const isAtOrigin = curLoc && curLoc.latitude && curLoc.longitude &&
@@ -1247,7 +1372,9 @@
                 } else if (s.status === 'DELIVERED') {
                     curPt = destPt;
                 } else {
-                    curPt = getPositionOnRoute(originPt, destPt, progress);
+                    const fullCurve = createCurvedPath(originPt, destPt, 40, laneCurvature, laneShift);
+                    const idx = Math.min(40, Math.max(0, Math.round(progress * 40)));
+                    curPt = fullCurve[idx] || originPt;
                 }
                 allBounds.push(curPt);
 
@@ -1275,40 +1402,58 @@
                 let vehicleMarker = null;
 
                 if (curPt) {
-                    const traveledPath = createCurvedPath(originPt, curPt, 16, 0.1);
+                    const traveledPath = createCurvedPath(originPt, curPt, 16, laneCurvature, laneShift);
                     traveledPoly = L.polyline(traveledPath, {
-                        color: '#0284c7', weight: 3.5, opacity: 0.9, cursor: 'pointer'
+                        color: isAirCargo ? '#0284c7' : '#0369a1', weight: 3.5, opacity: 0.9, cursor: 'pointer'
                     }).bindPopup(popupHtml).addTo(trackingLayerGroup);
                     traveledPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
-                    const remainingPath = createCurvedPath(curPt, destPt, 16, 0.1);
+                    const remainingPath = createCurvedPath(curPt, destPt, 16, laneCurvature, laneShift);
                     remainingPoly = L.polyline(remainingPath, {
-                        color: '#38bdf8', weight: 2.5, dashArray: '6, 6', opacity: 0.8, cursor: 'pointer'
+                        color: isAirCargo ? '#38bdf8' : '#7dd3fc', weight: 2.5, dashArray: '6, 6', opacity: 0.8, cursor: 'pointer'
                     }).bindPopup(popupHtml).addTo(trackingLayerGroup);
                     remainingPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
-                    const heading = calculateBearing(curPt, destPt);
-                    vehicleMarker = L.marker(curPt, {
-                        icon: L.divIcon({
-                            className: 'cargo-real-vehicle-marker',
-                            html: `
-                                <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${heading}deg);">
-                                    ${vehicle.realSvg}
-                                </div>
-                                <div class="cargo-vehicle-tag">
-                                    <span class="cargo-tag-dot" style="background:${vehicle.color};"></span>
-                                    <span>${s.shipment_number}</span>
-                                </div>
-                            `,
-                            iconSize: [44, 44],
-                            iconAnchor: [22, 22]
-                        })
-                    }).bindPopup(popupHtml).addTo(trackingLayerGroup);
-                    vehicleMarker.on('click', () => focusCargoShipment(s.id, curPt));
+                    // Anti-Collision / De-clustering
+                    let vehicleCoords = [curPt[0], curPt[1]];
+                    let collisionAttempts = 0;
+                    while (collisionAttempts < 8) {
+                        const collides = occupiedVehicleCoords.some(occ => {
+                            return (Math.abs(occ[0] - vehicleCoords[0]) < 2.8 && Math.abs(occ[1] - vehicleCoords[1]) < 4.2);
+                        });
+                        if (!collides) break;
+                        collisionAttempts++;
+                        const nudgeSeed = (s.id * 7 + collisionAttempts * 11) % 4;
+                        const latNudge = (nudgeSeed === 0 ? 3.0 : (nudgeSeed === 1 ? -3.0 : (nudgeSeed === 2 ? 2.2 : -2.2)));
+                        const lngNudge = (nudgeSeed === 0 ? 4.2 : (nudgeSeed === 1 ? -4.2 : (nudgeSeed === 2 ? -4.2 : 4.2)));
+                        vehicleCoords = [vehicleCoords[0] + latNudge, vehicleCoords[1] + lngNudge];
+                    }
+                    occupiedVehicleCoords.push(vehicleCoords);
+
+                    const heading = calculateBearing(vehicleCoords, destPt);
+                    const vehicleDivIcon = L.divIcon({
+                        className: 'cargo-real-vehicle-marker',
+                        html: `
+                            <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${heading}deg);" title="${vehicle.label} &bull; ${s.shipment_number}">
+                                ${vehicle.realSvg}
+                            </div>
+                            <div class="cargo-vehicle-tag">
+                                <span class="cargo-tag-dot" style="background:${vehicle.accentColor || '#38bdf8'};"></span>
+                                <span>${s.shipment_number}</span>
+                            </div>
+                        `,
+                        iconSize: [vehicle.iconW || 44, vehicle.iconH || 68],
+                        iconAnchor: [(vehicle.iconW || 44) / 2, (vehicle.iconH || 68) / 2],
+                        popupAnchor: [0, -((vehicle.iconH || 68) / 2 + 5)]
+                    });
+                    vehicleMarker = L.marker(vehicleCoords, { icon: vehicleDivIcon, zIndexOffset: 1000 })
+                        .bindPopup(popupHtml)
+                        .addTo(trackingLayerGroup);
+                    vehicleMarker.on('click', () => focusCargoShipment(s.id, vehicleCoords));
                 } else {
-                    const directPath = createCurvedPath(originPt, destPt, 20, 0.12);
+                    const directPath = createCurvedPath(originPt, destPt, 20, laneCurvature, laneShift);
                     directPoly = L.polyline(directPath, {
-                        color: '#0284c7', weight: 3, dashArray: '6, 6', opacity: 0.85, cursor: 'pointer'
+                        color: isAirCargo ? '#0284c7' : '#0369a1', weight: 3, dashArray: '6, 6', opacity: 0.85, cursor: 'pointer'
                     }).bindPopup(popupHtml).addTo(trackingLayerGroup);
                     directPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
                 }
@@ -1466,6 +1611,9 @@
                 });
             }
         });
+
+        const badgeEl = document.getElementById('badge-total-shipments');
+        if (badgeEl) badgeEl.innerText = visibleCount;
 
         if (allBounds.length > 0) {
             map.fitBounds(allBounds, { padding: [50, 50], maxZoom: 5 });
