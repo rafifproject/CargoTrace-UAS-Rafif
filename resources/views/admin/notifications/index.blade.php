@@ -3,7 +3,7 @@
 @section('title', 'Pusat Notifikasi')
 
 @section('content')
-<div class="space-y-6 max-w-4xl">
+<div class="space-y-6 w-full">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
