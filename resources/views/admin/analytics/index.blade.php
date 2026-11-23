@@ -59,27 +59,15 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5 no-print">
-            <!-- DROPDOWN SELECTOR: PILIH SUBFITUR DI ATAS -->
-            <div id="subfeature-dropdown-container" class="relative">
-                <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#0A1128] border-2 border-cyan-500/40 dark:border-cyan-500/50 shadow-sm">
-                    <i data-lucide="layout-grid" class="w-4 h-4 text-cyan-500 flex-shrink-0"></i>
-                    <div class="flex flex-col">
-                        <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Pilih Tampilan:</span>
-                        <select id="analytics-subfeature-select" onchange="switchAnalyticsTab(this.value)"
-                                class="bg-transparent text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none cursor-pointer pr-2">
-                            <option value="financial">💰 1. Finansial &amp; Pendapatan</option>
-                            <option value="varieties">☕ 2. Komoditas Kopi Terlaris</option>
-                            <option value="countries">🌍 3. Negara Pemesan Terbanyak</option>
-                            <option value="customers">👥 4. Roastery &amp; Pembeli Konsisten</option>
-                            <option value="operational">⏱️ 5. SLA &amp; Rantai Pasok</option>
-                        </select>
-                    </div>
-                </div>
+            <!-- Period Pill -->
+            <div class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-cyan-500"></i>
+                <span>Tahun Berjalan 2026</span>
             </div>
 
             <!-- Print / Export Report -->
             <button onclick="window.print()" type="button"
-                    class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-2xs">
+                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-2xs">
                 <i data-lucide="printer" class="w-3.5 h-3.5 text-slate-400"></i>
                 <span>Cetak / PDF</span>
             </button>
@@ -645,13 +633,7 @@
             targetBtn.classList.add('active');
         }
 
-        // 4. Update dropdown selector in header
-        const selectEl = document.getElementById('analytics-subfeature-select');
-        if (selectEl && selectEl.value !== tabId) {
-            selectEl.value = tabId;
-        }
-
-        // 5. Update URL hash
+        // 4. Update URL hash
         try {
             history.replaceState(null, null, '#tab-' + tabId);
         } catch (e) {}

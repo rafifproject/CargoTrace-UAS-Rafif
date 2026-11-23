@@ -171,4 +171,39 @@ class OperatorWorkflowTest extends TestCase
         $this->assertEquals('Operator Baru Terupdate', $this->operator->name);
         $this->assertEquals('+62811223344', $this->operator->phone);
     }
+
+    public function test_operator_can_view_incoming_customer_orders_queue(): void
+    {
+        $response = $this->actingAs($this->operator)->get(route('operator.shipments.incoming'));
+        $response->assertStatus(200);
+        $response->assertSee('Antrean Pesanan Masuk');
+    }
+
+    public function test_operator_can_verify_incoming_shipment_without_reinput(): void
+    {
+        $shipment = Shipment::where('status', Shipment::STATUS_CREATED)->first();
+        if (! $shipment) {
+            $shipment = Shipment::create([
+                'shipment_number' => 'CT-VERIFY-001',
+                'customer_id' => $this->customer->id,
+                'carrier_id' => $this->carrier->id,
+                'origin_location_id' => $this->origin->id,
+                'destination_location_id' => $this->destination->id,
+                'cargo_type' => 'Coffee Export Test',
+                'weight' => 500,
+                'volume' => 3.5,
+                'status' => Shipment::STATUS_CREATED,
+                'expected_departure' => now()->addDay(),
+                'expected_arrival' => now()->addDays(5),
+                'estimated_time_arrival' => now()->addDays(5),
+            ]);
+        }
+
+        $response = $this->actingAs($this->operator)
+            ->patch(route('operator.shipments.verify', $shipment));
+
+        $response->assertSessionHas('status');
+        $shipment->refresh();
+        $this->assertEquals(Shipment::STATUS_BOOKED, $shipment->status);
+    }
 }

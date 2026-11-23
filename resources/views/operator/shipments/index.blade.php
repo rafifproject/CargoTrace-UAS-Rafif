@@ -4,15 +4,25 @@
 
 @section('content')
 {{-- Page Header --}}
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-6 flex flex-wrap items-center justify-between gap-4">
     <div>
         <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Semua Pengiriman</h1>
         <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Kelola dan pantau seluruh pengiriman kargo operasional.</p>
     </div>
-    <a href="{{ route('operator.shipments.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-semibold transition-colors shadow-sm">
-        <i data-lucide="package-plus" class="w-4 h-4"></i>
-        Buat Pengiriman
-    </a>
+    <div class="flex items-center gap-2.5">
+        <a href="{{ route('operator.shipments.incoming') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 text-xs font-semibold transition-colors shadow-2xs">
+            <i data-lucide="inbox" class="w-4 h-4"></i>
+            <span>Antrean Pesanan Masuk</span>
+            @php $incomingCount = \App\Models\Shipment::whereIn('status', ['CREATED', 'BOOKED'])->count(); @endphp
+            @if($incomingCount > 0)
+                <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-cyan-500 text-white font-bold">{{ $incomingCount }}</span>
+            @endif
+        </a>
+        <a href="{{ route('operator.shipments.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold transition-colors shadow-sm">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Input Manual (Offline)</span>
+        </a>
+    </div>
 </div>
 
 {{-- Filter Bar --}}

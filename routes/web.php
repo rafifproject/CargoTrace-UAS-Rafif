@@ -126,6 +126,8 @@ Route::middleware(['auth', 'role:LOGISTICS_OPERATOR'])->prefix('operator')->name
 
     // 03-07. Pengelolaan Pengiriman
     Route::get('/shipments', [OperatorShipmentController::class, 'index'])->name('shipments.index');
+    Route::get('/shipments/incoming', [OperatorShipmentController::class, 'incoming'])->name('shipments.incoming');
+    Route::patch('/shipments/{shipment}/verify', [OperatorShipmentController::class, 'verify'])->name('shipments.verify');
     Route::get('/shipments/create', [OperatorShipmentController::class, 'create'])->name('shipments.create');
     Route::post('/shipments', [OperatorShipmentController::class, 'store'])->name('shipments.store');
     Route::get('/shipments/map', [OperatorShipmentController::class, 'map'])->name('shipments.map');

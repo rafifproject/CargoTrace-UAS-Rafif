@@ -8,20 +8,31 @@
         <div class="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500 mb-1">
             <a href="{{ route('operator.shipments.index') }}" class="hover:text-cyan-500">Semua Pengiriman</a>
             <i data-lucide="chevron-right" class="w-3 h-3"></i>
-            <span>Santos Coffee Exporters S.A. (Brazil)</span>
+            <a href="{{ route('operator.shipments.incoming') }}" class="hover:text-cyan-500">Antrean Pesanan Masuk</a>
             <i data-lucide="chevron-right" class="w-3 h-3"></i>
-            <span class="text-slate-600 dark:text-slate-300">Buat Pengiriman Baru</span>
+            <span class="text-slate-600 dark:text-slate-300">Input Manual (Offline)</span>
         </div>
-        <h1 class="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2.5">
-            <span>☕</span>
-            <span>Buat Pengiriman Ekspor Kopi Brazil Santos</span>
-        </h1>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Daftarkan pengiriman ekspor biji kopi via moda Kapal Laut (Pelabuhan Santos), Pesawat Kargo Udara (GRU São Paulo), atau Mobil Pengantaran Darat langsung ke kafe/toko tujuan</p>
+        <div class="flex items-center gap-3">
+            <h1 class="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2.5">
+                <span>☕</span>
+                <span>Input Pengiriman Ekspor Kopi Santos (Manual Offline)</span>
+            </h1>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+                Pesanan Offline / Telepon / Kontrak B2B
+            </span>
+        </div>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Formulir pendaftaran manual khusus pesanan offline (via telepon/email/kontrak tahunan fisik) di mana pelanggan tidak memesan via Customer Portal.</p>
     </div>
-    <a href="{{ route('operator.shipments.index') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5">
-        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-        <span>Kembali</span>
-    </a>
+    <div class="flex items-center gap-2">
+        <a href="{{ route('operator.shipments.incoming') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/50 hover:bg-cyan-100 dark:hover:bg-cyan-900/40 border border-cyan-200 dark:border-cyan-800 transition-colors flex items-center gap-1.5">
+            <i data-lucide="inbox" class="w-3.5 h-3.5"></i>
+            <span>Antrean Pesanan Masuk</span>
+        </a>
+        <a href="{{ route('operator.shipments.index') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+            <span>Kembali</span>
+        </a>
+    </div>
 </div>
 
 <form method="POST" action="{{ route('operator.shipments.store') }}">

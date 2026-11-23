@@ -84,6 +84,106 @@ class OperatorShipmentController extends Controller
     }
 
     /**
+     * Antrean Pesanan Masuk (Incoming Customer Orders - Verifikasi & Dispatch)
+     * Alur selaras: Customer pesan via Customer Portal -> Operator cukup verifikasi tanpa input ulang.
+     */
+    public function incoming(Request $request): View
+    {
+        $query = Shipment::with(['customer', 'carrier', 'origin', 'destination', 'currentLocation', 'items'])
+            ->whereIn('status', [Shipment::STATUS_CREATED, Shipment::STATUS_BOOKED]);
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('shipment_number', 'like', "%{$search}%")
+                    ->orWhere('invoice_number', 'like', "%{$search}%")
+                    ->orWhere('cargo_type', 'like', "%{$search}%")
+                    ->orWhere('coffee_variety', 'like', "%{$search}%")
+                    ->orWhere('delivery_city', 'like', "%{$search}%")
+                    ->orWhereHas('customer', function ($c) use ($search) {
+                        $c->where('name', 'like', "%{$search}%")
+                            ->orWhere('company_name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($paymentStatus = $request->input('payment_status')) {
+            $query->where('payment_status', $paymentStatus);
+        }
+
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        $shipments = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
+
+        $totalPending = Shipment::whereIn('status', [Shipment::STATUS_CREATED, Shipment::STATUS_BOOKED])->count();
+        $paidPending = Shipment::whereIn('status', [Shipment::STATUS_CREATED, Shipment::STATUS_BOOKED])
+            ->where('payment_status', 'PAID')->count();
+        $unpaidPending = Shipment::whereIn('status', [Shipment::STATUS_CREATED, Shipment::STATUS_BOOKED])
+            ->where('payment_status', 'UNPAID')->count();
+
+        return view('operator.shipments.incoming', compact('shipments', 'totalPending', 'paidPending', 'unpaidPending'));
+    }
+
+    /**
+     * Otorisasi & Verifikasi Cepat Pesanan Masuk Pelanggan
+     */
+    public function verify(Request $request, Shipment $shipment): RedirectResponse
+    {
+        $previousStatus = $shipment->status;
+        $newStatus = ($previousStatus === Shipment::STATUS_CREATED) ? Shipment::STATUS_BOOKED : Shipment::STATUS_PICKED_UP;
+
+        $shipment->status = $newStatus;
+        if ($newStatus === Shipment::STATUS_PICKED_UP && empty($shipment->actual_departure)) {
+            $shipment->actual_departure = now();
+        }
+        $shipment->save();
+
+        $operatorName = $request->user()->name;
+
+        // Append tracking event
+        TrackingEvent::create([
+            'shipment_id' => $shipment->id,
+            'event_type' => TrackingEvent::TYPE_STATUS_CHANGE,
+            'location_id' => $shipment->origin_location_id,
+            'event_time' => now(),
+            'shipment_status_at_event' => $newStatus,
+            'description' => $newStatus === Shipment::STATUS_BOOKED
+                ? "Pesanan kargo #{$shipment->shipment_number} diverifikasi & jadwal armada dikonfirmasi oleh Operator {$operatorName}. Siap penjemputan gudang."
+                : "Kargo #{$shipment->shipment_number} telah diambil dari gudang Santos (PICKED_UP) oleh Operator {$operatorName} dan siap dimuat ke armada.",
+            'created_by' => $request->user()->id,
+        ]);
+
+        // Notify Customer
+        if ($shipment->customer_id) {
+            Notification::create([
+                'user_id' => $shipment->customer_id,
+                'shipment_id' => $shipment->id,
+                'type' => Notification::TYPE_STATUS_UPDATE,
+                'severity' => Notification::SEVERITY_SUCCESS,
+                'title' => "Pesanan Kargo Diverifikasi: {$shipment->shipment_number}",
+                'message' => "Pesanan ekspor kopi Anda telah diverifikasi oleh Operator {$operatorName}. Status kargo kini: {$newStatus}.",
+                'is_read' => false,
+            ]);
+        }
+
+        // Audit Log
+        AuditLog::create([
+            'user_id' => $request->user()->id,
+            'action' => 'VERIFY_SHIPMENT',
+            'entity_type' => 'Shipment',
+            'entity_id' => (string) $shipment->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'description' => "Operator {$operatorName} memverifikasi pesanan kargo {$shipment->shipment_number} dari status {$previousStatus} ke {$newStatus}",
+            'new_values' => ['status' => $newStatus, 'verified_by' => $operatorName],
+            'created_at' => now(),
+        ]);
+
+        return back()->with('status', "Pesanan kargo {$shipment->shipment_number} berhasil diverifikasi! Status kini: {$newStatus}.");
+    }
+
+    /**
      * Mockup 04: Buat Pengiriman Baru
      */
     public function create(): View

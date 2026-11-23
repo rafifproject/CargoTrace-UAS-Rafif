@@ -19,21 +19,57 @@ class GlobalIntelligenceController extends Controller
      */
     public function weather(Request $request): View
     {
-        $originLat = (float) $request->input('lat1', -7.195);
-        $originLng = (float) $request->input('lng1', 112.729);
-        $destLat = (float) $request->input('lat2', -33.856);
-        $destLng = (float) $request->input('lng2', 151.209);
+        $allWeatherHubs = $this->intelligenceService->getGlobalWeatherHubs();
+
+        // 1. Determine Origin Hub (Titik 1)
+        $originCode = $request->input('origin');
+        $originHub = null;
+        if ($request->has('lat1') && $request->has('lng1')) {
+            $originLat = (float) $request->input('lat1');
+            $originLng = (float) $request->input('lng1');
+            $originHub = collect($allWeatherHubs)->first(fn ($h) => abs($h['lat'] - $originLat) < 1.5 && abs($h['lng'] - $originLng) < 1.5);
+        } elseif ($originCode) {
+            $originHub = collect($allWeatherHubs)->first(fn ($h) => strcasecmp($h['code'], $originCode) === 0 || strcasecmp($h['country'], $originCode) === 0);
+            $originLat = (float) ($originHub['lat'] ?? -7.195);
+            $originLng = (float) ($originHub['lng'] ?? 112.729);
+        } else {
+            $originHub = collect($allWeatherHubs)->firstWhere('code', 'ID') ?? $allWeatherHubs[0];
+            $originLat = (float) ($originHub['lat'] ?? -7.195);
+            $originLng = (float) ($originHub['lng'] ?? 112.729);
+        }
+        if (!$originHub) {
+            $originHub = ['country' => 'Indonesia', 'city' => 'Port Tanjung Perak / Surabaya', 'code' => 'ID', 'iso' => 'id', 'lat' => $originLat, 'lng' => $originLng, 'risk' => 'Rendah', 'condition' => 'Cerah Berawan', 'icon' => 'sun', 'temp' => 30.2, 'humidity' => 72, 'wind' => 15.4];
+        }
+
+        // 2. Determine Destination Hub (Titik 2)
+        $destCode = $request->input('dest');
+        $destHub = null;
+        if ($request->has('lat2') && $request->has('lng2')) {
+            $destLat = (float) $request->input('lat2');
+            $destLng = (float) $request->input('lng2');
+            $destHub = collect($allWeatherHubs)->first(fn ($h) => abs($h['lat'] - $destLat) < 1.5 && abs($h['lng'] - $destLng) < 1.5);
+        } elseif ($destCode) {
+            $destHub = collect($allWeatherHubs)->first(fn ($h) => strcasecmp($h['code'], $destCode) === 0 || strcasecmp($h['country'], $destCode) === 0);
+            $destLat = (float) ($destHub['lat'] ?? -33.856);
+            $destLng = (float) ($destHub['lng'] ?? 151.209);
+        } else {
+            $destHub = collect($allWeatherHubs)->firstWhere('code', 'AU') ?? $allWeatherHubs[1];
+            $destLat = (float) ($destHub['lat'] ?? -33.856);
+            $destLng = (float) ($destHub['lng'] ?? 151.209);
+        }
+        if (!$destHub) {
+            $destHub = ['country' => 'Australia', 'city' => 'Port Botany / Sydney', 'code' => 'AU', 'iso' => 'au', 'lat' => $destLat, 'lng' => $destLng, 'risk' => 'Waspada', 'condition' => 'Hujan Ringan & Berangin', 'icon' => 'cloud-rain', 'temp' => 23.4, 'humidity' => 70, 'wind' => 12.1];
+        }
 
         // Jika ada filter country dari klik peta
         $targetCountry = $request->input('country');
-        $allWeatherHubs = $this->intelligenceService->getGlobalWeatherHubs();
         $selectedHub = null;
-
         if ($targetCountry) {
             $selectedHub = $this->intelligenceService->findWeatherHub($targetCountry);
             if ($selectedHub) {
                 $originLat = (float) $selectedHub['lat'];
                 $originLng = (float) $selectedHub['lng'];
+                $originHub = $selectedHub;
             }
         }
 
@@ -42,7 +78,20 @@ class GlobalIntelligenceController extends Controller
 
         $locations = Location::where('status', 'ACTIVE')->get();
 
-        return view('admin.intelligence.weather', compact('originWeather', 'destWeather', 'locations', 'allWeatherHubs', 'selectedHub', 'targetCountry'));
+        return view('admin.intelligence.weather', compact(
+            'originWeather',
+            'destWeather',
+            'originHub',
+            'destHub',
+            'originLat',
+            'originLng',
+            'destLat',
+            'destLng',
+            'locations',
+            'allWeatherHubs',
+            'selectedHub',
+            'targetCountry'
+        ));
     }
 
     /**

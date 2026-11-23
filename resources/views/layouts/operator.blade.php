@@ -175,9 +175,23 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('operator.shipments.incoming') }}" class="flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('operator.shipments.incoming') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="inbox" class="w-4 h-4 {{ request()->routeIs('operator.shipments.incoming') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
+                                    <span>Antrean Pesanan Masuk</span>
+                                </div>
+                                @php
+                                    $incomingCount = \App\Models\Shipment::whereIn('status', ['CREATED', 'BOOKED'])->count();
+                                @endphp
+                                @if($incomingCount > 0)
+                                    <span class="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">{{ $incomingCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('operator.shipments.create') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('operator.shipments.create') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
-                                <i data-lucide="package-plus" class="w-4 h-4 {{ request()->routeIs('operator.shipments.create') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Buat Pengiriman</span>
+                                <i data-lucide="file-plus" class="w-4 h-4 {{ request()->routeIs('operator.shipments.create') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
+                                <span>Input Manual (Offline)</span>
                             </a>
                         </li>
                     </ul>

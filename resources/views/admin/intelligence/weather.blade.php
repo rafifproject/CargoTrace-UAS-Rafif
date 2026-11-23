@@ -79,76 +79,142 @@
     </div>
     @endif
 
-    <!-- Active Route Weather Comparison (Surabaya ID vs Sydney AU) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Origin Weather Card (Surabaya, ID) -->
-        <div class="p-6 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
-                <div>
-                    <span class="text-[10px] font-bold text-cyan-500 uppercase tracking-wider">Titik Asal Kargo</span>
-                    <h2 class="text-lg font-black text-slate-900 dark:text-white">Surabaya, Indonesia</h2>
-                    <p class="text-[11px] text-slate-400">Port Tanjung Perak (-7.195, 112.729)</p>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center">
-                    <i data-lucide="sun" class="w-7 h-7"></i>
-                </div>
+    <!-- Active Route Weather Comparison Form (Titik Asal 1 vs Titik Tujuan 2) -->
+    <form id="weather-comparison-form" method="GET" action="{{ route('admin.intelligence.weather') }}" class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-1">
+            <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300">
+                    Dual-Point Weather Comparison
+                </span>
+                <span class="text-xs text-slate-500 dark:text-slate-400">Pilih titik asal dan titik tujuan kargo dari dropdown di bawah untuk membandingkan cuaca maritim secara realtime</span>
             </div>
-
-            <div class="my-6 flex items-baseline gap-4">
-                <span class="text-5xl font-black text-slate-900 dark:text-white">{{ $originWeather['current']['temperature_2m'] ?? 32 }}°C</span>
-                <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Cerah Berawan</span>
-            </div>
-
-            <div class="grid grid-cols-3 gap-3 text-xs pt-4 border-t border-slate-100 dark:border-slate-800">
-                <div>
-                    <span class="text-[10px] text-slate-400 block font-medium">Kelembaban</span>
-                    <strong class="text-slate-800 dark:text-white">{{ $originWeather['current']['relative_humidity_2m'] ?? 72 }}%</strong>
-                </div>
-                <div>
-                    <span class="text-[10px] text-slate-400 block font-medium">Kecepatan Angin</span>
-                    <strong class="text-slate-800 dark:text-white">{{ $originWeather['current']['wind_speed_10m'] ?? 12 }} km/j</strong>
-                </div>
-                <div>
-                    <span class="text-[10px] text-slate-400 block font-medium">Risiko Maritim</span>
-                    <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-500">Rendah</span>
-                </div>
+            <div class="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                Rute: <strong class="text-cyan-600 dark:text-cyan-400">{{ $originHub['city'] ?? 'Surabaya' }}</strong> ➔ <strong class="text-rose-600 dark:text-rose-400">{{ $destHub['city'] ?? 'Sydney' }}</strong>
             </div>
         </div>
 
-        <!-- Destination Weather Card (Sydney, AU) -->
-        <div class="p-6 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
-                <div>
-                    <span class="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Titik Tujuan Kargo</span>
-                    <h2 class="text-lg font-black text-slate-900 dark:text-white">Sydney, Australia</h2>
-                    <p class="text-[11px] text-slate-400">Port Botany (-33.856, 151.209)</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Origin Weather Card (Titik Asal 1) -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-[#0A1128] border-2 border-cyan-500/30 dark:border-cyan-500/40 shadow-sm relative overflow-hidden">
+                <div class="flex flex-col gap-2.5 pb-4 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-cyan-500 uppercase tracking-wider flex items-center gap-1">
+                            <i data-lucide="map-pin" class="w-3 h-3"></i> Titik 1: Asal Kargo
+                        </span>
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center justify-center">
+                            @if(str_contains(strtolower($originHub['condition'] ?? ''), 'rain') || str_contains(strtolower($originHub['condition'] ?? ''), 'hujan'))
+                                <i data-lucide="cloud-rain" class="w-6 h-6"></i>
+                            @elseif(str_contains(strtolower($originHub['condition'] ?? ''), 'cloud') || str_contains(strtolower($originHub['condition'] ?? ''), 'awan'))
+                                <i data-lucide="cloud-sun" class="w-6 h-6"></i>
+                            @else
+                                <i data-lucide="sun" class="w-6 h-6"></i>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Dropdown Pemilihan Titik 1 -->
+                    <div>
+                        <label for="origin_select" class="block text-[10px] font-semibold text-slate-400 mb-1">Pilih Titik Asal:</label>
+                        <select id="origin_select" name="origin" onchange="this.form.submit()"
+                                class="w-full px-3 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 cursor-pointer">
+                            @foreach($allWeatherHubs as $hub)
+                                <option value="{{ $hub['code'] }}" {{ ($originHub['code'] ?? '') == $hub['code'] ? 'selected' : '' }}>
+                                    {{ $hub['country'] }} &mdash; {{ $hub['city'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mt-1">
+                        <h2 class="text-base font-black text-slate-900 dark:text-white">{{ $originHub['city'] }}, {{ $originHub['country'] }}</h2>
+                        <p class="text-[11px] text-slate-400 font-mono">Koordinat: {{ number_format($originLat, 3) }}, {{ number_format($originLng, 3) }}</p>
+                    </div>
                 </div>
-                <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center justify-center">
-                    <i data-lucide="cloud-rain" class="w-7 h-7"></i>
+
+                <div class="my-5 flex items-baseline gap-4">
+                    <span class="text-5xl font-black text-slate-900 dark:text-white">{{ $originWeather['current']['temperature_2m'] ?? $originHub['temp'] }}°C</span>
+                    <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">{{ $originHub['condition'] ?? 'Cerah Berawan' }}</span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 text-xs pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-medium">Kelembaban</span>
+                        <strong class="text-slate-800 dark:text-white">{{ $originWeather['current']['relative_humidity_2m'] ?? $originHub['humidity'] }}%</strong>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-medium">Kecepatan Angin</span>
+                        <strong class="text-slate-800 dark:text-white">{{ $originWeather['current']['wind_speed_10m'] ?? $originHub['wind'] }} km/j</strong>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-medium">Risiko Maritim</span>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold {{ str_contains(strtolower($originHub['risk'] ?? ''), 'high') ? 'bg-rose-500/10 text-rose-500' : (str_contains(strtolower($originHub['risk'] ?? ''), 'medium') || str_contains(strtolower($originHub['risk'] ?? ''), 'waspada') ? 'bg-amber-500/10 text-amber-500' : 'bg-emerald-500/10 text-emerald-500') }}">
+                            {{ $originHub['risk'] ?? 'Rendah' }}
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <div class="my-6 flex items-baseline gap-4">
-                <span class="text-5xl font-black text-slate-900 dark:text-white">{{ $destWeather['current']['temperature_2m'] ?? 26 }}°C</span>
-                <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Hujan Ringan & Berangin</span>
-            </div>
+            <!-- Destination Weather Card (Titik Tujuan 2) -->
+            <div class="p-6 rounded-2xl bg-white dark:bg-[#0A1128] border-2 border-rose-500/30 dark:border-rose-500/40 shadow-sm relative overflow-hidden">
+                <div class="flex flex-col gap-2.5 pb-4 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-rose-500 uppercase tracking-wider flex items-center gap-1">
+                            <i data-lucide="navigation" class="w-3 h-3"></i> Titik 2: Tujuan Kargo
+                        </span>
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center justify-center">
+                            @if(str_contains(strtolower($destHub['condition'] ?? ''), 'rain') || str_contains(strtolower($destHub['condition'] ?? ''), 'hujan'))
+                                <i data-lucide="cloud-rain" class="w-6 h-6"></i>
+                            @elseif(str_contains(strtolower($destHub['condition'] ?? ''), 'cloud') || str_contains(strtolower($destHub['condition'] ?? ''), 'awan'))
+                                <i data-lucide="cloud-sun" class="w-6 h-6"></i>
+                            @else
+                                <i data-lucide="sun" class="w-6 h-6"></i>
+                            @endif
+                        </div>
+                    </div>
 
-            <div class="grid grid-cols-3 gap-3 text-xs pt-4 border-t border-slate-100 dark:border-slate-800">
-                <div>
-                    <span class="text-[10px] text-slate-400 block font-medium">Kelembaban</span>
-                    <strong class="text-slate-800 dark:text-white">{{ $destWeather['current']['relative_humidity_2m'] ?? 84 }}%</strong>
+                    <!-- Dropdown Pemilihan Titik 2 -->
+                    <div>
+                        <label for="dest_select" class="block text-[10px] font-semibold text-slate-400 mb-1">Pilih Titik Tujuan:</label>
+                        <select id="dest_select" name="dest" onchange="this.form.submit()"
+                                class="w-full px-3 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer">
+                            @foreach($allWeatherHubs as $hub)
+                                <option value="{{ $hub['code'] }}" {{ ($destHub['code'] ?? '') == $hub['code'] ? 'selected' : '' }}>
+                                    {{ $hub['country'] }} &mdash; {{ $hub['city'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mt-1">
+                        <h2 class="text-base font-black text-slate-900 dark:text-white">{{ $destHub['city'] }}, {{ $destHub['country'] }}</h2>
+                        <p class="text-[11px] text-slate-400 font-mono">Koordinat: {{ number_format($destLat, 3) }}, {{ number_format($destLng, 3) }}</p>
+                    </div>
                 </div>
-                <div>
-                    <span class="text-[10px] text-slate-400 block font-medium">Kecepatan Angin</span>
-                    <strong class="text-slate-800 dark:text-white">{{ $destWeather['current']['wind_speed_10m'] ?? 28 }} km/j</strong>
+
+                <div class="my-5 flex items-baseline gap-4">
+                    <span class="text-5xl font-black text-slate-900 dark:text-white">{{ $destWeather['current']['temperature_2m'] ?? $destHub['temp'] }}°C</span>
+                    <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">{{ $destHub['condition'] ?? 'Hujan Ringan & Berangin' }}</span>
                 </div>
-                <div>
-                    <span class="text-[10px] text-slate-400 block font-medium">Risiko Maritim</span>
-                    <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-500">Waspada</span>
+
+                <div class="grid grid-cols-3 gap-3 text-xs pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-medium">Kelembaban</span>
+                        <strong class="text-slate-800 dark:text-white">{{ $destWeather['current']['relative_humidity_2m'] ?? $destHub['humidity'] }}%</strong>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-medium">Kecepatan Angin</span>
+                        <strong class="text-slate-800 dark:text-white">{{ $destWeather['current']['wind_speed_10m'] ?? $destHub['wind'] }} km/j</strong>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-medium">Risiko Maritim</span>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold {{ str_contains(strtolower($destHub['risk'] ?? ''), 'high') ? 'bg-rose-500/10 text-rose-500' : (str_contains(strtolower($destHub['risk'] ?? ''), 'medium') || str_contains(strtolower($destHub['risk'] ?? ''), 'waspada') ? 'bg-amber-500/10 text-amber-500' : 'bg-emerald-500/10 text-emerald-500') }}">
+                            {{ $destHub['risk'] ?? 'Waspada' }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 
     <!-- 3-Day Forecast Cards -->
     <div class="p-6 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
