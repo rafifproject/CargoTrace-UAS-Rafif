@@ -79,14 +79,14 @@
     </div>
 
     {{-- Main Container --}}
-    <div class="relative z-10 w-full max-w-[1520px] mx-auto px-6 sm:px-10 lg:px-14 xl:px-20 py-10 flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
+    <div class="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 py-10 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
 
         {{-- LEFT COLUMN: Glowing 3D Logo & Brand Presentation --}}
-        <div class="w-full lg:flex-1 max-w-2xl xl:max-w-3xl flex flex-col justify-center items-start text-left">
+        <div class="w-full lg:flex-1 max-w-lg xl:max-w-xl flex flex-col justify-center items-start text-left">
             
-            <div class="flex items-center gap-5 sm:gap-7 mb-4">
+            <div class="flex items-center gap-4 sm:gap-5 mb-3 sm:mb-4">
                 {{-- Isometric 3D Cargo Box with Orbit & Airplanes (Official Logo Mockup) --}}
-                <div class="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 xl:w-44 xl:h-44 flex-shrink-0 drop-shadow-[0_0_35px_rgba(0,194,255,0.7)]">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 lg:w-22 lg:h-22 flex-shrink-0 drop-shadow-[0_0_25px_rgba(0,194,255,0.6)]">
                     <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
                         <defs>
                             <linearGradient id="cubeTop" x1="60" y1="20" x2="60" y2="55" gradientUnits="userSpaceOnUse">
@@ -136,46 +136,41 @@
 
                 {{-- CargoTrace Wordmark --}}
                 <div class="font-outfit">
-                    <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black tracking-tight text-white leading-none">
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-none">
                         Cargo<span class="text-[#00C2FF]">Trace</span>
                     </h1>
                 </div>
             </div>
 
             {{-- Subtitles --}}
-            <div class="mt-3 sm:mt-5 space-y-1 sm:space-y-2">
-                <p class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
+            <div class="mt-2 sm:mt-3 space-y-0.5 sm:space-y-1">
+                <p class="text-base sm:text-lg lg:text-xl font-bold text-slate-100 tracking-wide">
                     Global Shipment Visibility &
                 </p>
-                <p class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#38BDF8] tracking-tight leading-tight">
+                <p class="text-base sm:text-lg lg:text-xl font-bold text-[#00C2FF] tracking-wide">
                     Tracking Platform
                 </p>
             </div>
 
             {{-- Demo Accounts Quick-Fill Badge (For UAS Evaluation) --}}
-            <div class="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-slate-700/60 w-full max-w-xl">
-                <div class="flex items-center gap-2 mb-3.5 sm:mb-4">
-                    <span class="inline-flex p-1 rounded-md bg-cyan-500/20 text-[#00C2FF]">
-                        <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    </span>
-                    <p class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-300">
-                        Akun Demo &mdash; Klik untuk Isi Cepat:
-                    </p>
-                </div>
-                <div class="flex flex-wrap gap-2.5 sm:gap-3.5">
+            <div class="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-700/50 w-full max-w-md">
+                <p class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5">
+                    Akun Demo &mdash; Klik untuk Isi Cepat:
+                </p>
+                <div class="flex flex-wrap gap-2">
                     <button type="button" onclick="fillLogin('admin@cargotrace.id','password')"
-                        class="px-4 py-2.5 sm:px-5 sm:py-3 text-xs sm:text-sm md:text-base rounded-xl sm:rounded-2xl border border-cyan-400/40 bg-cyan-950/60 text-cyan-200 font-bold hover:bg-cyan-900/70 hover:border-cyan-300 hover:scale-105 shadow-md shadow-cyan-950/50 transition-all flex items-center gap-2 cursor-pointer">
-                        <i data-lucide="shield" class="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400"></i>
+                        class="px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-cyan-500/30 bg-cyan-950/40 text-cyan-300 font-medium hover:bg-cyan-900/60 transition-all flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="shield" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400"></i>
                         <span>Administrator</span>
                     </button>
                     <button type="button" onclick="fillLogin('operator@cargotrace.id','password')"
-                        class="px-4 py-2.5 sm:px-5 sm:py-3 text-xs sm:text-sm md:text-base rounded-xl sm:rounded-2xl border border-emerald-400/40 bg-emerald-950/60 text-emerald-200 font-bold hover:bg-emerald-900/70 hover:border-emerald-300 hover:scale-105 shadow-md shadow-emerald-950/50 transition-all flex items-center gap-2 cursor-pointer">
-                        <i data-lucide="settings" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400"></i>
+                        class="px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-emerald-500/30 bg-emerald-950/40 text-emerald-300 font-medium hover:bg-emerald-900/60 transition-all flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="settings" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400"></i>
                         <span>Operator</span>
                     </button>
                     <button type="button" onclick="fillLogin('customer@globalmart.com','password')"
-                        class="px-4 py-2.5 sm:px-5 sm:py-3 text-xs sm:text-sm md:text-base rounded-xl sm:rounded-2xl border border-indigo-400/40 bg-indigo-950/60 text-indigo-200 font-bold hover:bg-indigo-900/70 hover:border-indigo-300 hover:scale-105 shadow-md shadow-indigo-950/50 transition-all flex items-center gap-2 cursor-pointer">
-                        <i data-lucide="user" class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-400"></i>
+                        class="px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-indigo-500/30 bg-indigo-950/40 text-indigo-300 font-medium hover:bg-indigo-900/60 transition-all flex items-center gap-1.5 cursor-pointer">
+                        <i data-lucide="user" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400"></i>
                         <span>Customer</span>
                     </button>
                 </div>
@@ -184,8 +179,8 @@
         </div>
 
         {{-- RIGHT COLUMN: Glassmorphism Login Card --}}
-        <div class="w-full sm:w-[440px] lg:w-[460px] xl:w-[480px] flex-shrink-0">
-            <div class="glass-card rounded-2xl sm:rounded-3xl p-7 sm:p-9 shadow-2xl relative">
+        <div class="w-full sm:w-[400px] lg:w-[420px] flex-shrink-0">
+            <div class="glass-card rounded-2xl sm:rounded-3xl p-7 sm:p-8 shadow-2xl relative">
 
                 {{-- Language Selector Pill (Top Right) --}}
                 <div class="flex justify-end mb-2">
