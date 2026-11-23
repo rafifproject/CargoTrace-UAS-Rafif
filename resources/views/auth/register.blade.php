@@ -73,12 +73,12 @@
          style="background: radial-gradient(circle at 75% 50%, rgba(2, 8, 23, 0.3) 0%, rgba(2, 8, 23, 0.8) 100%);">
     </div>
 
-    <div class="relative z-10 w-full max-w-[1480px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 py-10 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16">
+    <div class="relative z-10 w-full max-w-[1520px] mx-auto px-6 sm:px-10 lg:px-14 xl:px-20 py-10 flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
 
         {{-- LEFT COLUMN: Glowing 3D Logo & Brand Presentation --}}
-        <div class="w-full lg:flex-1 max-w-xl flex flex-col justify-center items-start text-left">
-            <div class="flex items-center gap-5 mb-3">
-                <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 drop-shadow-[0_0_25px_rgba(0,194,255,0.6)]">
+        <div class="w-full lg:flex-1 max-w-2xl xl:max-w-3xl flex flex-col justify-center items-start text-left">
+            <div class="flex items-center gap-5 sm:gap-7 mb-4">
+                <div class="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 xl:w-44 xl:h-44 flex-shrink-0 drop-shadow-[0_0_35px_rgba(0,194,255,0.7)]">
                     <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
                         <defs>
                             <linearGradient id="cubeTopReg" x1="60" y1="20" x2="60" y2="55" gradientUnits="userSpaceOnUse">
@@ -114,30 +114,32 @@
                     </svg>
                 </div>
                 <div class="font-outfit">
-                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-none">
+                    <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black tracking-tight text-white leading-none">
                         Cargo<span class="text-[#00C2FF]">Trace</span>
                     </h1>
                 </div>
             </div>
 
-            <div class="mt-2 space-y-1">
-                <p class="text-sm sm:text-base font-medium text-slate-200 tracking-wide">
+            <div class="mt-3 sm:mt-5 space-y-1 sm:space-y-2">
+                <p class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
                     Global Shipment Visibility &
                 </p>
-                <p class="text-sm sm:text-base font-medium text-slate-200 tracking-wide">
+                <p class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#38BDF8] tracking-tight leading-tight">
                     Tracking Platform
                 </p>
             </div>
 
-            <div class="mt-8 pt-6 border-t border-slate-700/50 flex items-center gap-2 text-cyan-400 text-xs font-semibold">
-                <i data-lucide="shield-check" class="w-4 h-4"></i>
-                <span>Registrasi Publik Resmi: Portal Akses Customer</span>
+            <div class="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-slate-700/60 flex items-center gap-3 text-cyan-300 text-xs sm:text-sm font-bold">
+                <span class="inline-flex p-1.5 rounded-lg bg-cyan-500/20 text-[#00C2FF]">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                </span>
+                <span>Registrasi Publik Resmi: Portal Akses Pelanggan Global</span>
             </div>
         </div>
 
         {{-- RIGHT COLUMN: Glassmorphism Register Card (Mockup 02) --}}
-        <div class="w-full sm:w-[420px] lg:w-[440px] flex-shrink-0">
-            <div class="glass-card rounded-2xl sm:rounded-3xl p-7 sm:p-8 shadow-2xl relative">
+        <div class="w-full sm:w-[440px] lg:w-[460px] xl:w-[480px] flex-shrink-0">
+            <div class="glass-card rounded-2xl sm:rounded-3xl p-7 sm:p-9 shadow-2xl relative">
 
                 {{-- Language Selector Pill --}}
                 <div class="flex justify-end mb-2">
