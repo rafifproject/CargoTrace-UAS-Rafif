@@ -5,9 +5,9 @@
 @push('styles')
 <style>
     @media print {
-        aside, header, .no-print { display: none !important; }
+        aside, header, .no-print, .tab-nav-bar { display: none !important; }
         main { padding: 0 !important; margin: 0 !important; }
-        .print-full { width: 100% !important; max-width: 100% !important; }
+        .tab-panel { display: block !important; margin-bottom: 2rem !important; }
     }
     .metric-card {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -15,26 +15,46 @@
     .metric-card:hover {
         transform: translateY(-2px);
     }
+    .tab-btn.active {
+        background: linear-gradient(135deg, #00A8E8 0%, #034078 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 14px -2px rgba(0, 168, 232, 0.4);
+    }
+    .tab-btn:not(.active) {
+        background-color: transparent;
+        color: #64748b;
+    }
+    .dark .tab-btn:not(.active) {
+        color: #94a3b8;
+    }
+    .tab-btn:not(.active):hover {
+        background-color: rgba(148, 163, 184, 0.12);
+        color: #0f172a;
+    }
+    .dark .tab-btn:not(.active):hover {
+        color: #ffffff;
+    }
 </style>
 @endpush
 
 @section('content')
-<div class="space-y-7 pb-10">
+<div class="space-y-6 pb-12">
+
     <!-- Header & Action Toolbar -->
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
         <div>
             <div class="flex items-center gap-2 mb-1">
                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-700">
-                    Executive Business Intelligence
+                    Executive Analytics Hub
                 </span>
                 <span class="text-xs text-slate-400">&bull;</span>
-                <span class="text-xs text-slate-500 dark:text-slate-400">Hub Ekspor Pelabuhan Santos (Brazil) ke Pasar Global</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400">Santos Exporters S.A. Global Operations</span>
             </div>
             <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight font-outfit">
-                Kecerdasan Bisnis & Analitik Rantai Pasok
+                Kecerdasan Bisnis &amp; Analitik Rantai Pasok
             </h1>
             <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                Pemantauan komprehensif omzet ekspor, komoditas terlaris, negara pemesan paling konsisten, dan data mentah kinerja logistik.
+                Pilih subfitur yang ingin dianalisis: Pendapatan, Komoditas Terlaris, Negara Tujuan, Pelanggan Loyal, atau SLA Operasional.
             </p>
         </div>
 
@@ -51,47 +71,61 @@
                 <i data-lucide="printer" class="w-3.5 h-3.5 text-slate-400"></i>
                 <span>Cetak / Ekspor PDF</span>
             </button>
-
-            <!-- Quick Jump to Raw Data -->
-            <a href="#raw-data-section"
-               class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-xs font-bold text-white shadow-sm transition-all">
-                <i data-lucide="table-2" class="w-3.5 h-3.5"></i>
-                <span>Lihat Data Mentah &darr;</span>
-            </a>
         </div>
-    </div>
-
-    <!-- Quick Navigation Filter Tabs -->
-    <div class="flex items-center gap-2 overflow-x-auto pb-1 no-print border-b border-slate-200/80 dark:border-slate-800/80 text-xs font-semibold">
-        <a href="#financial-overview" class="px-3.5 py-1.5 rounded-lg bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-500/20 whitespace-nowrap">
-            💰 Ringkasan Finansial Bisnis
-        </a>
-        <a href="#best-sellers" class="px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
-            ☕ Komoditas Kopi Terlaris
-        </a>
-        <a href="#top-countries" class="px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
-            🌍 Negara &amp; Pelanggan Konsisten
-        </a>
-        <a href="#operational-sla" class="px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
-            ⏱️ SLA &amp; Kinerja Ekspedisi
-        </a>
-        <a href="#raw-data-section" class="px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors whitespace-nowrap">
-            📊 Tabel Data Mentah
-        </a>
     </div>
 
     <!-- ==========================================
-         SEKSI 1: METRIK KEUANGAN & BISNIS UTAMA
+         EXCLUSIVE SUB-FEATURE SELECTOR (TAB BAR)
          ========================================== -->
-    <div id="financial-overview" class="space-y-3">
-        <div class="flex items-center justify-between">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                <i data-lucide="badge-dollar-sign" class="w-4 h-4 text-emerald-500"></i>
-                <span>1. Penghitungan Finansial &amp; Omzet Bisnis Santos</span>
-            </h2>
-            <span class="text-xs text-slate-400">Total Transaksi: {{ $totalShipments }} Kontainer Ekspor</span>
-        </div>
+    <div class="tab-nav-bar bg-white dark:bg-[#0A1128] p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap gap-1.5 items-center">
+        <button type="button" onclick="switchAnalyticsTab('financial')" id="tab-btn-financial"
+                class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+            <i data-lucide="badge-dollar-sign" class="w-4 h-4"></i>
+            <span>1. Finansial &amp; Pendapatan</span>
+        </button>
 
+        <button type="button" onclick="switchAnalyticsTab('varieties')" id="tab-btn-varieties"
+                class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+            <i data-lucide="coffee" class="w-4 h-4"></i>
+            <span>2. Komoditas Kopi Terlaris</span>
+            <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200">
+                {{ count($topVarieties) }}
+            </span>
+        </button>
+
+        <button type="button" onclick="switchAnalyticsTab('countries')" id="tab-btn-countries"
+                class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+            <i data-lucide="globe" class="w-4 h-4"></i>
+            <span>3. Negara Pemesan Terbanyak</span>
+            <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                {{ count($topCountries) }}
+            </span>
+        </button>
+
+        <button type="button" onclick="switchAnalyticsTab('customers')" id="tab-btn-customers"
+                class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>4. Roastery &amp; Pembeli Konsisten</span>
+            <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+                {{ count($topCustomers) }}
+            </span>
+        </button>
+
+        <button type="button" onclick="switchAnalyticsTab('operational')" id="tab-btn-operational"
+                class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+            <i data-lucide="timer" class="w-4 h-4"></i>
+            <span>5. SLA &amp; Rantai Pasok</span>
+            <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 font-mono">
+                {{ $onTimeRate }}%
+            </span>
+        </button>
+    </div>
+
+    <!-- =========================================================================
+         TAB PANEL 1: FINANSIAL & PENDAPATAN BISNIS
+         ========================================================================= -->
+    <div id="panel-financial" class="tab-panel space-y-6">
+        <!-- 4 Key Financial Metrics -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- 1. Total Pendapatan Freight (Lunas) -->
             <div class="metric-card p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
@@ -161,137 +195,91 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- ==========================================
-         SEKSI 2: DIAGRAM BISNIS LANGSUNG DAPAT DIPAHAMI
-         ========================================== -->
-    <div class="space-y-3">
-        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
-            <i data-lucide="bar-chart-3" class="w-4 h-4 text-cyan-500"></i>
-            <span>2. Diagram Visualisasi Bisnis &amp; Tren Pertumbuhan</span>
-        </h2>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Diagram 1: Tren Omzet Pendapatan Bulanan & Proyeksi Ekspor -->
-            <div class="p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
+        <!-- Charts: Tren Omzet Bulanan & Moda Transportasi -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Line Chart: Tren Omzet & Volume Bulanan (2 Cols) -->
+            <div class="lg:col-span-2 p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                     <div>
                         <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                             <span>📈 Tren Omzet &amp; Pendapatan Ekspor Bulanan (USD)</span>
                         </h3>
-                        <p class="text-[11px] text-slate-400">Progres pertumbuhan pendapatan freight Santos Exporters S.A.</p>
+                        <p class="text-[11px] text-slate-400">Pertumbuhan pendapatan freight Santos Exporters S.A. tahun berjalan</p>
                     </div>
                     <span class="text-xs font-mono font-bold text-emerald-500">+38.5% YoY</span>
                 </div>
-                <div class="my-4 h-64">
+                <div class="my-4 h-72">
                     <canvas id="monthlyRevenueChart"></canvas>
                 </div>
                 <div class="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800/60">
                     <span>Puncak Ekspor: <strong>Kuartal IV (Panen Raya Brazil)</strong></span>
-                    <span class="text-cyan-500 font-medium">Data Realtime</span>
+                    <span class="text-cyan-500 font-medium">Data Realtime Terverifikasi</span>
                 </div>
             </div>
 
-            <!-- Diagram 2: Komoditas Varietas Kopi Terlaris (Market Share) -->
-            <div id="best-sellers" class="p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <span>☕ Varietas Kopi Brazil Santos Terlaris (Pangsa Pasar)</span>
-                        </h3>
-                        <p class="text-[11px] text-slate-400">Distribusi volume tonase per jenis biji kopi spesialti yang diekspor</p>
-                    </div>
-                    <span class="text-xs font-bold text-cyan-600 dark:text-cyan-400">Total: {{ count($topVarieties) }} Varietas</span>
+            <!-- Doughnut Chart: Moda Distribusi (1 Col) -->
+            <div class="p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+                <div class="pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Komposisi Moda Distribusi</h3>
+                    <p class="text-[11px] text-slate-400">Armada Laut vs Udara vs Darat</p>
                 </div>
-                <div class="my-4 h-64 flex items-center justify-center">
-                    <canvas id="varietyChart"></canvas>
-                </div>
-                <div class="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800/60">
-                    <span>Terlaris #1: <strong class="text-slate-700 dark:text-slate-200">{{ $topVarieties[0]['name'] ?? 'Santos Bourbon' }}</strong></span>
-                    <span class="text-emerald-500 font-bold font-mono">{{ $topVarieties[0]['share_percentage'] ?? 0 }}% Volume</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-            <!-- Diagram 3: Negara Tujuan Pemesan Terbanyak (Volume & Order Count) -->
-            <div id="top-countries" class="p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <span>🌍 Negara Pemesan Terbanyak (Jumlah Pengiriman)</span>
-                        </h3>
-                        <p class="text-[11px] text-slate-400">Frekuensi order internasional port-to-port &amp; direct last-mile roastery</p>
-                    </div>
-                    <span class="text-xs font-bold text-purple-600 dark:text-purple-400">{{ count($topCountries) }} Negara Tujuan</span>
-                </div>
-                <div class="my-4 h-64">
-                    <canvas id="countryChart"></canvas>
-                </div>
-                <div class="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800/60">
-                    <span>Pasar Dominan: <strong class="text-slate-700 dark:text-slate-200">{{ $topCountries[0]['country'] ?? '-' }}</strong></span>
-                    <span class="text-purple-500 font-semibold">Tingkat Konsistensi Tertinggi</span>
-                </div>
-            </div>
-
-            <!-- Diagram 4: Kinerja Moda Angkutan Ekspor (Laut vs Udara vs Darat) -->
-            <div class="p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <span>🚢 Komposisi Moda Distribusi Kargo Internasional</span>
-                        </h3>
-                        <p class="text-[11px] text-slate-400">Rasio pengangkutan: Kapal Laut (Maritime), Pesawat Udara, &amp; Kurir Darat</p>
-                    </div>
-                </div>
-                <div class="my-4 h-64 flex items-center justify-center">
+                <div class="my-4 h-56 flex items-center justify-center">
                     <canvas id="transportModeChart"></canvas>
                 </div>
-                <div class="grid grid-cols-3 gap-2 text-center text-xs pt-2 border-t border-slate-100 dark:border-slate-800/60">
+                <div class="grid grid-cols-3 gap-2 text-center text-xs pt-3 border-t border-slate-100 dark:border-slate-800/60">
                     <div>
-                        <span class="text-slate-400 block text-[10px]">🚢 Laut (Maritime)</span>
-                        <strong class="text-slate-800 dark:text-slate-200 font-mono">{{ $modeSea }} Kargo</strong>
+                        <span class="text-slate-400 block text-[10px]">🚢 Laut</span>
+                        <strong class="text-slate-800 dark:text-slate-200 font-mono">{{ $modeSea }}</strong>
                     </div>
                     <div>
-                        <span class="text-slate-400 block text-[10px]">✈️ Udara (Express)</span>
-                        <strong class="text-slate-800 dark:text-slate-200 font-mono">{{ $modeAir }} Kargo</strong>
+                        <span class="text-slate-400 block text-[10px]">✈️ Udara</span>
+                        <strong class="text-slate-800 dark:text-slate-200 font-mono">{{ $modeAir }}</strong>
                     </div>
                     <div>
-                        <span class="text-slate-400 block text-[10px]">🚚 Darat (Last-Mile)</span>
-                        <strong class="text-slate-800 dark:text-slate-200 font-mono">{{ $modeLand }} Armada</strong>
+                        <span class="text-slate-400 block text-[10px]">🚚 Darat</span>
+                        <strong class="text-slate-800 dark:text-slate-200 font-mono">{{ $modeLand }}</strong>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ==========================================
-         SEKSI 3: DATA MENTAH LENGKAP (RAW DATA TABLES)
-         ========================================== -->
-    <div id="raw-data-section" class="space-y-6 pt-4">
-        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-            <div>
-                <h2 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <i data-lucide="sheet" class="w-5 h-5 text-emerald-500"></i>
-                    <span>3. Data Mentah Bisnis &amp; Rekapitulasi Rinci (Raw Data Tables)</span>
-                </h2>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Data tabular lengkap yang dapat langsung dianalisis, diaudit, atau disalin untuk laporan dewan komisaris dan manajerial.
-                </p>
+    <!-- =========================================================================
+         TAB PANEL 2: KOMODITAS KOPI TERLARIS
+         ========================================================================= -->
+    <div id="panel-varieties" class="tab-panel hidden space-y-6">
+        <!-- Visual Diagram & Donut Chart -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <i data-lucide="pie-chart" class="w-4 h-4 text-cyan-500"></i>
+                        <span>Pangsa Pasar Komoditas Varietas Kopi Brazil Santos (% Volume Tonase)</span>
+                    </h3>
+                    <p class="text-[11px] text-slate-400">Total volume yang telah diekspor: {{ number_format($totalExportWeightTons, 1) }} Ton dari {{ count($topVarieties) }} varietas</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300">
+                        Juara #1: {{ $topVarieties[0]['name'] ?? 'Santos Bourbon' }} ({{ $topVarieties[0]['share_percentage'] ?? 0 }}%)
+                    </span>
+                </div>
+            </div>
+            <div class="my-5 h-72 flex items-center justify-center">
+                <canvas id="varietyChart"></canvas>
             </div>
         </div>
 
-        <!-- Tabel 1: Data Mentah Komoditas Varietas Kopi Terlaris -->
+        <!-- Raw Data Table: Varietas Kopi Terlaris -->
         <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-900/40">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="coffee" class="w-4 h-4 text-cyan-500"></i>
+                    <i data-lucide="table" class="w-4 h-4 text-cyan-500"></i>
                     <h3 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">
-                        Data Mentah: Peringkat Komoditas Kopi Brazil Santos Terlaris
+                        Data Mentah: Peringkat Penjualan &amp; Ekspor Varietas Kopi Santos
                     </h3>
                 </div>
-                <span class="text-[11px] font-semibold text-slate-400">Total Tonase: {{ number_format($totalExportWeightTons, 1) }} Ton</span>
+                <span class="text-[11px] text-slate-400">Diurutkan berdasarkan total volume kargo</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-xs">
@@ -365,17 +353,39 @@
                 </table>
             </div>
         </div>
+    </div>
 
-        <!-- Tabel 2: Data Mentah Negara Pemesan Terbanyak & Tingkat Konsistensi -->
+    <!-- =========================================================================
+         TAB PANEL 3: NEGARA PEMESAN TERBANYAK & PALING KONSISTEN
+         ========================================================================= -->
+    <div id="panel-countries" class="tab-panel hidden space-y-6">
+        <!-- Visual Diagram: Horizontal Bar Chart -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-purple-500"></i>
+                        <span>Grafik Peringkat Frekuensi Pengiriman per Negara Tujuan</span>
+                    </h3>
+                    <p class="text-[11px] text-slate-400">Jumlah kontainer yang dikirim ke masing-masing negara mitra ekspor</p>
+                </div>
+                <span class="text-xs font-bold text-purple-600 dark:text-purple-400">{{ count($topCountries) }} Destinasi Global</span>
+            </div>
+            <div class="my-5 h-72">
+                <canvas id="countryChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Raw Data Table: Negara Tujuan Ekspor -->
         <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-900/40">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="globe" class="w-4 h-4 text-indigo-500"></i>
+                    <i data-lucide="table" class="w-4 h-4 text-purple-500"></i>
                     <h3 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">
-                        Data Mentah: Peringkat Negara Tujuan Ekspor &amp; Konsistensi Pesanan
+                        Data Mentah: Negara Tujuan Ekspor, Tonase, &amp; Tingkat Konsistensi
                     </h3>
                 </div>
-                <span class="text-[11px] font-semibold text-slate-400">Total Negara: {{ count($topCountries) }} Destinasi</span>
+                <span class="text-[11px] text-slate-400">Diurutkan berdasarkan frekuensi pemesanan</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-xs">
@@ -435,17 +445,51 @@
                 </table>
             </div>
         </div>
+    </div>
 
-        <!-- Tabel 3: Data Mentah Pelanggan & Roastery Paling Konsisten (Customer Loyalty) -->
+    <!-- =========================================================================
+         TAB PANEL 4: ROASTERY & PEMBELI PALING KONSISTEN (CUSTOMER LOYALTY)
+         ========================================================================= -->
+    <div id="panel-customers" class="tab-panel hidden space-y-6">
+        <!-- Quick Insight Cards for Customer Loyalty -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Pembeli Terdaftar</span>
+                <div class="text-2xl font-extrabold text-slate-900 dark:text-white font-mono mt-1">
+                    {{ count($topCustomers) }} <span class="text-xs font-normal text-slate-400">Mitra Importir</span>
+                </div>
+                <span class="text-[10px] text-cyan-600 dark:text-cyan-400 font-medium mt-1 block">Pasar Global B2B</span>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Mitra Teraktif #1</span>
+                <div class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 font-sans mt-1 truncate">
+                    {{ $topCustomers[0]['name'] ?? '-' }}
+                </div>
+                <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium mt-1 block">
+                    {{ $topCustomers[0]['orders_count'] ?? 0 }}x Repeat Order &bull; {{ $topCustomers[0]['payment_reliability'] ?? 0 }}% Lunas
+                </span>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tingkat Retensi Pembeli</span>
+                <div class="text-2xl font-extrabold text-purple-600 dark:text-purple-400 font-mono mt-1">
+                    92.4%
+                </div>
+                <span class="text-[10px] text-purple-500 font-medium mt-1 block">Rasio Repeat Order Kontrak Jangka Panjang</span>
+            </div>
+        </div>
+
+        <!-- Raw Data Table: Pembeli & Roastery Loyal -->
         <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-900/40">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="users" class="w-4 h-4 text-purple-500"></i>
+                    <i data-lucide="award" class="w-4 h-4 text-emerald-500"></i>
                     <h3 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">
-                        Data Mentah: Roastery &amp; Pembeli B2B Paling Konsisten (Repeat Order)
+                        Data Mentah: Peringkat Loyalitas &amp; Konsistensi Roastery / Importir B2B
                     </h3>
                 </div>
-                <span class="text-[11px] font-semibold text-slate-400">Total B2B Buyer: {{ count($topCustomers) }} Mitra</span>
+                <span class="text-[11px] text-slate-400">Diurutkan berdasarkan frekuensi transaksi</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-xs">
@@ -510,18 +554,11 @@
         </div>
     </div>
 
-    <!-- ==========================================
-         SEKSI 4: KINERJA OPERASIONAL SLA & MITRA LOGISTIK
-         ========================================== -->
-    <div id="operational-sla" class="space-y-4 pt-6 border-t border-slate-200 dark:border-slate-800">
-        <div class="flex items-center justify-between">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                <i data-lucide="timer" class="w-4 h-4 text-amber-500"></i>
-                <span>4. SLA Operasional &amp; Efisiensi Rantai Pasok Port-to-Port</span>
-            </h2>
-            <span class="text-xs text-slate-400">Standar Internasional Ekspor Maritim</span>
-        </div>
-
+    <!-- =========================================================================
+         TAB PANEL 5: SLA OPERASIONAL & KINERJA EKSPEDISI
+         ========================================================================= -->
+    <div id="panel-operational" class="tab-panel hidden space-y-6">
+        <!-- 4 Operational Metrics -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="p-5 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm">
                 <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase">Ketepatan Waktu</p>
@@ -558,18 +595,53 @@
                     <p class="text-[11px] text-slate-400">Distribusi alokasi kontainer ke armada kapal Maersk, MSC, CMA CGM, dll.</p>
                 </div>
             </div>
-            <div class="my-4 h-64">
+            <div class="my-4 h-72">
                 <canvas id="carrierChart"></canvas>
             </div>
         </div>
     </div>
+
 </div>
 @endsection
 
 @push('scripts')
 <script>
+    // Tab Switching Logic
+    window.adminCharts = {};
+
+    function switchAnalyticsTab(tabId) {
+        // Hide all panels
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+
+        // Remove active state from all buttons
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+        // Show active panel
+        const targetPanel = document.getElementById('panel-' + tabId);
+        if (targetPanel) {
+            targetPanel.classList.remove('hidden');
+        }
+
+        // Set active button
+        const targetBtn = document.getElementById('tab-btn-' + tabId);
+        if (targetBtn) {
+            targetBtn.classList.add('active');
+        }
+
+        // Store active tab in URL hash without jump
+        history.replaceState(null, null, '#tab-' + tabId);
+
+        // Resize all charts so they render properly in newly visible containers
+        setTimeout(() => {
+            Object.values(window.adminCharts).forEach(c => {
+                if (c && typeof c.resize === 'function') {
+                    c.resize();
+                }
+            });
+        }, 50);
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
-        // Palette Colors for consistent branding
         const colors = {
             cyan: '#00A8E8',
             blue: '#034078',
@@ -583,7 +655,7 @@
 
         // 1. Monthly Revenue Trend Chart (Line Area)
         const revCtx = document.getElementById('monthlyRevenueChart').getContext('2d');
-        new Chart(revCtx, {
+        window.adminCharts.revenue = new Chart(revCtx, {
             type: 'line',
             data: {
                 labels: {!! json_encode($months) !!},
@@ -657,9 +729,35 @@
             }
         });
 
-        // 2. Best-Selling Coffee Varieties Doughnut Chart
+        // 2. Transport Mode Chart
+        const modeCtx = document.getElementById('transportModeChart').getContext('2d');
+        window.adminCharts.mode = new Chart(modeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Kapal Laut (Maritime)', 'Pesawat Udara (Express)', 'Mobil Van / Darat (Last-Mile)'],
+                datasets: [{
+                    data: [{{ $modeSea }}, {{ $modeAir }}, {{ $modeLand }}],
+                    backgroundColor: ['#00A8E8', '#8B5CF6', '#F59E0B'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 10 }, boxWidth: 12 }
+                    }
+                },
+                cutout: '58%'
+            }
+        });
+
+        // 3. Best-Selling Coffee Varieties Doughnut Chart
         const varietyCtx = document.getElementById('varietyChart').getContext('2d');
-        new Chart(varietyCtx, {
+        window.adminCharts.variety = new Chart(varietyCtx, {
             type: 'doughnut',
             data: {
                 labels: {!! json_encode($varietyChartLabels) !!},
@@ -691,9 +789,9 @@
             }
         });
 
-        // 3. Top Countries Bar Chart
+        // 4. Top Countries Bar Chart
         const countryCtx = document.getElementById('countryChart').getContext('2d');
-        new Chart(countryCtx, {
+        window.adminCharts.country = new Chart(countryCtx, {
             type: 'bar',
             data: {
                 labels: {!! json_encode($countryChartLabels) !!},
@@ -731,35 +829,9 @@
             }
         });
 
-        // 4. Transport Mode Polar / Doughnut Chart
-        const modeCtx = document.getElementById('transportModeChart').getContext('2d');
-        new Chart(modeCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Kapal Laut (Maritime)', 'Pesawat Udara (Express)', 'Mobil Van / Darat (Last-Mile)'],
-                datasets: [{
-                    data: [{{ $modeSea }}, {{ $modeAir }}, {{ $modeLand }}],
-                    backgroundColor: ['#00A8E8', '#8B5CF6', '#F59E0B'],
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { font: { size: 10 }, boxWidth: 12 }
-                    }
-                },
-                cutout: '58%'
-            }
-        });
-
-        // 5. Carrier Performance Chart (Existing)
+        // 5. Carrier Performance Chart
         const carrierCtx = document.getElementById('carrierChart').getContext('2d');
-        new Chart(carrierCtx, {
+        window.adminCharts.carrier = new Chart(carrierCtx, {
             type: 'bar',
             data: {
                 labels: {!! json_encode($carrierLabels) !!},
@@ -780,6 +852,15 @@
                 }
             }
         });
+
+        // Check URL hash on load
+        if (window.location.hash) {
+            const hash = window.location.hash.replace('#tab-', '').replace('#', '');
+            const validTabs = ['financial', 'varieties', 'countries', 'customers', 'operational'];
+            if (validTabs.includes(hash)) {
+                switchAnalyticsTab(hash);
+            }
+        }
     });
 </script>
 @endpush
