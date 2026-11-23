@@ -79,14 +79,14 @@
     </div>
 
     {{-- Main Container --}}
-    <div class="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-12 flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
+    <div class="relative z-10 w-full max-w-[1480px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 py-10 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16">
 
         {{-- LEFT COLUMN: Glowing 3D Logo & Brand Presentation --}}
-        <div class="w-full lg:w-1/2 flex flex-col justify-center items-start text-left">
+        <div class="w-full lg:flex-1 max-w-xl flex flex-col justify-center items-start text-left">
             
             <div class="flex items-center gap-5 mb-3">
                 {{-- Isometric 3D Cargo Box with Orbit & Airplanes (Official Logo Mockup) --}}
-                <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 drop-shadow-[0_0_25px_rgba(0,194,255,0.6)]">
+                <div class="w-18 h-18 sm:w-22 sm:h-22 lg:w-24 lg:h-24 flex-shrink-0 drop-shadow-[0_0_25px_rgba(0,194,255,0.6)]">
                     <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
                         <defs>
                             <linearGradient id="cubeTop" x1="60" y1="20" x2="60" y2="55" gradientUnits="userSpaceOnUse">
@@ -176,24 +176,24 @@
         </div>
 
         {{-- RIGHT COLUMN: Glassmorphism Login Card --}}
-        <div class="w-full lg:w-auto lg:min-w-[420px] max-w-md">
-            <div class="glass-card rounded-3xl p-8 sm:p-9 shadow-2xl relative">
+        <div class="w-full sm:w-[420px] lg:w-[440px] flex-shrink-0">
+            <div class="glass-card rounded-2xl sm:rounded-3xl p-7 sm:p-8 shadow-2xl relative">
 
                 {{-- Language Selector Pill (Top Right) --}}
-                <div class="flex justify-end mb-4">
+                <div class="flex justify-end mb-2">
                     <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-600/60 bg-slate-800/80 text-xs text-white cursor-pointer hover:border-slate-500 transition-colors">
-                        <span class="text-sm">🇮🇩</span>
-                        <span class="font-semibold text-slate-200">ID</span>
-                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+                        <span class="text-xs">🇮🇩</span>
+                        <span class="font-semibold text-slate-200 text-xs">ID</span>
+                        <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
                     </div>
                 </div>
 
                 {{-- Card Header --}}
-                <div class="mb-7">
+                <div class="mb-6">
                     <h2 class="text-2xl sm:text-[26px] font-bold text-white tracking-tight leading-tight">
                         Masuk ke CargoTrace
                     </h2>
-                    <p class="text-xs sm:text-sm text-slate-300/90 mt-2 leading-relaxed">
+                    <p class="text-xs sm:text-sm text-slate-300/85 mt-1.5 leading-relaxed">
                         Kelola, pantau, dan lacak pengiriman global dalam satu platform.
                     </p>
                 </div>
@@ -218,48 +218,48 @@
 
                     {{-- Email Input --}}
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                             <i data-lucide="mail" class="w-4 h-4"></i>
                         </div>
                         <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus
                                placeholder="Alamat Email"
-                               class="input-dark w-full pl-11 pr-4 py-3 rounded-xl text-xs sm:text-sm">
+                               class="input-dark w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm">
                     </div>
 
                     {{-- Password Input with Show/Hide Toggle --}}
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                             <i data-lucide="lock" class="w-4 h-4"></i>
                         </div>
                         <input type="password" id="password" name="password" required
                                placeholder="Kata Sandi"
-                               class="input-dark w-full pl-11 pr-11 py-3 rounded-xl text-xs sm:text-sm">
+                               class="input-dark w-full pl-10 pr-10 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm">
                         <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-200">
                             <i data-lucide="eye" class="w-4 h-4" id="eye-icon"></i>
                         </button>
                     </div>
 
                     {{-- Remember Me & Forgot Password --}}
-                    <div class="flex items-center justify-between pt-1">
+                    <div class="flex items-center justify-between text-xs pt-0.5">
                         <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" id="remember" name="remember" class="w-4 h-4 rounded border-slate-600 bg-slate-800 text-cyan-500 focus:ring-cyan-500">
-                            <span class="text-xs text-slate-300">Ingat Saya</span>
+                            <input type="checkbox" id="remember" name="remember" class="w-3.5 h-3.5 rounded border-slate-600 bg-slate-800 text-cyan-500 focus:ring-cyan-500">
+                            <span class="text-slate-300">Ingat Saya</span>
                         </label>
-                        <a href="javascript:alert('Gunakan password demo: password');" class="text-xs text-slate-300 hover:text-cyan-300 transition-colors">
+                        <a href="javascript:alert('Gunakan password demo: password');" class="text-slate-300 hover:text-cyan-300 transition-colors">
                             Lupa kata sandi?
                         </a>
                     </div>
 
                     {{-- Submit Button (Rounded Pill Gradient) --}}
                     <button type="submit"
-                            class="btn-cyan-glow w-full mt-3 py-3 px-5 rounded-2xl text-xs sm:text-sm font-semibold text-white flex items-center justify-center gap-2">
+                            class="btn-cyan-glow w-full mt-2 py-2.5 sm:py-3 px-5 rounded-xl text-xs sm:text-sm font-semibold text-white flex items-center justify-center gap-2">
                         <i data-lucide="log-in" class="w-4 h-4"></i>
                         <span>Masuk</span>
                     </button>
                 </form>
 
                 {{-- Register Link --}}
-                <div class="mt-7 text-center">
+                <div class="mt-6 text-center">
                     <p class="text-xs text-slate-300">
                         Belum memiliki akun?
                         <a href="{{ route('register') }}" class="font-semibold text-[#00C2FF] hover:text-cyan-300 transition-colors ml-1">

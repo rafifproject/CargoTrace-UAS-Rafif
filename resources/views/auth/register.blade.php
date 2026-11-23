@@ -73,10 +73,10 @@
          style="background: radial-gradient(circle at 75% 50%, rgba(2, 8, 23, 0.3) 0%, rgba(2, 8, 23, 0.8) 100%);">
     </div>
 
-    <div class="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-12 flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-16">
+    <div class="relative z-10 w-full max-w-[1480px] mx-auto px-6 sm:px-10 lg:px-16 xl:px-24 py-10 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16">
 
         {{-- LEFT COLUMN: Glowing 3D Logo & Brand Presentation --}}
-        <div class="w-full lg:w-1/2 flex flex-col justify-center items-start text-left">
+        <div class="w-full lg:flex-1 max-w-xl flex flex-col justify-center items-start text-left">
             <div class="flex items-center gap-5 mb-3">
                 <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 drop-shadow-[0_0_25px_rgba(0,194,255,0.6)]">
                     <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
@@ -136,24 +136,24 @@
         </div>
 
         {{-- RIGHT COLUMN: Glassmorphism Register Card (Mockup 02) --}}
-        <div class="w-full lg:w-auto lg:min-w-[420px] max-w-md">
-            <div class="glass-card rounded-3xl p-8 sm:p-9 shadow-2xl relative">
+        <div class="w-full sm:w-[420px] lg:w-[440px] flex-shrink-0">
+            <div class="glass-card rounded-2xl sm:rounded-3xl p-7 sm:p-8 shadow-2xl relative">
 
                 {{-- Language Selector Pill --}}
-                <div class="flex justify-end mb-4">
+                <div class="flex justify-end mb-2">
                     <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-600/60 bg-slate-800/80 text-xs text-white cursor-pointer hover:border-slate-500 transition-colors">
-                        <span class="text-sm">🇮🇩</span>
-                        <span class="font-semibold text-slate-200">ID</span>
-                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+                        <span class="text-xs">🇮🇩</span>
+                        <span class="font-semibold text-slate-200 text-xs">ID</span>
+                        <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
                     </div>
                 </div>
 
                 {{-- Card Header --}}
-                <div class="mb-6">
+                <div class="mb-5">
                     <h2 class="text-2xl sm:text-[26px] font-bold text-white tracking-tight leading-tight">
                         Buat Akun Customer
                     </h2>
-                    <p class="text-xs sm:text-sm text-slate-300/90 mt-2 leading-relaxed">
+                    <p class="text-xs sm:text-sm text-slate-300/85 mt-1.5 leading-relaxed">
                         Buat akun untuk memantau pengiriman Anda.
                     </p>
                 </div>
