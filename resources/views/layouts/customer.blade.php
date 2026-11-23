@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full">
+<html lang="{{ app()->getLocale() }}" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Pelacakan Kargo') | CargoTrace - Customer Portal</title>
+    <title>@yield('title', __('Pelacakan Kargo')) | CargoTrace - Customer Portal</title>
 
     <!-- Favicon: CargoTrace Official 3D Box & Orbit Logo -->
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
@@ -153,12 +153,12 @@
             <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
                 <!-- Group 1: BERANDA -->
                 <div>
-                    <div class="px-3 mb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Beranda</div>
+                    <div class="px-3 mb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">{{ __('Beranda') }}</div>
                     <ul class="space-y-1">
                         <li>
                             <a href="{{ route('customer.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.dashboard') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 font-semibold' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
                                 <i data-lucide="layout-dashboard" class="w-4 h-4 {{ request()->routeIs('customer.dashboard') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Beranda</span>
+                                <span>{{ __('Beranda') }}</span>
                             </a>
                         </li>
                     </ul>
@@ -166,30 +166,30 @@
 
                 <!-- Group 2: PENGIRIMAN SAYA -->
                 <div>
-                    <div class="px-3 mb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Pengiriman Saya</div>
+                    <div class="px-3 mb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">{{ __('Pengiriman Saya') }}</div>
                     <ul class="space-y-1">
                         <li>
                             <a href="{{ route('customer.shipments.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.shipments.index') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
                                 <i data-lucide="package" class="w-4 h-4 {{ request()->routeIs('customer.shipments.index') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Pengiriman Saya</span>
+                                <span>{{ __('Pengiriman Saya') }}</span>
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('customer.shipments.create') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.shipments.create') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
                                 <i data-lucide="package-plus" class="w-4 h-4 {{ request()->routeIs('customer.shipments.create') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Pesan Pengiriman</span>
+                                <span>{{ __('Pesan Pengiriman') }}</span>
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('customer.tracking.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.tracking.index') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
                                 <i data-lucide="git-commit" class="w-4 h-4 {{ request()->routeIs('customer.tracking.index') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Riwayat Pelacakan</span>
+                                <span>{{ __('Riwayat Pelacakan') }}</span>
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('customer.shipments.map') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.shipments.map') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
                                 <i data-lucide="globe-2" class="w-4 h-4 {{ request()->routeIs('customer.shipments.map') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Peta Pengiriman</span>
+                                <span>{{ __('Peta Pengiriman') }}</span>
                             </a>
                         </li>
                     </ul>
@@ -197,13 +197,13 @@
 
                 <!-- Group 3: KENDALA & BANTUAN -->
                 <div>
-                    <div class="px-3 mb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Kendala & Bantuan</div>
+                    <div class="px-3 mb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">{{ __('Kendala & Bantuan') }}</div>
                     <ul class="space-y-1">
                         <li>
                             <a href="{{ route('customer.exceptions.index') }}" class="flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.exceptions.index') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
                                 <div class="flex items-center gap-3">
                                     <i data-lucide="alert-triangle" class="w-4 h-4 {{ request()->routeIs('customer.exceptions.index') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                    <span>Pengecualian / Kendala</span>
+                                    <span>{{ __('Pengecualian / Kendala') }}</span>
                                 </div>
                                 @php
                                     $myShipmentIds = auth()->user()->shipments()->pluck('id');
@@ -221,13 +221,13 @@
 
                 <!-- Group 4: AKUN SAYA -->
                 <div>
-                    <div class="px-3 mb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Akun Saya</div>
+                    <div class="px-3 mb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">{{ __('Akun Saya') }}</div>
                     <ul class="space-y-1">
                         <li>
                             <a href="{{ route('customer.notifications.index') }}" class="flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.notifications.index') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
                                 <div class="flex items-center gap-3">
                                     <i data-lucide="bell" class="w-4 h-4 {{ request()->routeIs('customer.notifications.index') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                    <span>Pusat Notifikasi</span>
+                                    <span>{{ __('Pusat Notifikasi') }}</span>
                                 </div>
                                 @php
                                     $custUnreadNotifs = \App\Models\Notification::where(function($q) use ($myShipmentIds) {
@@ -242,7 +242,7 @@
                         <li>
                             <a href="{{ route('customer.profile.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors {{ request()->routeIs('customer.profile.index') ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30' : 'hover:bg-slate-800/60 hover:text-white text-slate-300' }}">
                                 <i data-lucide="user-circle" class="w-4 h-4 {{ request()->routeIs('customer.profile.index') ? 'text-cyan-400' : 'text-slate-400' }}"></i>
-                                <span>Profil Akun</span>
+                                <span>{{ __('Profil Akun') }}</span>
                             </a>
                         </li>
                     </ul>
@@ -255,7 +255,7 @@
                     @csrf
                     <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors border border-rose-500/20">
                         <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-                        <span>Keluar dari Akun</span>
+                        <span>{{ __('Keluar dari Akun') }}</span>
                     </button>
                 </form>
             </div>
@@ -269,26 +269,33 @@
                 <div class="flex items-center gap-3 flex-1 max-w-md">
                     <form method="GET" action="{{ route('customer.shipments.index') }}" class="relative w-full">
                         <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Lacak nomor resi pengiriman Anda..." class="w-full pl-10 pr-4 py-1.5 text-xs bg-slate-100 dark:bg-slate-900/60 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 placeholder-slate-400 transition-colors">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Lacak nomor resi pengiriman Anda...') }}" class="w-full pl-10 pr-4 py-1.5 text-xs bg-slate-100 dark:bg-slate-900/60 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 placeholder-slate-400 transition-colors">
                     </form>
                 </div>
 
-                <!-- Right Actions: Live Clock, Theme Toggle, Notification Bell, User Menu -->
-                <div class="flex items-center gap-4">
+                <!-- Right Actions: Live Clock, Language Toggle, Theme Toggle, Notification Bell, User Menu -->
+                <div class="flex items-center gap-3 sm:gap-4">
                     <!-- Live Global Clock -->
                     <div class="hidden md:flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
                         <i data-lucide="clock" class="w-3.5 h-3.5 text-cyan-500"></i>
                         <span id="global-clock" class="font-mono font-medium">UTC --:-- | WIB --:--</span>
                     </div>
 
+                    <!-- Quick Language Switcher Pill (ID / EN) -->
+                    <a href="{{ route('locale.switch', app()->getLocale() === 'en' ? 'id' : 'en') }}"
+                       class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:border-cyan-500/40 hover:text-cyan-500"
+                       title="{{ app()->getLocale() === 'en' ? 'Ganti ke Bahasa Indonesia' : 'Switch to English' }}">
+                        <span>{{ app()->getLocale() === 'en' ? '🇬🇧 EN' : '🇮🇩 ID' }}</span>
+                    </a>
+
                     <!-- Single Global Dark/Light Toggle Button -->
-                    <button id="theme-toggle" type="button" onclick="toggleGlobalTheme()" class="p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-colors" title="Beralih Tema (Terang / Gelap)">
+                    <button id="theme-toggle" type="button" onclick="toggleGlobalTheme()" class="p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-colors" title="{{ __('Beralih Tema (Terang / Gelap)') }}">
                         <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
                         <i data-lucide="moon" class="w-4 h-4 block dark:hidden text-slate-600"></i>
                     </button>
 
                     <!-- Notifications Dropdown / Shortcut -->
-                    <a href="{{ route('customer.notifications.index') }}" class="relative p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-colors" title="Pusat Notifikasi">
+                    <a href="{{ route('customer.notifications.index') }}" class="relative p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-colors" title="{{ __('Pusat Notifikasi') }}">
                         <i data-lucide="bell" class="w-4 h-4"></i>
                         @if($custUnreadNotifs > 0)
                             <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-cyan-500 text-white text-[10px] font-bold flex items-center justify-center">
@@ -304,7 +311,7 @@
                         </div>
                         <div class="hidden sm:block text-left">
                             <div class="text-xs font-semibold text-slate-800 dark:text-white leading-tight">{{ auth()->user()->company_name ?: auth()->user()->name }}</div>
-                            <div class="text-[10px] text-cyan-600 dark:text-cyan-400 font-medium">Customer Portal</div>
+                            <div class="text-[10px] text-cyan-600 dark:text-cyan-400 font-medium">{{ __('Customer Portal') }}</div>
                         </div>
                     </a>
                 </div>

@@ -204,9 +204,9 @@
         <!-- 1. Total Shipments -->
         <div class="p-4 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
             <div>
-                <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Pengiriman</p>
+                <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ __('Total Pengiriman') }}</p>
                 <h3 class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1">{{ number_format($totalShipments) }}</h3>
-                <span class="text-[10px] text-cyan-600 dark:text-cyan-400 font-medium mt-0.5 block">Seluruh Kargo Aktif & Arsip</span>
+                <span class="text-[10px] text-cyan-600 dark:text-cyan-400 font-medium mt-0.5 block">{{ __('Seluruh Kargo Aktif & Arsip') }}</span>
             </div>
             <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-100 dark:border-blue-900">
                 <i data-lucide="package" class="w-5 h-5"></i>
@@ -216,9 +216,9 @@
         <!-- 2. In Transit -->
         <div class="p-4 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
             <div>
-                <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Dalam Proses</p>
+                <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ __('Dalam Proses') }}</p>
                 <h3 class="text-2xl font-extrabold text-blue-600 dark:text-cyan-400 mt-1">{{ number_format($inTransit) }}</h3>
-                <span class="text-[10px] text-slate-400 font-medium mt-0.5 block">Sedang Bergerak</span>
+                <span class="text-[10px] text-slate-400 font-medium mt-0.5 block">{{ __('Sedang Bergerak') }}</span>
             </div>
             <div class="w-10 h-10 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center border border-cyan-100 dark:border-cyan-900">
                 <i data-lucide="navigation" class="w-5 h-5"></i>
@@ -228,9 +228,9 @@
         <!-- 3. Delivered -->
         <div class="p-4 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
             <div>
-                <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Terkirim</p>
+                <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ __('Terkirim') }}</p>
                 <h3 class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">{{ number_format($delivered) }}</h3>
-                <span class="text-[10px] text-emerald-600 dark:text-emerald-500 font-medium mt-0.5 block">Selesai di Tujuan</span>
+                <span class="text-[10px] text-emerald-600 dark:text-emerald-500 font-medium mt-0.5 block">{{ __('Selesai di Tujuan') }}</span>
             </div>
             <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-100 dark:border-emerald-900">
                 <i data-lucide="check-circle" class="w-5 h-5"></i>
@@ -240,9 +240,9 @@
         <!-- 4. Delayed -->
         <div class="p-4 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
             <div>
-                <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Terlambat</p>
+                <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ __('Terlambat') }}</p>
                 <h3 class="text-2xl font-extrabold text-amber-600 dark:text-amber-400 mt-1">{{ number_format($delayed) }}</h3>
-                <span class="text-[10px] text-amber-600 dark:text-amber-500 font-medium mt-0.5 block">&gt; Batas Waktu ETA</span>
+                <span class="text-[10px] text-amber-600 dark:text-amber-500 font-medium mt-0.5 block">{{ __('> Batas Waktu ETA') }}</span>
             </div>
             <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-100 dark:border-amber-900">
                 <i data-lucide="clock-alert" class="w-5 h-5"></i>
@@ -252,9 +252,9 @@
         <!-- 5. Open Exceptions -->
         <div class="p-4 rounded-2xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between col-span-2 md:col-span-1">
             <div>
-                <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Pengecualian</p>
+                <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{{ __('Pengecualian') }}</p>
                 <h3 class="text-2xl font-extrabold text-rose-600 dark:text-rose-400 mt-1">{{ number_format($openExceptions) }}</h3>
-                <span class="text-[10px] text-rose-600 dark:text-rose-400 font-medium mt-0.5 block">Membutuhkan Tindakan</span>
+                <span class="text-[10px] text-rose-600 dark:text-rose-400 font-medium mt-0.5 block">{{ __('Membutuhkan Tindakan') }}</span>
             </div>
             <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-100 dark:border-rose-900">
                 <i data-lucide="alert-octagon" class="w-5 h-5"></i>

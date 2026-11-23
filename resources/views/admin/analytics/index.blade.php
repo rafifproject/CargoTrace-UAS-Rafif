@@ -51,10 +51,10 @@
                 <span class="text-xs text-slate-500 dark:text-slate-400">Santos Exporters S.A. Global Operations</span>
             </div>
             <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight font-outfit">
-                Kecerdasan Bisnis &amp; Analitik Rantai Pasok
+                {{ __('Kecerdasan Bisnis & Analitik Rantai Pasok') }}
             </h1>
             <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                Pilih subfitur yang ingin dianalisis untuk menampilkan metrik, grafik, dan tabel data terkait secara fokus.
+                {{ __('Pilih subfitur yang ingin dianalisis untuk menampilkan metrik, grafik, dan tabel data terkait secara fokus.') }}
             </p>
         </div>
 
@@ -62,14 +62,14 @@
             <!-- Period Pill -->
             <div class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
                 <i data-lucide="calendar" class="w-3.5 h-3.5 text-cyan-500"></i>
-                <span>Tahun Berjalan 2026</span>
+                <span>{{ __('Tahun Berjalan 2026') }}</span>
             </div>
 
             <!-- Print / Export Report -->
             <button onclick="window.print()" type="button"
                     class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-2xs">
                 <i data-lucide="printer" class="w-3.5 h-3.5 text-slate-400"></i>
-                <span>Cetak / PDF</span>
+                <span>{{ __('Cetak / Ekspor PDF') }}</span>
             </button>
         </div>
     </div>
@@ -81,13 +81,13 @@
         <button type="button" onclick="switchAnalyticsTab('financial')" id="tab-btn-financial"
                 class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer">
             <i data-lucide="badge-dollar-sign" class="w-4 h-4"></i>
-            <span>1. Finansial &amp; Pendapatan</span>
+            <span>{{ __('1. Finansial & Pendapatan') }}</span>
         </button>
 
         <button type="button" onclick="switchAnalyticsTab('varieties')" id="tab-btn-varieties"
                 class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer">
             <i data-lucide="coffee" class="w-4 h-4"></i>
-            <span>2. Komoditas Kopi Terlaris</span>
+            <span>{{ __('2. Komoditas Kopi Terlaris') }}</span>
             <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200">
                 {{ count($topVarieties) }}
             </span>
@@ -96,7 +96,7 @@
         <button type="button" onclick="switchAnalyticsTab('countries')" id="tab-btn-countries"
                 class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer">
             <i data-lucide="globe" class="w-4 h-4"></i>
-            <span>3. Negara Pemesan Terbanyak</span>
+            <span>{{ __('3. Negara Pemesan Terbanyak') }}</span>
             <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                 {{ count($topCountries) }}
             </span>
@@ -105,7 +105,7 @@
         <button type="button" onclick="switchAnalyticsTab('customers')" id="tab-btn-customers"
                 class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer">
             <i data-lucide="users" class="w-4 h-4"></i>
-            <span>4. Roastery &amp; Pembeli Konsisten</span>
+            <span>{{ __('4. Roastery & Pembeli Konsisten') }}</span>
             <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
                 {{ count($topCustomers) }}
             </span>
@@ -114,7 +114,7 @@
         <button type="button" onclick="switchAnalyticsTab('operational')" id="tab-btn-operational"
                 class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer">
             <i data-lucide="timer" class="w-4 h-4"></i>
-            <span>5. SLA &amp; Rantai Pasok</span>
+            <span>{{ __('5. SLA & Rantai Pasok') }}</span>
             <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 font-mono">
                 {{ $onTimeRate }}%
             </span>

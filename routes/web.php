@@ -43,6 +43,9 @@ Route::get('/', function () {
     return redirect()->route('admin.dashboard');
 });
 
+// Switch Application Locale (ID / EN)
+Route::get('/locale/{lang}', [SettingController::class, 'switchLocale'])->name('locale.switch');
+
 // Authentication Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

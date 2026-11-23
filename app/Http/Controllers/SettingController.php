@@ -41,6 +41,12 @@ class SettingController extends Controller
             SystemSetting::set($key, $val, 'general');
         }
 
+        session([
+            'user_selected_locale' => $validated['app_language'],
+            'app_locale' => $validated['app_language'],
+        ]);
+        \Illuminate\Support\Facades\App::setLocale($validated['app_language']);
+
         AuditLog::create([
             'user_id' => auth()->id(),
             'action' => 'CONFIG_CHANGE',
@@ -53,7 +59,21 @@ class SettingController extends Controller
             'created_at' => now(),
         ]);
 
-        return back()->with('status', 'Pengaturan sistem berhasil disimpan.');
+        return back()->with('status', __('Pengaturan sistem berhasil disimpan.'));
+    }
+
+    public function switchLocale(string $locale): RedirectResponse
+    {
+        if (in_array($locale, ['id', 'en'])) {
+            session([
+                'user_selected_locale' => $locale,
+                'app_locale' => $locale,
+            ]);
+            SystemSetting::set('app_language', $locale, 'general');
+            \Illuminate\Support\Facades\App::setLocale($locale);
+        }
+
+        return back();
     }
 }
 

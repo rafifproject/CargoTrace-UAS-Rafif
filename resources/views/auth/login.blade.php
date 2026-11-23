@@ -155,7 +155,7 @@
             {{-- Demo Accounts Quick-Fill Badge (For UAS Evaluation) --}}
             <div class="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-700/50 w-full max-w-md">
                 <p class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5">
-                    Akun Demo &mdash; Klik untuk Isi Cepat:
+                    {{ __('Akun Demo — Klik untuk Isi Cepat:') }}
                 </p>
                 <div class="flex flex-wrap gap-2">
                     <button type="button" onclick="fillLogin('admin@cargotrace.id','password')"
@@ -184,20 +184,21 @@
 
                 {{-- Language Selector Pill (Top Right) --}}
                 <div class="flex justify-end mb-2">
-                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-600/60 bg-slate-800/80 text-xs text-white cursor-pointer hover:border-slate-500 transition-colors">
-                        <span class="text-xs">🇮🇩</span>
-                        <span class="font-semibold text-slate-200 text-xs">ID</span>
-                        <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
-                    </div>
+                    <a href="{{ route('locale.switch', app()->getLocale() === 'en' ? 'id' : 'en') }}"
+                       class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-600/60 bg-slate-800/80 text-xs text-white cursor-pointer hover:border-cyan-400 hover:text-cyan-300 transition-colors">
+                        <span class="text-xs">{{ app()->getLocale() === 'en' ? '🇬🇧' : '🇮🇩' }}</span>
+                        <span class="font-semibold text-xs">{{ app()->getLocale() === 'en' ? 'EN' : 'ID' }}</span>
+                        <i data-lucide="refresh-cw" class="w-3 h-3 text-cyan-400"></i>
+                    </a>
                 </div>
 
                 {{-- Card Header --}}
                 <div class="mb-6">
                     <h2 class="text-2xl sm:text-[26px] font-bold text-white tracking-tight leading-tight">
-                        Masuk ke CargoTrace
+                        {{ __('Masuk ke CargoTrace') }}
                     </h2>
                     <p class="text-xs sm:text-sm text-slate-300/85 mt-1.5 leading-relaxed">
-                        Kelola, pantau, dan lacak pengiriman global dalam satu platform.
+                        {{ __('Kelola, pantau, dan lacak pengiriman global dalam satu platform.') }}
                     </p>
                 </div>
 
@@ -225,7 +226,7 @@
                             <i data-lucide="mail" class="w-4 h-4"></i>
                         </div>
                         <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus
-                               placeholder="Alamat Email"
+                               placeholder="{{ __('Alamat Email') }}"
                                class="input-dark w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm">
                     </div>
 
@@ -235,7 +236,7 @@
                             <i data-lucide="lock" class="w-4 h-4"></i>
                         </div>
                         <input type="password" id="password" name="password" required
-                               placeholder="Kata Sandi"
+                               placeholder="{{ __('Kata Sandi') }}"
                                class="input-dark w-full pl-10 pr-10 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm">
                         <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-200">
                             <i data-lucide="eye" class="w-4 h-4" id="eye-icon"></i>
@@ -246,10 +247,10 @@
                     <div class="flex items-center justify-between text-xs pt-0.5">
                         <label class="flex items-center gap-2 cursor-pointer select-none">
                             <input type="checkbox" id="remember" name="remember" class="w-3.5 h-3.5 rounded border-slate-600 bg-slate-800 text-cyan-500 focus:ring-cyan-500">
-                            <span class="text-slate-300">Ingat Saya</span>
+                            <span class="text-slate-300">{{ __('Ingat Saya') }}</span>
                         </label>
                         <a href="javascript:alert('Gunakan password demo: password');" class="text-slate-300 hover:text-cyan-300 transition-colors">
-                            Lupa kata sandi?
+                            {{ __('Lupa kata sandi?') }}
                         </a>
                     </div>
 
@@ -257,16 +258,16 @@
                     <button type="submit"
                             class="btn-cyan-glow w-full mt-2 py-2.5 sm:py-3 px-5 rounded-xl text-xs sm:text-sm font-semibold text-white flex items-center justify-center gap-2">
                         <i data-lucide="log-in" class="w-4 h-4"></i>
-                        <span>Masuk</span>
+                        <span>{{ __('Masuk') }}</span>
                     </button>
                 </form>
 
                 {{-- Register Link --}}
                 <div class="mt-6 text-center">
                     <p class="text-xs text-slate-300">
-                        Belum memiliki akun?
+                        {{ __('Belum memiliki akun?') }}
                         <a href="{{ route('register') }}" class="font-semibold text-[#00C2FF] hover:text-cyan-300 transition-colors ml-1">
-                            Daftar Sekarang
+                            {{ __('Daftar Sekarang') }}
                         </a>
                     </p>
                 </div>
