@@ -21,15 +21,12 @@
     .slide-in    { animation: slide-in 0.35s ease-out both; }
     .float-anim  { animation: float 3s ease-in-out infinite; }
     .card-row:hover { box-shadow: 0 4px 24px -4px rgba(0,168,232,0.10); }
+    /* KPI glass inside always-dark hero — no theme variant needed */
     .kpi-glass {
-        background: rgba(255,255,255,0.72);
+        background: rgba(255,255,255,0.08);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-    }
-    .dark .kpi-glass {
-        background: rgba(10,17,40,0.75);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.12);
     }
     .gradient-hero {
         background: linear-gradient(135deg, #034078 0%, #001F54 55%, #0a1128 100%);
@@ -102,44 +99,44 @@
     {{-- KPI Metric Strip --}}
     <div class="grid grid-cols-3 gap-3 mt-5 relative z-10">
         {{-- Menunggu Verifikasi --}}
-        <div class="kpi-glass rounded-xl border border-white/10 px-4 py-3 flex items-center gap-3">
+        <div class="kpi-glass rounded-xl px-4 py-3 flex items-center gap-3">
             @if($totalPending > 0)
-            <div class="w-9 h-9 rounded-full bg-blue-500/20 border border-blue-400/30 flex items-center justify-center pulse-ring flex-shrink-0">
-                <i data-lucide="inbox" class="w-4 h-4 text-blue-300"></i>
+            <div class="w-9 h-9 rounded-full bg-blue-400/20 border border-blue-300/30 flex items-center justify-center pulse-ring flex-shrink-0">
+                <i data-lucide="inbox" class="w-4 h-4 text-blue-200"></i>
             </div>
             @else
-            <div class="w-9 h-9 rounded-full bg-slate-500/20 border border-slate-400/20 flex items-center justify-center flex-shrink-0">
-                <i data-lucide="inbox" class="w-4 h-4 text-slate-400"></i>
+            <div class="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="inbox" class="w-4 h-4 text-slate-300"></i>
             </div>
             @endif
             <div>
                 <div class="text-2xl font-extrabold text-white font-sans leading-none">{{ $totalPending }}</div>
-                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">Menunggu Verifikasi</div>
-                <div class="text-[10px] text-blue-400">Status CREATED &amp; BOOKED</div>
+                <div class="text-[10px] font-semibold text-slate-300 uppercase tracking-wider mt-0.5">Menunggu Verifikasi</div>
+                <div class="text-[10px] text-blue-300">Status CREATED &amp; BOOKED</div>
             </div>
         </div>
 
         {{-- Invoice Lunas --}}
-        <div class="kpi-glass rounded-xl border border-white/10 px-4 py-3 flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center flex-shrink-0">
-                <i data-lucide="check-check" class="w-4 h-4 text-emerald-300"></i>
+        <div class="kpi-glass rounded-xl px-4 py-3 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-emerald-400/20 border border-emerald-300/30 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="check-check" class="w-4 h-4 text-emerald-200"></i>
             </div>
             <div>
                 <div class="text-2xl font-extrabold text-emerald-300 font-sans leading-none">{{ $paidPending }}</div>
-                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">Invoice Lunas</div>
-                <div class="text-[10px] text-emerald-400">Siap Otorisasi Dispatch ✓</div>
+                <div class="text-[10px] font-semibold text-slate-300 uppercase tracking-wider mt-0.5">Invoice Lunas</div>
+                <div class="text-[10px] text-emerald-300">Siap Otorisasi Dispatch ✓</div>
             </div>
         </div>
 
         {{-- Menunggu Wire --}}
-        <div class="kpi-glass rounded-xl border border-white/10 px-4 py-3 flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-amber-500/20 border border-amber-400/30 flex items-center justify-center flex-shrink-0">
-                <i data-lucide="clock" class="w-4 h-4 text-amber-300"></i>
+        <div class="kpi-glass rounded-xl px-4 py-3 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-amber-400/20 border border-amber-300/30 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="clock" class="w-4 h-4 text-amber-200"></i>
             </div>
             <div>
                 <div class="text-2xl font-extrabold text-amber-300 font-sans leading-none">{{ $unpaidPending }}</div>
-                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-0.5">Menunggu Wire</div>
-                <div class="text-[10px] text-amber-400">Pelunasan T/T Telegraphic</div>
+                <div class="text-[10px] font-semibold text-slate-300 uppercase tracking-wider mt-0.5">Menunggu Wire</div>
+                <div class="text-[10px] text-amber-300">Pelunasan T/T Telegraphic</div>
             </div>
         </div>
     </div>
