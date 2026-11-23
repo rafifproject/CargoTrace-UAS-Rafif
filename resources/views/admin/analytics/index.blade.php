@@ -5,7 +5,7 @@
 @push('styles')
 <style>
     @media print {
-        aside, header, .no-print, .tab-nav-bar { display: none !important; }
+        aside, header, .no-print, .tab-nav-bar, #subfeature-dropdown-container { display: none !important; }
         main { padding: 0 !important; margin: 0 !important; }
         .tab-panel { display: block !important; margin-bottom: 2rem !important; }
     }
@@ -16,8 +16,8 @@
         transform: translateY(-2px);
     }
     .tab-btn.active {
-        background: linear-gradient(135deg, #00A8E8 0%, #034078 100%);
-        color: #ffffff;
+        background: linear-gradient(135deg, #00A8E8 0%, #034078 100%) !important;
+        color: #ffffff !important;
         box-shadow: 0 4px 14px -2px rgba(0, 168, 232, 0.4);
     }
     .tab-btn:not(.active) {
@@ -54,38 +54,50 @@
                 Kecerdasan Bisnis &amp; Analitik Rantai Pasok
             </h1>
             <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                Pilih subfitur yang ingin dianalisis: Pendapatan, Komoditas Terlaris, Negara Tujuan, Pelanggan Loyal, atau SLA Operasional.
+                Pilih subfitur yang ingin dianalisis untuk menampilkan metrik, grafik, dan tabel data terkait secara fokus.
             </p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5 no-print">
-            <!-- Period Pill -->
-            <div class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
-                <i data-lucide="calendar" class="w-3.5 h-3.5 text-cyan-500"></i>
-                <span>Tahun Berjalan 2026</span>
+            <!-- DROPDOWN SELECTOR: PILIH SUBFITUR DI ATAS -->
+            <div id="subfeature-dropdown-container" class="relative">
+                <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#0A1128] border-2 border-cyan-500/40 dark:border-cyan-500/50 shadow-sm">
+                    <i data-lucide="layout-grid" class="w-4 h-4 text-cyan-500 flex-shrink-0"></i>
+                    <div class="flex flex-col">
+                        <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Pilih Tampilan:</span>
+                        <select id="analytics-subfeature-select" onchange="switchAnalyticsTab(this.value)"
+                                class="bg-transparent text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none cursor-pointer pr-2">
+                            <option value="financial">💰 1. Finansial &amp; Pendapatan</option>
+                            <option value="varieties">☕ 2. Komoditas Kopi Terlaris</option>
+                            <option value="countries">🌍 3. Negara Pemesan Terbanyak</option>
+                            <option value="customers">👥 4. Roastery &amp; Pembeli Konsisten</option>
+                            <option value="operational">⏱️ 5. SLA &amp; Rantai Pasok</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <!-- Print / Export Report -->
             <button onclick="window.print()" type="button"
-                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-2xs">
+                    class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#0A1128] border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-2xs">
                 <i data-lucide="printer" class="w-3.5 h-3.5 text-slate-400"></i>
-                <span>Cetak / Ekspor PDF</span>
+                <span>Cetak / PDF</span>
             </button>
         </div>
     </div>
 
     <!-- ==========================================
-         EXCLUSIVE SUB-FEATURE SELECTOR (TAB BAR)
+         SUB-FEATURE TAB BAR (PILIHAN 5 SUBFITUR)
          ========================================== -->
     <div class="tab-nav-bar bg-white dark:bg-[#0A1128] p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap gap-1.5 items-center">
         <button type="button" onclick="switchAnalyticsTab('financial')" id="tab-btn-financial"
-                class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer">
             <i data-lucide="badge-dollar-sign" class="w-4 h-4"></i>
             <span>1. Finansial &amp; Pendapatan</span>
         </button>
 
         <button type="button" onclick="switchAnalyticsTab('varieties')" id="tab-btn-varieties"
-                class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer">
             <i data-lucide="coffee" class="w-4 h-4"></i>
             <span>2. Komoditas Kopi Terlaris</span>
             <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200">
@@ -94,7 +106,7 @@
         </button>
 
         <button type="button" onclick="switchAnalyticsTab('countries')" id="tab-btn-countries"
-                class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer">
             <i data-lucide="globe" class="w-4 h-4"></i>
             <span>3. Negara Pemesan Terbanyak</span>
             <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
@@ -103,7 +115,7 @@
         </button>
 
         <button type="button" onclick="switchAnalyticsTab('customers')" id="tab-btn-customers"
-                class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer">
             <i data-lucide="users" class="w-4 h-4"></i>
             <span>4. Roastery &amp; Pembeli Konsisten</span>
             <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
@@ -112,7 +124,7 @@
         </button>
 
         <button type="button" onclick="switchAnalyticsTab('operational')" id="tab-btn-operational"
-                class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer">
             <i data-lucide="timer" class="w-4 h-4"></i>
             <span>5. SLA &amp; Rantai Pasok</span>
             <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 font-mono">
@@ -602,45 +614,60 @@
     </div>
 
 </div>
-@endsection
 
-@push('scripts')
+<!-- Inline Bulletproof Tab Switcher Script defined directly in content -->
 <script>
-    // Tab Switching Logic
     window.adminCharts = {};
 
     function switchAnalyticsTab(tabId) {
-        // Hide all panels
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+        console.log('CargoTrace Analytics: Switching to tab', tabId);
 
-        // Remove active state from all buttons
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        // 1. Hide all panels
+        const panels = document.querySelectorAll('.tab-panel');
+        panels.forEach(p => {
+            p.style.display = 'none';
+            p.classList.add('hidden');
+        });
 
-        // Show active panel
+        // 2. Show requested panel
         const targetPanel = document.getElementById('panel-' + tabId);
         if (targetPanel) {
+            targetPanel.style.display = 'block';
             targetPanel.classList.remove('hidden');
         }
 
-        // Set active button
+        // 3. Update tab buttons
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('active');
+        });
         const targetBtn = document.getElementById('tab-btn-' + tabId);
         if (targetBtn) {
             targetBtn.classList.add('active');
         }
 
-        // Store active tab in URL hash without jump
-        history.replaceState(null, null, '#tab-' + tabId);
+        // 4. Update dropdown selector in header
+        const selectEl = document.getElementById('analytics-subfeature-select');
+        if (selectEl && selectEl.value !== tabId) {
+            selectEl.value = tabId;
+        }
 
-        // Resize all charts so they render properly in newly visible containers
+        // 5. Update URL hash
+        try {
+            history.replaceState(null, null, '#tab-' + tabId);
+        } catch (e) {}
+
+        // 6. Lazy Render / Resize Chart for active tab
         setTimeout(() => {
-            Object.values(window.adminCharts).forEach(c => {
-                if (c && typeof c.resize === 'function') {
-                    c.resize();
-                }
-            });
+            if (window.renderChartForTab) {
+                window.renderChartForTab(tabId);
+            }
         }, 50);
     }
+</script>
+@endsection
 
+@push('scripts')
+<script>
     document.addEventListener('DOMContentLoaded', function () {
         const colors = {
             cyan: '#00A8E8',
@@ -653,214 +680,234 @@
             palette: ['#00A8E8', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444', '#3B82F6', '#14B8A6', '#EC4899']
         };
 
-        // 1. Monthly Revenue Trend Chart (Line Area)
-        const revCtx = document.getElementById('monthlyRevenueChart').getContext('2d');
-        window.adminCharts.revenue = new Chart(revCtx, {
-            type: 'line',
-            data: {
-                labels: {!! json_encode($months) !!},
-                datasets: [
-                    {
-                        label: 'Pendapatan Freight ($ USD)',
-                        data: {!! json_encode($monthlyRevenue) !!},
-                        borderColor: colors.emerald,
-                        backgroundColor: 'rgba(16, 185, 129, 0.12)',
-                        fill: true,
-                        tension: 0.35,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        yAxisID: 'y'
-                    },
-                    {
-                        label: 'Volume Kontainer (TEU)',
-                        data: {!! json_encode($monthlyVolume) !!},
-                        borderColor: colors.cyan,
-                        backgroundColor: 'transparent',
-                        borderDash: [4, 4],
-                        pointRadius: 3,
-                        tension: 0.35,
-                        yAxisID: 'y1'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: { font: { size: 11 } }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(ctx) {
-                                if (ctx.datasetIndex === 0) {
-                                    return ' ' + ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString();
+        const monthsData = {!! json_encode($months) !!};
+        const monthlyRevenueData = {!! json_encode($monthlyRevenue) !!};
+        const monthlyVolumeData = {!! json_encode($monthlyVolume) !!};
+        const varietyLabelsData = {!! json_encode($varietyChartLabels) !!};
+        const varietyWeightsData = {!! json_encode($varietyChartWeights) !!};
+        const countryLabelsData = {!! json_encode($countryChartLabels) !!};
+        const countryOrdersData = {!! json_encode($countryChartOrders) !!};
+        const carrierLabelsData = {!! json_encode($carrierLabels) !!};
+        const carrierCountsData = {!! json_encode($carrierCounts) !!};
+
+        // Function to safely create or resize chart on demand
+        window.renderChartForTab = function(tabId) {
+            try {
+                if (tabId === 'financial') {
+                    // Revenue Chart
+                    if (!window.adminCharts.revenue) {
+                        const el = document.getElementById('monthlyRevenueChart');
+                        if (el) {
+                            window.adminCharts.revenue = new Chart(el.getContext('2d'), {
+                                type: 'line',
+                                data: {
+                                    labels: monthsData,
+                                    datasets: [
+                                        {
+                                            label: 'Pendapatan Freight ($ USD)',
+                                            data: monthlyRevenueData,
+                                            borderColor: colors.emerald,
+                                            backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                                            fill: true,
+                                            tension: 0.35,
+                                            pointRadius: 4,
+                                            pointHoverRadius: 6,
+                                            yAxisID: 'y'
+                                        },
+                                        {
+                                            label: 'Volume Kontainer (TEU)',
+                                            data: monthlyVolumeData,
+                                            borderColor: colors.cyan,
+                                            backgroundColor: 'transparent',
+                                            borderDash: [4, 4],
+                                            pointRadius: 3,
+                                            tension: 0.35,
+                                            yAxisID: 'y1'
+                                        }
+                                    ]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: { display: true, position: 'top', labels: { font: { size: 11 } } },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(ctx) {
+                                                    if (ctx.datasetIndex === 0) {
+                                                        return ' ' + ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString();
+                                                    }
+                                                    return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y + ' TEU';
+                                                }
+                                            }
+                                        }
+                                    },
+                                    scales: {
+                                        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                                        y: {
+                                            type: 'linear', display: true, position: 'left',
+                                            grid: { color: 'rgba(148, 163, 184, 0.1)' },
+                                            ticks: { font: { size: 10 }, callback: function(v) { return '$' + (v / 1000) + 'k'; } }
+                                        },
+                                        y1: {
+                                            type: 'linear', display: true, position: 'right',
+                                            grid: { drawOnChartArea: false },
+                                            ticks: { font: { size: 10 }, callback: function(v) { return v + ' TEU'; } }
+                                        }
+                                    }
                                 }
-                                return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y + ' TEU';
-                            }
+                            });
                         }
+                    } else {
+                        window.adminCharts.revenue.resize();
                     }
-                },
-                scales: {
-                    x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        grid: { color: 'rgba(148, 163, 184, 0.1)' },
-                        ticks: {
-                            font: { size: 10 },
-                            callback: function(v) { return '$' + (v / 1000) + 'k'; }
+
+                    // Mode Chart
+                    if (!window.adminCharts.mode) {
+                        const modeEl = document.getElementById('transportModeChart');
+                        if (modeEl) {
+                            window.adminCharts.mode = new Chart(modeEl.getContext('2d'), {
+                                type: 'doughnut',
+                                data: {
+                                    labels: ['Kapal Laut (Maritime)', 'Pesawat Udara (Express)', 'Mobil Van / Darat (Last-Mile)'],
+                                    datasets: [{
+                                        data: [{{ $modeSea }}, {{ $modeAir }}, {{ $modeLand }}],
+                                        backgroundColor: ['#00A8E8', '#8B5CF6', '#F59E0B'],
+                                        borderWidth: 2,
+                                        borderColor: '#ffffff'
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 12 } } },
+                                    cutout: '58%'
+                                }
+                            });
                         }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        grid: { drawOnChartArea: false },
-                        ticks: {
-                            font: { size: 10 },
-                            callback: function(v) { return v + ' TEU'; }
+                    } else {
+                        window.adminCharts.mode.resize();
+                    }
+                } else if (tabId === 'varieties') {
+                    // Variety Chart
+                    if (!window.adminCharts.variety) {
+                        const varEl = document.getElementById('varietyChart');
+                        if (varEl) {
+                            window.adminCharts.variety = new Chart(varEl.getContext('2d'), {
+                                type: 'doughnut',
+                                data: {
+                                    labels: varietyLabelsData,
+                                    datasets: [{
+                                        data: varietyWeightsData,
+                                        backgroundColor: colors.palette,
+                                        borderWidth: 2,
+                                        borderColor: '#ffffff',
+                                        hoverOffset: 6
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: { position: 'right', labels: { font: { size: 10 }, boxWidth: 12 } },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(ctx) { return ' ' + ctx.label + ': ' + ctx.parsed.toLocaleString() + ' Ton'; }
+                                            }
+                                        }
+                                    },
+                                    cutout: '62%'
+                                }
+                            });
                         }
+                    } else {
+                        window.adminCharts.variety.resize();
+                    }
+                } else if (tabId === 'countries') {
+                    // Country Chart
+                    if (!window.adminCharts.country) {
+                        const cEl = document.getElementById('countryChart');
+                        if (cEl) {
+                            window.adminCharts.country = new Chart(cEl.getContext('2d'), {
+                                type: 'bar',
+                                data: {
+                                    labels: countryLabelsData,
+                                    datasets: [{
+                                        label: 'Jumlah Pengiriman (Kontainer)',
+                                        data: countryOrdersData,
+                                        backgroundColor: colors.purple,
+                                        borderRadius: 6
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    indexAxis: 'y',
+                                    plugins: {
+                                        legend: { display: false },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(ctx) { return ' Pengiriman: ' + ctx.parsed.x + ' Kontainer'; }
+                                            }
+                                        }
+                                    },
+                                    scales: {
+                                        x: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { font: { size: 10 }, precision: 0 } },
+                                        y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        window.adminCharts.country.resize();
+                    }
+                } else if (tabId === 'operational') {
+                    // Carrier Chart
+                    if (!window.adminCharts.carrier) {
+                        const carEl = document.getElementById('carrierChart');
+                        if (carEl) {
+                            window.adminCharts.carrier = new Chart(carEl.getContext('2d'), {
+                                type: 'bar',
+                                data: {
+                                    labels: carrierLabelsData,
+                                    datasets: [{
+                                        label: 'Pengiriman Kargo',
+                                        data: carrierCountsData,
+                                        backgroundColor: '#00A8E8',
+                                        borderRadius: 6
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { display: false } },
+                                    scales: {
+                                        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                                        y: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { font: { size: 10 }, precision: 0 } }
+                                    }
+                                }
+                            });
+                        }
+                    } else {
+                        window.adminCharts.carrier.resize();
                     }
                 }
+            } catch (err) {
+                console.error('Error rendering chart for tab', tabId, err);
             }
-        });
+        };
 
-        // 2. Transport Mode Chart
-        const modeCtx = document.getElementById('transportModeChart').getContext('2d');
-        window.adminCharts.mode = new Chart(modeCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Kapal Laut (Maritime)', 'Pesawat Udara (Express)', 'Mobil Van / Darat (Last-Mile)'],
-                datasets: [{
-                    data: [{{ $modeSea }}, {{ $modeAir }}, {{ $modeLand }}],
-                    backgroundColor: ['#00A8E8', '#8B5CF6', '#F59E0B'],
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { font: { size: 10 }, boxWidth: 12 }
-                    }
-                },
-                cutout: '58%'
-            }
-        });
-
-        // 3. Best-Selling Coffee Varieties Doughnut Chart
-        const varietyCtx = document.getElementById('varietyChart').getContext('2d');
-        window.adminCharts.variety = new Chart(varietyCtx, {
-            type: 'doughnut',
-            data: {
-                labels: {!! json_encode($varietyChartLabels) !!},
-                datasets: [{
-                    data: {!! json_encode($varietyChartWeights) !!},
-                    backgroundColor: colors.palette,
-                    borderWidth: 2,
-                    borderColor: '#ffffff',
-                    hoverOffset: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: { font: { size: 10 }, boxWidth: 12 }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(ctx) {
-                                return ' ' + ctx.label + ': ' + ctx.parsed.toLocaleString() + ' Ton';
-                            }
-                        }
-                    }
-                },
-                cutout: '62%'
-            }
-        });
-
-        // 4. Top Countries Bar Chart
-        const countryCtx = document.getElementById('countryChart').getContext('2d');
-        window.adminCharts.country = new Chart(countryCtx, {
-            type: 'bar',
-            data: {
-                labels: {!! json_encode($countryChartLabels) !!},
-                datasets: [{
-                    label: 'Jumlah Pengiriman (Kontainer)',
-                    data: {!! json_encode($countryChartOrders) !!},
-                    backgroundColor: colors.purple,
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(ctx) {
-                                return ' Pengiriman: ' + ctx.parsed.x + ' Kontainer';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { color: 'rgba(148, 163, 184, 0.1)' },
-                        ticks: { font: { size: 10 }, precision: 0 }
-                    },
-                    y: {
-                        grid: { display: false },
-                        ticks: { font: { size: 10 } }
-                    }
-                }
-            }
-        });
-
-        // 5. Carrier Performance Chart
-        const carrierCtx = document.getElementById('carrierChart').getContext('2d');
-        window.adminCharts.carrier = new Chart(carrierCtx, {
-            type: 'bar',
-            data: {
-                labels: {!! json_encode($carrierLabels) !!},
-                datasets: [{
-                    label: 'Pengiriman Kargo',
-                    data: {!! json_encode($carrierCounts) !!},
-                    backgroundColor: '#00A8E8',
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-                    y: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, ticks: { font: { size: 10 }, precision: 0 } }
-                }
-            }
-        });
-
-        // Check URL hash on load
+        // Determine starting tab
+        let startTab = 'financial';
         if (window.location.hash) {
             const hash = window.location.hash.replace('#tab-', '').replace('#', '');
             const validTabs = ['financial', 'varieties', 'countries', 'customers', 'operational'];
             if (validTabs.includes(hash)) {
-                switchAnalyticsTab(hash);
+                startTab = hash;
             }
         }
+
+        switchAnalyticsTab(startTab);
     });
 </script>
 @endpush
