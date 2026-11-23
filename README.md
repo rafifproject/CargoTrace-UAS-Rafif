@@ -100,7 +100,7 @@ Below is the complete walkthrough of every functional page across all 3 access l
 ### 🌐 Part A — Authentication & Multi-Role Gateway
 
 #### 1. Login Page (`/login`)
-![Login Screen](docs/screenshots/01_login_authentication.jpg)
+![Login Screen](docs/screenshots/01_login_authentication.png)
 - **Purpose**: Unified, secure authentication gateway for all platform actors with immediate role-based dispatching.
 - **Key Features**:
   - Deep space atmospheric visuals with glassmorphism login card.
@@ -128,11 +128,13 @@ Below is the complete walkthrough of every functional page across all 3 access l
 ### ☕ Part B — Customer Self-Service Portal (Buyer / Roastery)
 
 #### 4. Customer Dashboard (`/customer/dashboard`)
+![Customer Dashboard](docs/screenshots/06_customer_dashboard.png)
 - **Purpose**: Personalized executive landing page for international coffee buyers.
 - **Key Features**: Metric cards displaying active shipments, containers currently in-transit, completed deliveries, pending invoices, recent order activity feed, and quick link to the B2B catalog.
 - **Backend Architecture**: Eager-loaded queries scoped strictly to `auth()->id()`. E.g., `Shipment::where('customer_id', auth()->id())->count()`.
 
 #### 5. B2B Specialty Coffee Catalog (`/customer/catalog`)
+![B2B Coffee Catalog](docs/screenshots/07_customer_b2b_catalog.png)
 - **Purpose**: Interactive wholesale showroom displaying Santos Exporters S.A.'s premium coffee varieties.
 - **Key Features**: Product cards detailing coffee altitude (MASL), processing method (Natural, Pulped Natural, Washed), SCAA cupping score, FOB Santos price per metric ton, and an instant **"Order Cargo"** modal.
 - **Backend Architecture**: `CustomerCatalogController@index` serving structured coffee varieties with dynamic currency conversion indicators.
@@ -148,6 +150,7 @@ Below is the complete walkthrough of every functional page across all 3 access l
 - **Backend Architecture**: Enforces strict **Anti-IDOR Protection**: unauthorized attempts to query another buyer's shipments are aborted with `HTTP 404 / 403`.
 
 #### 8. Live Interactive Tracking Map (`/customer/shipments/{id}/map`)
+![Live Tracking Map](docs/screenshots/08_customer_tracking_map.png)
 - **Purpose**: Visual tracking experience giving buyers full visibility over ocean vessel transit.
 - **Key Features**:
   - Interactive **Leaflet.js** map with custom maritime route polylines.
@@ -166,6 +169,7 @@ Below is the complete walkthrough of every functional page across all 3 access l
 ### 🚢 Part C — Logistics Operator Portal (Santos Hub Dispatcher)
 
 #### 10. Operations Dashboard (`/operator/dashboard`)
+![Operator Dashboard](docs/screenshots/09_operator_dashboard.png)
 - **Purpose**: High-tempo operational command center for Santos hub logistics dispatchers.
 - **Key Features**: Counters for pending order reviews, shipments currently sailing, critical delay warnings, active exceptions, and daily dispatch targets.
 - **Backend Architecture**: Aggregated Eloquent queries optimized in `OperatorDashboardController`.
@@ -181,6 +185,7 @@ Below is the complete walkthrough of every functional page across all 3 access l
 - **Backend Architecture**: Transactional dispatch service generating sequential tracking numbers (`CT-YYYY-XXX`).
 
 #### 13. Shipment Management & Dispatch Center (`/operator/shipments`)
+![Operator Shipments](docs/screenshots/10_operator_shipments_management.png)
 - **Purpose**: Master operational table for all active and historical container consignments.
 - **Key Features**: Full-text search by tracking number, customer, or destination; filter by carrier and delay status; server-side sorting and pagination.
 - **Backend Architecture**: `ShipmentController@index` with parameterized query builders and eager loading (`with(['customer', 'carrier', 'originLocation', 'destinationLocation'])`).
@@ -196,7 +201,7 @@ Below is the complete walkthrough of every functional page across all 3 access l
 - **Backend Architecture**: `ExceptionService@handleException` triggering automated in-app alerts to affected customers and administrators.
 
 #### 16. Maritime Weather Monitoring Hub (`/operator/intelligence/weather`)
-![Weather Monitoring](docs/screenshots/04_weather_monitoring_hub.jpg)
+![Weather Monitoring](docs/screenshots/04_weather_monitoring_hub.png)
 - **Purpose**: Global meteorological intelligence evaluating voyage safety across major international shipping corridors.
 - **Key Features**: Real-time dual-origin/destination weather comparison, 3-day weather forecast, and a global maritime weather directory covering 215+ maritime stations.
 - **Backend Architecture**: `GlobalIntelligenceService` connecting to Open-Meteo with 15-minute caching to eliminate rate limits.
@@ -206,7 +211,7 @@ Below is the complete walkthrough of every functional page across all 3 access l
 ### 🛡️ Part D — Administrator Portal & Executive Intelligence
 
 #### 17. Executive Main Dashboard (`/admin/dashboard`)
-![Admin Dashboard](docs/screenshots/02_admin_dashboard_kpi.jpg)
+![Admin Dashboard](docs/screenshots/02_admin_dashboard_kpi.png)
 - **Purpose**: High-level governance and operational oversight dashboard for corporate leadership.
 - **Key Features**:
   - **5 Key KPI Cards**: Total Shipments, In-Transit, Delivered, Delayed, and Open Exceptions.
@@ -215,7 +220,7 @@ Below is the complete walkthrough of every functional page across all 3 access l
 - **Backend Architecture**: Real-time SQL aggregations in `AdminDashboardController`.
 
 #### 18. Business Intelligence & Supply Chain Analytics (`/admin/analytics`)
-![Business Intelligence Analytics](docs/screenshots/03_business_intelligence_analytics.jpg)
+![Business Intelligence Analytics](docs/screenshots/03_business_intelligence_analytics.png)
 - **Purpose**: Deep executive analytics suite connecting physical logistics operations with corporate business performance.
 - **Key Features (5 Focused Sub-Features)**:
   1. **Financials & Revenue**: Freight cash inflows ($195,370+), commodity GMV ($6,471,000+), 100% settlement health, and export tonnage (462.2 Tons).
@@ -242,7 +247,7 @@ Below is the complete walkthrough of every functional page across all 3 access l
 - **Backend Architecture**: Middleware-protected `UserController` with prevention against deleting active self-accounts.
 
 #### 22. System Settings & API Gateway Status (`/admin/settings`)
-![System Settings](docs/screenshots/05_system_settings_apigateways.jpg)
+![System Settings](docs/screenshots/05_system_settings_apigateways.png)
 - **Purpose**: Centralized platform configuration and external integration monitoring.
 - **Key Features**:
   - Full-width modern interface configuring system default language (Indonesian/English), timezones (WIB, WITA, WIT, UTC), and delay severity threshold (hours).
