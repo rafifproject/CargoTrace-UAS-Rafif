@@ -1,8 +1,11 @@
 *.log
 .DS_Store
 .env
-.env.backup
-.env.production
+.env.*
+.env.example
+CargoTrace_API_Collection.json
+*_API_Collection.json
+*.postman_collection.json
 .phpactor.json
 .phpunit.result.cache
 /.codex
@@ -25,5 +28,3 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
-CargoTrace_API_Collection.json
-*_API_Collection.json
