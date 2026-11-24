@@ -97,7 +97,30 @@ Below is the complete walkthrough of every functional page across all 3 access l
 
 ---
 
-### 🌐 Part A — Authentication & Multi-Role Gateway
+### 🌐 Part A — Public Showcase & Authentication Gateway
+
+#### 0. Public B2B Landing Page (`/`)
+![Landing Page Dark Mode](docs/screenshots/00_landing_page_dark.png)
+*Figure: CargoTrace Public B2B Showcase Landing Page — Dark Mode (`/`)*
+
+![Landing Page Clean Mode](docs/screenshots/00_landing_page_clean.png)
+*Figure: CargoTrace Public B2B Showcase Landing Page — Clean Mode (`/?theme=clean`)*
+
+- **Purpose**: Full-width, high-impact public portal showcasing Santos Exporters S.A. Brazilian specialty coffee supply chain from the Port of Santos to global roasters.
+- **Key Features**:
+  - **Full-Width Edge-to-Edge Responsive Layout** with organic curved ship boundary and luminous wave ribbons.
+  - **Interactive Theme Switcher (🌙 Dark Mode & ☀️ Clean Light Mode)** with instant CSS variable updates and `localStorage` persistence.
+  - **6 Dedicated Business Sections**:
+    1. `Beranda`: High-impact hero with real-time CTA, status chips, and 4 glass feature cards.
+    2. `Tentang Kami`: Santos Exporters S.A. story, Port of Santos infrastructure, and 4 live metric KPI counters ($6.4M+ GMV, 40+ Ports, 88.6% SLA).
+    3. `Produk`: 6 authentic Brazilian specialty coffee varieties (Bourbon, Yellow Catuai, Cerrado Mineiro, SSFC, Decaf Swiss Water, Espresso Master Blend) with SCA scores and flavor notes.
+    4. `Alur Sistem`: 5-stage collaborative swimlane flowmap with interactive lightbox zoom.
+    5. `Fitur`: Core architectural pillars (AIS/Leaflet geolocation, automated delay exception engine, RBAC & anti-IDOR security, executive BI).
+    6. `Kontak`: Port of Santos HQ contact details, quick tracking search by resi number, and direct export quotation inquiry form.
+  - **Top-Right Masuk / Login Button**: Links directly to `/login`, or dynamically displays `Dasbor (Role)` if user is already authenticated.
+- **Backend Architecture**:
+  - Route: `Route::get('/', ...)->name('landing')`.
+  - View: `resources/views/landing.blade.php`.
 
 #### 1. Login Page (`/login`)
 ![Login Screen](docs/screenshots/01_login_authentication.png)

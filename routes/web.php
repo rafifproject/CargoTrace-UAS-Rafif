@@ -28,20 +28,10 @@ use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Redirect root to dashboard or login
+// Landing Page (Public Showcase & Business Presentation)
 Route::get('/', function () {
-    if (! auth()->check()) {
-        return redirect()->route('login');
-    }
-    $user = auth()->user();
-    if ($user->isOperator()) {
-        return redirect()->route('operator.dashboard');
-    }
-    if ($user->isCustomer()) {
-        return redirect()->route('customer.dashboard');
-    }
-    return redirect()->route('admin.dashboard');
-});
+    return view('landing');
+})->name('landing');
 
 // Switch Application Locale (ID / EN)
 Route::get('/locale/{lang}', [SettingController::class, 'switchLocale'])->name('locale.switch');

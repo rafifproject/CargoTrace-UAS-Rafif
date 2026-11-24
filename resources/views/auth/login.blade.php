@@ -84,6 +84,11 @@
         {{-- LEFT COLUMN: Glowing 3D Logo & Brand Presentation --}}
         <div class="w-full lg:flex-1 max-w-lg xl:max-w-xl flex flex-col justify-center items-start text-left">
             
+            <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-xs font-semibold text-blue-300 hover:text-[#00C2FF] transition mb-3 px-3 py-1 rounded-full bg-white/5 border border-white/10 hover:border-[#00C2FF]/40">
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                <span>{{ __('Kembali ke Beranda') }}</span>
+            </a>
+
             <div class="flex items-center gap-4 sm:gap-5 mb-3 sm:mb-4">
                 {{-- Isometric 3D Cargo Box with Orbit & Airplanes (Official Logo Mockup) --}}
                 <div class="w-16 h-16 sm:w-20 sm:h-20 lg:w-22 lg:h-22 flex-shrink-0 drop-shadow-[0_0_25px_rgba(0,194,255,0.6)]">
