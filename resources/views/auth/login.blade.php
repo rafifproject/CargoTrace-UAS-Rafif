@@ -142,13 +142,25 @@
                 </div>
             </div>
 
-            {{-- Subtitles --}}
-            <div class="mt-2 sm:mt-3 space-y-0.5 sm:space-y-1">
-                <p class="text-base sm:text-lg lg:text-xl font-bold text-slate-100 tracking-wide">
-                    Global Shipment Visibility &
-                </p>
-                <p class="text-base sm:text-lg lg:text-xl font-bold text-[#00C2FF] tracking-wide">
-                    Tracking Platform
+            {{-- Subtitles & Business Theme --}}
+            <div class="mt-3 sm:mt-4 space-y-2">
+                <!-- Business Case Badge -->
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/35 text-amber-300 text-xs font-semibold backdrop-blur-sm shadow-sm">
+                    <span class="text-sm">☕</span>
+                    <span>Santos Exporters S.A. &bull; {{ __('Pelabuhan Santos, Brasil') }}</span>
+                </div>
+
+                <div>
+                    <h2 class="text-lg sm:text-xl lg:text-2xl font-extrabold text-white tracking-tight leading-snug">
+                        {{ __('Rantai Pasok Ekspor Kopi Spesialti Global') }}
+                    </h2>
+                    <p class="text-sm sm:text-base font-bold text-[#00C2FF] tracking-wide mt-1 flex items-center gap-2">
+                        <span>{{ __('Santos Exporters S.A. — Pelabuhan Santos ke Pasar Dunia') }}</span>
+                    </p>
+                </div>
+
+                <p class="text-xs sm:text-sm text-slate-300/80 leading-relaxed max-w-lg pt-1">
+                    {{ __('Platform Visibilitas Pelacakan Kargo Maritim & Manajemen Logistik Rantai Pasok') }}
                 </p>
             </div>
 
@@ -193,12 +205,16 @@
                 </div>
 
                 {{-- Card Header --}}
-                <div class="mb-6">
+                <div class="mb-5">
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-300 text-[10px] font-semibold mb-2">
+                        <span>☕</span>
+                        <span>Santos Exporters Hub</span>
+                    </div>
                     <h2 class="text-2xl sm:text-[26px] font-bold text-white tracking-tight leading-tight">
                         {{ __('Masuk ke CargoTrace') }}
                     </h2>
-                    <p class="text-xs sm:text-sm text-slate-300/85 mt-1.5 leading-relaxed">
-                        {{ __('Kelola, pantau, dan lacak pengiriman global dalam satu platform.') }}
+                    <p class="text-xs sm:text-sm text-slate-300/85 mt-1 leading-relaxed">
+                        {{ __('Kelola, pantau, dan lacak ekspor kargo kopi global dalam satu platform terpadu.') }}
                     </p>
                 </div>
 
