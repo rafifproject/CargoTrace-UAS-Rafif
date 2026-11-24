@@ -137,8 +137,8 @@
     <svg class="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
         <defs>
             <clipPath id="heroShipClip" clipPathUnits="objectBoundingBox">
-                <!-- Smooth organic curve identical to design mockup -->
-                <path d="M 0.08,0 C 0.16,0.18 0.23,0.36 0.19,0.55 C 0.15,0.72 0.07,0.88 0,1 L 1,1 L 1,0 Z" />
+                <!-- Top-left smooth curve -> Left edge -> Sharp corner at (0.02, 0.76) -> Slanted edge to (0.32, 1.0) -> Bottom edge -> Right edge -> Top -->
+                <path d="M 0.22,0 C 0.10,0.02 0.02,0.14 0.02,0.30 L 0.02,0.76 L 0.32,1.0 L 1.0,1.0 L 1.0,0 Z" />
             </clipPath>
         </defs>
     </svg>
@@ -309,27 +309,27 @@
             <div class="absolute inset-0" style="background: var(--hero-left-grad); opacity: 0.85;"></div>
         </div>
 
-        {{-- RIGHT-SIDE SHIP IMAGE CONTAINER (NO RECTANGLE BOX - TOUCHES TOP, BOTTOM & RIGHT EDGE) --}}
-        <div class="hidden lg:block absolute top-0 right-0 bottom-0 w-[53%] z-10 overflow-hidden pointer-events-none">
-            {{-- Ship Photo with Organic Wave Clip-Path --}}
+        {{-- RIGHT-SIDE SHIP IMAGE CONTAINER (FULL SHIP VISIBILITY WITH SHARP BOTTOM-LEFT SLANTED CORNER) --}}
+        <div class="hidden lg:block absolute top-16 lg:top-20 right-0 bottom-24 sm:bottom-28 lg:bottom-32 w-[58%] lg:w-[60%] xl:w-[62%] z-10 overflow-hidden pointer-events-none">
+            {{-- Ship Photo with Organic Wave & Slanted Clip-Path --}}
             <div class="w-full h-full hero-ship-mask relative">
                 <img src="{{ asset('images/landing-ship-santos.jpg') }}" 
                      alt="Santos Exporters Container Ship at Port of Santos Brazil" 
-                     class="w-full h-full object-cover object-center transform scale-105">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20"></div>
+                     class="w-full h-full object-cover object-left-bottom transform hover:scale-[1.02] transition duration-700">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10"></div>
             </div>
 
-            {{-- SVG Glowing Stroke following the exact curve boundary --}}
-            <svg class="absolute inset-y-0 left-0 h-full w-full pointer-events-none z-20" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M 8,0 C 16,18 23,36 19,55 C 15,72 7,88 0,100" 
+            {{-- SVG Glowing Stroke following the exact curve boundary with sharp bottom-left slant --}}
+            <svg class="absolute inset-0 w-full h-full pointer-events-none z-20" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M 22,0 C 10,2 2,14 2,30 L 2,76 L 32,100 L 100,100" 
                       fill="none" 
                       stroke="var(--curve-stroke)" 
-                      stroke-width="1.2" 
+                      stroke-width="1.8" 
                       class="drop-shadow-[0_0_12px_var(--brand-glow)]" />
             </svg>
 
             {{-- Floating Port Badge (Port of Santos Pier B-12) --}}
-            <div class="absolute top-28 left-[22%] z-30 theme-card px-4 py-1.5 rounded-full flex items-center gap-2 text-xs font-semibold shadow-lg"
+            <div class="absolute top-8 left-[18%] z-30 theme-card px-4 py-1.5 rounded-full flex items-center gap-2 text-xs font-semibold shadow-lg"
                  style="color: var(--text-heading)">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span>Port of Santos, Brazil &bull; Pier B-12</span>
@@ -338,7 +338,7 @@
 
         {{-- MAIN HERO CONTENT (Full Width Layout with generous responsive padding) --}}
         <div class="relative z-20 w-full px-6 sm:px-10 lg:px-14 xl:px-20 pt-8 sm:pt-12 lg:pt-16">
-            <div class="w-full lg:w-[48%] flex flex-col items-start text-left">
+            <div class="w-full lg:w-[44%] xl:w-[42%] flex flex-col items-start text-left">
                 
                 {{-- Eyebrow with Brand Accent Bar --}}
                 <div class="flex items-center gap-3 mb-4">
