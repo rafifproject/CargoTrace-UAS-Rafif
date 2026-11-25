@@ -48,7 +48,7 @@
             
             --tentang-bg-img: url('{{ asset('images/tentang-kami-bg-dark.jpg') }}');
             --produk-bg-img: url('{{ asset('images/produk-bg-dark-v2.jpg') }}?v={{ time() }}');
-            --alur-bg-img: url('{{ asset('images/alur-sistem-bg-dark.jpg') }}');
+            --alur-bg-img: url('{{ asset('images/alur-sistem-dark-hd.jpg') }}');
             
             --card-bg: rgba(11, 23, 50, 0.75);
             --card-border: rgba(0, 194, 255, 0.22);
@@ -87,7 +87,7 @@
             
             --tentang-bg-img: url('{{ asset('images/tentang-kami-bg.jpg') }}');
             --produk-bg-img: url('{{ asset('images/produk-bg-clean-v2.jpg') }}?v={{ time() }}');
-            --alur-bg-img: url('{{ asset('images/alur-sistem-bg.jpg') }}');
+            --alur-bg-img: url('{{ asset('images/alur-sistem-clean-hd.jpg') }}');
             
             --card-bg: rgba(255, 255, 255, 0.92);
             --card-border: rgba(203, 213, 225, 0.85);
@@ -834,52 +834,12 @@
     {{-- ========================================================================= --}}
     {{-- SECTION 4: ALUR SISTEM (5-Stage Swimlane Flowmap Showcase)                --}}
     {{-- ========================================================================= --}}
-    <section id="alur-sistem" class="py-8 sm:py-12 lg:py-16 relative overflow-hidden" style="background: var(--bg-alt);">
-        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            
-            {{-- Main 3D Flowmap Infographic Showcase (Matches exact user design mockup) --}}
-            <div class="theme-card rounded-3xl overflow-hidden relative shadow-2xl border"
-                 style="background: var(--card-bg); border-color: var(--card-border);">
-                
-                {{-- Action Bar on top of the card --}}
-                <div class="flex items-center justify-between px-5 sm:px-7 py-3.5 border-b backdrop-blur-md"
-                     style="background: var(--nav-bg); border-color: var(--nav-border);">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span class="text-xs sm:text-sm font-bold tracking-tight" style="color: var(--text-heading)">
-                            Flowmap Alur Sistem CargoTrace (5 Tahap Utama)
-                        </span>
-                        <span class="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-blue-500/15 text-blue-400 border border-blue-500/30">
-                            Ultra HD 2048px
-                        </span>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <button onclick="openFlowmapModal()" 
-                                class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-semibold transition hover:scale-105 shadow-sm"
-                                style="background: var(--btn-primary-bg); color: var(--btn-primary-text);">
-                            <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
-                            <span>{{ __('Perbesar Flowmap HD') }}</span>
-                        </button>
-                    </div>
-                </div>
-
-                {{-- The 3D Flowmap Graphic --}}
-                <div class="relative cursor-pointer overflow-hidden group" onclick="openFlowmapModal()">
-                    <img id="flowmapImage"
-                         src="{{ asset('images/alur-sistem-3d-v2.jpg') }}?v={{ time() }}" 
-                         alt="Alur Kerja Pengiriman Kargo (5 Tahap Utama) - CargoTrace" 
-                         class="w-full h-auto object-cover transition duration-500 group-hover:scale-[1.01] block">
-                    <div class="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/5 transition-colors flex items-center justify-center pointer-events-none">
-                        <div class="opacity-0 group-hover:opacity-100 transition-opacity bg-black/75 text-white px-4 py-2 rounded-full text-xs font-medium backdrop-blur-md flex items-center gap-2 shadow-lg">
-                            <i data-lucide="zoom-in" class="w-4 h-4 text-cyan-400"></i>
-                            <span>{{ __('Klik untuk Memperbesar Resolusi Penuh') }}</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
+    <section id="alur-sistem" class="relative w-full overflow-hidden" style="background: var(--bg-alt);">
+        <div class="w-full relative">
+            <img id="flowmapImage"
+                 src="{{ asset('images/alur-sistem-clean-hd.jpg') }}?v={{ time() }}" 
+                 alt="Alur Kerja Pengiriman Kargo (5 Tahap Utama) - CargoTrace" 
+                 class="w-full h-auto block select-none pointer-events-none">
         </div>
     </section>
 
@@ -1354,8 +1314,8 @@
             const flowmapImg = document.getElementById('flowmapImage');
             const flowmapModalImg = document.getElementById('flowmapModalImage');
             const flowmapSrc = theme === 'clean' 
-                ? "{{ asset('images/alur-sistem-3d-v2.jpg') }}?v={{ time() }}" 
-                : "{{ asset('images/alur-sistem-3d-dark-v2.jpg') }}?v={{ time() }}";
+                ? "{{ asset('images/alur-sistem-clean-hd.jpg') }}?v={{ time() }}" 
+                : "{{ asset('images/alur-sistem-dark-hd.jpg') }}?v={{ time() }}";
             if (flowmapImg) flowmapImg.src = flowmapSrc;
             if (flowmapModalImg) flowmapModalImg.src = flowmapSrc;
             localStorage.setItem('cargotrace_landing_theme', theme);
