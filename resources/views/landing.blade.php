@@ -861,15 +861,15 @@
                     <div class="absolute inset-0 w-full h-full pointer-events-none select-none font-sans">
                         
                         {{-- 1. Main Header Title (Top Left Sky) --}}
-                        <div class="absolute" style="left: 3.5%; top: 10%; width: 42%;">
-                            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[0.85cqw] font-bold tracking-wider uppercase mb-1 shadow-sm alur-badge border border-current/20">
-                                <i data-lucide="activity" class="w-[1cqw] h-[1cqw]"></i>
+                        <div class="absolute" style="left: 4.5%; top: 8.0%; width: 44%;">
+                            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.82cqw] font-bold tracking-wider uppercase mb-1.5 shadow-sm alur-badge border border-current/20">
+                                <i data-lucide="activity" class="w-[1.1cqw] h-[1.1cqw]"></i>
                                 <span>{{ __('FLOWMAP SISTEM TERINTEGRASI') }}</span>
                             </div>
-                            <h2 class="font-outfit text-[2.1cqw] font-extrabold tracking-tight leading-tight alur-title mb-0.5">
+                            <h2 class="font-outfit text-[2.2cqw] font-extrabold tracking-tight leading-tight alur-title mb-1">
                                 {{ __('Alur Kerja Pengiriman Kargo') }}
                             </h2>
-                            <div class="font-outfit text-[1.4cqw] font-bold alur-subtitle mb-1">
+                            <div class="font-outfit text-[1.4cqw] font-bold alur-subtitle mb-1.5">
                                 {{ __('(5 Tahap Utama)') }}
                             </div>
                             <p class="text-[0.92cqw] leading-relaxed alur-body max-w-[95%]">
@@ -877,146 +877,116 @@
                             </p>
                         </div>
 
-                        {{-- 2. Left Card 1: Tujuan Flowmap --}}
-                        <div class="absolute flex items-center justify-center" style="left: 3.5%; top: 31.8%; width: 13.2%; height: 3.5%;">
-                            <span class="text-white text-[0.85cqw] font-bold tracking-wide">{{ __('Tujuan Flowmap') }}</span>
-                        </div>
-                        <div class="absolute flex items-center justify-center px-1" style="left: 3.8%; top: 35.3%; width: 12.6%; height: 8.5%;">
-                            <p class="text-[0.72cqw] leading-snug alur-body font-medium text-center">
-                                {{ __('Menggambarkan alur kerja sistem CargoTrace secara menyeluruh, mulai dari pemesanan hingga analitik eksekusi.') }}
-                            </p>
-                        </div>
-
-                        {{-- 3. Left Card 2: Aktor Utama --}}
-                        <div class="absolute flex items-center justify-center" style="left: 3.5%; top: 45.8%; width: 13.2%; height: 3.5%;">
-                            <span class="text-white text-[0.85cqw] font-bold tracking-wide">{{ __('Aktor Utama') }}</span>
-                        </div>
-                        <div class="absolute flex items-center justify-center px-1" style="left: 3.8%; top: 49.3%; width: 12.6%; height: 7%;">
-                            <p class="text-[0.72cqw] leading-snug alur-body font-medium text-center">
-                                {{ __('Keterlibatan Customer, Operator Logistik, Sistem Otomatis, dan Administrator.') }}
-                            </p>
-                        </div>
-
-                        {{-- 4. Left Card 3: Hak Akses (4 Avatars) --}}
-                        <div class="absolute flex items-center justify-center" style="left: 3.5%; top: 57.2%; width: 13.2%; height: 3.5%;">
-                            <span class="text-white text-[0.85cqw] font-bold tracking-wide">{{ __('Hak Akses') }}</span>
-                        </div>
-                        {{-- Avatar 1: Customer --}}
-                        <div class="absolute flex flex-col justify-center" style="left: 8.0%; top: 61.2%; width: 8.5%; height: 3.8%;">
-                            <div class="text-[0.70cqw] font-bold alur-title leading-tight">{{ __('Customer (Buyer)') }}</div>
-                            <div class="text-[0.60cqw] alur-body leading-tight">{{ __('Pesan & lacak kargo') }}</div>
-                        </div>
-                        {{-- Avatar 2: Operator --}}
-                        <div class="absolute flex flex-col justify-center" style="left: 8.0%; top: 65.2%; width: 8.5%; height: 3.8%;">
-                            <div class="text-[0.70cqw] font-bold alur-title leading-tight">{{ __('Logistics Operator') }}</div>
-                            <div class="text-[0.60cqw] alur-body leading-tight">{{ __('Kelola rute & dokumen') }}</div>
-                        </div>
-                        {{-- Avatar 3: Sistem --}}
-                        <div class="absolute flex flex-col justify-center" style="left: 8.0%; top: 69.2%; width: 8.5%; height: 3.8%;">
-                            <div class="text-[0.70cqw] font-bold alur-title leading-tight">{{ __('Sistem (Otomatis)') }}</div>
-                            <div class="text-[0.60cqw] alur-body leading-tight">{{ __('Tracking IoT & notifikasi') }}</div>
-                        </div>
-                        {{-- Avatar 4: Admin --}}
-                        <div class="absolute flex flex-col justify-center" style="left: 8.0%; top: 73.2%; width: 8.5%; height: 3.8%;">
-                            <div class="text-[0.70cqw] font-bold alur-title leading-tight">{{ __('Administrator') }}</div>
-                            <div class="text-[0.60cqw] alur-body leading-tight">{{ __('Validasi data & analitik') }}</div>
-                        </div>
-
-                        {{-- 5. The 5 Steps on the 3D Wavy Path (Next to Circles) --}}
+                        {{-- 2. The 5 Steps on the 3D Wavy Path (Next to Circles) --}}
                         {{-- Step 1 --}}
-                        <div class="absolute flex items-center justify-start pl-1" style="left: 23.2%; top: 41.5%; width: 7.2%; height: 5.5%;">
-                            <span class="text-[0.75cqw] font-extrabold alur-title leading-tight tracking-tight">
+                        <div class="absolute flex items-center justify-start pl-1" style="left: 13.5%; top: 38.6%; width: 10.5%; height: 4.5%;">
+                            <span class="text-[0.78cqw] font-extrabold alur-title leading-tight tracking-tight">
                                 {{ __('Pemesanan Kargo') }}
                             </span>
                         </div>
                         {{-- Step 2 --}}
-                        <div class="absolute flex items-center justify-start pl-1" style="left: 35.6%; top: 46.5%; width: 8.2%; height: 5.5%;">
-                            <span class="text-[0.72cqw] font-extrabold alur-title leading-tight tracking-tight">
+                        <div class="absolute flex items-center justify-start pl-1" style="left: 30.2%; top: 36.0%; width: 12.0%; height: 4.5%;">
+                            <span class="text-[0.74cqw] font-extrabold alur-title leading-tight tracking-tight">
                                 {{ __('Validasi & Pengurusan Ekspedisi') }}
                             </span>
                         </div>
                         {{-- Step 3 --}}
-                        <div class="absolute flex items-center justify-start pl-1" style="left: 49.0%; top: 41.5%; width: 7.2%; height: 5.5%;">
-                            <span class="text-[0.75cqw] font-extrabold alur-title leading-tight tracking-tight">
+                        <div class="absolute flex items-center justify-start pl-1" style="left: 50.2%; top: 38.6%; width: 10.5%; height: 4.5%;">
+                            <span class="text-[0.78cqw] font-extrabold alur-title leading-tight tracking-tight">
                                 {{ __('Pelacakan Perjalanan') }}
                             </span>
                         </div>
                         {{-- Step 4 --}}
-                        <div class="absolute flex items-center justify-start pl-1" style="left: 62.0%; top: 46.5%; width: 8.5%; height: 5.5%;">
-                            <span class="text-[0.70cqw] font-extrabold alur-title leading-tight tracking-tight">
+                        <div class="absolute flex items-center justify-start pl-1" style="left: 68.2%; top: 41.0%; width: 12.0%; height: 4.5%;">
+                            <span class="text-[0.72cqw] font-extrabold alur-title leading-tight tracking-tight">
                                 {{ __('Deteksi Keterlambatan & Exception') }}
                             </span>
                         </div>
                         {{-- Step 5 --}}
-                        <div class="absolute flex items-center justify-start pl-1" style="left: 74.8%; top: 41.5%; width: 7.5%; height: 5.5%;">
-                            <span class="text-[0.75cqw] font-extrabold alur-title leading-tight tracking-tight">
+                        <div class="absolute flex items-center justify-start pl-1" style="left: 86.2%; top: 33.6%; width: 10.5%; height: 4.5%;">
+                            <span class="text-[0.78cqw] font-extrabold alur-title leading-tight tracking-tight">
                                 {{ __('Penyelesaian & Analitik') }}
                             </span>
                         </div>
 
-                        {{-- 6. Right Card 1: Legenda Simbol --}}
-                        <div class="absolute flex items-center justify-center" style="left: 83.5%; top: 39.2%; width: 13.2%; height: 3.5%;">
+                        {{-- 3. Bottom-Left Card: Tujuan Flowmap --}}
+                        <div class="absolute flex items-center justify-center" style="left: 4.7%; top: 62.0%; width: 16.1%; height: 4.0%;">
+                            <span class="text-white text-[0.85cqw] font-bold tracking-wide">{{ __('Tujuan Flowmap') }}</span>
+                        </div>
+                        <div class="absolute flex items-center justify-center px-2 text-center" style="left: 4.0%; top: 67.5%; width: 17.5%; height: 13.0%;">
+                            <p class="text-[0.76cqw] leading-relaxed alur-body font-medium">
+                                {{ __('Menggambarkan alur kerja sistem CargoTrace secara menyeluruh, mulai dari pemesanan hingga analitik eksekusi, dengan keterlibatan multi hak akses.') }}
+                            </p>
+                        </div>
+
+                        {{-- 4. Bottom-Center Card: Aktor / Hak Akses (4 Columns) --}}
+                        <div class="absolute flex items-center justify-center" style="left: 27.2%; top: 63.0%; width: 16.0%; height: 4.0%;">
+                            <span class="text-white text-[0.85cqw] font-bold tracking-wide">{{ __('Aktor / Hak Akses') }}</span>
+                        </div>
+                        {{-- Actor 1: Customer --}}
+                        <div class="absolute flex flex-col justify-center" style="left: 31.0%; top: 68.5%; width: 9.8%; height: 11.5%;">
+                            <div class="text-[0.78cqw] font-extrabold alur-title leading-tight mb-1">{{ __('Customer (Buyer)') }}</div>
+                            <div class="text-[0.66cqw] alur-body leading-snug">{{ __('Memesan kargo, melihat status, terima notifikasi.') }}</div>
+                        </div>
+                        {{-- Actor 2: Logistics Operator --}}
+                        <div class="absolute flex flex-col justify-center" style="left: 44.5%; top: 68.5%; width: 9.8%; height: 11.5%;">
+                            <div class="text-[0.78cqw] font-extrabold alur-title leading-tight mb-1">{{ __('Logistics Operator') }}</div>
+                            <div class="text-[0.66cqw] alur-body leading-snug">{{ __('Mengelola ekspedisi, dokumen, dan tracking.') }}</div>
+                        </div>
+                        {{-- Actor 3: Sistem Otomatis --}}
+                        <div class="absolute flex flex-col justify-center" style="left: 57.2%; top: 68.5%; width: 9.8%; height: 11.5%;">
+                            <div class="text-[0.78cqw] font-extrabold alur-title leading-tight mb-1">{{ __('Sistem (Otomatis)') }}</div>
+                            <div class="text-[0.66cqw] alur-body leading-snug">{{ __('Memproses data, melacak pengiriman, notifikasi.') }}</div>
+                        </div>
+                        {{-- Actor 4: Administrator --}}
+                        <div class="absolute flex flex-col justify-center" style="left: 71.0%; top: 68.5%; width: 9.8%; height: 11.5%;">
+                            <div class="text-[0.78cqw] font-extrabold alur-title leading-tight mb-1">{{ __('Administrator') }}</div>
+                            <div class="text-[0.66cqw] alur-body leading-snug">{{ __('Memantau kinerja, sistem, validasi data, & akses.') }}</div>
+                        </div>
+
+                        {{-- 5. Bottom-Right Card: Legenda Simbol --}}
+                        <div class="absolute flex items-center justify-center" style="left: 82.2%; top: 62.0%; width: 14.5%; height: 4.0%;">
                             <span class="text-white text-[0.85cqw] font-bold tracking-wide">{{ __('Legenda Simbol') }}</span>
                         </div>
-                        <div class="absolute flex items-center" style="left: 87.5%; top: 43.5%; width: 9.0%; height: 3.0%;">
+                        <div class="absolute flex items-center" style="left: 87.2%; top: 67.2%; width: 9.8%; height: 2.6%;">
                             <span class="text-[0.72cqw] font-semibold alur-title">{{ __('Mulai / Selesai') }}</span>
                         </div>
-                        <div class="absolute flex items-center" style="left: 87.5%; top: 46.8%; width: 9.0%; height: 3.0%;">
+                        <div class="absolute flex items-center" style="left: 87.2%; top: 70.4%; width: 9.8%; height: 2.6%;">
                             <span class="text-[0.72cqw] font-semibold alur-title">{{ __('Proses / Aktivitas') }}</span>
                         </div>
-                        <div class="absolute flex items-center" style="left: 87.5%; top: 50.1%; width: 9.0%; height: 3.0%;">
+                        <div class="absolute flex items-center" style="left: 87.2%; top: 73.6%; width: 9.8%; height: 2.6%;">
                             <span class="text-[0.72cqw] font-semibold alur-title">{{ __('Keputusan') }}</span>
                         </div>
-                        <div class="absolute flex items-center" style="left: 87.5%; top: 53.4%; width: 9.0%; height: 3.0%;">
+                        <div class="absolute flex items-center" style="left: 87.2%; top: 76.8%; width: 9.8%; height: 2.6%;">
                             <span class="text-[0.72cqw] font-semibold alur-title">{{ __('Data / Dokumen') }}</span>
                         </div>
-
-                        {{-- 7. Right Card 2: Hasil & Output --}}
-                        <div class="absolute flex items-center justify-center" style="left: 83.5%; top: 59.2%; width: 13.2%; height: 3.5%;">
-                            <span class="text-white text-[0.85cqw] font-bold tracking-wide">{{ __('Hasil & Output') }}</span>
-                        </div>
-                        <div class="absolute flex items-center" style="left: 87.5%; top: 63.8%; width: 9.0%; height: 3.0%;">
-                            <span class="text-[0.70cqw] font-semibold alur-title">{{ __('Order Tervalidasi') }}</span>
-                        </div>
-                        <div class="absolute flex items-center" style="left: 87.5%; top: 67.3%; width: 9.0%; height: 3.0%;">
-                            <span class="text-[0.70cqw] font-semibold alur-title">{{ __('Rute Real-Time') }}</span>
-                        </div>
-                        <div class="absolute flex items-center" style="left: 87.5%; top: 70.8%; width: 9.0%; height: 3.0%;">
-                            <span class="text-[0.70cqw] font-semibold alur-title">{{ __('Notifikasi Kendala') }}</span>
-                        </div>
-                        <div class="absolute flex items-center" style="left: 87.5%; top: 74.3%; width: 9.0%; height: 3.0%;">
-                            <span class="text-[0.70cqw] font-semibold alur-title">{{ __('Status Delivered') }}</span>
+                        <div class="absolute flex items-center" style="left: 87.2%; top: 80.0%; width: 9.8%; height: 2.6%;">
+                            <span class="text-[0.72cqw] font-semibold alur-title">{{ __('Alur Proses') }}</span>
                         </div>
 
-                        {{-- 8. Bottom 5 Outcome Cards --}}
-                        <div class="absolute flex flex-col justify-center items-start pl-4" style="left: 3.0%; top: 84.0%; width: 13.2%; height: 11.5%;">
-                            <span class="text-[0.95cqw] font-extrabold tracking-wide uppercase text-white">{{ __('HASIL SISTEM') }}</span>
-                            <span class="text-[0.70cqw] text-cyan-200 font-medium">{{ __('Output Operasional') }}</span>
+                        {{-- 6. Bottom Ribbon: Hasil / Output Sistem --}}
+                        <div class="absolute flex items-center pl-14" style="left: 3.0%; top: 86.8%; width: 17.5%; height: 10.0%;">
+                            <span class="text-[0.90cqw] font-extrabold text-white tracking-wide leading-tight">{{ __('Hasil / Output Sistem') }}</span>
                         </div>
-                        {{-- Card 1 --}}
-                        <div class="absolute flex flex-col justify-center pl-9 pr-2" style="left: 17.0%; top: 84.5%; width: 14.5%; height: 11.0%;">
-                            <div class="text-[0.82cqw] font-extrabold alur-title leading-tight mb-0.5">{{ __('Order Tercatat') }}</div>
-                            <div class="text-[0.66cqw] alur-body leading-snug">{{ __('Pesanan tervalidasi di sistem secara real-time.') }}</div>
+                        {{-- Box 1 --}}
+                        <div class="absolute flex items-center" style="left: 28.5%; top: 87.5%; width: 10.5%; height: 8.5%;">
+                            <span class="text-[0.74cqw] font-semibold alur-title leading-snug">{{ __('Order kargo tercatat & tervalidasi') }}</span>
                         </div>
-                        {{-- Card 2 --}}
-                        <div class="absolute flex flex-col justify-center pl-9 pr-2" style="left: 33.0%; top: 84.5%; width: 14.5%; height: 11.0%;">
-                            <div class="text-[0.82cqw] font-extrabold alur-title leading-tight mb-0.5">{{ __('Validasi Ekspedisi') }}</div>
-                            <div class="text-[0.66cqw] alur-body leading-snug">{{ __('Kelengkapan dokumen bea cukai & kontainer.') }}</div>
+                        {{-- Box 2 --}}
+                        <div class="absolute flex items-center" style="left: 42.5%; top: 87.5%; width: 10.5%; height: 8.5%;">
+                            <span class="text-[0.74cqw] font-semibold alur-title leading-snug">{{ __('Rute & pelacakan real-time di peta') }}</span>
                         </div>
-                        {{-- Card 3 --}}
-                        <div class="absolute flex flex-col justify-center pl-9 pr-2" style="left: 49.0%; top: 84.5%; width: 14.5%; height: 11.0%;">
-                            <div class="text-[0.82cqw] font-extrabold alur-title leading-tight mb-0.5">{{ __('Pelacakan Maritim') }}</div>
-                            <div class="text-[0.66cqw] alur-body leading-snug">{{ __('Monitoring posisi kapal & kontainer via satelit.') }}</div>
+                        {{-- Box 3 --}}
+                        <div class="absolute flex items-center" style="left: 56.5%; top: 87.5%; width: 10.5%; height: 8.5%;">
+                            <span class="text-[0.74cqw] font-semibold alur-title leading-snug">{{ __('Notifikasi otomatis jika ada kendala') }}</span>
                         </div>
-                        {{-- Card 4 --}}
-                        <div class="absolute flex flex-col justify-center pl-9 pr-2" style="left: 65.0%; top: 84.5%; width: 14.5%; height: 11.0%;">
-                            <div class="text-[0.82cqw] font-extrabold alur-title leading-tight mb-0.5">{{ __('Deteksi Exception') }}</div>
-                            <div class="text-[0.66cqw] alur-body leading-snug">{{ __('Peringatan dini anomali rute & cuaca buruk.') }}</div>
+                        {{-- Box 4 --}}
+                        <div class="absolute flex items-center" style="left: 71.0%; top: 87.5%; width: 10.5%; height: 8.5%;">
+                            <span class="text-[0.74cqw] font-semibold alur-title leading-snug">{{ __('Status pengiriman hingga Delivered') }}</span>
                         </div>
-                        {{-- Card 5 --}}
-                        <div class="absolute flex flex-col justify-center pl-9 pr-2" style="left: 81.0%; top: 84.5%; width: 14.5%; height: 11.0%;">
-                            <div class="text-[0.82cqw] font-extrabold alur-title leading-tight mb-0.5">{{ __('Analitik Bisnis') }}</div>
-                            <div class="text-[0.66cqw] alur-body leading-snug">{{ __('Kargo delivered & data evaluasi performa bisnis.') }}</div>
+                        {{-- Box 5 --}}
+                        <div class="absolute flex items-center" style="left: 85.5%; top: 87.5%; width: 10.5%; height: 8.5%;">
+                            <span class="text-[0.74cqw] font-semibold alur-title leading-snug">{{ __('Data analitik bisnis untuk keputusan') }}</span>
                         </div>
 
                     </div>
