@@ -46,6 +46,8 @@
             --hero-overlay-start: rgba(6, 12, 30, 0.85);
             --hero-overlay-mid: rgba(6, 12, 30, 0.40);
             
+            --tentang-bg-img: url('{{ asset('images/tentang-kami-bg-dark.jpg') }}');
+            
             --card-bg: rgba(11, 23, 50, 0.75);
             --card-border: rgba(0, 194, 255, 0.22);
             --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
@@ -80,6 +82,8 @@
             --hero-bg-img: url('{{ asset('images/hero-bg-clean.jpg') }}');
             --hero-overlay-start: rgba(248, 250, 252, 0.88);
             --hero-overlay-mid: rgba(248, 250, 252, 0.38);
+            
+            --tentang-bg-img: url('{{ asset('images/tentang-kami-bg.jpg') }}');
             
             --card-bg: rgba(255, 255, 255, 0.92);
             --card-border: rgba(203, 213, 225, 0.85);
@@ -349,130 +353,180 @@
     {{-- ========================================================================= --}}
     {{-- SECTION 2: TENTANG KAMI (Santos Exporters S.A. Story & Global Hub)       --}}
     {{-- ========================================================================= --}}
-    <section id="tentang-kami" class="py-20 lg:py-28 relative border-t"
-             style="background: var(--bg-alt); border-color: var(--nav-border);">
-        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="tentang-kami" class="py-16 sm:py-20 lg:py-24 relative overflow-hidden"
+             style="background-image: var(--tentang-bg-img); background-size: cover; background-position: top right; background-repeat: no-repeat;">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
-            {{-- Section Header --}}
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold tracking-wider uppercase mb-3 shadow-sm"
-                     style="background: var(--brand-glow); color: var(--brand-cyan); border: 1px solid var(--card-border)">
-                    <i data-lucide="anchor" class="w-3.5 h-3.5"></i>
-                    <span>{{ __('TENTANG SANTOS EXPORTERS S.A.') }}</span>
+            {{-- Section Header (Left-aligned, leaving top-right ship illustration unobstructed) --}}
+            <div class="w-full lg:max-w-xl xl:max-w-2xl text-left mb-10 sm:mb-12">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <div class="h-1 w-8 rounded-full" style="background: var(--brand-cyan)"></div>
+                    <span class="text-xs sm:text-sm font-bold tracking-wider uppercase" style="color: var(--text-heading)">
+                        {{ __('Tentang Kami') }}
+                    </span>
                 </div>
-                <h2 class="font-outfit text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4"
+                
+                <h2 class="font-outfit text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.15] mb-4"
                     style="color: var(--text-heading)">
-                    {{ __('Rantai Pasok Kopi Spesialti Berkelas Dunia dari Pelabuhan Santos') }}
+                    {{ __('Rantai Pasok Kopi Spesialti') }} <br>
+                    {{ __('Berkelas Dunia dari') }} <br>
+                    <span style="color: var(--brand-cyan)">{{ __('Pelabuhan Santos') }}</span>
                 </h2>
-                <p class="text-base sm:text-lg leading-relaxed font-normal" style="color: var(--text-body)">
+                
+                <p class="text-sm sm:text-base leading-relaxed font-normal" style="color: var(--text-body)">
                     {{ __('Menghubungkan perkebunan kopi terbaik Brasil dengan roastery spesialti global di Asia, Eropa, dan Amerika melalui pelabuhan maritim terbesar di Amerika Latin.') }}
                 </p>
             </div>
 
-            {{-- 2 Columns: Story & Mission + 4 Live Metric Stats --}}
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+            {{-- 2 Columns: Story & Mission (Left) + 4 Metric Cards (Right) --}}
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
                 
-                {{-- Left: Mission, Historical Context & Traceability --}}
-                <div class="lg:col-span-7 space-y-6">
-                    <div class="theme-card rounded-3xl p-7 lg:p-8 space-y-5">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">☕</span>
-                            <h3 class="text-xl font-bold font-outfit" style="color: var(--text-heading)">
-                                {{ __('Pusat Ekspor Kopi Global Terbesar di Dunia') }}
-                            </h3>
+                {{-- Left: Mission, Historical Context & Traceability Card --}}
+                <div class="lg:col-span-7">
+                    <div class="theme-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between"
+                         style="background: var(--card-bg); border: 1px solid var(--card-border);">
+                        <div>
+                            <div class="flex items-center gap-3.5 mb-4">
+                                <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+                                     style="background: rgba(0, 112, 243, 0.1); border: 1px solid var(--card-border); color: var(--brand-cyan);">
+                                    <i data-lucide="layers" class="w-6 h-6"></i>
+                                </div>
+                                <h3 class="font-outfit text-lg sm:text-xl font-bold leading-snug" style="color: var(--text-heading)">
+                                    {{ __('Pusat Ekspor Kopi Global') }} <span style="color: var(--brand-cyan)">{{ __('Terbesar di Dunia') }}</span>
+                                </h3>
+                            </div>
+                            
+                            <p class="text-xs sm:text-sm leading-relaxed mb-3.5" style="color: var(--text-body)">
+                                {{ __('Pelabuhan Santos (Porto de Santos), yang terletak di negara bagian São Paulo, Brasil, merupakan pintu gerbang ekspor maritim bagi lebih dari 80% kopi Brasil ke pasar dunia. Berdiri di jantung ekosistem logistik maritim ini, Santos Exporters S.A. mengintegrasikan perkebunan kopi terbaik di Minas Gerais, Sul de Minas, dan Mogiana langsung ke kapal kontainer laut.') }}
+                            </p>
+                            
+                            <p class="text-xs sm:text-sm leading-relaxed mb-6" style="color: var(--text-body)">
+                                {{ __('Melalui platform CargoTrace, kami menghilangkan ketidakpastian pengiriman laut: setiap kontainer kopi dipantau kelembapannya, dilengkapi sertifikasi Specialty Coffee Association (SCA), dan dapat dilacak pergerakan AIS kapal secara transparan dari dermaga muat hingga tiba di pelabuhan tujuan pembeli.') }}
+                            </p>
                         </div>
-                        <p class="text-sm sm:text-base leading-relaxed" style="color: var(--text-body)">
-                            {{ __('Pelabuhan Santos (Porto de Santos), yang terletak di negara bagian São Paulo, Brasil, merupakan pintu gerbang ekspor maritim bagi lebih dari 80% kopi Brasil ke pasar dunia. Berdiri di jantung ekosistem logistik maritim ini, Santos Exporters S.A. mengintegrasikan perkebunan kopi terbaik di Minas Gerais, Sul de Minas, dan Mogiana langsung ke kapal kontainer laut.') }}
-                        </p>
-                        <p class="text-sm sm:text-base leading-relaxed" style="color: var(--text-body)">
-                            {{ __('Melalui platform CargoTrace, kami menghilangkan ketidakpastian pengiriman laut: setiap kontainer kopi dipantau kelembapannya, dilengkapi sertifikasi Specialty Coffee Association (SCA), dan dapat dilacak pergerakan AIS kapal secara transparan dari dermaga muat hingga tiba di pelabuhan tujuan pembeli.') }}
-                        </p>
 
-                        {{-- 3 Value Pillars --}}
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t" style="border-color: var(--nav-border)">
-                            <div class="p-3 rounded-xl" style="background: rgba(255,255,255,0.04); border: 1px solid var(--nav-border)">
-                                <div class="text-emerald-500 font-bold text-sm mb-1 flex items-center gap-1.5">
-                                    <i data-lucide="check-circle" class="w-4 h-4"></i>
-                                    <span>Single-Origin</span>
+                        {{-- 3 Value Pillars at the bottom of the card --}}
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-5 border-t" style="border-color: var(--nav-border)">
+                            
+                            {{-- Pillar 1: Single-Origin --}}
+                            <div class="flex items-start gap-2.5">
+                                <div class="w-7 h-7 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center flex-shrink-0 text-emerald-500 mt-0.5">
+                                    <i data-lucide="check" class="w-4 h-4 stroke-[2.5]"></i>
                                 </div>
-                                <div class="text-xs" style="color: var(--text-muted)">Terlacak hingga kebun asal & sertifikat COO</div>
-                            </div>
-                            <div class="p-3 rounded-xl" style="background: rgba(255,255,255,0.04); border: 1px solid var(--nav-border)">
-                                <div class="font-bold text-sm mb-1 flex items-center gap-1.5" style="color: var(--brand-cyan)">
-                                    <i data-lucide="shield" class="w-4 h-4"></i>
-                                    <span>GrainPro Liner</span>
+                                <div>
+                                    <h4 class="font-bold text-xs sm:text-sm leading-tight" style="color: var(--text-heading)">Single-Origin</h4>
+                                    <p class="text-[11px] mt-0.5 leading-snug" style="color: var(--text-muted)">{{ __('Terlacak hingga kebun asal & sertifikat COO') }}</p>
                                 </div>
-                                <div class="text-xs" style="color: var(--text-muted)">Kontainer terlindung menjaga kelembapan 11%</div>
                             </div>
-                            <div class="p-3 rounded-xl" style="background: rgba(255,255,255,0.04); border: 1px solid var(--nav-border)">
-                                <div class="text-amber-500 font-bold text-sm mb-1 flex items-center gap-1.5">
-                                    <i data-lucide="award" class="w-4 h-4"></i>
-                                    <span>SCA 84+ Cupping</span>
+
+                            {{-- Pillar 2: GrainPro Liner --}}
+                            <div class="flex items-start gap-2.5">
+                                <div class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                                     style="background: rgba(0, 112, 243, 0.12); border: 1px solid var(--card-border); color: var(--brand-cyan);">
+                                    <i data-lucide="package" class="w-4 h-4 stroke-[2.5]"></i>
                                 </div>
-                                <div class="text-xs" style="color: var(--text-muted)">Uji cupping terstandar Q-Grader berlisensi</div>
+                                <div>
+                                    <h4 class="font-bold text-xs sm:text-sm leading-tight" style="color: var(--text-heading)">GrainPro Liner</h4>
+                                    <p class="text-[11px] mt-0.5 leading-snug" style="color: var(--text-muted)">{{ __('Kontainer terlindung menjaga kelembapan 11%') }}</p>
+                                </div>
                             </div>
+
+                            {{-- Pillar 3: SCA 84+ Cupping --}}
+                            <div class="flex items-start gap-2.5">
+                                <div class="w-7 h-7 rounded-full bg-amber-500/15 border border-amber-500/30 flex items-center justify-center flex-shrink-0 text-amber-500 mt-0.5">
+                                    <i data-lucide="award" class="w-4 h-4 stroke-[2.5]"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-xs sm:text-sm leading-tight" style="color: var(--text-heading)">SCA 84+ Cupping</h4>
+                                    <p class="text-[11px] mt-0.5 leading-snug" style="color: var(--text-muted)">{{ __('Uji cupping terstandar Q-Grader bersertifikasi') }}</p>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
 
-                {{-- Right: 4 High-Impact Metric Cards --}}
+                {{-- Right: 4 Metric Cards (Horizontal Flex Layout matching Mockup) --}}
                 <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     
                     {{-- Metric 1: 40+ Global Ports --}}
-                    <div class="theme-card rounded-2xl p-6 text-center">
-                        <div class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center"
-                             style="background: var(--brand-glow); color: var(--brand-cyan)">
+                    <div class="theme-card rounded-2xl p-5 flex items-center gap-4 relative overflow-hidden"
+                         style="background: var(--card-bg); border: 1px solid var(--card-border);">
+                        <div class="w-12 h-12 rounded-2xl flex-shrink-0 flex items-center justify-center shadow-sm"
+                             style="background: rgba(2, 132, 199, 0.15); color: #0284C7;">
                             <i data-lucide="globe" class="w-6 h-6"></i>
                         </div>
-                        <div class="font-outfit text-3xl sm:text-4xl font-extrabold mb-1" style="color: var(--text-heading)">
-                            40+
+                        <div>
+                            <div class="font-outfit text-2xl sm:text-3xl font-extrabold leading-none mb-1" style="color: var(--text-heading)">
+                                40+
+                            </div>
+                            <div class="text-xs sm:text-sm font-bold" style="color: var(--brand-cyan)">{{ __('Pelabuhan & Hub Global') }}</div>
+                            <p class="text-[11px] mt-0.5 leading-tight" style="color: var(--text-muted)">Santos, Priok, Rotterdam, Busan, Haneda, JFK</p>
                         </div>
-                        <div class="text-sm font-semibold" style="color: var(--brand-cyan)">{{ __('Pelabuhan & Hub Global') }}</div>
-                        <p class="text-xs mt-1" style="color: var(--text-muted)">Santos, Priok, Rotterdam, Busan, Haneda, JFK</p>
                     </div>
 
                     {{-- Metric 2: $6.4M+ GMV Cargo Value --}}
-                    <div class="theme-card rounded-2xl p-6 text-center">
-                        <div class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center"
-                             style="background: rgba(16, 185, 129, 0.15); color: #10B981">
-                            <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                    <div class="theme-card rounded-2xl p-5 flex items-center gap-4 relative overflow-hidden"
+                         style="background: var(--card-bg); border: 1px solid var(--card-border);">
+                        <div class="w-12 h-12 rounded-2xl flex-shrink-0 flex items-center justify-center shadow-sm"
+                             style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+                            <i data-lucide="layers" class="w-6 h-6"></i>
                         </div>
-                        <div class="font-outfit text-3xl sm:text-4xl font-extrabold mb-1" style="color: var(--text-heading)">
-                            $6.4M+
+                        <div>
+                            <div class="font-outfit text-2xl sm:text-3xl font-extrabold leading-none mb-1" style="color: var(--text-heading)">
+                                $6.4M+
+                            </div>
+                            <div class="text-xs sm:text-sm font-bold text-emerald-500">{{ __('Total Nilai Kargo (GMV)') }}</div>
+                            <p class="text-[11px] mt-0.5 leading-tight" style="color: var(--text-muted)">{{ __('Ekspor komoditas bernilai tinggi terproteksi') }}</p>
                         </div>
-                        <div class="text-sm font-semibold text-emerald-500">{{ __('Total Nilai Kargo (GMV)') }}</div>
-                        <p class="text-xs mt-1" style="color: var(--text-muted)">Ekspor komoditas bernilai tinggi terproteksi</p>
                     </div>
 
                     {{-- Metric 3: 88.6% On-Time SLA --}}
-                    <div class="theme-card rounded-2xl p-6 text-center">
-                        <div class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center"
-                             style="background: rgba(59, 130, 246, 0.15); color: #3B82F6">
+                    <div class="theme-card rounded-2xl p-5 flex items-center gap-4 relative overflow-hidden"
+                         style="background: var(--card-bg); border: 1px solid var(--card-border);">
+                        <div class="w-12 h-12 rounded-2xl flex-shrink-0 flex items-center justify-center shadow-sm"
+                             style="background: rgba(37, 99, 235, 0.15); color: #2563EB;">
                             <i data-lucide="trending-up" class="w-6 h-6"></i>
                         </div>
-                        <div class="font-outfit text-3xl sm:text-4xl font-extrabold mb-1" style="color: var(--text-heading)">
-                            88.6%
+                        <div>
+                            <div class="font-outfit text-2xl sm:text-3xl font-extrabold leading-none mb-1" style="color: var(--text-heading)">
+                                88.6%
+                            </div>
+                            <div class="text-xs sm:text-sm font-bold text-blue-500">{{ __('Ketepatan Waktu (SLA)') }}</div>
+                            <p class="text-[11px] mt-0.5 leading-tight" style="color: var(--text-muted)">{{ __('Deteksi otomatis deviasi rute dan cuaca') }}</p>
                         </div>
-                        <div class="text-sm font-semibold text-blue-500">{{ __('Ketepatan Waktu (SLA)') }}</div>
-                        <p class="text-xs mt-1" style="color: var(--text-muted)">Deteksi otomatis deviasi rute dan cuaca</p>
                     </div>
 
                     {{-- Metric 4: 6 Certified Varieties --}}
-                    <div class="theme-card rounded-2xl p-6 text-center">
-                        <div class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center"
-                             style="background: rgba(245, 158, 11, 0.15); color: #F59E0B">
-                            <i data-lucide="layers" class="w-6 h-6"></i>
+                    <div class="theme-card rounded-2xl p-5 flex items-center gap-4 relative overflow-hidden"
+                         style="background: var(--card-bg); border: 1px solid var(--card-border);">
+                        <div class="w-12 h-12 rounded-2xl flex-shrink-0 flex items-center justify-center shadow-sm"
+                             style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">
+                            <i data-lucide="coffee" class="w-6 h-6"></i>
                         </div>
-                        <div class="font-outfit text-3xl sm:text-4xl font-extrabold mb-1" style="color: var(--text-heading)">
-                            6
+                        <div>
+                            <div class="font-outfit text-2xl sm:text-3xl font-extrabold leading-none mb-1" style="color: var(--text-heading)">
+                                6
+                            </div>
+                            <div class="text-xs sm:text-sm font-bold text-amber-500">{{ __('Varietas Kopi Spesialti') }}</div>
+                            <p class="text-[11px] mt-0.5 leading-tight" style="color: var(--text-muted)">Bourbon, Catuai, Cerrado, SSFC & Blend</p>
                         </div>
-                        <div class="text-sm font-semibold text-amber-500">{{ __('Varietas Kopi Spesialti') }}</div>
-                        <p class="text-xs mt-1" style="color: var(--text-muted)">Bourbon, Catuai, Cerrado, SSFC & Blend</p>
                     </div>
 
                 </div>
 
             </div>
+
+        </div>
+
+        {{-- Flowing Ocean Wave at bottom of Tentang Kami --}}
+        <div class="w-full overflow-hidden leading-none pt-12 sm:pt-16 pointer-events-none">
+            <svg viewBox="0 0 1440 70" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-8 sm:h-12" preserveAspectRatio="none">
+                <path d="M0,35 C320,65 640,5 960,40 C1200,60 1360,25 1440,35 L1440,70 L0,70 Z" fill="var(--wave-2)" opacity="0.3"/>
+                <path d="M0,45 C280,15 600,65 920,30 C1180,50 1340,20 1440,45 L1440,70 L0,70 Z" fill="var(--wave-1)" opacity="0.6"/>
+            </svg>
+        </div>
+    </section>
 
         </div>
     </section>
