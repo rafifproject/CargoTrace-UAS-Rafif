@@ -1469,138 +1469,219 @@
     {{-- ========================================================================= --}}
     {{-- SECTION 5: FITUR UNGGULAN PLATFORM                                        --}}
     {{-- ========================================================================= --}}
-    <section id="fitur" class="py-20 lg:py-28 relative" style="background: var(--bg-page)">
-        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="fitur" class="py-16 sm:py-20 lg:py-24 relative overflow-hidden transition-colors duration-300" style="background: var(--bg-page)">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
-            {{-- Section Header --}}
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold tracking-wider uppercase mb-3 shadow-sm"
-                     style="background: var(--brand-glow); color: var(--brand-cyan); border: 1px solid var(--card-border)">
-                    <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
-                    <span>{{ __('ARSITEKTUR & FITUR UNGGULAN') }}</span>
+            {{-- Section Header: 2 Columns (Text on Left, 3D Telemetry Laptop Artwork on Right) --}}
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-12 sm:mb-16">
+                
+                <div class="lg:col-span-7 text-left">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase mb-4 shadow-sm bg-blue-500/10 text-blue-600 dark:text-cyan-400 border border-blue-500/20">
+                        <i data-lucide="package" class="w-3.5 h-3.5"></i>
+                        <span>{{ __('Arsitektur & Fitur Unggulan') }}</span>
+                    </div>
+                    <h2 class="font-outfit text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 leading-tight"
+                        style="color: var(--text-heading)">
+                        {{ __('Dibangun untuk Kompleksitas Logistik Kopi Maritim') }}
+                    </h2>
+                    <p class="text-sm sm:text-base lg:text-lg leading-relaxed font-normal" style="color: var(--text-muted)">
+                        {{ __('Integrasi fitur canggih yang memberikan keunggulan operasional, keandalan analitik bisnis, dan transparansi penuh bagi seluruh pemangku kepentingan.') }}
+                    </p>
                 </div>
-                <h2 class="font-outfit text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4"
-                    style="color: var(--text-heading)">
-                    {{ __('Dibangun untuk Kompleksitas Logistik Kopi Maritim') }}
-                </h2>
-                <p class="text-base sm:text-lg leading-relaxed font-normal" style="color: var(--text-body)">
-                    {{ __('Integrasi fitur canggih yang memberikan keunggulan operasional, keandalan analitik bisnis, dan transparansi penuh bagi seluruh pemangku kepentingan.') }}
-                </p>
+
+                <div class="lg:col-span-5 flex justify-center lg:justify-end">
+                    <div class="relative w-full max-w-sm sm:max-w-md">
+                        {{-- Atmosphere Glow --}}
+                        <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 to-blue-600/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+                        <img src="{{ asset('images/alur/laptop-tracking-containers.png') }}" 
+                             alt="Telemetri Global Kargo & Kontainer" 
+                             class="w-full h-auto object-contain animate-float drop-shadow-2xl [animation-duration:6s]">
+                    </div>
+                </div>
+
             </div>
 
-            {{-- 4 Core Architectural Features Grid --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {{-- 4 Core Architectural Features Grid (2x2 Grid with 3D Pedestal on the Left of each Card) --}}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
                 
                 {{-- Feature 1: Live Maritime Geolocation Tracking --}}
-                <div class="theme-card rounded-3xl p-8 relative overflow-hidden">
-                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-md"
-                         style="background: var(--brand-glow); color: var(--brand-cyan); border: 1px solid var(--card-border)">
-                        <i data-lucide="compass" class="w-7 h-7"></i>
+                <div class="theme-card rounded-3xl p-6 sm:p-7 border transition-all duration-300 hover:shadow-2xl hover:border-blue-500/40 relative overflow-hidden group">
+                    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
+                        
+                        {{-- 3D Pedestal Asset on Left --}}
+                        <div class="w-full sm:w-44 md:w-48 shrink-0 flex items-center justify-center">
+                            <img src="{{ asset('images/alur/step-3-pedestal.png') }}" 
+                                 alt="Pelacakan Geolokasi Maritim" 
+                                 class="w-36 sm:w-44 h-auto object-contain group-hover:scale-105 transition-transform duration-500 animate-float drop-shadow-lg">
+                        </div>
+
+                        {{-- Text Content on Right --}}
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-2.5">
+                                <span class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/20 flex items-center justify-center shrink-0 shadow-sm">
+                                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                </span>
+                                <h3 class="font-outfit text-base sm:text-lg font-bold leading-snug group-hover:text-blue-500 transition-colors" style="color: var(--text-heading)">
+                                    {{ __('Pelacakan Geolokasi Maritim Interaktif (Leaflet)') }}
+                                </h3>
+                            </div>
+
+                            <p class="text-xs sm:text-sm leading-relaxed mb-4" style="color: var(--text-muted)">
+                                {{ __('Peta maritim digital berskala global yang memproyeksikan lintasan pelayaran kapal kontainer kopi dari Dermaga Santos ke berbagai pelabuhan tujuan dunia.') }}
+                            </p>
+
+                            <ul class="space-y-2 text-xs sm:text-sm font-medium" style="color: var(--text-body)">
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                                    <span>{{ __('Visualisasi rute Great Circle Atlantik & Pasifik') }}</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                                    <span>{{ __('Estimasi waktu kedatangan (ETA) adaptif') }}</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                                    <span>{{ __('Riwayat checkpoint pelabuhan yang tercatat kronologis') }}</span>
+                                </li>
+                            </ul>
+                        </div>
+
                     </div>
-                    <h3 class="font-outfit text-2xl font-bold mb-3" style="color: var(--text-heading)">
-                        Pelacakan Geolokasi Maritim Interaktif (Leaflet)
-                    </h3>
-                    <p class="text-sm sm:text-base leading-relaxed mb-6" style="color: var(--text-body)">
-                        Peta maritim digital berskala global yang memproyeksikan lintasan pelayaran kapal kontainer kopi dari Dermaga Santos ke berbagai pelabuhan tujuan dunia, lengkap dengan interpolasi koordinat GPS dan pembaruan checkpoint otomatis.
-                    </p>
-                    <ul class="space-y-2.5 text-xs sm:text-sm" style="color: var(--text-body)">
-                        <li class="flex items-center gap-2.5">
-                            <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
-                            <span>Visualisasi rute Great Circle pelayaran samudra Atlantik & Pasifik</span>
-                        </li>
-                        <li class="flex items-center gap-2.5">
-                            <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
-                            <span>Estimasi waktu kedatangan (ETA) adaptif berdasarkan kecepatan kapal laut</span>
-                        </li>
-                        <li class="flex items-center gap-2.5">
-                            <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
-                            <span>Riwayat checkpoint pelabuhan transit yang tercatat secara kronologis</span>
-                        </li>
-                    </ul>
                 </div>
 
                 {{-- Feature 2: Automated Delay & Exception Engine --}}
-                <div class="theme-card rounded-3xl p-8 relative overflow-hidden">
-                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-md"
-                         style="background: rgba(244, 63, 94, 0.15); color: #F43F5E; border: 1px solid rgba(244, 63, 94, 0.3)">
-                        <i data-lucide="alert-triangle" class="w-7 h-7"></i>
+                <div class="theme-card rounded-3xl p-6 sm:p-7 border transition-all duration-300 hover:shadow-2xl hover:border-rose-500/40 relative overflow-hidden group">
+                    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
+                        
+                        {{-- 3D Pedestal Asset on Left --}}
+                        <div class="w-full sm:w-44 md:w-48 shrink-0 flex items-center justify-center">
+                            <img src="{{ asset('images/alur/step-4-pedestal.png') }}" 
+                                 alt="Deteksi Keterlambatan" 
+                                 class="w-36 sm:w-44 h-auto object-contain group-hover:scale-105 transition-transform duration-500 animate-float [animation-delay:1.5s] drop-shadow-lg">
+                        </div>
+
+                        {{-- Text Content on Right --}}
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-2.5">
+                                <span class="w-9 h-9 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/20 flex items-center justify-center shrink-0 shadow-sm">
+                                    <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                                </span>
+                                <h3 class="font-outfit text-base sm:text-lg font-bold leading-snug group-hover:text-rose-500 transition-colors" style="color: var(--text-heading)">
+                                    {{ __('Deteksi Keterlambatan & Exception Otomatis') }}
+                                </h3>
+                            </div>
+
+                            <p class="text-xs sm:text-sm leading-relaxed mb-4" style="color: var(--text-muted)">
+                                {{ __('Engine cerdas yang secara deterministik membandingkan estimasi kedatangan dengan ambang batas (delay threshold).') }}
+                            </p>
+
+                            <ul class="space-y-2 text-xs sm:text-sm font-medium" style="color: var(--text-body)">
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                                    <span>{{ __('Klasifikasi otomatis kendala (cuaca, dokumen, mesin)') }}</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                                    <span>{{ __('Notifikasi cepat ke buyer dan operator logistik') }}</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                                    <span>{{ __('Pencatatan tindakan resolusi dan pemulihan jadwal') }}</span>
+                                </li>
+                            </ul>
+                        </div>
+
                     </div>
-                    <h3 class="font-outfit text-2xl font-bold mb-3" style="color: var(--text-heading)">
-                        Deteksi Keterlambatan & Exception Otomatis
-                    </h3>
-                    <p class="text-sm sm:text-base leading-relaxed mb-6" style="color: var(--text-body)">
-                        Engine cerdas yang secara deterministik membandingkan estimasi kedatangan dengan ambang batas (delay threshold). Jika badai samudra atau kendala kepabeanan terdeteksi, status dialihkan ke EXCEPTION dan alert langsung dikirim.
-                    </p>
-                    <ul class="space-y-2.5 text-xs sm:text-sm" style="color: var(--text-body)">
-                        <li class="flex items-center gap-2.5">
-                            <i data-lucide="check" class="w-4 h-4 text-rose-500"></i>
-                            <span>Klasifikasi otomatis kendala: Cuaca Buruk, Masalah Dokumen, atau Kerusakan Mesin</span>
-                        </li>
-                        <li class="flex items-center gap-2.5">
-                            <i data-lucide="check" class="w-4 h-4 text-rose-500"></i>
-                            <span>Notifikasi push seketika kepada pembeli kargo dan operator logistik</span>
-                        </li>
-                        <li class="flex items-center gap-2.5">
-                            <i data-lucide="check" class="w-4 h-4 text-rose-500"></i>
-                            <span>Pencatatan tindakan resolusi kendala dan pemulihan jadwal kontainer</span>
-                        </li>
-                    </ul>
                 </div>
 
                 {{-- Feature 3: Strict RBAC & Anti-IDOR Security --}}
-                <div class="theme-card rounded-3xl p-8 relative overflow-hidden">
-                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-md"
-                         style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3)">
-                        <i data-lucide="shield-check" class="w-7 h-7"></i>
+                <div class="theme-card rounded-3xl p-6 sm:p-7 border transition-all duration-300 hover:shadow-2xl hover:border-emerald-500/40 relative overflow-hidden group">
+                    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
+                        
+                        {{-- 3D Pedestal Asset on Left --}}
+                        <div class="w-full sm:w-44 md:w-48 shrink-0 flex items-center justify-center">
+                            <img src="{{ asset('images/alur/pedestal-security-shield.png') }}" 
+                                 alt="Keamanan Berlapis RBAC" 
+                                 class="w-36 sm:w-44 h-auto object-contain group-hover:scale-105 transition-transform duration-500 animate-float [animation-delay:2.5s] drop-shadow-lg">
+                        </div>
+
+                        {{-- Text Content on Right --}}
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-2.5">
+                                <span class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-sm">
+                                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                </span>
+                                <h3 class="font-outfit text-base sm:text-lg font-bold leading-snug group-hover:text-emerald-500 transition-colors" style="color: var(--text-heading)">
+                                    {{ __('Keamanan Berlapis (RBAC & Anti-IDOR)') }}
+                                </h3>
+                            </div>
+
+                            <p class="text-xs sm:text-sm leading-relaxed mb-4" style="color: var(--text-muted)">
+                                {{ __('Pemisahan hak akses yang ketat antara 3 peran: Administrator, Logistics Operator, dan Customer, dengan perlindungan policy tingkat lanjut.') }}
+                            </p>
+
+                            <ul class="space-y-2 text-xs sm:text-sm font-medium" style="color: var(--text-body)">
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                                    <span>{{ __('Audit logging aktivitas (IP, User Agent, dan waktu)') }}</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                                    <span>{{ __('Proteksi manipulasi rute/status di luar kewenangan') }}</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                                    <span>{{ __('Enkripsi kata sandi mutakhir dan protokol brute-force') }}</span>
+                                </li>
+                            </ul>
+                        </div>
+
                     </div>
-                    <h3 class="font-outfit text-2xl font-bold mb-3" style="color: var(--text-heading)">
-                        Keamanan Berlapis (RBAC & Anti-IDOR)
-                    </h3>
-                    <p class="text-sm sm:text-base leading-relaxed mb-6" style="color: var(--text-body)">
-                        Pemisahan hak akses yang ketat antara 3 peran: Administrator, Logistics Operator, dan Customer. Dilindungi Policy Laravel anti-IDOR yang memastikan buyer hanya dapat mengakses data kargo miliknya sendiri.
-                    </p>
-                    <ul class="space-y-2.5 text-xs sm:text-sm" style="color: var(--text-body)">
-                        <li class="flex items-center gap-2.5">
-                            <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
-                            <span>Audit logging abadi yang mencatat IP, User Agent, dan stempel waktu aktivitas</span>
-                        </li>
-                        <li class="flex items-center gap-2.5">
-                            <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
-                            <span>Proteksi manipulasi resi atau pergantian status kargo di luar kewenangan</span>
-                        </li>
-                        <li class="flex items-center gap-2.5">
-                            <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
-                            <span>Enkripsi kata sandi mutakhir dan proteksi brute-force login</span>
-                        </li>
-                    </ul>
                 </div>
 
                 {{-- Feature 4: Executive Business Intelligence & Analytics --}}
-                <div class="theme-card rounded-3xl p-8 relative overflow-hidden">
-                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-md"
-                         style="background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.3)">
-                        <i data-lucide="bar-chart-3" class="w-7 h-7"></i>
+                <div class="theme-card rounded-3xl p-6 sm:p-7 border transition-all duration-300 hover:shadow-2xl hover:border-amber-500/40 relative overflow-hidden group">
+                    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
+                        
+                        {{-- 3D Pedestal Asset on Left --}}
+                        <div class="w-full sm:w-44 md:w-48 shrink-0 flex items-center justify-center">
+                            <img src="{{ asset('images/alur/step-5-pedestal.png') }}" 
+                                 alt="Dasbor Analitik Bisnis" 
+                                 class="w-36 sm:w-44 h-auto object-contain group-hover:scale-105 transition-transform duration-500 animate-float [animation-delay:3.5s] drop-shadow-lg">
+                        </div>
+
+                        {{-- Text Content on Right --}}
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-3 mb-2.5">
+                                <span class="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center justify-center shrink-0 shadow-sm">
+                                    <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+                                </span>
+                                <h3 class="font-outfit text-base sm:text-lg font-bold leading-snug group-hover:text-amber-500 transition-colors" style="color: var(--text-heading)">
+                                    {{ __('Dasbor Analitik Bisnis & Telemetri Kargo') }}
+                                </h3>
+                            </div>
+
+                            <p class="text-xs sm:text-sm leading-relaxed mb-4" style="color: var(--text-muted)">
+                                {{ __('Pusat telemetri bisnis komprehensif bagi Administrator untuk memantau kinerja ekspor kopi secara menyeluruh.') }}
+                            </p>
+
+                            <ul class="space-y-2 text-xs sm:text-sm font-medium" style="color: var(--text-body)">
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                                    <span>{{ __('Grafik interaktif pendapatan bulanan dan tren rute') }}</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                                    <span>{{ __('Peringkat negara pembeli terbanyak secara real-time') }}</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                                    <span>{{ __('Ekspor data pelacakan dan analitik untuk audit eksternal') }}</span>
+                                </li>
+                            </ul>
+                        </div>
+
                     </div>
-                    <h3 class="font-outfit text-2xl font-bold mb-3" style="color: var(--text-heading)">
-                        Dasbor Analitik Bisnis & Telemetri Kargo
-                    </h3>
-                    <p class="text-sm sm:text-base leading-relaxed mb-6" style="color: var(--text-body)">
-                        Pusat telemetri bisnis komprehensif bagi Administrator: menghitung total omzet (Gross Merchandise Value USD), grafik negara pengimpor terbesar, komoditas kopi terlaris, dan rasio pemenuhan SLA ketepatan waktu.
-                    </p>
-                    <ul class="space-y-2.5 text-xs sm:text-sm" style="color: var(--text-body)">
-                        <li class="flex items-center gap-2.5">
-                            <i data-lucide="check" class="w-4 h-4 text-amber-500"></i>
-                            <span>Grafik interaktif Chart.js pendapatan bulanan dan tren rute pelabuhan</span>
-                        </li>
-                        <li class="flex items-center gap-2.5">
-                            <i data-lucide="check" class="w-4 h-4 text-amber-500"></i>
-                            <span>Peringkat 5 negara pembeli kopi Santos terbanyak secara real-time</span>
-                        </li>
-                        <li class="flex items-center gap-2.5">
-                            <i data-lucide="check" class="w-4 h-4 text-amber-500"></i>
-                            <span>Ekspor data pelacakan dan analitik untuk keperluan audit eksternal</span>
-                        </li>
-                    </ul>
                 </div>
 
             </div>
