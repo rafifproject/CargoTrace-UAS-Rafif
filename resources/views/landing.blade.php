@@ -843,156 +843,559 @@
 
 
     {{-- ========================================================================= --}}
-    {{-- SECTION 4: ALUR SISTEM (5-Stage Swimlane Flowmap Showcase)                --}}
+    {{-- SECTION 4: ALUR SISTEM (Interactive 5-Stage Swimlane Flowmap Showcase)   --}}
     {{-- ========================================================================= --}}
-    <section id="alur-sistem" class="relative w-full overflow-hidden" style="background: var(--bg-alt);">
-        <div class="w-full max-w-[1500px] mx-auto px-2 sm:px-4 lg:px-6 py-6 lg:py-10">
-            <div class="w-full overflow-x-auto pb-4 custom-scrollbar">
-                <div class="relative w-full min-w-[1000px] aspect-[1024/576] rounded-2xl lg:rounded-3xl overflow-hidden shadow-2xl border border-slate-200/60 dark:border-cyan-500/20"
-                     style="container-type: inline-size;">
+    <section id="alur-sistem" class="py-16 lg:py-24 relative overflow-hidden transition-colors duration-300" style="background: var(--bg-alt);">
+        
+        {{-- Subtle Ambient Glows --}}
+        <div class="absolute -top-32 left-1/4 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-32 right-1/4 w-96 h-96 rounded-full bg-blue-600/10 blur-3xl pointer-events-none"></div>
+
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            
+            {{-- 1. Top Section Header & Port Santos Hero Showcase --}}
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-12 lg:mb-16">
+                
+                {{-- Header Typography --}}
+                <div class="lg:col-span-7">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase mb-3 shadow-sm border transition-all duration-300"
+                         style="background: var(--brand-glow); color: var(--brand-cyan); border-color: var(--card-border);">
+                        <i data-lucide="git-merge" class="w-4 h-4 animate-pulse"></i>
+                        <span>{{ __('FLOWMAP SISTEM TERINTEGRASI') }}</span>
+                    </div>
+
+                    <h2 class="font-outfit text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight mb-2"
+                        style="color: var(--text-heading)">
+                        {{ __('Alur Kerja Pengiriman Kargo') }}
+                        <span class="block bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-400 bg-clip-text text-transparent">
+                            {{ __('(5 Tahap Utama)') }}
+                        </span>
+                    </h2>
+
+                    <p class="text-base sm:text-lg leading-relaxed font-normal max-w-2xl mt-3" style="color: var(--text-body)">
+                        {{ __('Diagram alur swimlane yang menghubungkan peran Customer (Buyer), Logistics Operator, Sistem Mesin Otomatis, dan Administrator secara harmonis dalam satu ekosistem logistik maritim.') }}
+                    </p>
+
+                    <div class="flex flex-wrap items-center gap-3 mt-5">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> End-to-End SLA Guaranteed
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                            <i data-lucide="satellite" class="w-3.5 h-3.5"></i> Live AIS Satelit
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+                            <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Multi-Role Collaboration
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Santos Port & Ship Interactive Visual Banner --}}
+                <div class="lg:col-span-5">
+                    <div class="relative rounded-2xl overflow-hidden shadow-2xl border transition-all duration-500 hover:shadow-cyan-500/20 hover:scale-[1.01] group"
+                         style="background: var(--card-bg); border-color: var(--card-border);">
+                        <img src="{{ asset('images/alur/port-santos-banner.png') }}" 
+                             alt="Pelabuhan Santos & Pengiriman Global Kopi CargoTrace" 
+                             class="w-full h-48 sm:h-56 object-cover object-center group-hover:scale-105 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-4">
+                            <div class="flex items-center justify-between w-full text-white">
+                                <div>
+                                    <div class="text-xs font-semibold tracking-wider text-cyan-300 uppercase flex items-center gap-1.5">
+                                        <i data-lucide="anchor" class="w-3.5 h-3.5"></i> Port of Santos, Brazil
+                                    </div>
+                                    <div class="text-sm font-bold">Rute Utama Ekspor Kopi Global</div>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-cyan-500/80 text-white shadow-sm backdrop-blur-sm">
+                                    LIVE TERMINAL
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            {{-- 2. The 5 Main Stages (Interactive 3D Pedestal Flow Cards) --}}
+            <div class="mb-14">
+                
+                {{-- Flow Connecting Header Bar --}}
+                <div class="flex items-center justify-between mb-6 px-1">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-cyan-500 animate-ping"></span>
+                        <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--text-muted)">
+                            INTERACTIVE PIPELINE (KLIK / ARAHKAN KURSOR UNTUK DETAIL)
+                        </span>
+                    </div>
+                    <span class="text-xs font-medium text-cyan-600 dark:text-cyan-400 flex items-center gap-1">
+                        <i data-lucide="mouse-pointer" class="w-3.5 h-3.5"></i> Interaktif 5 Tahap
+                    </span>
+                </div>
+
+                {{-- 5-Card Grid with 3D Pedestals --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 relative">
                     
-                    {{-- HD Background Image --}}
-                    <img id="flowmapImage"
-                         src="{{ asset('images/alur-sistem-bg-clean-hd.jpg') }}?v={{ time() }}" 
-                         alt="Alur Kerja Pengiriman Kargo (5 Tahap Utama) - CargoTrace" 
-                         class="absolute inset-0 w-full h-full object-cover select-none pointer-events-none">
-
-                    {{-- Vector HD Typography Overlay (Razor-Sharp typography aligned with user background) --}}
-                    <div class="absolute inset-0 w-full h-full pointer-events-none select-none font-sans">
-                        
-                        {{-- 1. Main Header Title (Top Left Sky) --}}
-                        <div class="absolute" style="left: 4.5%; top: 8.0%; width: 44%;">
-                            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.82cqw] font-bold tracking-wider uppercase mb-1.5 shadow-sm alur-badge border border-current/20">
-                                <i data-lucide="activity" class="w-[1.1cqw] h-[1.1cqw]"></i>
-                                <span>{{ __('FLOWMAP SISTEM TERINTEGRASI') }}</span>
+                    {{-- STEP 1: Pemesanan Kargo --}}
+                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 relative overflow-hidden"
+                         onclick="selectFlowStep(1)" id="step-card-1">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-blue-400"></div>
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="w-8 h-8 rounded-full bg-blue-600 text-white font-black text-sm flex items-center justify-center shadow-lg shadow-blue-500/30">
+                                    1
+                                </span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                                    Customer
+                                </span>
                             </div>
-                            <h2 class="font-outfit text-[2.2cqw] font-extrabold tracking-tight leading-tight alur-title mb-1">
-                                {{ __('Alur Kerja Pengiriman Kargo') }}
-                            </h2>
-                            <div class="font-outfit text-[1.4cqw] font-bold alur-subtitle mb-1.5">
-                                {{ __('(5 Tahap Utama)') }}
-                            </div>
-                            <p class="text-[0.92cqw] leading-relaxed alur-body max-w-[95%]">
-                                {{ __('Diagram alur swimlane yang menghubungkan peran Customer (Buyer), Logistics Operator, Sistem Mesin Otomatis, dan Administrator secara harmonis.') }}
-                            </p>
-                        </div>
-
-                        {{-- 2. The 5 Steps on the 3D Wavy Path (Next to Circles) --}}
-                        {{-- Step 1 --}}
-                        <div class="absolute flex items-center justify-start pl-1" style="left: 13.5%; top: 38.6%; width: 10.5%; height: 4.5%;">
-                            <span class="text-[0.78cqw] font-extrabold alur-title leading-tight tracking-tight">
+                            <h3 class="font-outfit text-sm font-extrabold leading-snug group-hover:text-blue-500 transition-colors" style="color: var(--text-heading)">
                                 {{ __('Pemesanan Kargo') }}
-                            </span>
-                        </div>
-                        {{-- Step 2 --}}
-                        <div class="absolute flex items-center justify-start pl-1" style="left: 30.2%; top: 36.0%; width: 12.0%; height: 4.5%;">
-                            <span class="text-[0.74cqw] font-extrabold alur-title leading-tight tracking-tight">
-                                {{ __('Validasi & Pengurusan Ekspedisi') }}
-                            </span>
-                        </div>
-                        {{-- Step 3 --}}
-                        <div class="absolute flex items-center justify-start pl-1" style="left: 50.2%; top: 38.6%; width: 10.5%; height: 4.5%;">
-                            <span class="text-[0.78cqw] font-extrabold alur-title leading-tight tracking-tight">
-                                {{ __('Pelacakan Perjalanan') }}
-                            </span>
-                        </div>
-                        {{-- Step 4 --}}
-                        <div class="absolute flex items-center justify-start pl-1" style="left: 68.2%; top: 41.0%; width: 12.0%; height: 4.5%;">
-                            <span class="text-[0.72cqw] font-extrabold alur-title leading-tight tracking-tight">
-                                {{ __('Deteksi Keterlambatan & Exception') }}
-                            </span>
-                        </div>
-                        {{-- Step 5 --}}
-                        <div class="absolute flex items-center justify-start pl-1" style="left: 86.2%; top: 33.6%; width: 10.5%; height: 4.5%;">
-                            <span class="text-[0.78cqw] font-extrabold alur-title leading-tight tracking-tight">
-                                {{ __('Penyelesaian & Analitik') }}
-                            </span>
-                        </div>
-
-                        {{-- 3. Bottom-Left Card: Tujuan Flowmap --}}
-                        <div class="absolute flex items-center justify-center" style="left: 4.7%; top: 62.0%; width: 16.1%; height: 4.0%;">
-                            <span class="text-white text-[0.85cqw] font-bold tracking-wide">{{ __('Tujuan Flowmap') }}</span>
-                        </div>
-                        <div class="absolute flex items-center justify-center px-2 text-center" style="left: 4.0%; top: 67.5%; width: 17.5%; height: 13.0%;">
-                            <p class="text-[0.76cqw] leading-relaxed alur-body font-medium">
-                                {{ __('Menggambarkan alur kerja sistem CargoTrace secara menyeluruh, mulai dari pemesanan hingga analitik eksekusi, dengan keterlibatan multi hak akses.') }}
+                            </h3>
+                            <p class="text-xs leading-relaxed mt-1" style="color: var(--text-muted)">
+                                {{ __('Input pesanan kargo kopi, tonase, spesifikasi bean & penentuan kontainer ekspor.') }}
                             </p>
                         </div>
 
-                        {{-- 4. Bottom-Center Card: Aktor / Hak Akses (4 Columns) --}}
-                        <div class="absolute flex items-center justify-center" style="left: 27.2%; top: 63.0%; width: 16.0%; height: 4.0%;">
-                            <span class="text-white text-[0.85cqw] font-bold tracking-wide">{{ __('Aktor / Hak Akses') }}</span>
+                        {{-- 3D Pedestal Graphic --}}
+                        <div class="mt-3 rounded-xl overflow-hidden bg-gradient-to-b from-blue-500/5 to-cyan-500/10 p-2 flex items-center justify-center border border-blue-500/10 group-hover:border-blue-500/30 transition-all">
+                            <img src="{{ asset('images/alur/step-1-pedestal.png') }}" 
+                                 alt="Step 1 Pemesanan Kargo" 
+                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500">
                         </div>
-                        {{-- Actor 1: Customer --}}
-                        <div class="absolute flex flex-col justify-center" style="left: 31.0%; top: 68.5%; width: 9.8%; height: 11.5%;">
-                            <div class="text-[0.78cqw] font-extrabold alur-title leading-tight mb-1">{{ __('Customer (Buyer)') }}</div>
-                            <div class="text-[0.66cqw] alur-body leading-snug">{{ __('Memesan kargo, melihat status, terima notifikasi.') }}</div>
+
+                        <div class="mt-3 pt-2 border-t border-slate-200/40 dark:border-slate-800 flex items-center justify-between text-[11px] font-semibold text-blue-600 dark:text-blue-400">
+                            <span>PO & Verifikasi</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                         </div>
+                    </div>
+
+                    {{-- STEP 2: Validasi & Pengurusan Ekspedisi --}}
+                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 relative overflow-hidden"
+                         onclick="selectFlowStep(2)" id="step-card-2">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-amber-300"></div>
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="w-8 h-8 rounded-full bg-amber-500 text-white font-black text-sm flex items-center justify-center shadow-lg shadow-amber-500/30">
+                                    2
+                                </span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                    Operator
+                                </span>
+                            </div>
+                            <h3 class="font-outfit text-sm font-extrabold leading-snug group-hover:text-amber-500 transition-colors" style="color: var(--text-heading)">
+                                {{ __('Validasi & Ekspedisi') }}
+                            </h3>
+                            <p class="text-xs leading-relaxed mt-1" style="color: var(--text-muted)">
+                                {{ __('Pemeriksaan kelayakan kontainer, karantina, bea cukai pelabuhan, & manifest muatan.') }}
+                            </p>
+                        </div>
+
+                        {{-- 3D Pedestal Graphic --}}
+                        <div class="mt-3 rounded-xl overflow-hidden bg-gradient-to-b from-amber-500/5 to-amber-500/10 p-2 flex items-center justify-center border border-amber-500/10 group-hover:border-amber-500/30 transition-all">
+                            <img src="{{ asset('images/alur/step-2-pedestal.png') }}" 
+                                 alt="Step 2 Validasi Ekspedisi" 
+                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500">
+                        </div>
+
+                        <div class="mt-3 pt-2 border-t border-slate-200/40 dark:border-slate-800 flex items-center justify-between text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                            <span>Stuffing Pelabuhan</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    {{-- STEP 3: Pelacakan Perjalanan --}}
+                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 relative overflow-hidden"
+                         onclick="selectFlowStep(3)" id="step-card-3">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-teal-400"></div>
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="w-8 h-8 rounded-full bg-cyan-500 text-white font-black text-sm flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                                    3
+                                </span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+                                    Sistem IoT
+                                </span>
+                            </div>
+                            <h3 class="font-outfit text-sm font-extrabold leading-snug group-hover:text-cyan-500 transition-colors" style="color: var(--text-heading)">
+                                {{ __('Pelacakan Perjalanan') }}
+                            </h3>
+                            <p class="text-xs leading-relaxed mt-1" style="color: var(--text-muted)">
+                                {{ __('Telemetri satelit AIS real-time, koordinat lintang/bujur kapal, suhu kontainer, & ETA live.') }}
+                            </p>
+                        </div>
+
+                        {{-- 3D Pedestal Graphic --}}
+                        <div class="mt-3 rounded-xl overflow-hidden bg-gradient-to-b from-cyan-500/5 to-cyan-500/10 p-2 flex items-center justify-center border border-cyan-500/10 group-hover:border-cyan-500/30 transition-all">
+                            <img src="{{ asset('images/alur/step-3-pedestal.png') }}" 
+                                 alt="Step 3 Pelacakan Perjalanan" 
+                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500">
+                        </div>
+
+                        <div class="mt-3 pt-2 border-t border-slate-200/40 dark:border-slate-800 flex items-center justify-between text-[11px] font-semibold text-cyan-600 dark:text-cyan-400">
+                            <span>Satelit AIS Live</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    {{-- STEP 4: Deteksi Keterlambatan & Exception --}}
+                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 relative overflow-hidden"
+                         onclick="selectFlowStep(4)" id="step-card-4">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-orange-400"></div>
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="w-8 h-8 rounded-full bg-rose-500 text-white font-black text-sm flex items-center justify-center shadow-lg shadow-rose-500/30">
+                                    4
+                                </span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                                    AI Warning
+                                </span>
+                            </div>
+                            <h3 class="font-outfit text-sm font-extrabold leading-snug group-hover:text-rose-500 transition-colors" style="color: var(--text-heading)">
+                                {{ __('Deteksi Exception') }}
+                            </h3>
+                            <p class="text-xs leading-relaxed mt-1" style="color: var(--text-muted)">
+                                {{ __('Peringatan dini cuaca badai, potensi delay rute maritim, & auto-notifikasi multi-kanal.') }}
+                            </p>
+                        </div>
+
+                        {{-- 3D Pedestal Graphic --}}
+                        <div class="mt-3 rounded-xl overflow-hidden bg-gradient-to-b from-rose-500/5 to-rose-500/10 p-2 flex items-center justify-center border border-rose-500/10 group-hover:border-rose-500/30 transition-all">
+                            <img src="{{ asset('images/alur/step-4-pedestal.png') }}" 
+                                 alt="Step 4 Deteksi Exception" 
+                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500">
+                        </div>
+
+                        <div class="mt-3 pt-2 border-t border-slate-200/40 dark:border-slate-800 flex items-center justify-between text-[11px] font-semibold text-rose-600 dark:text-rose-400">
+                            <span>Mitigasi Anomali</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    {{-- STEP 5: Penyelesaian & Analitik --}}
+                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 relative overflow-hidden"
+                         onclick="selectFlowStep(5)" id="step-card-5">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 to-indigo-500"></div>
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="w-8 h-8 rounded-full bg-purple-600 text-white font-black text-sm flex items-center justify-center shadow-lg shadow-purple-500/30">
+                                    5
+                                </span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+                                    Admin
+                                </span>
+                            </div>
+                            <h3 class="font-outfit text-sm font-extrabold leading-snug group-hover:text-purple-500 transition-colors" style="color: var(--text-heading)">
+                                {{ __('Penyelesaian & Analitik') }}
+                            </h3>
+                            <p class="text-xs leading-relaxed mt-1" style="color: var(--text-muted)">
+                                {{ __('Konfirmasi kargo tiba di tujuan (Delivered), POD digital, & rekap evaluasi analitik bisnis.') }}
+                            </p>
+                        </div>
+
+                        {{-- 3D Pedestal Graphic --}}
+                        <div class="mt-3 rounded-xl overflow-hidden bg-gradient-to-b from-purple-500/5 to-purple-500/10 p-2 flex items-center justify-center border border-purple-500/10 group-hover:border-purple-500/30 transition-all">
+                            <img src="{{ asset('images/alur/step-5-pedestal.png') }}" 
+                                 alt="Step 5 Penyelesaian & Analitik" 
+                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500">
+                        </div>
+
+                        <div class="mt-3 pt-2 border-t border-slate-200/40 dark:border-slate-800 flex items-center justify-between text-[11px] font-semibold text-purple-600 dark:text-purple-400">
+                            <span>SLA Delivered & BI</span>
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-500"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            {{-- 3. The 3 Structured Information Cards (Tujuan, Aktor/Hak Akses, Legenda) --}}
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+                
+                {{-- Card 1: Tujuan Flowmap (3 Cols) --}}
+                <div class="lg:col-span-3 theme-card rounded-2xl p-6 flex flex-col justify-between border hover:border-cyan-500/40 transition-all duration-300">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white mb-4 shadow-md shadow-blue-500/20">
+                            <i data-lucide="target" class="w-3.5 h-3.5"></i>
+                            <span>{{ __('Tujuan Flowmap') }}</span>
+                        </div>
+
+                        <h4 class="font-outfit text-base font-extrabold mb-2" style="color: var(--text-heading)">
+                            {{ __('Transparansi Logistik Kargo Kopi') }}
+                        </h4>
+
+                        <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-body)">
+                            {{ __('Menggambarkan alur kerja sistem CargoTrace secara menyeluruh, mulai dari pemesanan hingga analitik eksekusi, dengan keterlibatan multi hak akses.') }}
+                        </p>
+                    </div>
+
+                    <div class="space-y-2 mt-5 pt-4 border-t border-slate-200/40 dark:border-slate-800 text-xs font-medium" style="color: var(--text-body)">
+                        <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>Akurasi Tracking Satelit 99.8%</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>Zero Bottleneck Dokumen Pabean</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-cyan-600 dark:text-cyan-400">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>Notifikasi Real-Time Multi-Aktor</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card 2: Aktor / Hak Akses (6 Cols - 4 Actor Grid) --}}
+                <div class="lg:col-span-6 theme-card rounded-2xl p-6 border hover:border-cyan-500/40 transition-all duration-300">
+                    <div class="flex items-center justify-between mb-5">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white shadow-md shadow-blue-500/20">
+                            <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                            <span>{{ __('Aktor / Hak Akses') }}</span>
+                        </div>
+                        <span class="text-xs font-semibold text-cyan-600 dark:text-cyan-400">4 Hak Akses Terintegrasi</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        
+                        {{-- Actor 1: Customer (Buyer) --}}
+                        <div class="p-3.5 rounded-xl border transition-all duration-300 hover:scale-[1.02] flex items-start gap-3"
+                             id="actor-card-1"
+                             style="background: var(--bg-page); border-color: var(--card-border);">
+                            <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-blue-500/40 shadow-sm bg-blue-100 dark:bg-blue-950 flex items-center justify-center">
+                                <img src="{{ asset('images/alur/avatar-customer.png') }}" alt="Customer" class="w-full h-full object-cover">
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-xs font-extrabold leading-tight mb-0.5" style="color: var(--text-heading)">
+                                    {{ __('Customer (Buyer)') }}
+                                </div>
+                                <p class="text-[11px] leading-snug" style="color: var(--text-muted)">
+                                    {{ __('Memesan kargo, melihat status posisi live, dan terima notifikasi kedatangan.') }}
+                                </p>
+                            </div>
+                        </div>
+
                         {{-- Actor 2: Logistics Operator --}}
-                        <div class="absolute flex flex-col justify-center" style="left: 44.5%; top: 68.5%; width: 9.8%; height: 11.5%;">
-                            <div class="text-[0.78cqw] font-extrabold alur-title leading-tight mb-1">{{ __('Logistics Operator') }}</div>
-                            <div class="text-[0.66cqw] alur-body leading-snug">{{ __('Mengelola ekspedisi, dokumen, dan tracking.') }}</div>
+                        <div class="p-3.5 rounded-xl border transition-all duration-300 hover:scale-[1.02] flex items-start gap-3"
+                             id="actor-card-2"
+                             style="background: var(--bg-page); border-color: var(--card-border);">
+                            <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-amber-500/40 shadow-sm bg-amber-100 dark:bg-amber-950 flex items-center justify-center">
+                                <img src="{{ asset('images/alur/avatar-operator.png') }}" alt="Operator" class="w-full h-full object-cover">
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-xs font-extrabold leading-tight mb-0.5" style="color: var(--text-heading)">
+                                    {{ __('Logistics Operator') }}
+                                </div>
+                                <p class="text-[11px] leading-snug" style="color: var(--text-muted)">
+                                    {{ __('Mengelola ekspedisi, dokumen pabean pelabuhan, dan pemantauan kargo.') }}
+                                </p>
+                            </div>
                         </div>
+
                         {{-- Actor 3: Sistem Otomatis --}}
-                        <div class="absolute flex flex-col justify-center" style="left: 57.2%; top: 68.5%; width: 9.8%; height: 11.5%;">
-                            <div class="text-[0.78cqw] font-extrabold alur-title leading-tight mb-1">{{ __('Sistem (Otomatis)') }}</div>
-                            <div class="text-[0.66cqw] alur-body leading-snug">{{ __('Memproses data, melacak pengiriman, notifikasi.') }}</div>
+                        <div class="p-3.5 rounded-xl border transition-all duration-300 hover:scale-[1.02] flex items-start gap-3"
+                             id="actor-card-3"
+                             style="background: var(--bg-page); border-color: var(--card-border);">
+                            <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-cyan-500/40 shadow-sm bg-cyan-100 dark:bg-cyan-950 flex items-center justify-center">
+                                <img src="{{ asset('images/alur/avatar-system.png') }}" alt="Sistem Otomatis" class="w-full h-full object-cover">
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-xs font-extrabold leading-tight mb-0.5" style="color: var(--text-heading)">
+                                    {{ __('Sistem (Otomatis)') }}
+                                </div>
+                                <p class="text-[11px] leading-snug" style="color: var(--text-muted)">
+                                    {{ __('Memproses telemetri IoT, melacak pergerakan kapal, & kirim alert kendala.') }}
+                                </p>
+                            </div>
                         </div>
+
                         {{-- Actor 4: Administrator --}}
-                        <div class="absolute flex flex-col justify-center" style="left: 71.0%; top: 68.5%; width: 9.8%; height: 11.5%;">
-                            <div class="text-[0.78cqw] font-extrabold alur-title leading-tight mb-1">{{ __('Administrator') }}</div>
-                            <div class="text-[0.66cqw] alur-body leading-snug">{{ __('Memantau kinerja, sistem, validasi data, & akses.') }}</div>
-                        </div>
-
-                        {{-- 5. Bottom-Right Card: Legenda Simbol --}}
-                        <div class="absolute flex items-center justify-center" style="left: 82.2%; top: 62.0%; width: 14.5%; height: 4.0%;">
-                            <span class="text-white text-[0.85cqw] font-bold tracking-wide">{{ __('Legenda Simbol') }}</span>
-                        </div>
-                        <div class="absolute flex items-center" style="left: 87.2%; top: 67.2%; width: 9.8%; height: 2.6%;">
-                            <span class="text-[0.72cqw] font-semibold alur-title">{{ __('Mulai / Selesai') }}</span>
-                        </div>
-                        <div class="absolute flex items-center" style="left: 87.2%; top: 70.4%; width: 9.8%; height: 2.6%;">
-                            <span class="text-[0.72cqw] font-semibold alur-title">{{ __('Proses / Aktivitas') }}</span>
-                        </div>
-                        <div class="absolute flex items-center" style="left: 87.2%; top: 73.6%; width: 9.8%; height: 2.6%;">
-                            <span class="text-[0.72cqw] font-semibold alur-title">{{ __('Keputusan') }}</span>
-                        </div>
-                        <div class="absolute flex items-center" style="left: 87.2%; top: 76.8%; width: 9.8%; height: 2.6%;">
-                            <span class="text-[0.72cqw] font-semibold alur-title">{{ __('Data / Dokumen') }}</span>
-                        </div>
-                        <div class="absolute flex items-center" style="left: 87.2%; top: 80.0%; width: 9.8%; height: 2.6%;">
-                            <span class="text-[0.72cqw] font-semibold alur-title">{{ __('Alur Proses') }}</span>
-                        </div>
-
-                        {{-- 6. Bottom Ribbon: Hasil / Output Sistem --}}
-                        <div class="absolute flex items-center pl-14" style="left: 3.0%; top: 86.8%; width: 17.5%; height: 10.0%;">
-                            <span class="text-[0.90cqw] font-extrabold text-white tracking-wide leading-tight">{{ __('Hasil / Output Sistem') }}</span>
-                        </div>
-                        {{-- Box 1 --}}
-                        <div class="absolute flex items-center" style="left: 28.5%; top: 87.5%; width: 10.5%; height: 8.5%;">
-                            <span class="text-[0.74cqw] font-semibold alur-title leading-snug">{{ __('Order kargo tercatat & tervalidasi') }}</span>
-                        </div>
-                        {{-- Box 2 --}}
-                        <div class="absolute flex items-center" style="left: 42.5%; top: 87.5%; width: 10.5%; height: 8.5%;">
-                            <span class="text-[0.74cqw] font-semibold alur-title leading-snug">{{ __('Rute & pelacakan real-time di peta') }}</span>
-                        </div>
-                        {{-- Box 3 --}}
-                        <div class="absolute flex items-center" style="left: 56.5%; top: 87.5%; width: 10.5%; height: 8.5%;">
-                            <span class="text-[0.74cqw] font-semibold alur-title leading-snug">{{ __('Notifikasi otomatis jika ada kendala') }}</span>
-                        </div>
-                        {{-- Box 4 --}}
-                        <div class="absolute flex items-center" style="left: 71.0%; top: 87.5%; width: 10.5%; height: 8.5%;">
-                            <span class="text-[0.74cqw] font-semibold alur-title leading-snug">{{ __('Status pengiriman hingga Delivered') }}</span>
-                        </div>
-                        {{-- Box 5 --}}
-                        <div class="absolute flex items-center" style="left: 85.5%; top: 87.5%; width: 10.5%; height: 8.5%;">
-                            <span class="text-[0.74cqw] font-semibold alur-title leading-snug">{{ __('Data analitik bisnis untuk keputusan') }}</span>
+                        <div class="p-3.5 rounded-xl border transition-all duration-300 hover:scale-[1.02] flex items-start gap-3"
+                             id="actor-card-4"
+                             style="background: var(--bg-page); border-color: var(--card-border);">
+                            <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-purple-500/40 shadow-sm bg-purple-100 dark:bg-purple-950 flex items-center justify-center">
+                                <img src="{{ asset('images/alur/avatar-admin.png') }}" alt="Administrator" class="w-full h-full object-cover">
+                            </div>
+                            <div class="min-w-0">
+                                <div class="text-xs font-extrabold leading-tight mb-0.5" style="color: var(--text-heading)">
+                                    {{ __('Administrator') }}
+                                </div>
+                                <p class="text-[11px] leading-snug" style="color: var(--text-muted)">
+                                    {{ __('Memantau kinerja sistem, audit validasi data, dan manajemen otorisasi akses.') }}
+                                </p>
+                            </div>
                         </div>
 
                     </div>
                 </div>
+
+                {{-- Card 3: Legenda Simbol Flowmap (3 Cols) --}}
+                <div class="lg:col-span-3 theme-card rounded-2xl p-6 border hover:border-cyan-500/40 transition-all duration-300">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white mb-4 shadow-md shadow-blue-500/20">
+                        <i data-lucide="shapes" class="w-3.5 h-3.5"></i>
+                        <span>{{ __('Legenda Simbol') }}</span>
+                    </div>
+
+                    <div class="space-y-2.5 text-xs font-medium" style="color: var(--text-heading)">
+                        
+                        {{-- Simbol 1: Mulai/Selesai --}}
+                        <div class="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-500/10 transition-colors">
+                            <span class="w-7 h-4 rounded-full bg-emerald-400/30 border border-emerald-500 inline-block shadow-sm"></span>
+                            <span class="font-semibold">{{ __('Mulai / Selesai (Terminal)') }}</span>
+                        </div>
+
+                        {{-- Simbol 2: Proses --}}
+                        <div class="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-500/10 transition-colors">
+                            <span class="w-7 h-4 rounded-md bg-blue-400/30 border border-blue-500 inline-block shadow-sm"></span>
+                            <span class="font-semibold">{{ __('Proses / Aktivitas Operasi') }}</span>
+                        </div>
+
+                        {{-- Simbol 3: Keputusan --}}
+                        <div class="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-500/10 transition-colors">
+                            <span class="w-4 h-4 rotate-45 bg-amber-400/30 border border-amber-500 inline-block shadow-sm mx-1.5"></span>
+                            <span class="font-semibold">{{ __('Keputusan (Validasi)') }}</span>
+                        </div>
+
+                        {{-- Simbol 4: Data / Dokumen --}}
+                        <div class="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-500/10 transition-colors">
+                            <span class="w-7 h-4 rounded-sm bg-purple-400/30 border border-purple-500 inline-block -skew-x-12 shadow-sm"></span>
+                            <span class="font-semibold">{{ __('Data / Dokumen Ekspor') }}</span>
+                        </div>
+
+                        {{-- Simbol 5: Alur Proses --}}
+                        <div class="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-500/10 transition-colors">
+                            <span class="w-7 flex items-center justify-center text-cyan-500 font-bold">
+                                <i data-lucide="move-right" class="w-5 h-5"></i>
+                            </span>
+                            <span class="font-semibold">{{ __('Alur Arah Terintegrasi') }}</span>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
+
+
+            {{-- 4. Bottom Ribbon Bar: Hasil / Output Sistem --}}
+            <div class="theme-card rounded-2xl p-3 sm:p-4 border shadow-xl transition-all duration-300 hover:shadow-cyan-500/10"
+                 style="background: var(--card-bg); border-color: var(--card-border);">
+                
+                <div class="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
+                    
+                    {{-- Left Badge Header --}}
+                    <div class="px-5 py-3 rounded-xl bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-600 text-white flex items-center justify-between lg:justify-center gap-3 shrink-0 shadow-lg shadow-blue-600/30">
+                        <div class="flex items-center gap-2.5">
+                            <span class="p-1 rounded-full bg-white/20">
+                                <i data-lucide="target" class="w-4 h-4 text-white"></i>
+                            </span>
+                            <span class="font-outfit text-sm font-extrabold uppercase tracking-wide">
+                                {{ __('Hasil / Output Sistem') }}
+                            </span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-cyan-200"></i>
+                    </div>
+
+                    {{-- 5 Output Cards Grid --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5 grow">
+                        
+                        {{-- Output 1 --}}
+                        <div class="p-2.5 rounded-xl border flex items-center gap-2.5 hover:bg-blue-500/5 transition-all hover:border-blue-400/40"
+                             style="background: var(--bg-page); border-color: var(--card-border);">
+                            <span class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                <i data-lucide="package-check" class="w-4 h-4"></i>
+                            </span>
+                            <span class="text-xs font-semibold leading-snug" style="color: var(--text-heading)">
+                                {{ __('Order kargo tercatat & tervalidasi') }}
+                            </span>
+                        </div>
+
+                        {{-- Output 2 --}}
+                        <div class="p-2.5 rounded-xl border flex items-center gap-2.5 hover:bg-cyan-500/5 transition-all hover:border-cyan-400/40"
+                             style="background: var(--bg-page); border-color: var(--card-border);">
+                            <span class="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
+                                <i data-lucide="ship" class="w-4 h-4"></i>
+                            </span>
+                            <span class="text-xs font-semibold leading-snug" style="color: var(--text-heading)">
+                                {{ __('Rute & pelacakan real-time di peta') }}
+                            </span>
+                        </div>
+
+                        {{-- Output 3 --}}
+                        <div class="p-2.5 rounded-xl border flex items-center gap-2.5 hover:bg-amber-500/5 transition-all hover:border-amber-400/40"
+                             style="background: var(--bg-page); border-color: var(--card-border);">
+                            <span class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                                <i data-lucide="bell-ring" class="w-4 h-4"></i>
+                            </span>
+                            <span class="text-xs font-semibold leading-snug" style="color: var(--text-heading)">
+                                {{ __('Notifikasi otomatis jika ada kendala') }}
+                            </span>
+                        </div>
+
+                        {{-- Output 4 --}}
+                        <div class="p-2.5 rounded-xl border flex items-center gap-2.5 hover:bg-emerald-500/5 transition-all hover:border-emerald-400/40"
+                             style="background: var(--bg-page); border-color: var(--card-border);">
+                            <span class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                            </span>
+                            <span class="text-xs font-semibold leading-snug" style="color: var(--text-heading)">
+                                {{ __('Status pengiriman hingga Delivered') }}
+                            </span>
+                        </div>
+
+                        {{-- Output 5 --}}
+                        <div class="p-2.5 rounded-xl border flex items-center gap-2.5 hover:bg-purple-500/5 transition-all hover:border-purple-400/40"
+                             style="background: var(--bg-page); border-color: var(--card-border);">
+                            <span class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                                <i data-lucide="database" class="w-4 h-4"></i>
+                            </span>
+                            <span class="text-xs font-semibold leading-snug" style="color: var(--text-heading)">
+                                {{ __('Data analitik bisnis untuk keputusan') }}
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
+
+        {{-- Client-side Flowmap Interactive Script --}}
+        <script>
+            function selectFlowStep(stepNumber) {
+                // Highlight active step
+                for (let i = 1; i <= 5; i++) {
+                    const card = document.getElementById('step-card-' + i);
+                    if (card) {
+                        if (i === stepNumber) {
+                            card.classList.add('ring-2', 'ring-cyan-500', 'shadow-xl', 'shadow-cyan-500/20');
+                        } else {
+                            card.classList.remove('ring-2', 'ring-cyan-500', 'shadow-xl', 'shadow-cyan-500/20');
+                        }
+                    }
+                }
+
+                // Highlight corresponding actor card
+                const actorMapping = {
+                    1: 1, // Customer
+                    2: 2, // Operator
+                    3: 3, // Sistem IoT
+                    4: 3, // Sistem AI Warning
+                    5: 4  // Admin
+                };
+
+                const targetActor = actorMapping[stepNumber];
+                for (let a = 1; a <= 4; a++) {
+                    const actorCard = document.getElementById('actor-card-' + a);
+                    if (actorCard) {
+                        if (a === targetActor) {
+                            actorCard.classList.add('ring-2', 'ring-blue-500', 'scale-[1.03]');
+                        } else {
+                            actorCard.classList.remove('ring-2', 'ring-blue-500', 'scale-[1.03]');
+                        }
+                    }
+                }
+            }
+        </script>
     </section>
 
 
