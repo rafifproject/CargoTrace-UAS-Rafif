@@ -47,6 +47,7 @@
             --hero-overlay-mid: rgba(6, 12, 30, 0.40);
             
             --tentang-bg-img: url('{{ asset('images/tentang-kami-bg-dark.jpg') }}');
+            --produk-bg-img: url('{{ asset('images/produk-bg-dark.jpg') }}');
             
             --card-bg: rgba(11, 23, 50, 0.75);
             --card-border: rgba(0, 194, 255, 0.22);
@@ -84,6 +85,7 @@
             --hero-overlay-mid: rgba(248, 250, 252, 0.38);
             
             --tentang-bg-img: url('{{ asset('images/tentang-kami-bg.jpg') }}');
+            --produk-bg-img: url('{{ asset('images/produk-bg.jpg') }}');
             
             --card-bg: rgba(255, 255, 255, 0.92);
             --card-border: rgba(203, 213, 225, 0.85);
@@ -528,262 +530,309 @@
         </div>
     </section>
 
-        </div>
-    </section>
-
-
     {{-- ========================================================================= --}}
     {{-- SECTION 3: PRODUK KOPI SPESIALTI BRASIL (6 Authentic Database Varieties) --}}
     {{-- ========================================================================= --}}
-    <section id="produk" class="py-20 lg:py-28 relative" style="background: var(--bg-page)">
-        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="produk" class="py-16 sm:py-20 lg:py-24 relative overflow-hidden"
+             style="background-image: var(--produk-bg-img); background-size: cover; background-position: top right; background-repeat: no-repeat;">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
-            {{-- Section Header --}}
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold tracking-wider uppercase mb-3 shadow-sm"
-                     style="background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.3)">
-                    <i data-lucide="coffee" class="w-3.5 h-3.5"></i>
-                    <span>{{ __('KATALOG KOMODITAS EKSPOR') }}</span>
+            {{-- Section Header (Left-aligned, leaving top-right ship illustration unobstructed) --}}
+            <div class="w-full lg:max-w-xl xl:max-w-2xl text-left mb-10 sm:mb-12">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <div class="h-1 w-8 rounded-full" style="background: var(--brand-cyan)"></div>
+                    <span class="text-xs sm:text-sm font-bold tracking-wider uppercase" style="color: var(--text-heading)">
+                        {{ __('KATALOG KOMODITAS EKSPOR') }}
+                    </span>
                 </div>
-                <h2 class="font-outfit text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4"
+                
+                <h2 class="font-outfit text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.15] mb-4"
                     style="color: var(--text-heading)">
-                    {{ __('Pilihan Kopi Spesialti Brasil Terbaik') }}
+                    {{ __('Pilihan Kopi Spesialti') }} <span style="color: var(--brand-cyan)">{{ __('Brasil Terbaik') }}</span>
                 </h2>
-                <p class="text-base sm:text-lg leading-relaxed font-normal" style="color: var(--text-body)">
+                
+                <p class="text-sm sm:text-base leading-relaxed font-normal" style="color: var(--text-body)">
                     {{ __('Dipanen langsung dari perkebunan dataran tinggi terbaik Brasil, disortir dengan ketat sesuai standar Specialty Coffee Association (SCA) sebelum diberangkatkan dari Pelabuhan Santos.') }}
                 </p>
             </div>
 
-            {{-- Grid of 6 Coffee Varieties --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {{-- 6 Coffee Varieties Grid (3 Columns on Desktop, 2 on Tablet, 1 on Mobile) --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
                 
                 {{-- Product 1: Brazil Santos Bourbon Specialty --}}
-                <div class="theme-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between border-t-4 border-t-amber-500">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">
-                                SCA Score 86.5
-                            </span>
-                            <span class="text-xs flex items-center gap-1" style="color: var(--text-muted)">
-                                <i data-lucide="mountain" class="w-3.5 h-3.5 text-blue-500"></i>
-                                1,200m dpl
-                            </span>
-                        </div>
-                        <h3 class="font-outfit text-xl font-bold mb-2" style="color: var(--text-heading)">
-                            Kopi Brazil Santos Bourbon Specialty
-                        </h3>
-                        <p class="text-xs font-medium mb-4" style="color: var(--text-muted)">
-                            Sul de Minas, Brasil &bull; Natural Sun-Dried Process
-                        </p>
-                        <p class="text-sm leading-relaxed mb-5" style="color: var(--text-body)">
-                            Varietas unggulan dengan keasaman lembut, rasa manis karamel pekat, cokelat susu, serta sentuhan roasted hazelnut.
-                        </p>
-                        <div class="flex flex-wrap gap-1.5 mb-6">
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Karamel</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Cokelat Susu</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Hazelnut</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Body Lembut</span>
-                        </div>
+                <div class="theme-card rounded-3xl overflow-hidden flex flex-row items-stretch border transition hover:-translate-y-1 hover:shadow-xl"
+                     style="background: var(--card-bg); border-color: var(--card-border);">
+                    <div class="w-24 sm:w-28 md:w-32 flex-shrink-0 relative overflow-hidden flex items-center justify-center">
+                        <img src="{{ asset('images/products/coffee-1.png') }}" alt="Kopi Brazil Santos Bourbon Specialty" class="w-full h-full object-cover">
                     </div>
-                    <div class="pt-4 border-t flex items-center justify-between" style="border-color: var(--nav-border)">
-                        <div class="text-xs" style="color: var(--text-muted)">Kemasan: 60kg GrainPro</div>
-                        <a href="{{ route('login') }}" class="px-4 py-2 rounded-full font-bold text-xs transition flex items-center gap-1.5 shadow-md hover:scale-105"
-                           style="background: var(--btn-primary-bg); color: var(--btn-primary-text)">
-                            <span>{{ __('Pesan Kargo') }}</span>
-                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                        </a>
-                    </div>
-                </div>
-
-                {{-- Product 2: Brazil Santos Yellow Catuai Natural Micro-lot --}}
-                <div class="theme-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between border-t-4" style="border-top-color: var(--brand-cyan)">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: var(--brand-glow); color: var(--brand-cyan);">
-                                SCA Score 87.5 &bull; Micro-lot
-                            </span>
-                            <span class="text-xs flex items-center gap-1" style="color: var(--text-muted)">
-                                <i data-lucide="mountain" class="w-3.5 h-3.5 text-blue-500"></i>
-                                1,250m dpl
-                            </span>
+                    <div class="flex-1 p-3.5 sm:p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-tight shadow-sm"
+                                      style="background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.3);">
+                                    SCA Score 86.5
+                                </span>
+                                <span class="text-[11px] flex items-center gap-1 font-medium" style="color: var(--text-muted)">
+                                    <i data-lucide="mountain" class="w-3.5 h-3.5 text-[#0070F3]"></i>
+                                    1,200 m dpl
+                                </span>
+                            </div>
+                            <h3 class="font-outfit text-sm sm:text-base font-extrabold leading-tight mb-1" style="color: var(--text-heading)">
+                                Kopi Brazil Santos Bourbon Specialty
+                            </h3>
+                            <p class="text-[11px] font-medium mb-2" style="color: var(--text-muted)">
+                                Sul de Minas, Brasil • Natural Sun-Dried Process
+                            </p>
+                            <div class="flex items-start gap-1.5 text-[11px] leading-snug mb-3" style="color: var(--text-body)">
+                                <i data-lucide="coffee" class="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-[#0070F3]"></i>
+                                <span>Karamel, Cokelat Susu, Hazelnut, Body Lembut</span>
+                            </div>
                         </div>
-                        <h3 class="font-outfit text-xl font-bold mb-2" style="color: var(--text-heading)">
-                            Brazil Santos Yellow Catuai Natural
-                        </h3>
-                        <p class="text-xs font-medium mb-4" style="color: var(--text-muted)">
-                            Carmo de Minas, Brasil &bull; Anaerobic Natural
-                        </p>
-                        <p class="text-sm leading-relaxed mb-5" style="color: var(--text-body)">
-                            Koleksi mikro-lot eksklusif dengan kompleksitas tinggi: madu liar, buah markisa, gula tebu, dan aroma bunga bermekaran.
-                        </p>
-                        <div class="flex flex-wrap gap-1.5 mb-6">
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Madu Liar</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Markisa</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Bunga Tropis</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Gula Tebu</span>
+                        <div class="flex items-center justify-between gap-2 pt-2 border-t" style="border-color: var(--nav-border)">
+                            <div class="flex items-center gap-1.5 text-[11px]" style="color: var(--text-muted)">
+                                <i data-lucide="package" class="w-3.5 h-3.5 text-[#0070F3]"></i>
+                                <span>Kemasan: 60kg GrainPro</span>
+                            </div>
+                            <a href="{{ route('login') }}" 
+                               class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition hover:scale-105 shadow-sm"
+                               style="background: #0070F3; color: #FFFFFF;">
+                                <span>{{ __('Pesan Kargo') }}</span>
+                                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                            </a>
                         </div>
-                    </div>
-                    <div class="pt-4 border-t flex items-center justify-between" style="border-color: var(--nav-border)">
-                        <div class="text-xs" style="color: var(--text-muted)">Kemasan: 30kg Vakum Box</div>
-                        <a href="{{ route('login') }}" class="px-4 py-2 rounded-full font-bold text-xs transition flex items-center gap-1.5 shadow-md hover:scale-105"
-                           style="background: var(--btn-primary-bg); color: var(--btn-primary-text)">
-                            <span>{{ __('Pesan Kargo') }}</span>
-                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                        </a>
                     </div>
                 </div>
 
-                {{-- Product 3: Brazil Santos Cerrado Mineiro Single-Origin --}}
-                <div class="theme-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between border-t-4 border-t-emerald-500">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
-                                SCA Score 85.0 &bull; D.O. Protected
-                            </span>
-                            <span class="text-xs flex items-center gap-1" style="color: var(--text-muted)">
-                                <i data-lucide="mountain" class="w-3.5 h-3.5 text-blue-500"></i>
-                                1,050m dpl
-                            </span>
-                        </div>
-                        <h3 class="font-outfit text-xl font-bold mb-2" style="color: var(--text-heading)">
-                            Brazil Santos Cerrado Mineiro
-                        </h3>
-                        <p class="text-xs font-medium mb-4" style="color: var(--text-muted)">
-                            Patrocínio, Cerrado Mineiro &bull; Pulped Natural
-                        </p>
-                        <p class="text-sm leading-relaxed mb-5" style="color: var(--text-body)">
-                            Memiliki sertifikasi indikasi geografis resmi (D.O.). Karakter kuat kakao murni, kacang almond panggang, dan body yang pekat.
-                        </p>
-                        <div class="flex flex-wrap gap-1.5 mb-6">
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Kakao Hitam</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Kacang Almond</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Body Tebal</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Low Acid</span>
-                        </div>
+                {{-- Product 2: Brazil Santos Yellow Catuai Natural --}}
+                <div class="theme-card rounded-3xl overflow-hidden flex flex-row items-stretch border transition hover:-translate-y-1 hover:shadow-xl"
+                     style="background: var(--card-bg); border-color: var(--card-border);">
+                    <div class="w-24 sm:w-28 md:w-32 flex-shrink-0 relative overflow-hidden flex items-center justify-center">
+                        <img src="{{ asset('images/products/coffee-2.png') }}" alt="Brazil Santos Yellow Catuai Natural" class="w-full h-full object-cover">
                     </div>
-                    <div class="pt-4 border-t flex items-center justify-between" style="border-color: var(--nav-border)">
-                        <div class="text-xs" style="color: var(--text-muted)">Kemasan: Kontainer 20ft / FCL</div>
-                        <a href="{{ route('login') }}" class="px-4 py-2 rounded-full font-bold text-xs transition flex items-center gap-1.5 shadow-md hover:scale-105"
-                           style="background: var(--btn-primary-bg); color: var(--btn-primary-text)">
-                            <span>{{ __('Pesan Kargo') }}</span>
-                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                        </a>
-                    </div>
-                </div>
-
-                {{-- Product 4: Brazil Santos Strictly Soft Fine Cup (SSFC) --}}
-                <div class="theme-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between border-t-4 border-t-indigo-500">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: rgba(99, 102, 241, 0.15); color: #6366F1;">
-                                SCA Score 84.0 &bull; NY 2/3 SSFC
-                            </span>
-                            <span class="text-xs flex items-center gap-1" style="color: var(--text-muted)">
-                                <i data-lucide="mountain" class="w-3.5 h-3.5 text-blue-500"></i>
-                                1,000m dpl
-                            </span>
+                    <div class="flex-1 p-3.5 sm:p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-tight shadow-sm"
+                                      style="background: rgba(0, 112, 243, 0.15); color: #0070F3; border: 1px solid rgba(0, 112, 243, 0.3);">
+                                    SCA Score 87.5 • Micro-lot
+                                </span>
+                                <span class="text-[11px] flex items-center gap-1 font-medium" style="color: var(--text-muted)">
+                                    <i data-lucide="mountain" class="w-3.5 h-3.5 text-[#0070F3]"></i>
+                                    1,250 m dpl
+                                </span>
+                            </div>
+                            <h3 class="font-outfit text-sm sm:text-base font-extrabold leading-tight mb-1" style="color: var(--text-heading)">
+                                Brazil Santos Yellow Catuai Natural
+                            </h3>
+                            <p class="text-[11px] font-medium mb-2" style="color: var(--text-muted)">
+                                Carmo de Minas, Brasil • Anaerobic Natural
+                            </p>
+                            <div class="flex items-start gap-1.5 text-[11px] leading-snug mb-3" style="color: var(--text-body)">
+                                <i data-lucide="coffee" class="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-[#0070F3]"></i>
+                                <span>Madu Liar, Markisa, Bunga Tropis, Gula Tebu</span>
+                            </div>
                         </div>
-                        <h3 class="font-outfit text-xl font-bold mb-2" style="color: var(--text-heading)">
-                            Santos Strictly Soft Fine Cup (SSFC)
-                        </h3>
-                        <p class="text-xs font-medium mb-4" style="color: var(--text-muted)">
-                            Mogiana Paulista &bull; Natural Sun-Dried
-                        </p>
-                        <p class="text-sm leading-relaxed mb-5" style="color: var(--text-body)">
-                            Standar acuan ekspor kopi pelabuhan Santos internasional. Cita rasa bersih, seimbang, kacang manis, dan keasaman sangat halus.
-                        </p>
-                        <div class="flex flex-wrap gap-1.5 mb-6">
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Bersih & Seimbang</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Kacang Manis</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Halus</span>
+                        <div class="flex items-center justify-between gap-2 pt-2 border-t" style="border-color: var(--nav-border)">
+                            <div class="flex items-center gap-1.5 text-[11px]" style="color: var(--text-muted)">
+                                <i data-lucide="package" class="w-3.5 h-3.5 text-[#0070F3]"></i>
+                                <span>Kemasan: 30kg Vakum Box</span>
+                            </div>
+                            <a href="{{ route('login') }}" 
+                               class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition hover:scale-105 shadow-sm"
+                               style="background: #0070F3; color: #FFFFFF;">
+                                <span>{{ __('Pesan Kargo') }}</span>
+                                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                            </a>
                         </div>
-                    </div>
-                    <div class="pt-4 border-t flex items-center justify-between" style="border-color: var(--nav-border)">
-                        <div class="text-xs" style="color: var(--text-muted)">Kemasan: Karung Goni 60kg</div>
-                        <a href="{{ route('login') }}" class="px-4 py-2 rounded-full font-bold text-xs transition flex items-center gap-1.5 shadow-md hover:scale-105"
-                           style="background: var(--btn-primary-bg); color: var(--btn-primary-text)">
-                            <span>{{ __('Pesan Kargo') }}</span>
-                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                        </a>
                     </div>
                 </div>
 
-                {{-- Product 5: Brazil Santos Decaf Swiss Water Process --}}
-                <div class="theme-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between border-t-4 border-t-sky-500">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: rgba(14, 165, 233, 0.15); color: #0EA5E9;">
-                                SCA Score 83.5 &bull; 99.9% Bebas Kafein
-                            </span>
-                            <span class="text-xs flex items-center gap-1" style="color: var(--text-muted)">
-                                <i data-lucide="mountain" class="w-3.5 h-3.5 text-blue-500"></i>
-                                1,100m dpl
-                            </span>
-                        </div>
-                        <h3 class="font-outfit text-xl font-bold mb-2" style="color: var(--text-heading)">
-                            Santos Decaf Swiss Water Process
-                        </h3>
-                        <p class="text-xs font-medium mb-4" style="color: var(--text-muted)">
-                            Minas Gerais &bull; 100% Chemical-Free Decaf
-                        </p>
-                        <p class="text-sm leading-relaxed mb-5" style="color: var(--text-body)">
-                            Didekafeinasi murni menggunakan air tanpa pelarut kimia, mempertahankan cita rasa autentik cocoa, walnut, dan aroma mentega gurih.
-                        </p>
-                        <div class="flex flex-wrap gap-1.5 mb-6">
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Tanpa Kimia</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Kakao Lembut</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Walnut</span>
-                        </div>
+                {{-- Product 3: Brazil Santos Cerrado Mineiro --}}
+                <div class="theme-card rounded-3xl overflow-hidden flex flex-row items-stretch border transition hover:-translate-y-1 hover:shadow-xl"
+                     style="background: var(--card-bg); border-color: var(--card-border);">
+                    <div class="w-24 sm:w-28 md:w-32 flex-shrink-0 relative overflow-hidden flex items-center justify-center">
+                        <img src="{{ asset('images/products/coffee-3.png') }}" alt="Brazil Santos Cerrado Mineiro" class="w-full h-full object-cover">
                     </div>
-                    <div class="pt-4 border-t flex items-center justify-between" style="border-color: var(--nav-border)">
-                        <div class="text-xs" style="color: var(--text-muted)">Kemasan: Multi-Barrier 60kg</div>
-                        <a href="{{ route('login') }}" class="px-4 py-2 rounded-full font-bold text-xs transition flex items-center gap-1.5 shadow-md hover:scale-105"
-                           style="background: var(--btn-primary-bg); color: var(--btn-primary-text)">
-                            <span>{{ __('Pesan Kargo') }}</span>
-                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                        </a>
+                    <div class="flex-1 p-3.5 sm:p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-tight shadow-sm"
+                                      style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3);">
+                                    SCA Score 85.0 • D.O. Protected
+                                </span>
+                                <span class="text-[11px] flex items-center gap-1 font-medium" style="color: var(--text-muted)">
+                                    <i data-lucide="mountain" class="w-3.5 h-3.5 text-[#0070F3]"></i>
+                                    1,050 m dpl
+                                </span>
+                            </div>
+                            <h3 class="font-outfit text-sm sm:text-base font-extrabold leading-tight mb-1" style="color: var(--text-heading)">
+                                Brazil Santos Cerrado Mineiro
+                            </h3>
+                            <p class="text-[11px] font-medium mb-2" style="color: var(--text-muted)">
+                                Patrocinio, Cerrado Mineiro • Pulped Natural
+                            </p>
+                            <div class="flex items-start gap-1.5 text-[11px] leading-snug mb-3" style="color: var(--text-body)">
+                                <i data-lucide="coffee" class="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-[#0070F3]"></i>
+                                <span>Kakao Hitam, Kacang Almond, Body Tebal, Low Acid</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between gap-2 pt-2 border-t" style="border-color: var(--nav-border)">
+                            <div class="flex items-center gap-1.5 text-[11px]" style="color: var(--text-muted)">
+                                <i data-lucide="package" class="w-3.5 h-3.5 text-[#0070F3]"></i>
+                                <span>Kemasan: Kontainer 20ft / FCL</span>
+                            </div>
+                            <a href="{{ route('login') }}" 
+                               class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition hover:scale-105 shadow-sm"
+                               style="background: #0070F3; color: #FFFFFF;">
+                                <span>{{ __('Pesan Kargo') }}</span>
+                                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                {{-- Product 6: Brazil Santos Espresso Roast Master Blend --}}
-                <div class="theme-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between border-t-4 border-t-rose-500">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: rgba(244, 63, 94, 0.15); color: #F43F5E;">
-                                SCA Score 85.5 &bull; Master Blend
-                            </span>
-                            <span class="text-xs flex items-center gap-1" style="color: var(--text-muted)">
-                                <i data-lucide="mountain" class="w-3.5 h-3.5 text-blue-500"></i>
-                                1,150m dpl
-                            </span>
+                {{-- Product 4: Santos Strictly Soft Fine Cup (SSFC) --}}
+                <div class="theme-card rounded-3xl overflow-hidden flex flex-row items-stretch border transition hover:-translate-y-1 hover:shadow-xl"
+                     style="background: var(--card-bg); border-color: var(--card-border);">
+                    <div class="w-24 sm:w-28 md:w-32 flex-shrink-0 relative overflow-hidden flex items-center justify-center">
+                        <img src="{{ asset('images/products/coffee-4.png') }}" alt="Santos Strictly Soft Fine Cup (SSFC)" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 p-3.5 sm:p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-tight shadow-sm"
+                                      style="background: rgba(139, 92, 246, 0.15); color: #8B5CF6; border: 1px solid rgba(139, 92, 246, 0.3);">
+                                    SCA Score 84.0 • NY 2/3 SSFC
+                                </span>
+                                <span class="text-[11px] flex items-center gap-1 font-medium" style="color: var(--text-muted)">
+                                    <i data-lucide="mountain" class="w-3.5 h-3.5 text-[#0070F3]"></i>
+                                    1,000 m dpl
+                                </span>
+                            </div>
+                            <h3 class="font-outfit text-sm sm:text-base font-extrabold leading-tight mb-1" style="color: var(--text-heading)">
+                                Santos Strictly Soft Fine Cup (SSFC)
+                            </h3>
+                            <p class="text-[11px] font-medium mb-2" style="color: var(--text-muted)">
+                                Mogiana Paulista • Natural Sun-Dried
+                            </p>
+                            <div class="flex items-start gap-1.5 text-[11px] leading-snug mb-3" style="color: var(--text-body)">
+                                <i data-lucide="coffee" class="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-[#0070F3]"></i>
+                                <span>Bersih & Seimbang, Kacang Manis, Halus</span>
+                            </div>
                         </div>
-                        <h3 class="font-outfit text-xl font-bold mb-2" style="color: var(--text-heading)">
-                            Santos Espresso Master Blend
-                        </h3>
-                        <p class="text-xs font-medium mb-4" style="color: var(--text-muted)">
-                            Santos Select Blend &bull; Full City Roast Ready
-                        </p>
-                        <p class="text-sm leading-relaxed mb-5" style="color: var(--text-body)">
-                            Diformulasikan khusus untuk mesin espresso komersial: menghasilkan crema keemasan yang sangat tebal, dark cocoa pekat, dan sirup molase.
-                        </p>
-                        <div class="flex flex-wrap gap-1.5 mb-6">
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Crema Tebal</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Dark Cocoa</span>
-                            <span class="px-2.5 py-1 rounded-md text-[11px]" style="background: rgba(255,255,255,0.06); color: var(--text-body)">Molase</span>
+                        <div class="flex items-center justify-between gap-2 pt-2 border-t" style="border-color: var(--nav-border)">
+                            <div class="flex items-center gap-1.5 text-[11px]" style="color: var(--text-muted)">
+                                <i data-lucide="package" class="w-3.5 h-3.5 text-[#0070F3]"></i>
+                                <span>Kemasan: Karung Goni 60kg</span>
+                            </div>
+                            <a href="{{ route('login') }}" 
+                               class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition hover:scale-105 shadow-sm"
+                               style="background: #0070F3; color: #FFFFFF;">
+                                <span>{{ __('Pesan Kargo') }}</span>
+                                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                            </a>
                         </div>
                     </div>
-                    <div class="pt-4 border-t flex items-center justify-between" style="border-color: var(--nav-border)">
-                        <div class="text-xs" style="color: var(--text-muted)">Kemasan: Karung Foil 60kg</div>
-                        <a href="{{ route('login') }}" class="px-4 py-2 rounded-full font-bold text-xs transition flex items-center gap-1.5 shadow-md hover:scale-105"
-                           style="background: var(--btn-primary-bg); color: var(--btn-primary-text)">
-                            <span>{{ __('Pesan Kargo') }}</span>
-                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                        </a>
+                </div>
+
+                {{-- Product 5: Santos Decaf Swiss Water Process --}}
+                <div class="theme-card rounded-3xl overflow-hidden flex flex-row items-stretch border transition hover:-translate-y-1 hover:shadow-xl"
+                     style="background: var(--card-bg); border-color: var(--card-border);">
+                    <div class="w-24 sm:w-28 md:w-32 flex-shrink-0 relative overflow-hidden flex items-center justify-center">
+                        <img src="{{ asset('images/products/coffee-5.png') }}" alt="Santos Decaf Swiss Water Process" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 p-3.5 sm:p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-tight shadow-sm"
+                                      style="background: rgba(2, 132, 199, 0.15); color: #0284C7; border: 1px solid rgba(2, 132, 199, 0.3);">
+                                    SCA Score 83.5 • 99.9% Bebas Kafein
+                                </span>
+                                <span class="text-[11px] flex items-center gap-1 font-medium" style="color: var(--text-muted)">
+                                    <i data-lucide="mountain" class="w-3.5 h-3.5 text-[#0070F3]"></i>
+                                    1,100 m dpl
+                                </span>
+                            </div>
+                            <h3 class="font-outfit text-sm sm:text-base font-extrabold leading-tight mb-1" style="color: var(--text-heading)">
+                                Santos Decaf Swiss Water Process
+                            </h3>
+                            <p class="text-[11px] font-medium mb-2" style="color: var(--text-muted)">
+                                Minas Gerais • 100% Chemical-Free Decaf
+                            </p>
+                            <div class="flex items-start gap-1.5 text-[11px] leading-snug mb-3" style="color: var(--text-body)">
+                                <i data-lucide="coffee" class="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-[#0070F3]"></i>
+                                <span>Tanpa Kimia, Kakao Lembut, Walnut</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between gap-2 pt-2 border-t" style="border-color: var(--nav-border)">
+                            <div class="flex items-center gap-1.5 text-[11px]" style="color: var(--text-muted)">
+                                <i data-lucide="package" class="w-3.5 h-3.5 text-[#0070F3]"></i>
+                                <span>Kemasan: Multi-Barrier 60kg</span>
+                            </div>
+                            <a href="{{ route('login') }}" 
+                               class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition hover:scale-105 shadow-sm"
+                               style="background: #0070F3; color: #FFFFFF;">
+                                <span>{{ __('Pesan Kargo') }}</span>
+                                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Product 6: Santos Espresso Master Blend --}}
+                <div class="theme-card rounded-3xl overflow-hidden flex flex-row items-stretch border transition hover:-translate-y-1 hover:shadow-xl"
+                     style="background: var(--card-bg); border-color: var(--card-border);">
+                    <div class="w-24 sm:w-28 md:w-32 flex-shrink-0 relative overflow-hidden flex items-center justify-center">
+                        <img src="{{ asset('images/products/coffee-6.png') }}" alt="Santos Espresso Master Blend" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 p-3.5 sm:p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-1 mb-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-tight shadow-sm"
+                                      style="background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3);">
+                                    SCA Score 85.5 • Master Blend
+                                </span>
+                                <span class="text-[11px] flex items-center gap-1 font-medium" style="color: var(--text-muted)">
+                                    <i data-lucide="mountain" class="w-3.5 h-3.5 text-[#0070F3]"></i>
+                                    1,150 m dpl
+                                </span>
+                            </div>
+                            <h3 class="font-outfit text-sm sm:text-base font-extrabold leading-tight mb-1" style="color: var(--text-heading)">
+                                Santos Espresso Master Blend
+                            </h3>
+                            <p class="text-[11px] font-medium mb-2" style="color: var(--text-muted)">
+                                Santos Select Blend • Full City Roast Ready
+                            </p>
+                            <div class="flex items-start gap-1.5 text-[11px] leading-snug mb-3" style="color: var(--text-body)">
+                                <i data-lucide="coffee" class="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-[#0070F3]"></i>
+                                <span>Crema Tebal, Dark Cocoa, Molase</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between gap-2 pt-2 border-t" style="border-color: var(--nav-border)">
+                            <div class="flex items-center gap-1.5 text-[11px]" style="color: var(--text-muted)">
+                                <i data-lucide="package" class="w-3.5 h-3.5 text-[#0070F3]"></i>
+                                <span>Kemasan: Karung Foil 60kg</span>
+                            </div>
+                            <a href="{{ route('login') }}" 
+                               class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition hover:scale-105 shadow-sm"
+                               style="background: #0070F3; color: #FFFFFF;">
+                                <span>{{ __('Pesan Kargo') }}</span>
+                                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
             </div>
 
+        </div>
+
+        {{-- Flowing Ocean Wave at bottom of Produk --}}
+        <div class="w-full overflow-hidden leading-none pt-12 sm:pt-16 pointer-events-none">
+            <svg viewBox="0 0 1440 70" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-8 sm:h-12" preserveAspectRatio="none">
+                <path d="M0,35 C320,65 640,5 960,40 C1200,60 1360,25 1440,35 L1440,70 L0,70 Z" fill="var(--wave-2)" opacity="0.3"/>
+                <path d="M0,45 C280,15 600,65 920,30 C1180,50 1340,20 1440,45 L1440,70 L0,70 Z" fill="var(--wave-1)" opacity="0.6"/>
+            </svg>
         </div>
     </section>
 
