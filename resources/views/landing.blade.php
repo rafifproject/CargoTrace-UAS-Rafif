@@ -1361,9 +1361,7 @@
                         {{-- Output 1 --}}
                         <div class="p-2.5 rounded-xl border flex items-center gap-2.5 hover:bg-blue-500/5 transition-all hover:border-blue-400/40"
                              style="background: var(--bg-page); border-color: var(--card-border);">
-                            <span class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-                                <i data-lucide="package-check" class="w-4 h-4"></i>
-                            </span>
+                            <img src="{{ asset('images/alur/icon-box-order.png') }}" alt="Order Kargo" class="w-8 h-8 object-contain shrink-0 drop-shadow-sm">
                             <span class="text-xs font-semibold leading-snug" style="color: var(--text-heading)">
                                 {{ __('Order kargo tercatat & tervalidasi') }}
                             </span>
@@ -1372,9 +1370,7 @@
                         {{-- Output 2 --}}
                         <div class="p-2.5 rounded-xl border flex items-center gap-2.5 hover:bg-cyan-500/5 transition-all hover:border-cyan-400/40"
                              style="background: var(--bg-page); border-color: var(--card-border);">
-                            <span class="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
-                                <i data-lucide="ship" class="w-4 h-4"></i>
-                            </span>
+                            <img src="{{ asset('images/alur/icon-ship-tracking.png') }}" alt="Pelacakan Kapal" class="w-8 h-8 object-contain shrink-0 drop-shadow-sm">
                             <span class="text-xs font-semibold leading-snug" style="color: var(--text-heading)">
                                 {{ __('Rute & pelacakan real-time di peta') }}
                             </span>
@@ -1383,9 +1379,7 @@
                         {{-- Output 3 --}}
                         <div class="p-2.5 rounded-xl border flex items-center gap-2.5 hover:bg-amber-500/5 transition-all hover:border-amber-400/40"
                              style="background: var(--bg-page); border-color: var(--card-border);">
-                            <span class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-                                <i data-lucide="bell-ring" class="w-4 h-4"></i>
-                            </span>
+                            <img src="{{ asset('images/alur/icon-bell-notification.png') }}" alt="Notifikasi Kendala" class="w-8 h-8 object-contain shrink-0 drop-shadow-sm">
                             <span class="text-xs font-semibold leading-snug" style="color: var(--text-heading)">
                                 {{ __('Notifikasi otomatis jika ada kendala') }}
                             </span>
@@ -1394,9 +1388,7 @@
                         {{-- Output 4 --}}
                         <div class="p-2.5 rounded-xl border flex items-center gap-2.5 hover:bg-emerald-500/5 transition-all hover:border-emerald-400/40"
                              style="background: var(--bg-page); border-color: var(--card-border);">
-                            <span class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                                <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
-                            </span>
+                            <img src="{{ asset('images/alur/icon-barchart-status.png') }}" alt="Status Delivered" class="w-8 h-8 object-contain shrink-0 drop-shadow-sm">
                             <span class="text-xs font-semibold leading-snug" style="color: var(--text-heading)">
                                 {{ __('Status pengiriman hingga Delivered') }}
                             </span>
@@ -1405,9 +1397,7 @@
                         {{-- Output 5 --}}
                         <div class="p-2.5 rounded-xl border flex items-center gap-2.5 hover:bg-purple-500/5 transition-all hover:border-purple-400/40"
                              style="background: var(--bg-page); border-color: var(--card-border);">
-                            <span class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-                                <i data-lucide="database" class="w-4 h-4"></i>
-                            </span>
+                            <img src="{{ asset('images/alur/icon-database-bi.png') }}" alt="Analitik Bisnis" class="w-8 h-8 object-contain shrink-0 drop-shadow-sm">
                             <span class="text-xs font-semibold leading-snug" style="color: var(--text-heading)">
                                 {{ __('Data analitik bisnis untuk keputusan') }}
                             </span>
