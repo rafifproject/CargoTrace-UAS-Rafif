@@ -834,335 +834,47 @@
     {{-- ========================================================================= --}}
     {{-- SECTION 4: ALUR SISTEM (5-Stage Swimlane Flowmap Showcase)                --}}
     {{-- ========================================================================= --}}
-    <section id="alur-sistem" class="py-16 sm:py-20 lg:py-24 relative overflow-hidden"
-             style="background: var(--bg-alt); border-top: 1px solid var(--nav-border); border-bottom: 1px solid var(--nav-border);">
+    <section id="alur-sistem" class="py-8 sm:py-12 lg:py-16 relative overflow-hidden" style="background: var(--bg-alt);">
         <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
-            {{-- Section Header (Left-aligned, matching user mockup title & badge) --}}
-            <div class="w-full lg:max-w-2xl xl:max-w-3xl text-left mb-10 sm:mb-12">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase mb-3.5 shadow-sm"
-                     style="background: var(--brand-glow); color: var(--brand-cyan); border: 1px solid var(--card-border)">
-                    <i data-lucide="git-branch" class="w-3.5 h-3.5"></i>
-                    <span>{{ __('FLOWMAP SISTEM TERINTEGRASI') }}</span>
-                </div>
-                <h2 class="font-outfit text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.15] mb-3 sm:mb-4"
-                    style="color: var(--text-heading)">
-                    {{ __('Alur Kerja Pengiriman Kargo') }} <br class="hidden sm:inline">
-                    <span style="color: var(--brand-cyan)">{{ __('(5 Tahap Utama)') }}</span>
-                </h2>
-                <p class="text-sm sm:text-base leading-relaxed font-normal" style="color: var(--text-body)">
-                    {{ __('Diagram alur swimlane yang menghubungkan peran Customer (Buyer), Logistics Operator, Sistem Mesin Otomatis, dan Administrator secara harmonis.') }}
-                </p>
-            </div>
+            {{-- Main 3D Flowmap Infographic Showcase (Matches exact user design mockup) --}}
+            <div class="theme-card rounded-3xl overflow-hidden relative shadow-2xl border"
+                 style="background: var(--card-bg); border-color: var(--card-border);">
+                
+                {{-- Action Bar on top of the card --}}
+                <div class="flex items-center justify-between px-5 sm:px-7 py-3.5 border-b backdrop-blur-md"
+                     style="background: var(--nav-bg); border-color: var(--nav-border);">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-xs sm:text-sm font-bold tracking-tight" style="color: var(--text-heading)">
+                            Flowmap Alur Sistem CargoTrace (5 Tahap Utama)
+                        </span>
+                        <span class="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-blue-500/15 text-blue-400 border border-blue-500/30">
+                            Ultra HD 2048px
+                        </span>
+                    </div>
 
-            {{-- Flowmap Visual Showcase Container with HD Image & Modal Zoom --}}
-            <div class="mb-12 sm:mb-16">
-                <div class="theme-card rounded-3xl p-4 sm:p-6 overflow-hidden relative group"
-                     style="background: var(--card-bg); border: 1px solid var(--card-border);">
-                    <div class="flex items-center justify-between pb-4 mb-4 border-b flex-wrap gap-2" style="border-color: var(--nav-border)">
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span class="text-xs sm:text-sm font-bold" style="color: var(--text-heading)">
-                                Flowmap Swimlane &mdash; 5 Tahap Pengiriman Kargo Kopi CargoTrace
-                            </span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-blue-500/15 text-blue-400 border border-blue-500/30">
-                                HD 2048px
-                            </span>
-                        </div>
-                        <button onclick="openFlowmapModal()" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition hover:scale-105 shadow-sm"
+                    <div class="flex items-center gap-2">
+                        <button onclick="openFlowmapModal()" 
+                                class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-semibold transition hover:scale-105 shadow-sm"
                                 style="background: var(--btn-primary-bg); color: var(--btn-primary-text);">
                             <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
                             <span>{{ __('Perbesar Flowmap HD') }}</span>
                         </button>
                     </div>
-
-                    <div class="cursor-pointer overflow-hidden rounded-2xl relative" onclick="openFlowmapModal()">
-                        <img id="flowmapImage"
-                             src="{{ asset('images/flowmap-sistem.jpg') }}" 
-                             alt="Flowmap Alur Sistem CargoTrace (5 Tahap Utama)" 
-                             class="w-full h-auto object-cover rounded-xl shadow-2xl transition duration-500 group-hover:scale-[1.01]">
-                        <div class="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/5 transition-colors flex items-center justify-center pointer-events-none">
-                            <div class="opacity-0 group-hover:opacity-100 transition-opacity bg-black/75 text-white px-4 py-2 rounded-full text-xs font-medium backdrop-blur-md flex items-center gap-2 shadow-lg">
-                                <i data-lucide="zoom-in" class="w-4 h-4 text-cyan-400"></i>
-                                <span>{{ __('Klik untuk Memperbesar Resolusi Penuh') }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- 3 Key Information Cards Matching Design Mockup (Tujuan, Aktor/Hak Akses, Legenda Simbol) --}}
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-8">
-                
-                {{-- Card 1: Tujuan Flowmap (col-span-3) --}}
-                <div class="lg:col-span-3 theme-card rounded-2xl p-5 flex flex-col justify-between"
-                     style="background: var(--card-bg); border: 1px solid var(--card-border);">
-                    <div>
-                        <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl mb-4"
-                             style="background: rgba(0, 112, 243, 0.12); color: var(--brand-cyan); border: 1px solid var(--card-border);">
-                            <i data-lucide="target" class="w-4 h-4"></i>
-                            <h4 class="font-outfit font-bold text-xs uppercase tracking-wider">{{ __('Tujuan Flowmap') }}</h4>
-                        </div>
-                        <p class="text-xs sm:text-sm leading-relaxed" style="color: var(--text-body)">
-                            {{ __('Menggambarkan alur kerja sistem CargoTrace secara menyeluruh, mulai dari pemesanan hingga analitik eksekusi, dengan keterlibatan tiga hak akses utama.') }}
-                        </p>
-                    </div>
-                    <div class="mt-4 pt-3 border-t text-[11px] flex items-center justify-between"
-                         style="border-color: var(--nav-border); color: var(--text-muted)">
-                        <span>Cakupan Proses</span>
-                        <span class="font-bold text-emerald-400">End-to-End</span>
-                    </div>
                 </div>
 
-                {{-- Card 2: Aktor / Hak Akses (col-span-6) --}}
-                <div class="lg:col-span-6 theme-card rounded-2xl p-5"
-                     style="background: var(--card-bg); border: 1px solid var(--card-border);">
-                    <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl mb-4"
-                         style="background: rgba(0, 112, 243, 0.12); color: var(--brand-cyan); border: 1px solid var(--card-border);">
-                        <i data-lucide="users" class="w-4 h-4"></i>
-                        <h4 class="font-outfit font-bold text-xs uppercase tracking-wider">{{ __('Aktor / Hak Akses') }}</h4>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                        {{-- Actor 1: Customer --}}
-                        <div class="p-3 rounded-xl border flex items-start gap-2.5"
-                             style="background: var(--bg-page); border-color: var(--nav-border);">
-                            <div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <i data-lucide="user" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold text-xs" style="color: var(--text-heading)">Customer (Buyer)</div>
-                                <p class="text-[11px] leading-snug mt-0.5" style="color: var(--text-muted)">
-                                    Memesan kargo, melihat status, terima notifikasi.
-                                </p>
-                            </div>
+                {{-- The 3D Flowmap Graphic --}}
+                <div class="relative cursor-pointer overflow-hidden group" onclick="openFlowmapModal()">
+                    <img id="flowmapImage"
+                         src="{{ asset('images/alur-sistem-3d-v2.jpg') }}?v={{ time() }}" 
+                         alt="Alur Kerja Pengiriman Kargo (5 Tahap Utama) - CargoTrace" 
+                         class="w-full h-auto object-cover transition duration-500 group-hover:scale-[1.01] block">
+                    <div class="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/5 transition-colors flex items-center justify-center pointer-events-none">
+                        <div class="opacity-0 group-hover:opacity-100 transition-opacity bg-black/75 text-white px-4 py-2 rounded-full text-xs font-medium backdrop-blur-md flex items-center gap-2 shadow-lg">
+                            <i data-lucide="zoom-in" class="w-4 h-4 text-cyan-400"></i>
+                            <span>{{ __('Klik untuk Memperbesar Resolusi Penuh') }}</span>
                         </div>
-
-                        {{-- Actor 2: Logistics Operator --}}
-                        <div class="p-3 rounded-xl border flex items-start gap-2.5"
-                             style="background: var(--bg-page); border-color: var(--nav-border);">
-                            <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <i data-lucide="hard-hat" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold text-xs" style="color: var(--text-heading)">Logistics Operator</div>
-                                <p class="text-[11px] leading-snug mt-0.5" style="color: var(--text-muted)">
-                                    Mengelola ekspedisi, dokumen, dan tracking.
-                                </p>
-                            </div>
-                        </div>
-
-                        {{-- Actor 3: Sistem (Otomatis) --}}
-                        <div class="p-3 rounded-xl border flex items-start gap-2.5"
-                             style="background: var(--bg-page); border-color: var(--nav-border);">
-                            <div class="w-8 h-8 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <i data-lucide="cpu" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold text-xs" style="color: var(--text-heading)">Sistem (Otomatis)</div>
-                                <p class="text-[11px] leading-snug mt-0.5" style="color: var(--text-muted)">
-                                    Memproses data, melacak pengiriman, dan mengirim notifikasi.
-                                </p>
-                            </div>
-                        </div>
-
-                        {{-- Actor 4: Administrator --}}
-                        <div class="p-3 rounded-xl border flex items-start gap-2.5"
-                             style="background: var(--bg-page); border-color: var(--nav-border);">
-                            <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <i data-lucide="shield-check" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold text-xs" style="color: var(--text-heading)">Administrator</div>
-                                <p class="text-[11px] leading-snug mt-0.5" style="color: var(--text-muted)">
-                                    Memantau kinerja, sistem, validasi data, dan kelola akses.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Card 3: Legenda Simbol (col-span-3) --}}
-                <div class="lg:col-span-3 theme-card rounded-2xl p-5 flex flex-col justify-between"
-                     style="background: var(--card-bg); border: 1px solid var(--card-border);">
-                    <div>
-                        <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl mb-4"
-                             style="background: rgba(0, 112, 243, 0.12); color: var(--brand-cyan); border: 1px solid var(--card-border);">
-                            <i data-lucide="bookmark" class="w-4 h-4"></i>
-                            <h4 class="font-outfit font-bold text-xs uppercase tracking-wider">{{ __('Legenda Simbol') }}</h4>
-                        </div>
-
-                        <div class="space-y-2 text-xs" style="color: var(--text-body)">
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-5 h-2.5 rounded-full bg-emerald-500/30 border border-emerald-400"></span>
-                                <span class="text-[11px]">Mulai / Selesai</span>
-                            </div>
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-5 h-2.5 rounded-sm bg-blue-500/30 border border-blue-400"></span>
-                                <span class="text-[11px]">Proses / Aktivitas</span>
-                            </div>
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-3 h-3 rotate-45 bg-amber-500/30 border border-amber-400"></span>
-                                <span class="text-[11px] ml-1">Keputusan</span>
-                            </div>
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-5 h-2.5 rounded-tl-lg bg-purple-500/30 border border-purple-400"></span>
-                                <span class="text-[11px]">Data / Dokumen (Output)</span>
-                            </div>
-                            <div class="flex items-center gap-2.5">
-                                <i data-lucide="arrow-right" class="w-4 h-4 text-blue-400"></i>
-                                <span class="text-[11px]">Alur Proses</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-4 pt-3 border-t text-[11px]" style="border-color: var(--nav-border); color: var(--text-muted)">
-                        Standar Notasi ISO 5807
-                    </div>
-                </div>
-
-            </div>
-
-            {{-- Full-width System Output Ribbon Matching Mockup --}}
-            <div class="theme-card rounded-2xl p-4 sm:p-5 mb-10 flex flex-col lg:flex-row items-center gap-4"
-                 style="background: var(--card-bg); border: 1px solid var(--card-border);">
-                {{-- Left dark blue pill --}}
-                <div class="flex items-center gap-2 px-5 py-3 rounded-xl flex-shrink-0 text-white font-outfit font-bold text-xs sm:text-sm tracking-wide shadow-md"
-                     style="background: linear-gradient(135deg, #0070F3 0%, #00C2FF 100%);">
-                    <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                    <span>{{ __('Hasil / Output Sistem') }}</span>
-                    <i data-lucide="chevron-right" class="w-4 h-4 hidden sm:inline"></i>
-                </div>
-
-                {{-- 5 Output Pills --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 w-full">
-                    <div class="p-2.5 rounded-xl border flex items-center gap-2"
-                         style="background: var(--bg-page); border-color: var(--nav-border);">
-                        <i data-lucide="package" class="w-4 h-4 text-blue-400 flex-shrink-0"></i>
-                        <span class="text-[11px] font-medium leading-tight" style="color: var(--text-heading)">
-                            Order kargo tercatat & tervalidasi
-                        </span>
-                    </div>
-
-                    <div class="p-2.5 rounded-xl border flex items-center gap-2"
-                         style="background: var(--bg-page); border-color: var(--nav-border);">
-                        <i data-lucide="navigation" class="w-4 h-4 text-cyan-400 flex-shrink-0"></i>
-                        <span class="text-[11px] font-medium leading-tight" style="color: var(--text-heading)">
-                            Rute & pelacakan real-time di peta
-                        </span>
-                    </div>
-
-                    <div class="p-2.5 rounded-xl border flex items-center gap-2"
-                         style="background: var(--bg-page); border-color: var(--nav-border);">
-                        <i data-lucide="bell" class="w-4 h-4 text-amber-400 flex-shrink-0"></i>
-                        <span class="text-[11px] font-medium leading-tight" style="color: var(--text-heading)">
-                            Notifikasi otomatis jika ada kendala
-                        </span>
-                    </div>
-
-                    <div class="p-2.5 rounded-xl border flex items-center gap-2"
-                         style="background: var(--bg-page); border-color: var(--nav-border);">
-                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
-                        <span class="text-[11px] font-medium leading-tight" style="color: var(--text-heading)">
-                            Status pengiriman hingga Delivered
-                        </span>
-                    </div>
-
-                    <div class="p-2.5 rounded-xl border flex items-center gap-2"
-                         style="background: var(--bg-page); border-color: var(--nav-border);">
-                        <i data-lucide="database" class="w-4 h-4 text-purple-400 flex-shrink-0"></i>
-                        <span class="text-[11px] font-medium leading-tight" style="color: var(--text-heading)">
-                            Data analitik bisnis untuk keputusan
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            {{-- The 5 Stages Breakdown Cards (Interactive Detail Cards) --}}
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                
-                {{-- Tahap 1 --}}
-                <div class="theme-card rounded-2xl p-5 border-t-4 border-t-blue-500 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="w-7 h-7 rounded-full bg-blue-500/20 text-blue-500 font-bold text-xs flex items-center justify-center">1</span>
-                            <span class="text-[11px] font-bold text-blue-500 uppercase">Customer</span>
-                        </div>
-                        <h4 class="font-outfit font-bold text-base mb-1.5" style="color: var(--text-heading)">Pemesanan Kargo</h4>
-                        <p class="text-xs leading-relaxed" style="color: var(--text-body)">
-                            Buyer memilih varietas kopi, menentukan pelabuhan tujuan & mengisi detail kontainer.
-                        </p>
-                    </div>
-                    <div class="mt-4 pt-3 border-t text-[11px]" style="border-color: var(--nav-border); color: var(--text-muted)">
-                        Output: Draft Resi Kargo
-                    </div>
-                </div>
-
-                {{-- Tahap 2 --}}
-                <div class="theme-card rounded-2xl p-5 border-t-4 border-t-amber-500 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="w-7 h-7 rounded-full bg-amber-500/20 text-amber-500 font-bold text-xs flex items-center justify-center">2</span>
-                            <span class="text-[11px] font-bold text-amber-500 uppercase">Operator</span>
-                        </div>
-                        <h4 class="font-outfit font-bold text-base mb-1.5" style="color: var(--text-heading)">Validasi & Pengurusan</h4>
-                        <p class="text-xs leading-relaxed" style="color: var(--text-body)">
-                            Operator memvalidasi manifest, menetapkan kapal ekspedisi & merilis Tracking Number resmi.
-                        </p>
-                    </div>
-                    <div class="mt-4 pt-3 border-t text-[11px]" style="border-color: var(--nav-border); color: var(--text-muted)">
-                        Output: Resi Aktif & Rute
-                    </div>
-                </div>
-
-                {{-- Tahap 3 --}}
-                <div class="theme-card rounded-2xl p-5 border-t-4" style="border-top-color: var(--brand-cyan)">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center"
-                                  style="background: var(--brand-glow); color: var(--brand-cyan)">3</span>
-                            <span class="text-[11px] font-bold uppercase" style="color: var(--brand-cyan)">Kolaboratif</span>
-                        </div>
-                        <h4 class="font-outfit font-bold text-base mb-1.5" style="color: var(--text-heading)">Pelacakan Perjalanan</h4>
-                        <p class="text-xs leading-relaxed" style="color: var(--text-body)">
-                            Peta Live Leaflet melacak kapal, memperbarui checkpoint maritim & menghitung ETA otomatis.
-                        </p>
-                    </div>
-                    <div class="mt-4 pt-3 border-t text-[11px]" style="border-color: var(--nav-border); color: var(--text-muted)">
-                        Output: Posisi GPS Real-time
-                    </div>
-                </div>
-
-                {{-- Tahap 4 --}}
-                <div class="theme-card rounded-2xl p-5 border-t-4 border-t-rose-500 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="w-7 h-7 rounded-full bg-rose-500/20 text-rose-500 font-bold text-xs flex items-center justify-center">4</span>
-                            <span class="text-[11px] font-bold text-rose-500 uppercase">Mesin Otomatis</span>
-                        </div>
-                        <h4 class="font-outfit font-bold text-base mb-1.5" style="color: var(--text-heading)">Deteksi Keterlambatan</h4>
-                        <p class="text-xs leading-relaxed" style="color: var(--text-body)">
-                            Algoritma mendeteksi cuaca buruk & delay, memicu status DELAYED serta notifikasi instan.
-                        </p>
-                    </div>
-                    <div class="mt-4 pt-3 border-t text-[11px]" style="border-color: var(--nav-border); color: var(--text-muted)">
-                        Output: Alert Keterlambatan
-                    </div>
-                </div>
-
-                {{-- Tahap 5 --}}
-                <div class="theme-card rounded-2xl p-5 border-t-4 border-t-emerald-500 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-500 font-bold text-xs flex items-center justify-center">5</span>
-                            <span class="text-[11px] font-bold text-emerald-500 uppercase">Administrator</span>
-                        </div>
-                        <h4 class="font-outfit font-bold text-base mb-1.5" style="color: var(--text-heading)">Penyelesaian & Analitik</h4>
-                        <p class="text-xs leading-relaxed" style="color: var(--text-body)">
-                            Kargo berstatus Delivered. Data transaksi terakumulasi ke dasbor GMV & rasio SLA eksekutif.
-                        </p>
-                    </div>
-                    <div class="mt-4 pt-3 border-t text-[11px]" style="border-color: var(--nav-border); color: var(--text-muted)">
-                        Output: Analitik Bisnis & SLA
                     </div>
                 </div>
 
@@ -1607,7 +1319,7 @@
                 </button>
             </div>
             <div class="p-4 overflow-auto max-h-[calc(92vh-70px)] flex justify-center" style="background: var(--bg-page)">
-                <img id="flowmapModalImage" src="{{ asset('images/flowmap-sistem.jpg') }}" alt="Flowmap Lengkap CargoTrace" class="max-w-full h-auto rounded-xl shadow-2xl">
+                <img id="flowmapModalImage" src="{{ asset('images/alur-sistem-3d-v2.jpg') }}?v={{ time() }}" alt="Flowmap Lengkap CargoTrace" class="max-w-full h-auto rounded-xl shadow-2xl">
             </div>
         </div>
     </div>
@@ -1641,7 +1353,9 @@
             // Sync Alur Sistem Flowmap graphic with theme
             const flowmapImg = document.getElementById('flowmapImage');
             const flowmapModalImg = document.getElementById('flowmapModalImage');
-            const flowmapSrc = theme === 'clean' ? "{{ asset('images/flowmap-sistem.jpg') }}" : "{{ asset('images/flowmap-sistem-dark.jpg') }}";
+            const flowmapSrc = theme === 'clean' 
+                ? "{{ asset('images/alur-sistem-3d-v2.jpg') }}?v={{ time() }}" 
+                : "{{ asset('images/alur-sistem-3d-dark-v2.jpg') }}?v={{ time() }}";
             if (flowmapImg) flowmapImg.src = flowmapSrc;
             if (flowmapModalImg) flowmapModalImg.src = flowmapSrc;
             localStorage.setItem('cargotrace_landing_theme', theme);
