@@ -47,7 +47,7 @@
             --hero-overlay-mid: rgba(6, 12, 30, 0.40);
             
             --tentang-bg-img: url('{{ asset('images/tentang-kami-bg-dark.jpg') }}');
-            --produk-bg-img: url('{{ asset('images/produk-bg-dark.jpg') }}');
+            --produk-bg-img: url('{{ asset('images/produk-bg-dark-v2.jpg') }}?v={{ time() }}');
             --alur-bg-img: url('{{ asset('images/alur-sistem-bg-dark.jpg') }}');
             
             --card-bg: rgba(11, 23, 50, 0.75);
@@ -86,7 +86,7 @@
             --hero-overlay-mid: rgba(248, 250, 252, 0.38);
             
             --tentang-bg-img: url('{{ asset('images/tentang-kami-bg.jpg') }}');
-            --produk-bg-img: url('{{ asset('images/produk-bg.jpg') }}');
+            --produk-bg-img: url('{{ asset('images/produk-bg-clean-v2.jpg') }}?v={{ time() }}');
             --alur-bg-img: url('{{ asset('images/alur-sistem-bg.jpg') }}');
             
             --card-bg: rgba(255, 255, 255, 0.92);
@@ -535,12 +535,12 @@
     {{-- ========================================================================= --}}
     {{-- SECTION 3: PRODUK KOPI SPESIALTI BRASIL (6 Authentic Database Varieties) --}}
     {{-- ========================================================================= --}}
-    <section id="produk" class="py-12 sm:py-16 lg:py-20 relative overflow-hidden flex flex-col justify-between"
+    <section id="produk" class="py-8 sm:py-12 lg:py-14 relative overflow-hidden flex flex-col justify-between"
              style="background-image: var(--produk-bg-img); background-size: cover; background-position: center top; background-repeat: no-repeat;">
         <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
             {{-- Section Header (Left-aligned, leaving top-right ship illustration unobstructed) --}}
-            <div class="w-full lg:max-w-xl xl:max-w-2xl text-left mb-8 sm:mb-10">
+            <div class="w-full lg:max-w-xl xl:max-w-2xl text-left mb-6 sm:mb-8">
                 <div class="flex items-center gap-2.5 mb-2.5">
                     <div class="h-1 w-8 rounded-full" style="background: var(--brand-cyan)"></div>
                     <span class="text-xs sm:text-sm font-bold tracking-wider uppercase" style="color: var(--text-heading)">
@@ -559,7 +559,7 @@
             </div>
 
             {{-- 6 Coffee Varieties Grid (3 Columns on Desktop, 2 on Tablet, 1 on Mobile) --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 pb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 lg:gap-5 pb-4">
                 
                 {{-- Product 1: Brazil Santos Bourbon Specialty --}}
                 <div class="theme-card rounded-3xl overflow-hidden flex flex-row items-stretch border transition hover:-translate-y-1 hover:shadow-xl"
