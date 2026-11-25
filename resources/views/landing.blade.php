@@ -141,6 +141,19 @@
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--brand-cyan); }
 
+        /* Hide scrollbars for clean mobile touch swipe */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Floating 3D Micro-animation */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        .animate-float {
+            animation: floatSlow 4s ease-in-out infinite;
+        }
+
         /* Alur Sistem Vector Typography */
         .theme-clean .alur-title { color: #0A1938; }
         .theme-clean .alur-subtitle { color: #0070F3; }
@@ -368,10 +381,30 @@
     {{-- ========================================================================= --}}
     {{-- SECTION 2: TENTANG KAMI (Santos Exporters S.A. Story & Global Hub)       --}}
     {{-- ========================================================================= --}}
-    <section id="tentang-kami" class="py-16 sm:py-20 lg:py-24 relative overflow-hidden"
+    <section id="tentang-kami" class="py-14 sm:py-18 lg:py-24 relative overflow-hidden transition-colors duration-300"
+             style="background: var(--bg-alt);">
+
+        {{-- Desktop Panoramic Background Layer --}}
+        <div class="hidden lg:block absolute inset-0 w-full h-full pointer-events-none select-none transition-opacity duration-500"
              style="background-image: var(--tentang-bg-img); background-size: cover; background-position: top right; background-repeat: no-repeat;">
+        </div>
+
         <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
+            {{-- Mobile Adaptive Visual Banner (Ensures 100% of the Santos Ship artwork is visible without clipping) --}}
+            <div class="lg:hidden w-full mb-8">
+                <div class="relative rounded-2xl overflow-hidden shadow-xl border" style="border-color: var(--card-border);">
+                    <img src="{{ asset('images/tentang-kami-bg.jpg') }}" alt="Pelabuhan Santos & Ekspor Kopi" class="w-full h-44 sm:h-56 object-cover object-top">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg-alt)] via-transparent to-transparent"></div>
+                    <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
+                        <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-600/90 text-white shadow-sm backdrop-blur-sm uppercase tracking-wider">
+                            Porto de Santos • Brazil
+                        </span>
+                        <span class="text-xs font-semibold text-cyan-200 drop-shadow">Pintu Ekspor 80% Kopi Dunia</span>
+                    </div>
+                </div>
+            </div>
+
             {{-- Section Header (Left-aligned, leaving top-right ship illustration unobstructed) --}}
             <div class="w-full lg:max-w-xl xl:max-w-2xl text-left mb-10 sm:mb-12">
                 <div class="flex items-center gap-2.5 mb-3">
@@ -546,10 +579,30 @@
     {{-- ========================================================================= --}}
     {{-- SECTION 3: PRODUK KOPI SPESIALTI BRASIL (6 Authentic Database Varieties) --}}
     {{-- ========================================================================= --}}
-    <section id="produk" class="py-8 sm:py-12 lg:py-14 relative overflow-hidden flex flex-col justify-between"
+    <section id="produk" class="py-10 sm:py-14 lg:py-16 relative overflow-hidden flex flex-col justify-between transition-colors duration-300"
+             style="background: var(--bg-alt);">
+
+        {{-- Desktop Panoramic Background Layer --}}
+        <div class="hidden lg:block absolute inset-0 w-full h-full pointer-events-none select-none transition-opacity duration-500"
              style="background-image: var(--produk-bg-img); background-size: cover; background-position: center top; background-repeat: no-repeat;">
+        </div>
+
         <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
+            {{-- Mobile Adaptive Visual Banner (Santos Ship & Coffee Beans Artwork) --}}
+            <div class="lg:hidden w-full mb-6">
+                <div class="relative rounded-2xl overflow-hidden shadow-xl border" style="border-color: var(--card-border);">
+                    <img src="{{ asset('images/produk-bg-clean-v2.jpg') }}" alt="Santos Coffee Export" class="w-full h-40 sm:h-52 object-cover object-top">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg-alt)] via-transparent to-transparent"></div>
+                    <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
+                        <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-600/90 text-white shadow-sm backdrop-blur-sm uppercase tracking-wider">
+                            SCA Certified Specialty
+                        </span>
+                        <span class="text-xs font-semibold text-amber-200 drop-shadow">6 Komoditas Pilihan</span>
+                    </div>
+                </div>
+            </div>
+
             {{-- Section Header (Left-aligned, leaving top-right ship illustration unobstructed) --}}
             <div class="w-full lg:max-w-xl xl:max-w-2xl text-left mb-6 sm:mb-8">
                 <div class="flex items-center gap-2.5 mb-2.5">
@@ -919,23 +972,32 @@
             <div class="mb-14">
                 
                 {{-- Flow Connecting Header Bar --}}
-                <div class="flex items-center justify-between mb-6 px-1">
+                <div class="flex items-center justify-between mb-4 px-1">
                     <div class="flex items-center gap-2">
                         <span class="w-3 h-3 rounded-full bg-cyan-500 animate-ping"></span>
                         <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--text-muted)">
-                            INTERACTIVE PIPELINE (KLIK / ARAHKAN KURSOR UNTUK DETAIL)
+                            INTERACTIVE PIPELINE (GESER / TAP DI HP ATAU KLIK DI DESKTOP)
                         </span>
                     </div>
                     <span class="text-xs font-medium text-cyan-600 dark:text-cyan-400 flex items-center gap-1">
-                        <i data-lucide="mouse-pointer" class="w-3.5 h-3.5"></i> Interaktif 5 Tahap
+                        <i data-lucide="touchpad" class="w-3.5 h-3.5"></i> Swipe & Touch Friendly
                     </span>
                 </div>
 
-                {{-- 5-Card Grid with 3D Pedestals --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 relative">
+                {{-- Mobile Stepper Indicator Tabs (Quick Jump & Tap on Mobile) --}}
+                <div class="flex lg:hidden items-center justify-between gap-1 mb-4 p-1.5 rounded-xl border bg-slate-500/5 backdrop-blur-sm shadow-sm" style="border-color: var(--card-border);">
+                    <button type="button" onclick="jumpToStep(1)" class="flex-1 py-1.5 text-center rounded-lg text-xs font-bold transition-all text-blue-600 bg-blue-500/15 shadow-sm" id="mob-step-btn-1">1. Pesan</button>
+                    <button type="button" onclick="jumpToStep(2)" class="flex-1 py-1.5 text-center rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-amber-500" id="mob-step-btn-2">2. Validasi</button>
+                    <button type="button" onclick="jumpToStep(3)" class="flex-1 py-1.5 text-center rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-cyan-500" id="mob-step-btn-3">3. Tracking</button>
+                    <button type="button" onclick="jumpToStep(4)" class="flex-1 py-1.5 text-center rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-rose-500" id="mob-step-btn-4">4. Alert</button>
+                    <button type="button" onclick="jumpToStep(5)" class="flex-1 py-1.5 text-center rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-purple-500" id="mob-step-btn-5">5. Selesai</button>
+                </div>
+
+                {{-- 5-Card Touch-Swipe Carousel on Mobile, Grid on Desktop --}}
+                <div id="flow-steps-container" class="flex lg:grid lg:grid-cols-5 gap-4 relative overflow-x-auto lg:overflow-visible pb-4 lg:pb-0 snap-x snap-mandatory scroll-smooth no-scrollbar px-1">
                     
                     {{-- STEP 1: Pemesanan Kargo --}}
-                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 relative overflow-hidden"
+                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 active:scale-[0.98] relative overflow-hidden shrink-0 w-[84vw] sm:w-[46vw] lg:w-auto snap-center shadow-lg"
                          onclick="selectFlowStep(1)" id="step-card-1">
                         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-blue-400"></div>
                         <div>
@@ -955,11 +1017,11 @@
                             </p>
                         </div>
 
-                        {{-- 3D Pedestal Graphic --}}
+                        {{-- 3D Pedestal Graphic with Floating Animation --}}
                         <div class="mt-3 rounded-xl overflow-hidden bg-gradient-to-b from-blue-500/5 to-cyan-500/10 p-2 flex items-center justify-center border border-blue-500/10 group-hover:border-blue-500/30 transition-all">
                             <img src="{{ asset('images/alur/step-1-pedestal.png') }}" 
                                  alt="Step 1 Pemesanan Kargo" 
-                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500">
+                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500 animate-float">
                         </div>
 
                         <div class="mt-3 pt-2 border-t border-slate-200/40 dark:border-slate-800 flex items-center justify-between text-[11px] font-semibold text-blue-600 dark:text-blue-400">
@@ -969,7 +1031,7 @@
                     </div>
 
                     {{-- STEP 2: Validasi & Pengurusan Ekspedisi --}}
-                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 relative overflow-hidden"
+                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 active:scale-[0.98] relative overflow-hidden shrink-0 w-[84vw] sm:w-[46vw] lg:w-auto snap-center shadow-lg"
                          onclick="selectFlowStep(2)" id="step-card-2">
                         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-amber-300"></div>
                         <div>
@@ -989,11 +1051,11 @@
                             </p>
                         </div>
 
-                        {{-- 3D Pedestal Graphic --}}
+                        {{-- 3D Pedestal Graphic with Floating Animation --}}
                         <div class="mt-3 rounded-xl overflow-hidden bg-gradient-to-b from-amber-500/5 to-amber-500/10 p-2 flex items-center justify-center border border-amber-500/10 group-hover:border-amber-500/30 transition-all">
                             <img src="{{ asset('images/alur/step-2-pedestal.png') }}" 
                                  alt="Step 2 Validasi Ekspedisi" 
-                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500">
+                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500 animate-float [animation-delay:0.8s]">
                         </div>
 
                         <div class="mt-3 pt-2 border-t border-slate-200/40 dark:border-slate-800 flex items-center justify-between text-[11px] font-semibold text-amber-600 dark:text-amber-400">
@@ -1003,7 +1065,7 @@
                     </div>
 
                     {{-- STEP 3: Pelacakan Perjalanan --}}
-                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 relative overflow-hidden"
+                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 active:scale-[0.98] relative overflow-hidden shrink-0 w-[84vw] sm:w-[46vw] lg:w-auto snap-center shadow-lg"
                          onclick="selectFlowStep(3)" id="step-card-3">
                         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-teal-400"></div>
                         <div>
@@ -1023,11 +1085,11 @@
                             </p>
                         </div>
 
-                        {{-- 3D Pedestal Graphic --}}
+                        {{-- 3D Pedestal Graphic with Floating Animation --}}
                         <div class="mt-3 rounded-xl overflow-hidden bg-gradient-to-b from-cyan-500/5 to-cyan-500/10 p-2 flex items-center justify-center border border-cyan-500/10 group-hover:border-cyan-500/30 transition-all">
                             <img src="{{ asset('images/alur/step-3-pedestal.png') }}" 
                                  alt="Step 3 Pelacakan Perjalanan" 
-                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500">
+                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500 animate-float [animation-delay:1.6s]">
                         </div>
 
                         <div class="mt-3 pt-2 border-t border-slate-200/40 dark:border-slate-800 flex items-center justify-between text-[11px] font-semibold text-cyan-600 dark:text-cyan-400">
@@ -1037,7 +1099,7 @@
                     </div>
 
                     {{-- STEP 4: Deteksi Keterlambatan & Exception --}}
-                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 relative overflow-hidden"
+                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 active:scale-[0.98] relative overflow-hidden shrink-0 w-[84vw] sm:w-[46vw] lg:w-auto snap-center shadow-lg"
                          onclick="selectFlowStep(4)" id="step-card-4">
                         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-orange-400"></div>
                         <div>
@@ -1057,11 +1119,11 @@
                             </p>
                         </div>
 
-                        {{-- 3D Pedestal Graphic --}}
+                        {{-- 3D Pedestal Graphic with Floating Animation --}}
                         <div class="mt-3 rounded-xl overflow-hidden bg-gradient-to-b from-rose-500/5 to-rose-500/10 p-2 flex items-center justify-center border border-rose-500/10 group-hover:border-rose-500/30 transition-all">
                             <img src="{{ asset('images/alur/step-4-pedestal.png') }}" 
                                  alt="Step 4 Deteksi Exception" 
-                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500">
+                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500 animate-float [animation-delay:2.4s]">
                         </div>
 
                         <div class="mt-3 pt-2 border-t border-slate-200/40 dark:border-slate-800 flex items-center justify-between text-[11px] font-semibold text-rose-600 dark:text-rose-400">
@@ -1071,7 +1133,7 @@
                     </div>
 
                     {{-- STEP 5: Penyelesaian & Analitik --}}
-                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 relative overflow-hidden"
+                    <div class="theme-card rounded-2xl p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 hover:-translate-y-2 active:scale-[0.98] relative overflow-hidden shrink-0 w-[84vw] sm:w-[46vw] lg:w-auto snap-center shadow-lg"
                          onclick="selectFlowStep(5)" id="step-card-5">
                         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 to-indigo-500"></div>
                         <div>
@@ -1091,11 +1153,11 @@
                             </p>
                         </div>
 
-                        {{-- 3D Pedestal Graphic --}}
+                        {{-- 3D Pedestal Graphic with Floating Animation --}}
                         <div class="mt-3 rounded-xl overflow-hidden bg-gradient-to-b from-purple-500/5 to-purple-500/10 p-2 flex items-center justify-center border border-purple-500/10 group-hover:border-purple-500/30 transition-all">
                             <img src="{{ asset('images/alur/step-5-pedestal.png') }}" 
                                  alt="Step 5 Penyelesaian & Analitik" 
-                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500">
+                                 class="w-full h-24 object-contain group-hover:scale-110 transition-transform duration-500 animate-float [animation-delay:3.2s]">
                         </div>
 
                         <div class="mt-3 pt-2 border-t border-slate-200/40 dark:border-slate-800 flex items-center justify-between text-[11px] font-semibold text-purple-600 dark:text-purple-400">
@@ -1361,7 +1423,38 @@
 
         {{-- Client-side Flowmap Interactive Script --}}
         <script>
+            function updateMobileStepperUi(stepNumber) {
+                const colorClasses = {
+                    1: 'text-blue-600 bg-blue-500/15 shadow-sm',
+                    2: 'text-amber-600 bg-amber-500/15 shadow-sm',
+                    3: 'text-cyan-600 bg-cyan-500/15 shadow-sm',
+                    4: 'text-rose-600 bg-rose-500/15 shadow-sm',
+                    5: 'text-purple-600 bg-purple-500/15 shadow-sm'
+                };
+                for (let i = 1; i <= 5; i++) {
+                    const btn = document.getElementById('mob-step-btn-' + i);
+                    if (btn) {
+                        if (i === stepNumber) {
+                            btn.className = `flex-1 py-1.5 text-center rounded-lg text-xs font-bold transition-all ${colorClasses[i] || 'text-cyan-600 bg-cyan-500/15 shadow-sm'}`;
+                        } else {
+                            btn.className = "flex-1 py-1.5 text-center rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-cyan-500";
+                        }
+                    }
+                }
+            }
+
+            function jumpToStep(stepNumber) {
+                selectFlowStep(stepNumber);
+                const card = document.getElementById('step-card-' + stepNumber);
+                if (card) {
+                    card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+                updateMobileStepperUi(stepNumber);
+            }
+
             function selectFlowStep(stepNumber) {
+                updateMobileStepperUi(stepNumber);
+
                 // Highlight active step
                 for (let i = 1; i <= 5; i++) {
                     const card = document.getElementById('step-card-' + i);
@@ -1395,6 +1488,34 @@
                     }
                 }
             }
+
+            // Mobile Touch-Swipe Observer for Stepper
+            document.addEventListener('DOMContentLoaded', () => {
+                const container = document.getElementById('flow-steps-container');
+                if (container && 'IntersectionObserver' in window) {
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+                                const stepId = entry.target.id;
+                                if (stepId && stepId.startsWith('step-card-')) {
+                                    const stepNum = parseInt(stepId.replace('step-card-', ''), 10);
+                                    if (stepNum) {
+                                        selectFlowStep(stepNum);
+                                    }
+                                }
+                            }
+                        });
+                    }, {
+                        root: container,
+                        threshold: 0.6
+                    });
+
+                    for (let i = 1; i <= 5; i++) {
+                        const card = document.getElementById('step-card-' + i);
+                        if (card) observer.observe(card);
+                    }
+                }
+            });
         </script>
     </section>
 
