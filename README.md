@@ -108,10 +108,10 @@ Below is the complete walkthrough of every functional page across all 3 access l
 
 - **Purpose**: Full-width, high-impact public portal showcasing Santos Exporters S.A. Brazilian specialty coffee supply chain from the Port of Santos to global roasters.
 - **Key Features**:
-  - **Full-Width Edge-to-Edge Responsive Layout** with organic curved ship boundary and luminous wave ribbons.
-  - **Interactive Theme Switcher (🌙 Dark Mode & ☀️ Clean Light Mode)** with instant CSS variable updates and `localStorage` persistence.
+  - **Full-Width Edge-to-Edge Responsive Layout** with high-resolution panoramic maritime background (Santos Port, container ship, crane, and specialty coffee dock) and luminous ocean wave ribbon transition.
+  - **Interactive Theme Switcher (🌙 Dark Mode & ☀️ Clean Light Mode)** with instant CSS variable updates, dynamic background swap, and `localStorage` persistence.
   - **6 Dedicated Business Sections**:
-    1. `Beranda`: High-impact hero with real-time CTA, status chips, and 4 glass feature cards.
+    1. `Beranda`: High-impact hero with real-time CTA, Brazilian specialty coffee export focus, and 4 glass feature cards (Kopi Spesialti Brasil, Pengiriman Global, Pelacakan Real-Time, Aman & Terpercaya).
     2. `Tentang Kami`: Santos Exporters S.A. story, Port of Santos infrastructure, and 4 live metric KPI counters ($6.4M+ GMV, 40+ Ports, 88.6% SLA).
     3. `Produk`: 6 authentic Brazilian specialty coffee varieties (Bourbon, Yellow Catuai, Cerrado Mineiro, SSFC, Decaf Swiss Water, Espresso Master Blend) with SCA scores and flavor notes.
     4. `Alur Sistem`: 5-stage collaborative swimlane flowmap with interactive lightbox zoom.
