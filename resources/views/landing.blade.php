@@ -1170,18 +1170,18 @@
             </div>
 
 
-            {{-- 3. The 3 Structured Information Cards (Tujuan, Aktor/Hak Akses, Legenda) --}}
+            {{-- 3. The Structured Information Cards (Tujuan Sistem & Aktor Hak Akses) --}}
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
                 
-                {{-- Card 1: Tujuan Flowmap (3 Cols) --}}
-                <div class="lg:col-span-3 theme-card rounded-2xl p-6 flex flex-col justify-between border hover:border-cyan-500/40 transition-all duration-300">
+                {{-- Card 1: Tujuan Alur Kerja (4 Cols) --}}
+                <div class="lg:col-span-4 theme-card rounded-2xl p-6 flex flex-col justify-between border hover:border-cyan-500/40 transition-all duration-300">
                     <div>
-                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white mb-4 shadow-md shadow-blue-500/20">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white mb-4 shadow-md shadow-blue-500/20">
                             <i data-lucide="target" class="w-3.5 h-3.5"></i>
-                            <span>{{ __('Tujuan Flowmap') }}</span>
+                            <span>{{ __('Tujuan Alur Kerja') }}</span>
                         </div>
 
-                        <h4 class="font-outfit text-base font-extrabold mb-2" style="color: var(--text-heading)">
+                        <h4 class="font-outfit text-base sm:text-lg font-extrabold mb-2" style="color: var(--text-heading)">
                             {{ __('Transparansi Logistik Kargo Kopi') }}
                         </h4>
 
@@ -1206,8 +1206,8 @@
                     </div>
                 </div>
 
-                {{-- Card 2: Aktor / Hak Akses (6 Cols - 4 Actor Grid) --}}
-                <div class="lg:col-span-6 theme-card rounded-2xl p-6 border hover:border-cyan-500/40 transition-all duration-300">
+                {{-- Card 2: Aktor / Hak Akses (8 Cols - 4 Actor Grid) --}}
+                <div class="lg:col-span-8 theme-card rounded-2xl p-6 border hover:border-cyan-500/40 transition-all duration-300">
                     <div class="flex items-center justify-between mb-5">
                         <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white shadow-md shadow-blue-500/20">
                             <i data-lucide="users" class="w-3.5 h-3.5"></i>
@@ -1284,50 +1284,6 @@
                                     {{ __('Memantau kinerja sistem, audit validasi data, dan manajemen otorisasi akses.') }}
                                 </p>
                             </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                {{-- Card 3: Legenda Simbol Flowmap (3 Cols) --}}
-                <div class="lg:col-span-3 theme-card rounded-2xl p-6 border hover:border-cyan-500/40 transition-all duration-300">
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white mb-4 shadow-md shadow-blue-500/20">
-                        <i data-lucide="shapes" class="w-3.5 h-3.5"></i>
-                        <span>{{ __('Legenda Simbol') }}</span>
-                    </div>
-
-                    <div class="space-y-2.5 text-xs font-medium" style="color: var(--text-heading)">
-                        
-                        {{-- Simbol 1: Mulai/Selesai --}}
-                        <div class="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-500/10 transition-colors">
-                            <span class="w-7 h-4 rounded-full bg-emerald-400/30 border border-emerald-500 inline-block shadow-sm"></span>
-                            <span class="font-semibold">{{ __('Mulai / Selesai (Terminal)') }}</span>
-                        </div>
-
-                        {{-- Simbol 2: Proses --}}
-                        <div class="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-500/10 transition-colors">
-                            <span class="w-7 h-4 rounded-md bg-blue-400/30 border border-blue-500 inline-block shadow-sm"></span>
-                            <span class="font-semibold">{{ __('Proses / Aktivitas Operasi') }}</span>
-                        </div>
-
-                        {{-- Simbol 3: Keputusan --}}
-                        <div class="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-500/10 transition-colors">
-                            <span class="w-4 h-4 rotate-45 bg-amber-400/30 border border-amber-500 inline-block shadow-sm mx-1.5"></span>
-                            <span class="font-semibold">{{ __('Keputusan (Validasi)') }}</span>
-                        </div>
-
-                        {{-- Simbol 4: Data / Dokumen --}}
-                        <div class="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-500/10 transition-colors">
-                            <span class="w-7 h-4 rounded-sm bg-purple-400/30 border border-purple-500 inline-block -skew-x-12 shadow-sm"></span>
-                            <span class="font-semibold">{{ __('Data / Dokumen Ekspor') }}</span>
-                        </div>
-
-                        {{-- Simbol 5: Alur Proses --}}
-                        <div class="flex items-center gap-3 p-1.5 rounded-lg hover:bg-slate-500/10 transition-colors">
-                            <span class="w-7 flex items-center justify-center text-cyan-500 font-bold">
-                                <i data-lucide="move-right" class="w-5 h-5"></i>
-                            </span>
-                            <span class="font-semibold">{{ __('Alur Arah Terintegrasi') }}</span>
                         </div>
 
                     </div>
