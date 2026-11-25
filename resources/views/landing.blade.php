@@ -46,7 +46,7 @@
             --hero-overlay-start: rgba(6, 12, 30, 0.85);
             --hero-overlay-mid: rgba(6, 12, 30, 0.40);
             
-            --tentang-bg-img: url('{{ asset('images/tentang-kami-bg-dark.jpg') }}');
+            --tentang-bg-img: url('{{ asset('images/tentang-kami-bg-dark-v2.jpg') }}?v={{ time() }}');
             --produk-bg-img: url('{{ asset('images/produk-bg-dark-v2.jpg') }}?v={{ time() }}');
             --alur-bg-img: url('{{ asset('images/alur-sistem-dark-hd.jpg') }}');
             
