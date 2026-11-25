@@ -36,64 +36,64 @@
             --brand-cyan: #00C2FF;
             --brand-glow: rgba(0, 194, 255, 0.5);
             
-            --nav-bg: rgba(6, 12, 30, 0.88);
-            --nav-border: rgba(255, 255, 255, 0.1);
+            --nav-bg: rgba(6, 12, 30, 0.75);
+            --nav-border: rgba(255, 255, 255, 0.12);
             --nav-link: #CBD5E1;
             --nav-active-bg: #00C2FF;
             --nav-active-text: #060C1E;
             
-            --hero-bg: #060C1E;
-            --hero-left-grad: linear-gradient(135deg, rgba(6,12,30,0.98) 0%, rgba(10,20,50,0.92) 50%, rgba(6,12,30,0.85) 100%);
-            --curve-stroke: #00C2FF;
+            --hero-bg-img: url('{{ asset('images/hero-bg-dark.jpg') }}');
+            --hero-overlay-start: rgba(6, 12, 30, 0.85);
+            --hero-overlay-mid: rgba(6, 12, 30, 0.40);
             
-            --card-bg: rgba(11, 23, 50, 0.72);
+            --card-bg: rgba(11, 23, 50, 0.75);
             --card-border: rgba(0, 194, 255, 0.22);
             --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
             --card-hover-border: rgba(0, 194, 255, 0.5);
             
             --btn-primary-bg: #00C2FF;
             --btn-primary-text: #060C1E;
-            --btn-secondary-bg: rgba(255, 255, 255, 0.08);
-            --btn-secondary-border: rgba(255, 255, 255, 0.25);
+            --btn-secondary-bg: rgba(255, 255, 255, 0.12);
+            --btn-secondary-border: rgba(255, 255, 255, 0.3);
             --btn-secondary-text: #FFFFFF;
             
             --wave-1: #00C2FF;
             --wave-2: #0284C7;
         }
 
-        /* Clean / Light Mode (Exact matches to media_1795507043000_6263c1c6.jpg) */
+        /* Clean / Light Mode (Exact matches to user provided Clean Background & Mockup) */
         html.theme-clean {
             --bg-page: #F8FAFC;
             --bg-alt: #FFFFFF;
             --text-heading: #0A1938;
-            --text-body: #475569;
+            --text-body: #334155;
             --text-muted: #64748B;
-            --brand-cyan: #0056B3;
-            --brand-glow: rgba(0, 86, 179, 0.3);
+            --brand-cyan: #0070F3;
+            --brand-glow: rgba(0, 112, 243, 0.3);
             
-            --nav-bg: rgba(255, 255, 255, 0.94);
+            --nav-bg: rgba(255, 255, 255, 0.88);
             --nav-border: rgba(226, 232, 240, 0.9);
             --nav-link: #334155;
-            --nav-active-bg: #0056B3;
+            --nav-active-bg: #0070F3;
             --nav-active-text: #FFFFFF;
             
-            --hero-bg: #F0F6FF;
-            --hero-left-grad: linear-gradient(135deg, #FFFFFF 0%, #F1F6FE 50%, #E5EFFB 100%);
-            --curve-stroke: #0056B3;
+            --hero-bg-img: url('{{ asset('images/hero-bg-clean.jpg') }}');
+            --hero-overlay-start: rgba(248, 250, 252, 0.88);
+            --hero-overlay-mid: rgba(248, 250, 252, 0.38);
             
-            --card-bg: rgba(255, 255, 255, 0.95);
+            --card-bg: rgba(255, 255, 255, 0.92);
             --card-border: rgba(203, 213, 225, 0.85);
             --card-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
-            --card-hover-border: rgba(0, 86, 179, 0.4);
+            --card-hover-border: rgba(0, 112, 243, 0.4);
             
-            --btn-primary-bg: #0056B3;
+            --btn-primary-bg: #0070F3;
             --btn-primary-text: #FFFFFF;
-            --btn-secondary-bg: #FFFFFF;
+            --btn-secondary-bg: rgba(255, 255, 255, 0.9);
             --btn-secondary-border: #CBD5E1;
             --btn-secondary-text: #0A1938;
             
-            --wave-1: #38BDF8;
-            --wave-2: #BAE6FD;
+            --wave-1: #0070F3;
+            --wave-2: #38BDF8;
         }
 
         body {
@@ -118,10 +118,13 @@
             box-shadow: 0 16px 36px -10px var(--brand-glow);
         }
 
-        /* SVG Clip-Path for Ship Hero Container */
-        .hero-ship-mask {
-            clip-path: url(#heroShipClip);
-            -webkit-clip-path: url(#heroShipClip);
+        /* Hero Container with Dynamic Background Image */
+        .hero-panoramic {
+            background-image: var(--hero-bg-img);
+            background-size: cover;
+            background-position: center bottom;
+            background-repeat: no-repeat;
+            transition: background-image 0.5s ease;
         }
 
         /* Custom Scrollbar */
@@ -133,18 +136,8 @@
 </head>
 <body class="min-h-screen flex flex-col relative selection:bg-[#00C2FF] selection:text-[#060C1E]">
 
-    {{-- Invisible SVG for Curved Hero Clip-Path (Scales across all screen sizes) --}}
-    <svg class="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
-        <defs>
-            <clipPath id="heroShipClip" clipPathUnits="objectBoundingBox">
-                <!-- Top-left smooth curve -> Left edge -> Sharp corner at (0.02, 0.76) -> Slanted edge to (0.32, 1.0) -> Bottom edge -> Right edge -> Top -->
-                <path d="M 0.22,0 C 0.10,0.02 0.02,0.14 0.02,0.30 L 0.02,0.76 L 0.32,1.0 L 1.0,1.0 L 1.0,0 Z" />
-            </clipPath>
-        </defs>
-    </svg>
-
     {{-- ========================================================================= --}}
-    {{-- TOP NAVIGATION BAR (FULL WIDTH EDGE-TO-EDGE)                              --}}
+    {{-- TOP NAVIGATION BAR (Exact replica of user design mockup)                  --}}
     {{-- ========================================================================= --}}
     <header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-xl border-b"
             style="background: var(--nav-bg); border-color: var(--nav-border);">
@@ -185,20 +178,17 @@
                         </svg>
                     </div>
 
-                    <div class="flex flex-col">
-                        <div class="flex items-center gap-2.5">
-                            <span class="font-outfit text-2xl font-extrabold tracking-tight" style="color: var(--text-heading)">
-                                Cargo<span style="color: var(--brand-cyan)">Trace</span>
-                            </span>
-                            <div class="hidden xl:block h-4 w-px bg-slate-400/30"></div>
-                            <span class="hidden xl:inline-block text-[11px] font-normal tracking-wide" style="color: var(--text-muted)">
-                                Global Shipment Visibility & Tracking Platform
-                            </span>
-                        </div>
+                    <div class="flex flex-col justify-center">
+                        <span class="font-outfit text-xl sm:text-2xl font-extrabold tracking-tight leading-none" style="color: var(--text-heading)">
+                            Cargo<span style="color: var(--brand-cyan)">Trace</span>
+                        </span>
+                        <span class="hidden sm:inline-block text-[10px] sm:text-[11px] font-normal tracking-wide mt-1" style="color: var(--text-muted)">
+                            Global Shipment Visibility & Tracking Platform
+                        </span>
                     </div>
                 </a>
 
-                {{-- Center Navigation Links (Exact 6 Menu Items) --}}
+                {{-- Center Navigation Links (6 Menu Items) --}}
                 <nav class="hidden md:flex items-center gap-1.5 lg:gap-2">
                     <a href="#beranda" class="nav-link px-4 py-1.5 rounded-full text-xs lg:text-sm font-semibold transition"
                        style="background: var(--nav-active-bg); color: var(--nav-active-text);">
@@ -232,7 +222,7 @@
                     {{-- Clean / Dark Theme Switcher Button --}}
                     <button id="themeToggleBtn" onclick="toggleTheme()" type="button" 
                             class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition shadow-sm"
-                            style="border-color: var(--nav-border); color: var(--text-heading); background: rgba(255,255,255,0.06);"
+                            style="border-color: var(--nav-border); color: var(--text-heading); background: rgba(255,255,255,0.08);"
                             title="Beralih Tema (Clean / Dark Mode)">
                         <span id="themeToggleIcon" class="text-sm">☀️</span>
                         <span id="themeToggleText" class="hidden sm:inline">Clean Mode</span>
@@ -270,7 +260,7 @@
                     @else
                         <a href="{{ route('login') }}" 
                            class="flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full border transition font-semibold text-xs sm:text-sm shadow-sm hover:scale-105"
-                           style="border-color: var(--brand-cyan); color: var(--brand-cyan);">
+                           style="border-color: var(--brand-cyan); color: var(--brand-cyan); background: rgba(255,255,255,0.06);">
                             <i data-lucide="user" class="w-4 h-4"></i>
                             <span>{{ __('Masuk / Login') }}</span>
                         </a>
@@ -298,47 +288,18 @@
 
 
     {{-- ========================================================================= --}}
-    {{-- SECTION 1: HERO / BERANDA (FULL-WIDTH EDGE-TO-EDGE WITH ORGANIC SHIP MASK) --}}
+    {{-- SECTION 1: HERO / BERANDA (PANORAMIC FULL-WIDTH - EXACTLY LIKE IMAGE 3)    --}}
     {{-- ========================================================================= --}}
-    <section id="beranda" class="relative w-full min-h-[92vh] pt-24 pb-10 flex flex-col justify-between overflow-hidden"
-             style="background: var(--hero-bg);">
+    <section id="beranda" class="hero-panoramic relative w-full min-h-[92vh] lg:min-h-[98vh] pt-24 pb-12 flex flex-col justify-between overflow-hidden">
         
-        {{-- Background Earth Network (Visible in Dark Mode) --}}
-        <div id="earthNetworkBg" class="absolute inset-0 z-0 pointer-events-none transition-opacity duration-500 opacity-40">
-            <img src="{{ asset('images/landing-earth-network.jpg') }}" alt="Earth Network" class="w-full h-full object-cover object-left-top">
-            <div class="absolute inset-0" style="background: var(--hero-left-grad); opacity: 0.85;"></div>
+        {{-- Soft Diffuse Overlay on the left to guarantee 100% text readability --}}
+        <div class="absolute inset-0 pointer-events-none z-10"
+             style="background: linear-gradient(to right, var(--hero-overlay-start) 0%, var(--hero-overlay-mid) 40%, transparent 68%);">
         </div>
 
-        {{-- RIGHT-SIDE SHIP IMAGE CONTAINER (FULL SHIP VISIBILITY WITH SHARP BOTTOM-LEFT SLANTED CORNER) --}}
-        <div class="hidden lg:block absolute top-16 lg:top-20 right-0 bottom-24 sm:bottom-28 lg:bottom-32 w-[58%] lg:w-[60%] xl:w-[62%] z-10 overflow-hidden pointer-events-none">
-            {{-- Ship Photo with Organic Wave & Slanted Clip-Path --}}
-            <div class="w-full h-full hero-ship-mask relative">
-                <img src="{{ asset('images/landing-ship-santos.jpg') }}" 
-                     alt="Santos Exporters Container Ship at Port of Santos Brazil" 
-                     class="w-full h-full object-cover object-left-bottom transform hover:scale-[1.02] transition duration-700">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10"></div>
-            </div>
-
-            {{-- SVG Glowing Stroke following the exact curve boundary with sharp bottom-left slant --}}
-            <svg class="absolute inset-0 w-full h-full pointer-events-none z-20" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M 22,0 C 10,2 2,14 2,30 L 2,76 L 32,100 L 100,100" 
-                      fill="none" 
-                      stroke="var(--curve-stroke)" 
-                      stroke-width="1.8" 
-                      class="drop-shadow-[0_0_12px_var(--brand-glow)]" />
-            </svg>
-
-            {{-- Floating Port Badge (Port of Santos Pier B-12) --}}
-            <div class="absolute top-8 left-[18%] z-30 theme-card px-4 py-1.5 rounded-full flex items-center gap-2 text-xs font-semibold shadow-lg"
-                 style="color: var(--text-heading)">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Port of Santos, Brazil &bull; Pier B-12</span>
-            </div>
-        </div>
-
-        {{-- MAIN HERO CONTENT (Full Width Layout with generous responsive padding) --}}
-        <div class="relative z-20 w-full px-6 sm:px-10 lg:px-14 xl:px-20 pt-8 sm:pt-12 lg:pt-16">
-            <div class="w-full lg:w-[44%] xl:w-[42%] flex flex-col items-start text-left">
+        {{-- MAIN HERO TEXT CONTENT (Left-Aligned, Exactly matching Image 3) --}}
+        <div class="relative z-20 w-full px-6 sm:px-10 lg:px-14 xl:px-20 pt-10 sm:pt-16 lg:pt-24 my-auto">
+            <div class="w-full lg:max-w-2xl xl:max-w-3xl flex flex-col items-start text-left">
                 
                 {{-- Eyebrow with Brand Accent Bar --}}
                 <div class="flex items-center gap-3 mb-4">
@@ -348,13 +309,11 @@
                     <div class="h-0.5 w-12" style="background: linear-gradient(to right, var(--brand-cyan), transparent);"></div>
                 </div>
 
-                {{-- Main Headline --}}
-                <h1 class="font-outfit text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold tracking-tight leading-[1.12] mb-6"
+                {{-- Main Headline (2 Lines, Clean, Bold Typography matching Image 2/3) --}}
+                <h1 class="font-outfit text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-[4rem] font-extrabold tracking-tight leading-[1.12] mb-6"
                     style="color: var(--text-heading)">
                     {{ __('Ekspor Kopi Spesialti Brasil') }} <br>
-                    <span style="color: var(--brand-cyan)" class="drop-shadow-[0_0_25px_var(--brand-glow)]">
-                        {{ __('ke Pasar Dunia') }}
-                    </span>
+                    {{ __('ke') }} <span style="color: var(--brand-cyan)" class="drop-shadow-[0_0_25px_var(--brand-glow)]">{{ __('Pasar Dunia') }}</span>
                 </h1>
 
                 {{-- Descriptive Paragraph --}}
@@ -365,50 +324,33 @@
                 {{-- CTA Buttons: Primary Pill + Secondary Play Pill --}}
                 <div class="flex flex-wrap items-center gap-4">
                     <a href="{{ route('login') }}" 
-                       class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full font-bold text-sm transition transform hover:-translate-y-0.5 shadow-lg"
+                       class="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full font-bold text-sm transition transform hover:-translate-y-0.5 shadow-lg"
                        style="background: var(--btn-primary-bg); color: var(--btn-primary-text);">
                         <span>{{ __('Pesan Kargo Sekarang') }}</span>
                         <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </a>
 
                     <a href="#alur-sistem" 
-                       class="inline-flex items-center gap-2 px-5 py-3.5 rounded-full font-medium text-sm transition backdrop-blur-md"
+                       class="inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-medium text-sm transition backdrop-blur-md hover:scale-105"
                        style="background: var(--btn-secondary-bg); border: 1px solid var(--btn-secondary-border); color: var(--btn-secondary-text);">
                         <i data-lucide="play-circle" class="w-5 h-5" style="color: var(--brand-cyan)"></i>
                         <span>{{ __('Lihat Cara Kerja') }}</span>
                     </a>
                 </div>
 
-                {{-- Trust Micro-Badge --}}
-                <div class="mt-8 flex items-center gap-4 text-xs" style="color: var(--text-muted)">
-                    <div class="flex items-center gap-1.5 text-emerald-500 font-medium">
-                        <i data-lucide="shield-check" class="w-4 h-4"></i>
-                        <span>{{ __('Sertifikasi COO & SCA 84+') }}</span>
-                    </div>
-                    <span>&bull;</span>
-                    <div class="flex items-center gap-1.5 font-medium" style="color: var(--brand-cyan)">
-                        <i data-lucide="anchor" class="w-4 h-4"></i>
-                        <span>{{ __('Pelabuhan Santos (BRSSZ)') }}</span>
-                    </div>
-                </div>
-
             </div>
         </div>
 
-        {{-- Mobile Ship Image Viewport (< lg) --}}
-        <div class="lg:hidden relative z-20 w-full px-6 mt-8">
-            <div class="rounded-2xl overflow-hidden border shadow-xl relative" style="border-color: var(--card-border)">
-                <img src="{{ asset('images/landing-ship-santos.jpg') }}" alt="Santos Ship" class="w-full h-64 object-cover">
-                <div class="absolute bottom-3 left-3 theme-card px-3 py-1 rounded-full text-xs font-semibold" style="color: var(--text-heading)">
-                    Port of Santos, Brazil
-                </div>
-            </div>
-        </div>
+        {{-- Spacer to push content gracefully --}}
+        <div class="relative z-20 pb-4"></div>
+    </section>
 
-        {{-- ================================================================= --}}
-        {{-- BOTTOM 4 GLASS CARDS RIBBON (Full-Width Across Screen)            --}}
-        {{-- ================================================================= --}}
-        <div class="relative z-20 w-full px-6 sm:px-10 lg:px-14 xl:px-20 mt-12 mb-4">
+
+    {{-- ========================================================================= --}}
+    {{-- 4 FEATURE CARDS RIBBON (Transition Bar)                                   --}}
+    {{-- ========================================================================= --}}
+    <section class="relative z-20 w-full px-6 sm:px-10 lg:px-14 xl:px-20 -mt-10 sm:-mt-12 mb-8">
+        <div class="w-full max-w-7xl mx-auto">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                 
                 {{-- Card 1: Kopi Spesialti Brasil --}}
@@ -478,11 +420,11 @@
             </div>
         </div>
 
-        {{-- FLOWING CURVED WAVE RIBBONS AT THE BOTTOM (Exact match to design mockup) --}}
-        <div class="relative w-full overflow-hidden leading-none z-10 pointer-events-none -mb-1">
-            <svg viewBox="0 0 1440 65" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-10 sm:h-14 lg:h-16" preserveAspectRatio="none">
-                <path d="M0,35 C320,65 640,10 960,45 C1200,65 1380,20 1440,30 L1440,65 L0,65 Z" fill="var(--wave-1)" fill-opacity="0.3"/>
-                <path d="M0,45 C360,15 720,60 1080,30 C1260,15 1380,45 1440,40 L1440,65 L0,65 Z" fill="var(--wave-2)" fill-opacity="0.4"/>
+        {{-- Luminous Ocean Wave Ribbon Transition (Exact match to Image 2) --}}
+        <div class="w-full overflow-hidden leading-none pt-6 pointer-events-none">
+            <svg viewBox="0 0 1440 90" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-10 sm:h-14 lg:h-18" preserveAspectRatio="none">
+                <path d="M0,50 C320,85 640,15 960,55 C1200,80 1360,35 1440,50 L1440,90 L0,90 Z" fill="var(--wave-2)" opacity="0.35"/>
+                <path d="M0,65 C280,25 600,85 920,40 C1180,65 1340,30 1440,60 L1440,90 L0,90 Z" fill="var(--wave-1)" opacity="0.65"/>
             </svg>
         </div>
     </section>
@@ -1472,18 +1414,15 @@
             const root = document.documentElement;
             const icon = document.getElementById('themeToggleIcon');
             const label = document.getElementById('themeToggleText');
-            const earthBg = document.getElementById('earthNetworkBg');
 
             if (theme === 'clean') {
                 root.classList.add('theme-clean');
                 if (icon) icon.textContent = '🌙';
                 if (label) label.textContent = 'Dark Mode';
-                if (earthBg) earthBg.style.opacity = '0.12';
             } else {
                 root.classList.remove('theme-clean');
                 if (icon) icon.textContent = '☀️';
                 if (label) label.textContent = 'Clean Mode';
-                if (earthBg) earthBg.style.opacity = '0.40';
             }
             localStorage.setItem('cargotrace_landing_theme', theme);
             lucide.createIcons();
