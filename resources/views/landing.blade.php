@@ -533,31 +533,31 @@
     {{-- ========================================================================= --}}
     {{-- SECTION 3: PRODUK KOPI SPESIALTI BRASIL (6 Authentic Database Varieties) --}}
     {{-- ========================================================================= --}}
-    <section id="produk" class="py-16 sm:py-20 lg:py-24 relative overflow-hidden"
-             style="background-image: var(--produk-bg-img); background-size: cover; background-position: top right; background-repeat: no-repeat;">
+    <section id="produk" class="py-12 sm:py-16 lg:py-20 relative overflow-hidden flex flex-col justify-between"
+             style="background-image: var(--produk-bg-img); background-size: cover; background-position: center top; background-repeat: no-repeat;">
         <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
             {{-- Section Header (Left-aligned, leaving top-right ship illustration unobstructed) --}}
-            <div class="w-full lg:max-w-xl xl:max-w-2xl text-left mb-10 sm:mb-12">
-                <div class="flex items-center gap-2.5 mb-3">
+            <div class="w-full lg:max-w-xl xl:max-w-2xl text-left mb-8 sm:mb-10">
+                <div class="flex items-center gap-2.5 mb-2.5">
                     <div class="h-1 w-8 rounded-full" style="background: var(--brand-cyan)"></div>
                     <span class="text-xs sm:text-sm font-bold tracking-wider uppercase" style="color: var(--text-heading)">
                         {{ __('KATALOG KOMODITAS EKSPOR') }}
                     </span>
                 </div>
                 
-                <h2 class="font-outfit text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.15] mb-4"
+                <h2 class="font-outfit text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.15] mb-3 sm:mb-4"
                     style="color: var(--text-heading)">
                     {{ __('Pilihan Kopi Spesialti') }} <span style="color: var(--brand-cyan)">{{ __('Brasil Terbaik') }}</span>
                 </h2>
                 
-                <p class="text-sm sm:text-base leading-relaxed font-normal" style="color: var(--text-body)">
+                <p class="text-xs sm:text-sm lg:text-base leading-relaxed font-normal" style="color: var(--text-body)">
                     {{ __('Dipanen langsung dari perkebunan dataran tinggi terbaik Brasil, disortir dengan ketat sesuai standar Specialty Coffee Association (SCA) sebelum diberangkatkan dari Pelabuhan Santos.') }}
                 </p>
             </div>
 
             {{-- 6 Coffee Varieties Grid (3 Columns on Desktop, 2 on Tablet, 1 on Mobile) --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6 pb-6">
                 
                 {{-- Product 1: Brazil Santos Bourbon Specialty --}}
                 <div class="theme-card rounded-3xl overflow-hidden flex flex-row items-stretch border transition hover:-translate-y-1 hover:shadow-xl"
@@ -825,14 +825,6 @@
 
             </div>
 
-        </div>
-
-        {{-- Flowing Ocean Wave at bottom of Produk --}}
-        <div class="w-full overflow-hidden leading-none pt-12 sm:pt-16 pointer-events-none">
-            <svg viewBox="0 0 1440 70" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-8 sm:h-12" preserveAspectRatio="none">
-                <path d="M0,35 C320,65 640,5 960,40 C1200,60 1360,25 1440,35 L1440,70 L0,70 Z" fill="var(--wave-2)" opacity="0.3"/>
-                <path d="M0,45 C280,15 600,65 920,30 C1180,50 1340,20 1440,45 L1440,70 L0,70 Z" fill="var(--wave-1)" opacity="0.6"/>
-            </svg>
         </div>
     </section>
 
