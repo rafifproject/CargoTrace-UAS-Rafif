@@ -6,9 +6,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-COPY resources ./resources
-COPY public ./public
-COPY vite.config.js ./
+# Salin file project agar konfigurasi Vite ikut tersedia
+COPY . .
 
 RUN npm run build
 
