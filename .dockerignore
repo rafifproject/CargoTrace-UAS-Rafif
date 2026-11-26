@@ -1,0 +1,14 @@
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+node_modules
+vendor
+public/build
+public/hot
+storage/*.key
+storage/logs/*.log
+docs/
+tests/
+*.sql
