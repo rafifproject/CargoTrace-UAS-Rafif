@@ -101,10 +101,22 @@ Below is the complete walkthrough of every functional page across all 3 access l
 
 #### 0. Public B2B Landing Page (`/`)
 ![Landing Page Dark Mode](docs/screenshots/00_landing_page_dark.png)
-*Figure: CargoTrace Public B2B Showcase Landing Page — Dark Mode (`/`)*
+*Figure: CargoTrace Public B2B Showcase Landing Page — Beranda Dark Mode (`/`)*
 
 ![Landing Page Clean Mode](docs/screenshots/00_landing_page_clean.png)
-*Figure: CargoTrace Public B2B Showcase Landing Page — Clean Mode (`/?theme=clean`)*
+*Figure: CargoTrace Public B2B Showcase Landing Page — Beranda Clean Mode (`/?theme=clean`)*
+
+![Landing Page Tentang Kami](docs/screenshots/00_landing_tentang_kami.png)
+*Figure: Tentang Kami — Santos Exporters S.A. Origin Story, Quality Pillars & Global KPIs*
+
+![Landing Page Produk](docs/screenshots/00_landing_produk.png)
+*Figure: Produk — Full-Bleed HD Brazilian Specialty Coffee Showcase & Tasting Notes*
+
+![Landing Page Alur Sistem 3D](docs/screenshots/00_landing_alur_sistem.png)
+*Figure: Alur Sistem — Interactive 3D Coverflow Perspective Pipeline & Stakeholder Sync*
+
+![Landing Page Kontak Clean Mode](docs/screenshots/00_landing_kontak_clean.png)
+*Figure: Kontak — Port of Santos HQ, APAC Representative & High-Contrast Clean Mode Backdrop*
 
 - **Purpose**: Full-width, high-impact public portal showcasing Santos Exporters S.A. Brazilian specialty coffee supply chain from the Port of Santos to global roasters.
 - **Key Features**:
