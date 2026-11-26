@@ -108,15 +108,15 @@ Below is the complete walkthrough of every functional page across all 3 access l
 
 - **Purpose**: Full-width, high-impact public portal showcasing Santos Exporters S.A. Brazilian specialty coffee supply chain from the Port of Santos to global roasters.
 - **Key Features**:
-  - **Full-Width Edge-to-Edge Responsive Layout** with high-resolution panoramic maritime background (Santos Port, container ship, crane, and specialty coffee dock) with uninterrupted scenic vista.
-  - **Interactive Theme Switcher (🌙 Dark Mode & ☀️ Clean Light Mode)** with instant CSS variable updates, dynamic background swap, and `localStorage` persistence.
-  - **6 Dedicated Business Sections**:
-    1. `Beranda`: High-impact hero with real-time CTA, Brazilian specialty coffee export focus, and clean panoramic presentation.
-    2. `Tentang Kami`: Santos Exporters S.A. story, Port of Santos infrastructure, and 4 live metric KPI counters ($6.4M+ GMV, 40+ Ports, 88.6% SLA).
-    3. `Produk`: 6 authentic Brazilian specialty coffee varieties (Bourbon, Yellow Catuai, Cerrado Mineiro, SSFC, Decaf Swiss Water, Espresso Master Blend) with SCA scores and flavor notes.
-    4. `Alur Sistem`: 5-stage collaborative swimlane flowmap with interactive lightbox zoom.
+  - **Floating Transparent Navigation Bar**: Borderless transparent header over the hero vista (no solid rectangle container) that smoothly transitions into a frosted glass bar on scroll.
+  - **Interactive Theme Switcher (🌙 Dark Mode & ☀️ Clean Light Mode)** with instant CSS variable updates, dynamic dual-theme hero & contact backgrounds (`hero-bg-dark-v2.jpg` / `hero-bg-clean-v2.jpg`), and `localStorage` persistence.
+  - **6 Dedicated Interactive Sections**:
+    1. `Beranda`: Panoramic maritime port hero with an interactive **Real-time Shipment Tracking** glass card (animated dashed route SVG & pulsing live pin), staggered entrance animations, and direct CTAs (*Pesan Kargo Sekarang* & *Lihat Cara Kerja*).
+    2. `Tentang Kami`: Balanced full-height two-column layout pairing Santos Exporters S.A.'s origin story & quality guarantees (*Single-Origin*, *GrainPro Liner*, *SCA 84+ Cupping*) with the Port of Santos showcase and 4 live KPI metric cards (`$6.4M+` GMV, `40+` Ports, `88.6%` SLA, `6` Varieties).
+    3. `Produk`: Interactive full-bleed showcase featuring 6 HD Brazilian specialty coffee varieties (*Bourbon Specialty*, *Yellow Catuai Natural*, *Cerrado Mineiro*, *SSFC*, *Decaf Swiss Water*, *Espresso Master Blend*) with sharp unblurred backgrounds, animated transitions, SCA scores, and detailed tasting notes.
+    4. `Alur Sistem`: **3D Coverflow Perspective Carousel** (`perspective: 1300px`) with depth-stacked stage cards, arrow/pill/swipe controls, **bidirectional synchronization** with the 4 Stakeholder / Actor cards (*Customer*, *Logistics Operator*, *Sistem Otomatis*, *Administrator*), and an interactive lightbox-zoomable system flowmap.
     5. `Fitur`: Core architectural pillars (AIS/Leaflet geolocation, automated delay exception engine, RBAC & anti-IDOR security, executive BI).
-    6. `Kontak`: Port of Santos HQ contact details, quick tracking search by resi number, and direct export quotation inquiry form.
+    6. `Kontak`: High-contrast Port of Santos ship & crane backdrop tuned for both Dark Mode and Clean Mode, complete with Santos HQ & APAC office details and quick tracking access.
   - **Top-Right Masuk / Login Button**: Links directly to `/login`, or dynamically displays `Dasbor (Role)` if user is already authenticated.
 - **Backend Architecture**:
   - Route: `Route::get('/', ...)->name('landing')`.
