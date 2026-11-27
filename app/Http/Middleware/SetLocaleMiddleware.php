@@ -6,6 +6,7 @@ use App\Models\SystemSetting;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,9 +29,11 @@ class SetLocaleMiddleware
             $locale = Session::get('user_selected_locale');
             Session::put('app_locale', $locale);
         } else {
-            // 3. Follow SystemSetting (configured in Admin Settings)
+            // 3. Follow SystemSetting (cached 5 mins to avoid per-request DB round-trip)
             try {
-                $locale = SystemSetting::get('app_language', 'id');
+                $locale = Cache::remember('sys_app_language', 300, function () {
+                    return SystemSetting::get('app_language', 'id');
+                });
             } catch (\Throwable $e) {
                 $locale = 'id';
             }

@@ -20,7 +20,7 @@ class GlobalIntelligenceService
         return Cache::remember($cacheKey, 900, function () use ($lat, $lng) {
             try {
                 $baseUrl = rtrim(config('services.openmeteo.url', env('OPENMETEO_BASE_URL', 'https://api.open-meteo.com/v1')), '/');
-                $response = Http::timeout(6)->retry(2, 200)->get($baseUrl . '/forecast', [
+                $response = Http::timeout(3)->get($baseUrl . '/forecast', [
                     'latitude' => $lat,
                     'longitude' => $lng,
                     'current' => 'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m',
@@ -73,7 +73,7 @@ class GlobalIntelligenceService
             // 1. Try v6 API with key if available
             if (!empty($apiKey)) {
                 try {
-                    $response = Http::timeout(6)->retry(2, 200)
+                    $response = Http::timeout(3)
                         ->get("https://v6.exchangerate-api.com/v6/{$apiKey}/latest/{$base}");
 
                     if ($response->successful()) {
@@ -97,7 +97,7 @@ class GlobalIntelligenceService
 
             // 2. Fallback to open.er-api.com
             try {
-                $response = Http::timeout(6)->retry(2, 200)->get("https://open.er-api.com/v6/latest/{$base}");
+                $response = Http::timeout(3)->get("https://open.er-api.com/v6/latest/{$base}");
 
                 if ($response->successful()) {
                     $json = $response->json();
@@ -153,7 +153,7 @@ class GlobalIntelligenceService
 
             // 1. Fetch REST Countries API for Name, Region, Currency, Population
             try {
-                $rcResponse = Http::timeout(5)->retry(2, 200)->get("https://restcountries.com/v3.1/alpha/{$countryCode}");
+                $rcResponse = Http::timeout(3)->get("https://restcountries.com/v3.1/alpha/{$countryCode}");
                 if ($rcResponse->successful()) {
                     $rcData = $rcResponse->json()[0] ?? null;
                     if ($rcData) {
@@ -171,7 +171,7 @@ class GlobalIntelligenceService
 
             // 2. Fetch World Bank API for Live GDP (NY.GDP.MKTP.CD)
             try {
-                $wbGdpResponse = Http::timeout(5)->retry(2, 200)->get("https://api.worldbank.org/v2/country/{$countryCode}/indicator/NY.GDP.MKTP.CD?format=json&per_page=5");
+                $wbGdpResponse = Http::timeout(3)->get("https://api.worldbank.org/v2/country/{$countryCode}/indicator/NY.GDP.MKTP.CD?format=json&per_page=5");
                 if ($wbGdpResponse->successful()) {
                     $wbGdp = $wbGdpResponse->json()[1] ?? [];
                     foreach ($wbGdp as $record) {
@@ -190,7 +190,7 @@ class GlobalIntelligenceService
 
             // 3. Fetch World Bank API for Live Inflation (FP.CPI.TOTL.ZG)
             try {
-                $wbInfResponse = Http::timeout(5)->retry(2, 200)->get("https://api.worldbank.org/v2/country/{$countryCode}/indicator/FP.CPI.TOTL.ZG?format=json&per_page=5");
+                $wbInfResponse = Http::timeout(3)->get("https://api.worldbank.org/v2/country/{$countryCode}/indicator/FP.CPI.TOTL.ZG?format=json&per_page=5");
                 if ($wbInfResponse->successful()) {
                     $wbInf = $wbInfResponse->json()[1] ?? [];
                     foreach ($wbInf as $record) {
