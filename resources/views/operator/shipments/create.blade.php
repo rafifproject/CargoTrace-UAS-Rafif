@@ -448,6 +448,7 @@ const initialDestId = @json(old('destination_location_id'));
 // URL dinamis API Geoapify via Laravel route helpers
 const GEO_CITIES_URL = @json(route('geo.cities'));
 const GEO_DISTRICTS_URL = @json(route('geo.districts'));
+const GEO_HUBS_URL      = @json(route('geo.country_hubs'));
 const GEO_GEOCODE_URL = @json(route('geo.geocode'));
 
 // Master data kota instan (Zero latency - tampil seketika sesuai negara yang dipilih)
@@ -701,22 +702,42 @@ function matchCountryHub(locCountry, selectedCountry) {
 /**
  * Filter Simpul Transit Tujuan Berdasarkan Negara
  */
-function updateDestinationNodesByCountry(selectedCountry) {
+async function updateDestinationNodesByCountry(selectedCountry) {
     if (!selectedCountry) return;
     const destSelect = document.getElementById('dest-select');
     if (!destSelect) return;
 
     const isAir = (currentMode === 'AIR');
     const pool = isAir ? airportLocations : (currentMode === 'LAND' ? portLocations.concat(airportLocations) : portLocations);
-    const allHubs = portLocations.concat(airportLocations);
 
     let matching = pool.filter(loc => matchCountryHub(loc.country, selectedCountry));
-    let isGlobalFallback = false;
 
-    if (matching.length === 0) {
-        matching = allHubs.filter(loc => matchCountryHub(loc.country, selectedCountry));
+    if (matching.length === 0 && typeof GEO_HUBS_URL !== 'undefined') {
+        destSelect.innerHTML = `<option value="">Memuat ${isAir ? 'bandara' : 'pelabuhan'} ${selectedCountry}...</option>`;
+        try {
+            const res = await fetch(`${GEO_HUBS_URL}?country=${encodeURIComponent(selectedCountry)}&mode=${encodeURIComponent(currentMode)}`);
+            if (res.ok) {
+                const json = await res.json();
+                if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+                    matching = json.data;
+                    matching.forEach(h => {
+                        const targetArr = (h.location_type === 'AIRPORT') ? airportLocations : portLocations;
+                        if (!targetArr.some(x => String(x.id) === String(h.id))) {
+                            targetArr.push(h);
+                        }
+                    });
+                }
+            }
+        } catch (e) {
+            console.warn('Gagal memuat hub negara:', e);
+        }
     }
 
+    let isGlobalFallback = false;
+    if (matching.length === 0) {
+        const allHubs = portLocations.concat(airportLocations);
+        matching = allHubs.filter(loc => matchCountryHub(loc.country, selectedCountry));
+    }
     if (matching.length === 0) {
         matching = pool;
         isGlobalFallback = true;

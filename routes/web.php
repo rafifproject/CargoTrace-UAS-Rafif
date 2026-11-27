@@ -52,6 +52,7 @@ Route::prefix('api/geo')->name('geo.')->group(function () {
     Route::get('/cities', [\App\Http\Controllers\GeoController::class, 'cities'])->name('cities');
     Route::get('/districts', [\App\Http\Controllers\GeoController::class, 'districts'])->name('districts');
     Route::get('/geocode', [\App\Http\Controllers\GeoController::class, 'geocode'])->name('geocode');
+    Route::get('/country-hubs', [\App\Http\Controllers\GeoController::class, 'countryHubs'])->name('country_hubs');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');

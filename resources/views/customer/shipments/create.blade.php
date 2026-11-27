@@ -585,6 +585,7 @@
     // URL dinamis API Geoapify via Laravel route helpers
     const GEO_CITIES_URL = @json(route('geo.cities'));
     const GEO_DISTRICTS_URL = @json(route('geo.districts'));
+    const GEO_HUBS_URL      = @json(route('geo.country_hubs'));
     const GEO_GEOCODE_URL = @json(route('geo.geocode'));
 
     // Master data kota instan (Zero latency - tampil seketika sesuai negara yang dipilih)
@@ -846,25 +847,45 @@
     /**
      * Memfilter Simpul Transit Tujuan (Pelabuhan/Bandara) Otomatis Sesuai Negara Tujuan
      */
-    function updateDestinationNodesByCountry(selectedCountry) {
+    async function updateDestinationNodesByCountry(selectedCountry) {
         if (!selectedCountry) return;
         const destSelect = document.getElementById('dest-select');
         if (!destSelect) return;
 
         const isAir = (currentMode === 'AIR');
         const pool = isAir ? airportLocations : (currentMode === 'LAND' ? portLocations.concat(airportLocations) : portLocations);
-        const allHubs = portLocations.concat(airportLocations);
 
-        // 1. Cari hub sesuai moda & negara tujuan (mendukung alias ID/EN)
+        // 1. Cari hub sesuai moda & negara tujuan dari cache lokal
         let matching = pool.filter(loc => matchCountryHub(loc.country, selectedCountry));
-        let isGlobalFallback = false;
 
-        // 2. Jika belum ada bandara/pelabuhan khusus di moda tsb, cek semua hub di negara tersebut
-        if (matching.length === 0) {
-            matching = allHubs.filter(loc => matchCountryHub(loc.country, selectedCountry));
+        // 2. Jika belum ada di DB lokal, ambil & auto-registrasi dinamis dari backend (/api/geo/country-hubs)
+        if (matching.length === 0 && typeof GEO_HUBS_URL !== 'undefined') {
+            destSelect.innerHTML = `<option value="">Memuat ${isAir ? 'bandara' : 'pelabuhan'} ${selectedCountry}...</option>`;
+            try {
+                const res = await fetch(`${GEO_HUBS_URL}?country=${encodeURIComponent(selectedCountry)}&mode=${encodeURIComponent(currentMode)}`);
+                if (res.ok) {
+                    const json = await res.json();
+                    if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+                        matching = json.data;
+                        matching.forEach(h => {
+                            const targetArr = (h.location_type === 'AIRPORT') ? airportLocations : portLocations;
+                            if (!targetArr.some(x => String(x.id) === String(h.id))) {
+                                targetArr.push(h);
+                            }
+                        });
+                    }
+                }
+            } catch (e) {
+                console.warn('Gagal memuat hub negara:', e);
+            }
         }
 
-        // 3. Fallback ke hub transit global jika negara belum punya hub di database
+        // 3. Fallback ke semua hub di negara tersebut atau hub transit global
+        let isGlobalFallback = false;
+        if (matching.length === 0) {
+            const allHubs = portLocations.concat(airportLocations);
+            matching = allHubs.filter(loc => matchCountryHub(loc.country, selectedCountry));
+        }
         if (matching.length === 0) {
             matching = pool;
             isGlobalFallback = true;

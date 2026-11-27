@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Location;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -558,6 +559,128 @@ class GeoService
         }
 
         return ['lat' => -23.9618, 'lng' => -46.3322]; // Default: Santos, Brazil
+    }
+
+    /**
+     * Ambil hub (Bandara/Pelabuhan) untuk negara mana pun secara dinamis;
+     * jika belum ada di tabel locations, cari via Geoapify & simpan otomatis.
+     */
+    public function getOrCreateCountryHubs(string $country, string $mode = 'SEA'): array
+    {
+        $countryClean = trim($country);
+        if ($countryClean === '') {
+            return [];
+        }
+
+        $apiCountry = $this->normalizeCountryForApi($countryClean);
+        $targetType = strtoupper(trim($mode)) === 'AIR' ? Location::TYPE_AIRPORT : Location::TYPE_PORT;
+
+        $findExisting = function (string $type) use ($countryClean, $apiCountry) {
+            $lowerOrig = strtolower($countryClean);
+            $lowerApi  = strtolower($apiCountry);
+            return Location::where('status', Location::STATUS_ACTIVE)
+                ->where('location_type', $type)
+                ->where(function ($q) use ($lowerOrig, $lowerApi) {
+                    $q->whereRaw('LOWER(country) = ?', [$lowerOrig])
+                      ->orWhereRaw('LOWER(country) = ?', [$lowerApi])
+                      ->orWhereRaw('LOWER(country) LIKE ?', ['%' . $lowerOrig . '%'])
+                      ->orWhereRaw('LOWER(country) LIKE ?', ['%' . $lowerApi . '%']);
+                })
+                ->orderBy('name')
+                ->get(['id', 'name', 'city', 'country', 'location_type', 'latitude', 'longitude']);
+        };
+
+        $existing = $findExisting($targetType);
+        if ($existing->isNotEmpty()) {
+            return $existing->toArray();
+        }
+
+        // Auto-discover via Geoapify Geocoding API
+        $apiKey  = config('services.geoapify.key', env('GEOAPIFY_API_KEY', '11121e44a86f40d593e90176dda45e95'));
+        $baseUrl = rtrim(config('services.geoapify.url', env('GEOAPIFY_BASE_URL', 'https://api.geoapify.com/v1')), '/');
+        $iso     = $this->getCountryIso($countryClean);
+        $created = [];
+
+        if (!empty($apiKey)) {
+            try {
+                $searchText = $targetType === Location::TYPE_AIRPORT
+                    ? "International Airport, {$apiCountry}"
+                    : "International Seaport, {$apiCountry}";
+
+                $params = [
+                    'text'   => $searchText,
+                    'limit'  => 3,
+                    'apiKey' => $apiKey,
+                ];
+                if (!empty($iso) && strlen($iso) === 2) {
+                    $params['filter'] = 'countrycode:' . strtolower($iso);
+                }
+
+                $response = Http::timeout(5)->get("{$baseUrl}/geocode/search", $params);
+                if ($response->successful()) {
+                    $features = $response->json()['features'] ?? [];
+                    foreach ($features as $feat) {
+                        $p = $feat['properties'] ?? [];
+                        $lat = isset($p['lat']) ? (float) $p['lat'] : null;
+                        $lng = isset($p['lon']) ? (float) $p['lon'] : null;
+                        if ($lat === null || $lng === null) {
+                            continue;
+                        }
+
+                        $city = $p['city'] ?? $p['state'] ?? $apiCountry;
+                        $rawName = $p['name'] ?? $p['address_line1'] ?? '';
+                        if (empty($rawName) || strcasecmp($rawName, $apiCountry) === 0) {
+                            $rawName = $targetType === Location::TYPE_AIRPORT
+                                ? "{$city} International Airport"
+                                : "Port of {$city}";
+                        }
+
+                        $loc = Location::firstOrCreate(
+                            ['name' => mb_substr($rawName, 0, 150)],
+                            [
+                                'city'          => mb_substr($city, 0, 100),
+                                'country'       => mb_substr($apiCountry, 0, 100),
+                                'address'       => $p['formatted'] ?? "{$rawName}, {$city}, {$apiCountry}",
+                                'location_type' => $targetType,
+                                'latitude'      => round($lat, 7),
+                                'longitude'     => round($lng, 7),
+                                'status'        => Location::STATUS_ACTIVE,
+                            ]
+                        );
+                        $created[] = $loc->only(['id', 'name', 'city', 'country', 'location_type', 'latitude', 'longitude']);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Geoapify country hub discovery failed: ' . $e->getMessage());
+            }
+        }
+
+        if (!empty($created)) {
+            return $created;
+        }
+
+        // Fallback terukur menggunakan kota utama & koordinat negara tersebut
+        $cities   = $this->getCities($countryClean);
+        $mainCity = $cities[0] ?? $apiCountry;
+        $coords   = $this->getCityCoordinates($mainCity, $countryClean);
+        $hubName  = $targetType === Location::TYPE_AIRPORT
+            ? "{$mainCity} International Airport"
+            : "Port of {$mainCity}";
+
+        $loc = Location::firstOrCreate(
+            ['name' => mb_substr($hubName, 0, 150)],
+            [
+                'city'          => mb_substr($mainCity, 0, 100),
+                'country'       => mb_substr($apiCountry, 0, 100),
+                'address'       => "{$hubName}, {$mainCity}, {$apiCountry}",
+                'location_type' => $targetType,
+                'latitude'      => round((float) $coords['lat'], 7),
+                'longitude'     => round((float) $coords['lng'], 7),
+                'status'        => Location::STATUS_ACTIVE,
+            ]
+        );
+
+        return [$loc->only(['id', 'name', 'city', 'country', 'location_type', 'latitude', 'longitude'])];
     }
 }
 

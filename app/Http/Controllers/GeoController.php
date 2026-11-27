@@ -104,5 +104,27 @@ class GeoController extends Controller
             'data'    => $result,
         ]);
     }
+
+    /**
+     * Ambil atau auto-registrasi bandara/pelabuhan internasional untuk negara tujuan manapun
+     */
+    public function countryHubs(Request $request): JsonResponse
+    {
+        $country = (string) $request->query('country', '');
+        $mode    = (string) $request->query('mode', 'SEA');
+
+        if (trim($country) === '') {
+            return response()->json(['success' => false, 'data' => []]);
+        }
+
+        $hubs = $this->geoService->getOrCreateCountryHubs($country, $mode);
+
+        return response()->json([
+            'success' => !empty($hubs),
+            'country' => $country,
+            'mode'    => strtoupper($mode),
+            'data'    => $hubs,
+        ]);
+    }
 }
 
