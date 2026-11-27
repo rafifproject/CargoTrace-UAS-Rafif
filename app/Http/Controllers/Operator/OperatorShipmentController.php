@@ -195,11 +195,19 @@ class OperatorShipmentController extends Controller
         $airportLocations = Location::where('status', Location::STATUS_ACTIVE)->where('location_type', Location::TYPE_AIRPORT)->orderBy('name', 'asc')->get();
         $countries = app(\App\Services\GeoService::class)->getCountries();
 
+        $santosPortId = $portLocations->first(fn ($loc) => stripos((string) $loc->name, 'Santos') !== false || stripos((string) $loc->city, 'Santos') !== false || stripos((string) $loc->country, 'Brazil') !== false || stripos((string) $loc->country, 'Brasil') !== false)?->id
+            ?? $portLocations->first()?->id
+            ?? 39;
+
+        $brazilAirportId = $airportLocations->first(fn ($loc) => stripos((string) $loc->name, 'Guarulhos') !== false || stripos((string) $loc->name, 'Sao Paulo') !== false || stripos((string) $loc->name, 'São Paulo') !== false || stripos((string) $loc->country, 'Brazil') !== false || stripos((string) $loc->country, 'Brasil') !== false)?->id
+            ?? $airportLocations->first()?->id
+            ?? 93;
+
         // Auto-generate next shipment number CT-2026-XXX
         $count = Shipment::count() + 1;
         $suggestedNumber = 'CT-2026-' . str_pad((string) $count, 3, '0', STR_PAD_LEFT);
 
-        return view('operator.shipments.create', compact('customers', 'carriers', 'locations', 'portLocations', 'airportLocations', 'countries', 'suggestedNumber'));
+        return view('operator.shipments.create', compact('customers', 'carriers', 'locations', 'portLocations', 'airportLocations', 'countries', 'suggestedNumber', 'santosPortId', 'brazilAirportId'));
     }
 
     /**

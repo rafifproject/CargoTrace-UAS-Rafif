@@ -256,7 +256,7 @@
                     <span class="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60 px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-700">
                         Pusat Eksportir Kopi Santos ✓
                     </span>
-                    <input type="hidden" name="origin_location_id" id="origin-select" value="{{ old('origin_location_id', 39) }}" data-lat="-23.9610" data-lng="-46.3020">
+                    <input type="hidden" name="origin_location_id" id="origin-select" value="{{ old('origin_location_id', $santosPortId ?? 39) }}" data-lat="-23.9610" data-lng="-46.3020">
                 </div>
 
                 {{-- FORM TUJUAN PENGANTARAN LENGKAP --}}
@@ -751,7 +751,7 @@
             if (originIcon) originIcon.textContent = '✈️';
             if (originText) originText.textContent = 'Sao Paulo/Guarulhos International Cargo (GRU) — Brasil';
             if (originInput) {
-                originInput.value = '93';
+                originInput.value = '{{ $brazilAirportId ?? 93 }}';
                 originInput.setAttribute('data-lat', '-23.4356');
                 originInput.setAttribute('data-lng', '-46.4731');
             }
@@ -774,7 +774,7 @@
             if (originIcon) originIcon.textContent = '🚢';
             if (originText) originText.textContent = 'Port of Santos (Santos, Brasil) — Simpul Ekspor Maritim Kopi';
             if (originInput) {
-                originInput.value = '39';
+                originInput.value = '{{ $santosPortId ?? 39 }}';
                 originInput.setAttribute('data-lat', '-23.9610');
                 originInput.setAttribute('data-lng', '-46.3020');
             }
