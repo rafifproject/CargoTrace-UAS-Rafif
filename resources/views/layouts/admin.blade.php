@@ -76,9 +76,12 @@
 </head>
 <body class="h-full bg-slate-50 text-slate-800 dark:bg-[#070C1E] dark:text-slate-100 transition-colors duration-200 antialiased flex flex-col">
 
-    <div class="flex h-screen overflow-hidden">
+    <div class="flex h-[100dvh] overflow-hidden relative">
+        <!-- Mobile Sidebar Backdrop -->
+        <div id="portal-sidebar-backdrop" onclick="closePortalSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 hidden lg:hidden transition-opacity"></div>
+
         <!-- ==================== SIDEBAR ==================== -->
-        <aside class="w-64 bg-[#0A1128] text-slate-300 flex flex-col flex-shrink-0 z-30 border-r border-slate-800 select-none">
+        <aside id="portal-sidebar" class="fixed inset-y-0 left-0 lg:static w-64 bg-[#0A1128] text-slate-300 flex flex-col flex-shrink-0 z-50 lg:z-30 border-r border-slate-800 select-none transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-out">
             <!-- Sidebar Header / Unified Brand & Organization Card -->
             <div class="p-3.5 border-b border-slate-800/80 bg-gradient-to-b from-[#0A1128] to-[#0d1633]">
                 <!-- Main Brand Row -->
@@ -329,17 +332,20 @@
         <!-- ==================== MAIN CONTENT AREA ==================== -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             <!-- Top Navbar -->
-            <header class="h-16 bg-white dark:bg-[#0A1128] border-b border-slate-200 dark:border-slate-800 px-6 flex items-center justify-between z-20 flex-shrink-0 transition-colors">
-                <!-- Search Bar -->
-                <div class="flex items-center gap-3 flex-1 max-w-md">
-                    <form method="GET" action="{{ route('admin.shipments.index') }}" class="relative w-full">
-                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Cari No. Resi, Pelanggan, Ekspedisi, atau Rute...') }}" class="w-full pl-10 pr-4 py-1.5 text-xs bg-slate-100 dark:bg-slate-900/60 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 placeholder-slate-400 transition-colors">
+            <header class="h-16 bg-white dark:bg-[#0A1128] border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4 z-20 flex-shrink-0 transition-colors">
+                <!-- Mobile Menu Button & Search Bar -->
+                <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 max-w-md">
+                    <button type="button" onclick="togglePortalSidebar()" class="lg:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:text-cyan-500 transition-colors shrink-0" aria-label="Buka Menu">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+                    <form method="GET" action="{{ route('admin.shipments.index') }}" class="relative w-full min-w-0">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Cari No. Resi, Pelanggan, Ekspedisi, atau Rute...') }}" class="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-100 dark:bg-slate-900/60 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 placeholder-slate-400 transition-colors">
                     </form>
                 </div>
 
                 <!-- Right Actions: Live Clock, Language Toggle, Theme Toggle, Notification Bell, User Menu -->
-                <div class="flex items-center gap-3 sm:gap-4">
+                <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
                     <!-- Live Global Clock -->
                     <div class="hidden md:flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
                         <i data-lucide="clock" class="w-3.5 h-3.5 text-cyan-500"></i>
@@ -383,7 +389,7 @@
             </header>
 
             <!-- Main Page Body -->
-            <main class="flex-1 overflow-y-auto p-6 bg-slate-50 dark:bg-[#070C1E] transition-colors">
+            <main class="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-5 lg:p-6 bg-slate-50 dark:bg-[#070C1E] transition-colors">
                 <!-- Session Alerts -->
                 @if(session('status') || session('success'))
                     <div class="mb-5 flex items-center gap-3 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-800/60 dark:text-emerald-300 text-sm">
@@ -452,6 +458,28 @@
         }
         setInterval(updateGlobalClock, 1000);
         updateGlobalClock();
+
+        // Mobile Sidebar Drawer Controls
+        function togglePortalSidebar() {
+            const sidebar = document.getElementById('portal-sidebar');
+            const backdrop = document.getElementById('portal-sidebar-backdrop');
+            if (!sidebar || !backdrop) return;
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                closePortalSidebar();
+            }
+        }
+        function closePortalSidebar() {
+            const sidebar = document.getElementById('portal-sidebar');
+            const backdrop = document.getElementById('portal-sidebar-backdrop');
+            if (sidebar) sidebar.classList.add('-translate-x-full');
+            if (backdrop) backdrop.classList.add('hidden');
+        }
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePortalSidebar(); });
+        window.addEventListener('resize', () => { if (window.innerWidth >= 1024) closePortalSidebar(); });
     </script>
     @stack('scripts')
 </body>

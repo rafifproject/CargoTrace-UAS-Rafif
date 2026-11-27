@@ -399,7 +399,7 @@
             <!-- Left: Map + Status Banner -->
             <div class="flex-1 relative flex flex-col">
                 <!-- Active Mode Banner (Standard for Cargo, Weather, Ports, Airports) -->
-                <div id="map-mode-banner" class="px-4 py-2 text-xs font-semibold text-white flex items-center justify-between transition-all duration-300" style="background:linear-gradient(90deg,#0A1128,#0e3a6e);">
+                <div id="map-mode-banner" class="px-3 sm:px-4 py-2 text-xs font-semibold text-white flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-all duration-300" style="background:linear-gradient(90deg,#0A1128,#0e3a6e);">
                     <div class="flex items-center gap-2">
                         <span id="banner-icon">🧭</span>
                         <span id="banner-text">Mode: Pemantau CargoTrace — Kargo Aktif & Jalur Pengiriman</span>
