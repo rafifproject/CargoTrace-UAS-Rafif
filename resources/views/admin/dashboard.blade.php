@@ -1632,7 +1632,7 @@
                 const destType   = (s.destination?.location_type || '').toUpperCase();
                 const sModeRaw   = (s.transport_mode || '').toUpperCase();
                 const isLandCargo = (s.is_last_mile === true || s.is_last_mile === 1 || s.is_last_mile === '1' || s.is_last_mile === 'true') || (sModeRaw === 'LAND');
-                const isAirCargo = !isLandCargo && ((sModeRaw === 'AIR') || (originType === 'AIRPORT' || destType === 'AIRPORT'));
+                const isAirCargo = !isLandCargo && (sModeRaw === 'AIR' || (!sModeRaw && (originType === 'AIRPORT' || destType === 'AIRPORT')));
                 const sMode      = isLandCargo ? 'LAND' : (isAirCargo ? 'AIR' : (sModeRaw || 'SEA'));
 
                 if (cargoTransportFilter !== 'ALL') {
