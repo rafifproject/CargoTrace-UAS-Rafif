@@ -1630,9 +1630,10 @@
                 // Sub-filter moda transportasi (Semua / Laut / Udara / Mobil Dekat)
                 const originType = (s.origin?.location_type || '').toUpperCase();
                 const destType   = (s.destination?.location_type || '').toUpperCase();
-                const isLandCargo = !!s.is_last_mile || (s.transport_mode === 'LAND');
-                const isAirCargo = !isLandCargo && ((s.transport_mode === 'AIR') || (originType === 'AIRPORT' || destType === 'AIRPORT'));
-                const sMode      = isLandCargo ? 'LAND' : (isAirCargo ? 'AIR' : (s.transport_mode || 'SEA'));
+                const sModeRaw   = (s.transport_mode || '').toUpperCase();
+                const isLandCargo = (s.is_last_mile === true || s.is_last_mile === 1 || s.is_last_mile === '1' || s.is_last_mile === 'true') || (sModeRaw === 'LAND');
+                const isAirCargo = !isLandCargo && ((sModeRaw === 'AIR') || (originType === 'AIRPORT' || destType === 'AIRPORT'));
+                const sMode      = isLandCargo ? 'LAND' : (isAirCargo ? 'AIR' : (sModeRaw || 'SEA'));
 
                 if (cargoTransportFilter !== 'ALL') {
                     if (cargoTransportFilter === 'LAND' && !isLandCargo) return;
@@ -1670,7 +1671,7 @@
                 let progressIdx  = Math.min(fullCorridor.length - 1, Math.max(1, Math.round(progress * (fullCorridor.length - 1))));
 
                 // Anti-Collision along the route: geser posisi progres di sepanjang koridor laut jika bertumpuk
-                if (!s.is_last_mile && s.status !== 'DELIVERED') {
+                if (!isLandCargo && s.status !== 'DELIVERED') {
                     const offsets = [0, 5, -5, 10, -10, 15, -15, 20, -20, 25, -25];
                     for (const off of offsets) {
                         const testIdx = Math.min(fullCorridor.length - 2, Math.max(1, progressIdx + off));
@@ -1687,13 +1688,13 @@
                 }
 
                 let curCoords = fullCorridor[progressIdx] || originCoords;
-                if (s.is_last_mile || s.status === 'DELIVERED') {
+                if (isLandCargo || s.status === 'DELIVERED') {
                     curCoords = destCoords;
                 }
                 latLngs.push(curCoords);
 
                 const displayCurLoc = {
-                    name: s.is_last_mile ? `Tiba di ${s.destination.name} &bull; Di-oper ke Mobil Paket Kurir` : (isAirCargo ? `Di Udara (Koridor Udara Internasional - FL360)` : `Di Jalur Pelayaran Samudra (Laut Lepas)`)
+                    name: isLandCargo ? `Tiba di ${s.destination.name} &bull; Di-oper ke Mobil Paket Kurir` : (isAirCargo ? `Di Udara (Koridor Udara Internasional - FL360)` : `Di Jalur Pelayaran Samudra (Laut Lepas)`)
                 };
 
                 const popupHtml = generateShipmentPopupContent(s, vehicle, eta, displayCurLoc, progress);
@@ -1715,7 +1716,7 @@
                 let directPoly = null;
                 let vehicleMarker = null;
 
-                if (s.is_last_mile) {
+                if (isLandCargo) {
                     // Kargo sudah sampai di pelabuhan tujuan, lintasan samudra 100% selesai penuh
                     traveledPoly = L.polyline(fullCorridor, {
                         color: isAirCargo ? '#0284c7' : '#0369a1',
@@ -1789,10 +1790,12 @@
                 let feederFlightPoly = null;
                 let feederPlaneMarker = null;
                 let courierVanMarker = null;
-                if (s.delivery_lat && s.delivery_lng) {
-                    const devLat = parseFloat(s.delivery_lat);
-                    const devLng = parseFloat(s.delivery_lng);
-                    if (!isNaN(devLat) && !isNaN(devLng)) {
+                const rawDevLat = s.delivery_lat ? parseFloat(s.delivery_lat) : (isLandCargo ? dLat + (((s.id % 5) - 2) * 0.04 || 0.04) : NaN);
+                const rawDevLng = s.delivery_lng ? parseFloat(s.delivery_lng) : (isLandCargo ? dLng + (((s.id % 7) - 3) * 0.04 || 0.04) : NaN);
+                if (!isNaN(rawDevLat) && !isNaN(rawDevLng)) {
+                    const devLat = rawDevLat;
+                    const devLng = rawDevLng;
+                    {
                         const devCoords = [devLat, devLng];
                         routePoints.push(devCoords);
                         latLngs.push(devCoords);
@@ -1863,7 +1866,7 @@
 
                         // 1. Mobil Van Paket Kurir (Sama seperti mobil paket pada umumnya - TANPA LINGKARAN BULAT)
                         // Tampilkan mobil van paket hanya jika sudah tahap last-mile atau DELIVERED
-                        if (s.is_last_mile || s.status === 'DELIVERED') {
+                        if (isLandCargo || s.status === 'DELIVERED') {
                             const vanFraction = isDomesticFeederAir ? 0.88 : 0.65;
                             const vanLat = destCoords[0] + (devCoords[0] - destCoords[0]) * vanFraction;
                             const vanLng = destCoords[1] + (devCoords[1] - destCoords[1]) * vanFraction;
