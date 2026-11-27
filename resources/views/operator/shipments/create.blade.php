@@ -259,11 +259,24 @@
                         @error('destination_location_id')<p class="text-rose-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
 
-                    {{-- 3. Kota Tujuan (Cascading dari Negara) --}}
+                    {{-- 3. Provinsi / State (Cascading dari Negara) --}}
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
                             <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">
-                                3. Kota Tujuan Pengantaran <span class="text-rose-500">*</span>
+                                3. Provinsi / State Tujuan <span class="text-rose-500">*</span>
+                            </label>
+                            <span class="text-[10px] text-cyan-500 font-semibold">Pilih Provinsi</span>
+                        </div>
+                        <select name="delivery_province" id="delivery_province" onchange="onProvinceSelected(this.value)" class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="">— Pilih Provinsi / State —</option>
+                        </select>
+                    </div>
+
+                    {{-- 4. Kota Tujuan (Cascading dari Provinsi) --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">
+                                4. Kota Tujuan Pengantaran <span class="text-rose-500">*</span>
                             </label>
                             <span id="city-spinner" class="hidden text-[10px] text-cyan-500 animate-pulse">Memuat kota...</span>
                         </div>
@@ -272,11 +285,11 @@
                         </select>
                     </div>
 
-                    {{-- 4. Daerah / Distrik (Cascading dari Kota) --}}
-                    <div>
+                    {{-- 5. Daerah / Distrik (Cascading dari Kota) --}}
+                    <div class="md:col-span-2">
                         <div class="flex items-center justify-between mb-1.5">
                             <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400">
-                                4. Daerah / Distrik / Suburb <span class="text-rose-500">*</span>
+                                5. Daerah / Distrik / Suburb <span class="text-rose-500">*</span>
                             </label>
                             <span id="district-spinner" class="hidden text-[10px] text-cyan-500 animate-pulse">Memuat daerah...</span>
                         </div>
@@ -289,7 +302,7 @@
                 {{-- Detail Alamat Jalan / Kafe / Roastery & Geocoding --}}
                 <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
                     <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                        5. Alamat Spesifik Penerima (Nama Kafe / Roastery / Jalan & Nomor Gedung)
+                        6. Alamat Spesifik Penerima (Nama Kafe / Roastery / Jalan & Nomor Gedung)
                     </label>
                     <div class="flex gap-2">
                         <input type="text" name="delivery_address" id="delivery_address" oninput="triggerGeocodeDebounce()" value="{{ old('delivery_address', 'Jl. Senopati No. 42, Roastery Kopi Santos') }}" placeholder="cth. Jl. Senopati No. 42 atau 38 Upper Montagu Street" class="flex-1 px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
@@ -424,6 +437,7 @@
 @endsection
 
 @push('scripts')
+@include('partials.geo-province-cascade')
 <script>
 const portLocations = @json($portLocations);
 const airportLocations = @json($airportLocations);
@@ -706,64 +720,10 @@ function alignPortWithCity(cityName) {
 
 async function onCountrySelected(country) {
     if (!country) return;
-    updateDestinationNodesByCountry(country);
-
-    const citySelect = document.getElementById('delivery_city');
-    const districtSelect = document.getElementById('delivery_district');
-    const spinner = document.getElementById('city-spinner');
-
-    // Cari daftar kota yang benar-benar cocok dengan negara yang dipilih
-    let baseCities = null;
-    const cleanCountry = country.toLowerCase().trim();
-    for (const [k, v] of Object.entries(fallbackCitiesMap)) {
-        const kLower = k.toLowerCase();
-        if (cleanCountry === kLower || cleanCountry.includes(kLower) || kLower.includes(cleanCountry)) {
-            baseCities = v;
-            break;
-        }
+    if (window.extraDistrictsMap) {
+        Object.assign(fallbackDistrictsMap, window.extraDistrictsMap);
     }
-
-    if (baseCities && baseCities.length > 0) {
-        let opts = '<option value="">— Pilih Kota Tujuan —</option>';
-        baseCities.forEach((city, idx) => {
-            const isSel = (idx === 0) ? 'selected' : '';
-            opts += `<option value="${city}" ${isSel}>${city}</option>`;
-        });
-        citySelect.innerHTML = opts;
-        citySelect.value = baseCities[0];
-        onCitySelected(baseCities[0]);
-    } else {
-        citySelect.innerHTML = `<option value="">Memuat kota ${country} via Geoapify...</option>`;
-        if (districtSelect) districtSelect.innerHTML = '<option value="">— Pilih Daerah Setelah Kota —</option>';
-    }
-
-    // Fetch data live dari Geoapify Search API melalui route dinamis Laravel
-    if (spinner) spinner.classList.remove('hidden');
-
-    try {
-        const res = await fetch(`${GEO_CITIES_URL}?country=${encodeURIComponent(country)}`);
-        if (res.ok) {
-            const json = await res.json();
-            if (json.data && Array.isArray(json.data) && json.data.length > 0) {
-                const citiesList = json.data;
-                const selectedNow = citySelect.value;
-                let refreshedOpts = '<option value="">— Pilih Kota Tujuan —</option>';
-                citiesList.forEach(city => {
-                    const isSel = (city === selectedNow) ? 'selected' : '';
-                    refreshedOpts += `<option value="${city}" ${isSel}>${city}</option>`;
-                });
-                citySelect.innerHTML = refreshedOpts;
-                if (!citySelect.value && citiesList[0]) {
-                    citySelect.value = citiesList[0];
-                    onCitySelected(citiesList[0]);
-                }
-            }
-        }
-    } catch (e) {
-        console.warn("Live Geoapify city fetch warning:", e);
-    } finally {
-        if (spinner) spinner.classList.add('hidden');
-    }
+    await window.populateProvincesAndCascade(country);
 }
 
 async function onCitySelected(city) {
