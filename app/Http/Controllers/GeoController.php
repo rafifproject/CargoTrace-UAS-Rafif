@@ -24,6 +24,38 @@ class GeoController extends Controller
     }
 
     /**
+     * Daftar provinsi / state berdasarkan negara yang dipilih
+     */
+    public function provinces(Request $request): JsonResponse
+    {
+        $country = (string) $request->query('country', '');
+        $provinces = $this->geoService->getProvinces($country);
+
+        return response()->json([
+            'success' => true,
+            'country' => $country,
+            'data'    => $provinces,
+        ]);
+    }
+
+    /**
+     * Daftar kota berdasarkan negara dan provinsi yang dipilih
+     */
+    public function provinceCities(Request $request): JsonResponse
+    {
+        $country  = (string) $request->query('country', '');
+        $province = (string) $request->query('province', '');
+        $cities   = $this->geoService->getCitiesByProvince($country, $province);
+
+        return response()->json([
+            'success'  => true,
+            'country'  => $country,
+            'province' => $province,
+            'data'     => $cities,
+        ]);
+    }
+
+    /**
      * Daftar kota berdasarkan negara yang dipilih
      */
     public function cities(Request $request): JsonResponse

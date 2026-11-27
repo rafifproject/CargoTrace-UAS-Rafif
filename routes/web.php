@@ -47,6 +47,8 @@ Route::middleware('guest')->group(function () {
 // Geoapify Cascading Dropdown Endpoints (Negara -> Kota -> Daerah / Geocoding Presisi)
 Route::prefix('api/geo')->name('geo.')->group(function () {
     Route::get('/countries', [\App\Http\Controllers\GeoController::class, 'countries'])->name('countries');
+    Route::get('/provinces', [\App\Http\Controllers\GeoController::class, 'provinces'])->name('provinces');
+    Route::get('/province-cities', [\App\Http\Controllers\GeoController::class, 'provinceCities'])->name('province_cities');
     Route::get('/cities', [\App\Http\Controllers\GeoController::class, 'cities'])->name('cities');
     Route::get('/districts', [\App\Http\Controllers\GeoController::class, 'districts'])->name('districts');
     Route::get('/geocode', [\App\Http\Controllers\GeoController::class, 'geocode'])->name('geocode');

@@ -28,6 +28,118 @@ class GeoService
     }
 
     /**
+     * Dapatkan seluruh provinsi / state dari suatu negara (CountriesNow API + cache 24 jam)
+     *
+     * @return array<int, string>
+     */
+    public function getProvinces(string $country): array
+    {
+        $countryClean = trim($country);
+        if ($countryClean === '') {
+            return [];
+        }
+
+        $apiCountry = $this->normalizeCountryForApi($countryClean);
+        $cacheKey = 'geo_provinces_v1_' . md5(strtolower($apiCountry));
+
+        return Cache::remember($cacheKey, 86400, function () use ($apiCountry) {
+            try {
+                $response = Http::timeout(4)->post('https://countriesnow.space/api/v0.1/countries/states', [
+                    'country' => $apiCountry,
+                ]);
+
+                if ($response->successful()) {
+                    $states = $response->json('data.states') ?? [];
+                    $names = [];
+                    foreach ($states as $st) {
+                        $name = trim((string) ($st['name'] ?? ''));
+                        if ($name !== '') {
+                            $names[] = $name;
+                        }
+                    }
+
+                    if (! empty($names)) {
+                        return array_values(array_unique($names));
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('CountriesNow states API unreachable: ' . $e->getMessage());
+            }
+
+            return [];
+        });
+    }
+
+    /**
+     * Dapatkan daftar kota berdasarkan negara dan provinsi yang dipilih
+     *
+     * @return array<int, string>
+     */
+    public function getCitiesByProvince(string $country, string $province): array
+    {
+        $countryClean = trim($country);
+        $provinceClean = trim($province);
+        if ($countryClean === '' || $provinceClean === '') {
+            return [];
+        }
+
+        $apiCountry = $this->normalizeCountryForApi($countryClean);
+        $cacheKey = 'geo_prov_cities_v1_' . md5(strtolower($apiCountry . '|' . $provinceClean));
+
+        return Cache::remember($cacheKey, 86400, function () use ($apiCountry, $provinceClean) {
+            try {
+                $response = Http::timeout(4)->post('https://countriesnow.space/api/v0.1/countries/state/cities', [
+                    'country' => $apiCountry,
+                    'state'   => $provinceClean,
+                ]);
+
+                if ($response->successful()) {
+                    $cities = $response->json('data') ?? [];
+                    if (is_array($cities) && ! empty($cities)) {
+                        return array_values(array_unique(array_filter(array_map('trim', $cities))));
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('CountriesNow state cities API unreachable: ' . $e->getMessage());
+            }
+
+            return [];
+        });
+    }
+
+    private function normalizeCountryForApi(string $country): string
+    {
+        $map = [
+            'indonesia' => 'Indonesia',
+            'malaysia' => 'Malaysia',
+            'singapura' => 'Singapore',
+            'jepang' => 'Japan',
+            'tiongkok' => 'China',
+            'korea selatan' => 'South Korea',
+            'filipina' => 'Philippines',
+            'amerika serikat' => 'United States',
+            'inggris raya' => 'United Kingdom',
+            'inggris' => 'United Kingdom',
+            'belanda' => 'Netherlands',
+            'jerman' => 'Germany',
+            'prancis' => 'France',
+            'italia' => 'Italy',
+            'spanyol' => 'Spain',
+            'turki' => 'Turkey',
+            'rusia' => 'Russia',
+            'arab saudi' => 'Saudi Arabia',
+            'uni emirat arab' => 'United Arab Emirates',
+            'brasil' => 'Brazil',
+            'kamboja' => 'Cambodia',
+            'swiss' => 'Switzerland',
+            'belgia' => 'Belgium',
+        ];
+
+        $lower = strtolower($country);
+        return $map[$lower] ?? $country;
+    }
+
+    /**
      * Dapatkan daftar kota dari suatu negara (Geoapify live query + Curated Global Fallback)
      */
     public function getCities(string $country): array
