@@ -1902,15 +1902,15 @@
     {{-- ========================================================================= --}}
     {{-- SECTION 6: KONTAK & QUICK TRACK (Santos HQ & Direct Contact)              --}}
     {{-- ========================================================================= --}}
-    <section id="kontak" class="pt-14 pb-52 sm:pt-20 sm:pb-64 lg:py-28 lg:pb-0 relative overflow-hidden transition-colors duration-300 min-h-[620px] flex flex-col justify-between"
+    <section id="kontak" class="pt-14 pb-40 sm:pt-20 sm:pb-48 lg:py-28 lg:pb-0 relative overflow-hidden transition-colors duration-300 min-h-[620px] flex flex-col justify-between"
              style="background: var(--kontak-bg-color); border-color: var(--kontak-border-color);">
 
         {{-- Panoramic Background Layer with Port of Santos Ship (Visible on Mobile/HP & Desktop) --}}
-        <div class="absolute inset-0 w-full h-full pointer-events-none select-none transition-all duration-500 bg-no-repeat bg-[length:165%_auto] sm:bg-[length:130%_auto] bg-right-bottom lg:bg-cover lg:bg-[position:center_right]"
+        <div class="absolute inset-0 lg:inset-0 bottom-8 lg:bottom-0 w-full pointer-events-none select-none transition-all duration-500 bg-no-repeat bg-[length:160%_auto] sm:bg-[length:125%_auto] bg-[position:right_88%] lg:bg-cover lg:bg-[position:center_right]"
              style="background-image: var(--kontak-bg-img); filter: contrast(1.06) saturate(1.12);">
-            {{-- Mobile Gradient Mask: text at top stays crisp while CargoTrace ship & Port of Santos crane shine below --}}
+            {{-- Mobile Gradient Mask: smooth top & bottom fade so ship/crane sit cleanly inside #kontak without a hard cut line --}}
             <div class="lg:hidden absolute inset-0 transition-all duration-500"
-                 style="background: linear-gradient(to bottom, var(--kontak-bg-color) 0%, var(--kontak-bg-color) 42%, color-mix(in srgb, var(--kontak-bg-color) 65%, transparent) 62%, transparent 82%);"></div>
+                 style="background: linear-gradient(to bottom, var(--kontak-bg-color) 0%, var(--kontak-bg-color) 38%, color-mix(in srgb, var(--kontak-bg-color) 55%, transparent) 55%, transparent 72%, transparent 86%, var(--kontak-bg-color) 100%);"></div>
             {{-- Desktop Smooth Gradient Mask on the left to keep text ultra-readable --}}
             <div class="hidden lg:block absolute inset-0 transition-all duration-500" style="background: var(--kontak-mask-gradient);"></div>
         </div>
