@@ -1174,12 +1174,15 @@
             const cargo       = (s.cargo_type || '').toLowerCase();
             const notes       = (s.notes || '').toLowerCase();
 
+            const modeRaw = (s.transport_mode || '').toUpperCase();
+
             // 0. Pesawat Kargo Udara (Real Jet Freighter Top-Down)
-            if (s.transport_mode === 'AIR' || originType === 'AIRPORT' || destType === 'AIRPORT' ||
+            // Jika transport_mode eksplisit 'SEA', wajib tetap tampil sebagai Kapal Laut
+            if (modeRaw === 'AIR' || (!modeRaw && (originType === 'AIRPORT' || destType === 'AIRPORT' ||
                 originName.includes('bandara') || originName.includes('airport') ||
                 destName.includes('bandara') || destName.includes('airport') ||
                 carrierCode === 'FDX' || carrierName.includes('fedex') || carrierName.includes('express air') ||
-                cargo.includes('avionics') || cargo.includes('vaccine') || cargo.includes('pharmaceutical')) {
+                cargo.includes('avionics') || cargo.includes('vaccine') || cargo.includes('pharmaceutical')))) {
                 return {
                     type: 'plane',
                     label: 'Pesawat Kargo Udara (Air Cargo)',
