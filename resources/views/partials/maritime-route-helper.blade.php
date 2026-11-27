@@ -10,10 +10,10 @@ window.buildMaritimeWaypoints = function (start, end, isAir = false, shipmentId 
         return [start, end];
     }
 
-    // Deterministic per-shipment oceanic lane spread (-2.7° to +2.7°)
-    const seed = ((Number(shipmentId) || 1) * 13) % 7 - 3; // -3 .. +3
-    const dLat = seed * 0.85;
-    const dLon = seed * 1.05;
+    // Deterministic per-shipment oceanic lane spread (-4.0° to +4.0°)
+    const seed = ((Number(shipmentId) || 1) * 17) % 11 - 5; // -5 .. +5
+    const dLat = seed * 0.75;
+    const dLon = seed * 0.95;
 
     const pts = [start];
 

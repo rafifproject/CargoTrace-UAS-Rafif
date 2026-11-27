@@ -1736,20 +1736,7 @@
                     remainingPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
                     // 3. Real Vehicle Visual Marker (Kapal Kontainer / Pesawat Udara di koridor internasional)
-                    // Anti-Collision / De-clustering: Pastikan tidak ada 2 armada yang bertumpukan di titik yang sama
                     let vehicleCoords = [curCoords[0], curCoords[1]];
-                    let collisionAttempts = 0;
-                    while (collisionAttempts < 8) {
-                        const collides = occupiedVehicleCoords.some(occ => {
-                            return (Math.abs(occ[0] - vehicleCoords[0]) < 2.8 && Math.abs(occ[1] - vehicleCoords[1]) < 4.2);
-                        });
-                        if (!collides) break;
-                        collisionAttempts++;
-                        const nudgeSeed = (s.id * 7 + collisionAttempts * 11) % 4;
-                        const latNudge = (nudgeSeed === 0 ? 3.0 : (nudgeSeed === 1 ? -3.0 : (nudgeSeed === 2 ? 2.2 : -2.2)));
-                        const lngNudge = (nudgeSeed === 0 ? 4.2 : (nudgeSeed === 1 ? -4.2 : (nudgeSeed === 2 ? -4.2 : 4.2)));
-                        vehicleCoords = [vehicleCoords[0] + latNudge, vehicleCoords[1] + lngNudge];
-                    }
                     occupiedVehicleCoords.push(vehicleCoords);
 
                     const heading = calculateBearing(vehicleCoords, destCoords);
