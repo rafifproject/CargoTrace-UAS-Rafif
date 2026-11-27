@@ -695,6 +695,7 @@
 @endsection
 
 @push('scripts')
+@include('partials.maritime-route-helper')
 <script>
     // Global function registry so onclick buttons work immediately even if clicked before ready
     window.switchMapMode                 = window.switchMapMode || function(mode) { console.log('Init pending...', mode); };
@@ -1661,8 +1662,11 @@
                 // Hitung progres real-time berdasarkan waktu keberangkatan & perkiraan tiba
                 const progress = getShipmentRealtimeProgress(s);
 
-                // Buat lintasan kurva lengkap dengan pemisahan lajur
-                const fullCorridor = createCurvedPath(originCoords, destCoords, 50, laneCurvature, laneShift);
+                // Buat lintasan rute (gunakan jalur samudra realistis untuk kapal laut)
+                const seaWaypoints = window.buildMaritimeWaypoints(originCoords, destCoords, isAirCargo);
+                const fullCorridor = seaWaypoints.length > 2
+                    ? window.samplePolylineByRange(seaWaypoints, 0, 1, 50)
+                    : createCurvedPath(originCoords, destCoords, 50, laneCurvature, laneShift);
                 const progressIdx  = Math.min(50, Math.max(1, Math.round(progress * 50)));
 
                 let curCoords = fullCorridor[progressIdx] || originCoords;
@@ -1806,8 +1810,8 @@
                             }).bindPopup(popupHtml).addTo(cargoLayerGroup);
                             feederFlightPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
-                            // Pesawat Kargo Domestik
-                            if (s.is_last_mile || s.status === 'DELIVERED') {
+                            // Pesawat Kargo Domestik tidak ditumpuk saat pelayaran utama berjalan
+                            if (false && (s.is_last_mile || s.status === 'DELIVERED')) {
                                 const planeLat = destCoords[0] + (devCoords[0] - destCoords[0]) * 0.52;
                                 const planeLng = destCoords[1] + (devCoords[1] - destCoords[1]) * 0.52;
                                 const planeHeading = calculateBearing(destCoords, devCoords);
@@ -1854,7 +1858,7 @@
                         deliveryPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
                         // 1. Mobil Van Paket Kurir (Sama seperti mobil paket pada umumnya - TANPA LINGKARAN BULAT)
-                        // Tampilkan mobil van paket bergerak jika pengiriman sudah tahap last-mile atau tiba di negara tujuan
+                        // Tampilkan mobil van paket hanya jika sudah tahap last-mile atau DELIVERED
                         if (s.is_last_mile || s.status === 'DELIVERED') {
                             const vanFraction = isDomesticFeederAir ? 0.88 : 0.65;
                             const vanLat = destCoords[0] + (devCoords[0] - destCoords[0]) * vanFraction;
