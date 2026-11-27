@@ -1667,7 +1667,24 @@
                 const fullCorridor = seaWaypoints.length > 2
                     ? window.samplePolylineByRange(seaWaypoints, 0, 1, 50)
                     : createCurvedPath(originCoords, destCoords, 50, laneCurvature, laneShift);
-                const progressIdx  = Math.min(50, Math.max(1, Math.round(progress * 50)));
+                let progressIdx  = Math.min(fullCorridor.length - 1, Math.max(1, Math.round(progress * (fullCorridor.length - 1))));
+
+                // Anti-Collision along the route: geser posisi progres di sepanjang koridor laut jika bertumpuk
+                if (!s.is_last_mile && s.status !== 'DELIVERED') {
+                    const offsets = [0, 5, -5, 10, -10, 15, -15, 20, -20, 25, -25];
+                    for (const off of offsets) {
+                        const testIdx = Math.min(fullCorridor.length - 2, Math.max(1, progressIdx + off));
+                        const pt = fullCorridor[testIdx];
+                        if (!pt) continue;
+                        const collides = occupiedVehicleCoords.some(occ =>
+                            Math.abs(occ[0] - pt[0]) < 4.5 && Math.abs(occ[1] - pt[1]) < 7.5
+                        );
+                        if (!collides) {
+                            progressIdx = testIdx;
+                            break;
+                        }
+                    }
+                }
 
                 let curCoords = fullCorridor[progressIdx] || originCoords;
                 if (s.is_last_mile || s.status === 'DELIVERED') {
