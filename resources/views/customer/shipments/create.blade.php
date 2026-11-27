@@ -801,6 +801,48 @@
         }
     }
 
+    function matchCountryHub(locCountry, selectedCountry) {
+        const a = (locCountry || '').toLowerCase().trim();
+        const b = (selectedCountry || '').toLowerCase().trim();
+        if (!a || !b) return false;
+        if (a === b || a.includes(b) || b.includes(a)) return true;
+
+        const aliases = [
+            ['turki', 'turkey', 'türkiye'],
+            ['inggris', 'united kingdom', 'uk', 'great britain', 'england'],
+            ['jerman', 'germany', 'deutschland'],
+            ['belanda', 'netherlands', 'holland'],
+            ['prancis', 'france'],
+            ['italia', 'italy'],
+            ['spanyol', 'spain'],
+            ['tiongkok', 'china', 'prc'],
+            ['jepang', 'japan'],
+            ['korea selatan', 'south korea', 'korea'],
+            ['amerika serikat', 'united states', 'usa', 'us'],
+            ['uni emirat arab', 'united arab emirates', 'uae'],
+            ['arab saudi', 'saudi arabia'],
+            ['mesir', 'egypt'],
+            ['maroko', 'morocco'],
+            ['afrika selatan', 'south africa'],
+            ['brasil', 'brazil'],
+            ['meksiko', 'mexico'],
+            ['kanada', 'canada'],
+            ['kolombia', 'colombia'],
+            ['selandia baru', 'new zealand'],
+            ['polandia', 'poland'],
+            ['swedia', 'sweden'],
+            ['norwegia', 'norway'],
+            ['finlandia', 'finland'],
+            ['yunani', 'greece'],
+            ['swiss', 'switzerland'],
+            ['rusia', 'russia'],
+            ['filipina', 'philippines'],
+            ['singapura', 'singapore'],
+        ];
+        return aliases.some(group => group.includes(a) && group.some(alias => b === alias || b.includes(alias) || alias.includes(b)))
+            || aliases.some(group => group.includes(b) && group.some(alias => a === alias || a.includes(alias) || alias.includes(a)));
+    }
+
     /**
      * Memfilter Simpul Transit Tujuan (Pelabuhan/Bandara) Otomatis Sesuai Negara Tujuan
      */
@@ -811,17 +853,21 @@
 
         const isAir = (currentMode === 'AIR');
         const pool = isAir ? airportLocations : (currentMode === 'LAND' ? portLocations.concat(airportLocations) : portLocations);
-        const cleanC = selectedCountry.toLowerCase().trim();
+        const allHubs = portLocations.concat(airportLocations);
 
-        // Cari lokasi yang negaranya cocok
-        let matching = pool.filter(loc => {
-            const locC = (loc.country || '').toLowerCase().trim();
-            return locC === cleanC || locC.includes(cleanC) || cleanC.includes(locC);
-        });
+        // 1. Cari hub sesuai moda & negara tujuan (mendukung alias ID/EN)
+        let matching = pool.filter(loc => matchCountryHub(loc.country, selectedCountry));
+        let isGlobalFallback = false;
 
-        // Fallback jika belum ada yang spesifik negara tersebut
+        // 2. Jika belum ada bandara/pelabuhan khusus di moda tsb, cek semua hub di negara tersebut
+        if (matching.length === 0) {
+            matching = allHubs.filter(loc => matchCountryHub(loc.country, selectedCountry));
+        }
+
+        // 3. Fallback ke hub transit global jika negara belum punya hub di database
         if (matching.length === 0) {
             matching = pool;
+            isGlobalFallback = true;
         }
 
         let html = '';
@@ -829,6 +875,9 @@
             const isSel = (initialDestId && String(loc.id) === String(initialDestId)) || idx === 0;
             html += `<option value="${loc.id}" data-lat="${loc.latitude}" data-lng="${loc.longitude}" data-country="${loc.country}" data-city="${loc.city}" ${isSel ? 'selected' : ''}>${loc.name} (${loc.city ? loc.city + ', ' : ''}${loc.country})</option>`;
         });
+        if (isGlobalFallback && html) {
+            html = `<optgroup label="Hub Transit Internasional (${selectedCountry} belum memiliki hub langsung)">${html}</optgroup>`;
+        }
 
         destSelect.innerHTML = html;
         if (matching.length > 0) {
