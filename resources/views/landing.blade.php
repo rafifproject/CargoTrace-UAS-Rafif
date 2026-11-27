@@ -1902,31 +1902,20 @@
     {{-- ========================================================================= --}}
     {{-- SECTION 6: KONTAK & QUICK TRACK (Santos HQ & Direct Contact)              --}}
     {{-- ========================================================================= --}}
-    <section id="kontak" class="pt-14 sm:pt-20 lg:pt-28 pb-0 relative overflow-hidden transition-colors duration-300 min-h-[620px] flex flex-col justify-between"
+    <section id="kontak" class="pt-14 pb-52 sm:pt-20 sm:pb-64 lg:py-28 lg:pb-0 relative overflow-hidden transition-colors duration-300 min-h-[620px] flex flex-col justify-between"
              style="background: var(--kontak-bg-color); border-color: var(--kontak-border-color);">
 
-        {{-- Desktop Panoramic Background Layer with Port of Santos Ship --}}
-        <div class="hidden lg:block absolute inset-0 w-full h-full pointer-events-none select-none transition-all duration-500"
-             style="background-image: var(--kontak-bg-img); background-size: cover; background-position: center right; background-repeat: no-repeat; filter: contrast(1.06) saturate(1.12);">
-            {{-- Smooth Gradient Mask on the left to keep text ultra-readable --}}
-            <div class="absolute inset-0 transition-all duration-500" style="background: var(--kontak-mask-gradient);"></div>
+        {{-- Panoramic Background Layer with Port of Santos Ship (Visible on Mobile/HP & Desktop) --}}
+        <div class="absolute inset-0 w-full h-full pointer-events-none select-none transition-all duration-500 bg-no-repeat bg-[length:165%_auto] sm:bg-[length:130%_auto] bg-right-bottom lg:bg-cover lg:bg-[position:center_right]"
+             style="background-image: var(--kontak-bg-img); filter: contrast(1.06) saturate(1.12);">
+            {{-- Mobile Gradient Mask: text at top stays crisp while CargoTrace ship & Port of Santos crane shine below --}}
+            <div class="lg:hidden absolute inset-0 transition-all duration-500"
+                 style="background: linear-gradient(to bottom, var(--kontak-bg-color) 0%, var(--kontak-bg-color) 42%, color-mix(in srgb, var(--kontak-bg-color) 65%, transparent) 62%, transparent 82%);"></div>
+            {{-- Desktop Smooth Gradient Mask on the left to keep text ultra-readable --}}
+            <div class="hidden lg:block absolute inset-0 transition-all duration-500" style="background: var(--kontak-mask-gradient);"></div>
         </div>
 
-        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 my-auto pb-12 sm:pb-16 lg:pb-24">
-
-            {{-- Mobile Adaptive Visual Banner (Cleanly framed Ship & Port of Santos) --}}
-            <div class="lg:hidden w-full mb-8">
-                <div class="relative rounded-2xl overflow-hidden shadow-2xl border" style="border-color: var(--kontak-border-color);">
-                    <img id="kontakMobileBanner" src="{{ asset('images/kontak-port-santos-bg.jpg') }}" alt="Pelabuhan Santos & Pengiriman Global CargoTrace" class="w-full h-48 sm:h-64 object-cover object-right">
-                    <div class="absolute inset-0 bg-gradient-to-t from-[var(--kontak-bg-color)] via-transparent to-transparent"></div>
-                    <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
-                        <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-600/90 text-white shadow-sm backdrop-blur-sm uppercase tracking-wider">
-                            Port of Santos • Brazil
-                        </span>
-                        <span class="text-xs font-semibold text-cyan-200 drop-shadow">Hub Ekspor Maritim Global</span>
-                    </div>
-                </div>
-            </div>
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 my-auto pb-8 sm:pb-12 lg:pb-24">
 
             {{-- Main Content: Left-Aligned (Leaving the Ship & Crane on the right completely visible) --}}
             <div class="w-full lg:max-w-xl xl:max-w-2xl text-left">
