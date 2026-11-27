@@ -404,12 +404,23 @@
                         <span id="banner-icon">🧭</span>
                         <span id="banner-text">Mode: Pemantau CargoTrace — Kargo Aktif & Jalur Pengiriman</span>
                     </div>
-                    <!-- Sub-filter moda pengiriman di mode CargoTrace -->
-                    <div id="cargo-mode-subfilter" class="flex items-center gap-1 bg-slate-900/80 p-0.5 rounded-lg border border-slate-700/80">
-                        <button type="button" onclick="setCargoTransportFilter('ALL')" id="filter-cargo-all" class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-600 text-white transition-all">Semua</button>
-                        <button type="button" onclick="setCargoTransportFilter('SEA')" id="filter-cargo-sea" class="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-300 hover:text-white transition-all">🚢 Laut</button>
-                        <button type="button" onclick="setCargoTransportFilter('AIR')" id="filter-cargo-air" class="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-300 hover:text-white transition-all">✈️ Udara</button>
-                        <button type="button" onclick="setCargoTransportFilter('LAND')" id="filter-cargo-land" class="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-300 hover:text-white transition-all">🚚 Mobil / Dekat</button>
+                    <!-- Sub-filter moda pengiriman & benua tujuan di mode CargoTrace -->
+                    <div id="cargo-mode-subfilter" class="flex flex-wrap items-center gap-1.5">
+                        <div class="flex items-center gap-1 bg-slate-900/80 p-0.5 rounded-lg border border-slate-700/80">
+                            <button type="button" onclick="setCargoTransportFilter('ALL')" id="filter-cargo-all" class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-600 text-white transition-all">Semua</button>
+                            <button type="button" onclick="setCargoTransportFilter('SEA')" id="filter-cargo-sea" class="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-300 hover:text-white transition-all">🚢 Laut</button>
+                            <button type="button" onclick="setCargoTransportFilter('AIR')" id="filter-cargo-air" class="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-300 hover:text-white transition-all">✈️ Udara</button>
+                            <button type="button" onclick="setCargoTransportFilter('LAND')" id="filter-cargo-land" class="px-2 py-0.5 rounded text-[10px] font-semibold text-slate-300 hover:text-white transition-all">🚚 Mobil / Dekat</button>
+                        </div>
+                        <select id="filter-cargo-continent" onchange="setCargoContinentFilter(this.value)" title="Filter Benua Tujuan"
+                            class="bg-slate-900/90 text-white text-[10px] font-semibold px-2 py-1 rounded-lg border border-slate-700/80 focus:outline-none focus:ring-1 focus:ring-cyan-400 cursor-pointer">
+                            <option value="ALL">🌍 Semua Benua</option>
+                            <option value="ASIA">🌏 Asia</option>
+                            <option value="EUROPE">🌍 Eropa</option>
+                            <option value="AMERICAS">🌎 Amerika</option>
+                            <option value="AFRICA">🌍 Afrika</option>
+                            <option value="OCEANIA">🌏 Oseania</option>
+                        </select>
                     </div>
                 </div>
 
@@ -707,6 +718,7 @@
     window.resetShipmentFocus            = window.resetShipmentFocus || function() {};
     window.setTraceTransportMode         = window.setTraceTransportMode || function(mode) {};
     window.setCargoTransportFilter       = window.setCargoTransportFilter || function(filter) {};
+    window.setCargoContinentFilter       = window.setCargoContinentFilter || function(continent) {};
     window.resetRouteTrackerInteractive  = window.resetRouteTrackerInteractive || function() {};
     window.openRouteAnalyticsModal       = window.openRouteAnalyticsModal || function() {};
     window.closeRouteAnalyticsModal      = window.closeRouteAnalyticsModal || function() {};
@@ -978,6 +990,26 @@
 
         let currentMode = 'cargo';
         let cargoTransportFilter = 'ALL';
+        let cargoContinentFilter = 'ALL';
+
+        function getDestinationContinent(s) {
+            const c = (s.destination?.country || '').toLowerCase().trim();
+            if (/australia|new zealand|selandia baru|fiji|papua/.test(c)) return 'OCEANIA';
+            if (/nigeria|kenya|morocco|maroko|south africa|afrika selatan|egypt|mesir|ethiopia|ghana|tanzania|senegal|djibouti|algeria|aljazair|tunisia/.test(c)) return 'AFRICA';
+            if (/belanda|netherlands|inggris|united kingdom|\buk\b|jerman|germany|prancis|france|italia|italy|spanyol|spain|poland|polandia|sweden|swedia|norway|norwegia|finland|finlandia|greece|yunani|portugal|belgia|belgium|swiss|switzerland|austria|denmark|ireland|irlandia|turkey|turki|russia|rusia|ukraine|ukraina/.test(c)) return 'EUROPE';
+            if (/amerika|united states|\busa\b|canada|kanada|mexico|meksiko|brasil|brazil|chile|chili|colombia|kolombia|argentina|peru|panama|ecuador|ekuador/.test(c)) return 'AMERICAS';
+            if (/indonesia|singap|malaysia|thailand|vietnam|philippines|filipina|japan|jepang|korea|china|tiongkok|india|pakistan|bangladesh|sri lanka|kazakhstan|taiwan|hong kong|saudi|uae|emirat|qatar|oman|kuwait|jordan|yordania|israel|iran|iraq|irak/.test(c)) return 'ASIA';
+
+            const lat = parseFloat(s.destination?.latitude);
+            const lng = parseFloat(s.destination?.longitude);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                if (lng < -30) return 'AMERICAS';
+                if (lat < -10 && lng > 110) return 'OCEANIA';
+                if (lat >= 35 && lng >= -15 && lng <= 45) return 'EUROPE';
+                if (lat < 35 && lat >= -35 && lng >= -20 && lng <= 52) return 'AFRICA';
+            }
+            return 'ASIA';
+        }
 
         // ── MODE BUTTON STYLES ──────────────────────────────────
         function updateModeButtons(mode) {
@@ -1642,6 +1674,10 @@
                     if (cargoTransportFilter === 'LAND' && !isLandCargo) return;
                     if (cargoTransportFilter === 'AIR' && !isAirCargo) return;
                     if (cargoTransportFilter === 'SEA' && (isAirCargo || isLandCargo)) return;
+                }
+
+                if (cargoContinentFilter !== 'ALL' && getDestinationContinent(s) !== cargoContinentFilter) {
+                    return;
                 }
 
                 const oLat = parseFloat(s.origin.latitude);
@@ -2674,6 +2710,22 @@
             const latLngs = buildCargoLayer();
             if (latLngs && latLngs.length > 0) {
                 map.flyToBounds(latLngs, { padding: [50, 50], maxZoom: 6, duration: 1.2 });
+            } else {
+                map.setView([15, 20], 2);
+            }
+        }
+
+        function setCargoContinentFilter(continent) {
+            cargoContinentFilter = continent || 'ALL';
+            const sel = document.getElementById('filter-cargo-continent');
+            if (sel && sel.value !== cargoContinentFilter) {
+                sel.value = cargoContinentFilter;
+            }
+            const latLngs = buildCargoLayer();
+            if (latLngs && latLngs.length > 0) {
+                map.flyToBounds(latLngs, { padding: [50, 50], maxZoom: 6, duration: 1.2 });
+            } else {
+                map.setView([15, 20], 2);
             }
         }
 
@@ -2958,6 +3010,7 @@
         window.resetShipmentFocus            = typeof resetCargoShipmentFocus === 'function' ? resetCargoShipmentFocus : function() {};
         window.setTraceTransportMode         = typeof setTraceTransportMode === 'function' ? setTraceTransportMode : function() {};
         window.setCargoTransportFilter       = typeof setCargoTransportFilter === 'function' ? setCargoTransportFilter : function() {};
+        window.setCargoContinentFilter       = typeof setCargoContinentFilter === 'function' ? setCargoContinentFilter : function() {};
         window.resetRouteTrackerInteractive  = typeof resetRouteTrackerInteractive === 'function' ? resetRouteTrackerInteractive : function() {};
         window.openRouteAnalyticsModal       = typeof openRouteAnalyticsModal === 'function' ? openRouteAnalyticsModal : function() {};
         window.closeRouteAnalyticsModal      = typeof closeRouteAnalyticsModal === 'function' ? closeRouteAnalyticsModal : function() {};
