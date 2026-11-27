@@ -784,10 +784,11 @@ function initCustomerDashboardMap() {
                 const seaWaypoints = window.buildMaritimeWaypoints(originPt, destPt, isAir);
 
                 let curPt = null;
-                if (s.current_location && s.current_location.latitude && s.current_location.longitude) {
+                if (s.current_location && s.current_location.latitude && s.current_location.longitude && s.status !== 'DELIVERED') {
                     const cLat = parseFloat(s.current_location.latitude);
                     const cLng = parseFloat(s.current_location.longitude);
-                    if (!isNaN(cLat) && !isNaN(cLng)) {
+                    const isAtOrigin = Math.abs(cLat - oLat) < 0.25 && Math.abs(cLng - oLng) < 0.25;
+                    if (!isNaN(cLat) && !isNaN(cLng) && !isAtOrigin) {
                         curPt = [cLat, cLng];
                     }
                 }

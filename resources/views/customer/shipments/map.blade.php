@@ -342,6 +342,7 @@
 @endsection
 
 @push('scripts')
+@include('partials.maritime-route-helper')
 <script>
     const shipments = {!! json_encode($mapShipments) !!};
     const countriesData = {!! json_encode($countriesList) !!};
@@ -1400,6 +1401,7 @@
                 const vehicle = getShipmentVehicle(s);
                 const isAir = (s.transport_mode === 'AIR') || (vehicle.type === 'AIR');
                 const progress = getShipmentRealtimeProgress(s);
+                const seaWaypoints = window.buildMaritimeWaypoints(originPt, destPt, isAir);
 
                 const curLoc = s.current_location || s.currentLocation;
                 const isAtOrigin = curLoc && curLoc.latitude && curLoc.longitude &&
@@ -1411,6 +1413,9 @@
                     curPt = [parseFloat(curLoc.latitude), parseFloat(curLoc.longitude)];
                 } else if (s.status === 'DELIVERED') {
                     curPt = destPt;
+                } else if (seaWaypoints.length > 2) {
+                    const sampled = window.samplePolylineByRange(seaWaypoints, 0, progress, 1);
+                    curPt = sampled[sampled.length - 1] || originPt;
                 } else {
                     curPt = getPositionOnRoute(originPt, destPt, progress);
                 }
@@ -1439,43 +1444,52 @@
                 let directPoly = null;
                 let vehicleMarker = null;
 
-                // Main route paths
+                const isDelivered = (s.status === 'DELIVERED');
+
+                // Main route paths (oceanic waypoints)
                 if (curPt) {
-                    const traveledPath = createCurvedPath(originPt, curPt, 20, isAir ? 0.15 : 0.11);
+                    const traveledPath = seaWaypoints.length > 2
+                        ? window.samplePolylineByRange(seaWaypoints, 0, progress, 24)
+                        : createCurvedPath(originPt, curPt, 20, isAir ? 0.15 : 0.11);
                     traveledPoly = L.polyline(traveledPath, {
                         color: isAir ? '#0284c7' : '#0369a1', weight: 3.5, opacity: 0.9, lineCap: 'round', lineJoin: 'round', cursor: 'pointer'
                     }).bindPopup(popupHtml).addTo(trackingLayerGroup);
                     traveledPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
-                    const remainingPath = createCurvedPath(curPt, destPt, 20, isAir ? 0.15 : 0.11);
+                    const remainingPath = seaWaypoints.length > 2
+                        ? window.samplePolylineByRange(seaWaypoints, progress, 1, 24)
+                        : createCurvedPath(curPt, destPt, 20, isAir ? 0.15 : 0.11);
                     remainingPoly = L.polyline(remainingPath, {
                         color: isAir ? '#38bdf8' : '#7dd3fc', weight: 2.5, dashArray: '6, 8', opacity: 0.8, lineCap: 'round', lineJoin: 'round', cursor: 'pointer'
                     }).bindPopup(popupHtml).addTo(trackingLayerGroup);
                     remainingPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
-                    const heading = calculateBearing(curPt, destPt);
-                    const vW = vehicle.iconW || 44;
-                    const vH = vehicle.iconH || 68;
+                    if (!isDelivered) {
+                        const nextBearingPt = (remainingPath && remainingPath.length > 1) ? remainingPath[1] : destPt;
+                        const heading = calculateBearing(curPt, nextBearingPt);
+                        const vW = vehicle.iconW || 44;
+                        const vH = vehicle.iconH || 68;
 
-                    vehicleMarker = L.marker(curPt, {
-                        icon: L.divIcon({
-                            className: 'cargo-real-vehicle-marker',
-                            html: `
-                                <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${heading}deg);" title="${vehicle.label} &bull; ${s.shipment_number}">
-                                    ${vehicle.realSvg}
-                                </div>
-                                <div class="cargo-vehicle-tag" style="white-space:nowrap; margin-top:-2px;">
-                                    <span class="cargo-tag-dot" style="background:${vehicle.accentColor || vehicle.color || '#38bdf8'};"></span>
-                                    <span>${s.shipment_number}</span>
-                                </div>
-                            `,
-                            iconSize: [vW, vH],
-                            iconAnchor: [vW / 2, vH / 2],
-                            popupAnchor: [0, -(vH / 2 + 5)]
-                        }),
-                        zIndexOffset: 1000
-                    }).bindPopup(popupHtml).addTo(trackingLayerGroup);
-                    vehicleMarker.on('click', () => focusCargoShipment(s.id, curPt));
+                        vehicleMarker = L.marker(curPt, {
+                            icon: L.divIcon({
+                                className: 'cargo-real-vehicle-marker',
+                                html: `
+                                    <div class="cargo-real-vehicle-wrapper" style="transform: rotate(${heading}deg);" title="${vehicle.label} &bull; ${s.shipment_number}">
+                                        ${vehicle.realSvg}
+                                    </div>
+                                    <div class="cargo-vehicle-tag" style="white-space:nowrap; margin-top:-2px;">
+                                        <span class="cargo-tag-dot" style="background:${vehicle.accentColor || vehicle.color || '#38bdf8'};"></span>
+                                        <span>${s.shipment_number}</span>
+                                    </div>
+                                `,
+                                iconSize: [vW, vH],
+                                iconAnchor: [vW / 2, vH / 2],
+                                popupAnchor: [0, -(vH / 2 + 5)]
+                            }),
+                            zIndexOffset: 1000
+                        }).bindPopup(popupHtml).addTo(trackingLayerGroup);
+                        vehicleMarker.on('click', () => focusCargoShipment(s.id, curPt));
+                    }
                 } else {
                     const directPath = createCurvedPath(originPt, destPt, 20, 0.12);
                     directPoly = L.polyline(directPath, {
@@ -1513,8 +1527,8 @@
                             }).bindPopup(popupHtml).addTo(trackingLayerGroup);
                             feederFlightPoly.on('click', (e) => focusCargoShipment(s.id, e.latlng));
 
-                            // Pesawat Kargo Domestik (Feeder Flight)
-                            if (s.is_last_mile || s.status === 'DELIVERED') {
+                            // Pesawat Kargo Domestik tidak ditumpuk saat pelayaran utama berjalan
+                            if (false && (s.is_last_mile || s.status === 'DELIVERED')) {
                                 const planeLat = destPt[0] + (devCoords[0] - destPt[0]) * 0.52;
                                 const planeLng = destPt[1] + (devCoords[1] - destPt[1]) * 0.52;
                                 const planeHeading = calculateBearing(destPt, devCoords);
@@ -1568,8 +1582,8 @@
                             .addTo(trackingLayerGroup);
                         destPinMarker.on('click', () => focusCargoShipment(s.id, devCoords));
 
-                        // 🚚 Mobil Van Kurir Paket Pengantaran Terakhir ke Alamat
-                        if (s.is_last_mile || s.status === 'DELIVERED') {
+                        // 🚚 Mobil Van Kurir Paket hanya muncul saat status DELIVERED
+                        if (isDelivered && s.is_last_mile) {
                             const vanFraction = isDomesticFeederAir ? 0.88 : 0.65;
                             const vanLat = destPt[0] + (devCoords[0] - destPt[0]) * vanFraction;
                             const vanLng = destPt[1] + (devCoords[1] - destPt[1]) * vanFraction;
