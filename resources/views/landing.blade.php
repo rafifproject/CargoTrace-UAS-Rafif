@@ -1902,20 +1902,31 @@
     {{-- ========================================================================= --}}
     {{-- SECTION 6: KONTAK & QUICK TRACK (Santos HQ & Direct Contact)              --}}
     {{-- ========================================================================= --}}
-    <section id="kontak" class="pt-14 pb-52 sm:pt-20 sm:pb-60 lg:py-28 relative overflow-hidden transition-colors duration-300 min-h-[620px] flex items-center"
+    <section id="kontak" class="py-16 sm:py-20 lg:py-28 relative overflow-hidden transition-colors duration-300 min-h-[620px] flex items-center"
              style="background: var(--kontak-bg-color); border-color: var(--kontak-border-color);">
 
-        {{-- Responsive Panoramic Background Layer with Port of Santos Ship (Visible on Mobile/HP & Desktop) --}}
-        <div class="absolute inset-0 w-full h-full pointer-events-none select-none transition-all duration-500 bg-cover bg-no-repeat bg-[position:78%_bottom] lg:bg-[position:center_right]"
-             style="background-image: var(--kontak-bg-img); filter: contrast(1.06) saturate(1.12);">
-            {{-- Mobile Gradient Mask (top-to-bottom so text at top stays crisp and ship at bottom is clearly visible) --}}
-            <div class="lg:hidden absolute inset-0 transition-all duration-500"
-                 style="background: linear-gradient(to bottom, var(--kontak-bg-color) 0%, var(--kontak-bg-color) 44%, color-mix(in srgb, var(--kontak-bg-color) 45%, transparent) 72%, transparent 100%);"></div>
-            {{-- Desktop Smooth Gradient Mask on the left to keep text ultra-readable --}}
-            <div class="hidden lg:block absolute inset-0 transition-all duration-500" style="background: var(--kontak-mask-gradient);"></div>
+        {{-- Desktop Panoramic Background Layer with Port of Santos Ship --}}
+        <div class="hidden lg:block absolute inset-0 w-full h-full pointer-events-none select-none transition-all duration-500"
+             style="background-image: var(--kontak-bg-img); background-size: cover; background-position: center right; background-repeat: no-repeat; filter: contrast(1.06) saturate(1.12);">
+            {{-- Smooth Gradient Mask on the left to keep text ultra-readable --}}
+            <div class="absolute inset-0 transition-all duration-500" style="background: var(--kontak-mask-gradient);"></div>
         </div>
 
         <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+            {{-- Mobile Adaptive Visual Banner (Cleanly framed Ship & Port of Santos) --}}
+            <div class="lg:hidden w-full mb-8">
+                <div class="relative rounded-2xl overflow-hidden shadow-2xl border" style="border-color: var(--kontak-border-color);">
+                    <img id="kontakMobileBanner" src="{{ asset('images/kontak-port-santos-bg.jpg') }}" alt="Pelabuhan Santos & Pengiriman Global CargoTrace" class="w-full h-48 sm:h-64 object-cover object-right">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[var(--kontak-bg-color)] via-transparent to-transparent"></div>
+                    <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
+                        <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-600/90 text-white shadow-sm backdrop-blur-sm uppercase tracking-wider">
+                            Port of Santos • Brazil
+                        </span>
+                        <span class="text-xs font-semibold text-cyan-200 drop-shadow">Hub Ekspor Maritim Global</span>
+                    </div>
+                </div>
+            </div>
 
             {{-- Main Content: Left-Aligned (Leaving the Ship & Crane on the right completely visible) --}}
             <div class="w-full lg:max-w-xl xl:max-w-2xl text-left">
@@ -1991,9 +2002,9 @@
                                 {{ __('KONTAK EMAIL') }}
                             </div>
                             <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:text-sm font-medium" style="color: var(--brand-cyan);">
-                                <a href="mailto:ops@cargotrace.com?subject=Konsultasi%20Ekspor%20Kopi%20CargoTrace" class="underline decoration-cyan-500/40 hover:decoration-cyan-400 active:opacity-75">ops@cargotrace.com</a>
+                                <a href="mailto:ops@cargotrace.com?subject=Konsultasi%20Ekspor%20Kopi%20CargoTrace" class="hover:underline active:opacity-75">ops@cargotrace.com</a>
                                 <span class="opacity-50">/</span>
-                                <a href="mailto:export@santosexporters.br?subject=Export%20Inquiry%20Santos%20Coffee" class="underline decoration-cyan-500/40 hover:decoration-cyan-400 active:opacity-75">export@santosexporters.br</a>
+                                <a href="mailto:export@santosexporters.br?subject=Export%20Inquiry%20Santos%20Coffee" class="hover:underline active:opacity-75">export@santosexporters.br</a>
                             </div>
                         </div>
                     </div>
@@ -2009,41 +2020,13 @@
                                 {{ __('LAYANAN TELEPON OPERASIONAL (24/7)') }}
                             </div>
                             <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:text-sm font-semibold" style="color: var(--kontak-body-color);">
-                                <a href="tel:+551332194800" class="hover:text-cyan-400 underline decoration-slate-500/40 active:opacity-75">+55 (13) 3219-4800</a>
+                                <a href="tel:+551332194800" class="hover:text-cyan-400 hover:underline active:opacity-75">+55 (13) 3219-4800</a>
                                 <span class="opacity-50">/</span>
-                                <a href="tel:+622150887200" class="hover:text-cyan-400 underline decoration-slate-500/40 active:opacity-75">+62 (21) 5088-7200</a>
+                                <a href="tel:+622150887200" class="hover:text-cyan-400 hover:underline active:opacity-75">+62 (21) 5088-7200</a>
                             </div>
                         </div>
                     </div>
 
-                </div>
-
-                {{-- Quick Action Buttons (Thumb-friendly untuk HP & Desktop) --}}
-                <div class="mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3">
-                    <a href="tel:+622150887200"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white shadow-lg transition-all duration-200 hover:brightness-110 active:scale-95"
-                       style="background: linear-gradient(135deg, #0284c7, #2563eb);">
-                        <i data-lucide="phone-call" class="w-4 h-4"></i>
-                        <span>{{ __('Telepon 24/7') }}</span>
-                    </a>
-                    <a href="https://wa.me/622150887200?text=Halo%20CargoTrace%20Santos%2C%20saya%20ingin%20konsultasi%20pengiriman%20kopi." target="_blank" rel="noopener noreferrer"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white shadow-lg transition-all duration-200 hover:brightness-110 active:scale-95"
-                       style="background: linear-gradient(135deg, #059669, #10b981);">
-                        <i data-lucide="message-circle" class="w-4 h-4"></i>
-                        <span>{{ __('WhatsApp Ops') }}</span>
-                    </a>
-                    <a href="mailto:ops@cargotrace.com?subject=Konsultasi%20Ekspor%20Kopi%20CargoTrace"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 backdrop-blur-md hover:opacity-90 active:scale-95"
-                       style="background: var(--kontak-icon-bg); border: 1px solid var(--kontak-icon-border); color: var(--kontak-heading-color);">
-                        <i data-lucide="send" class="w-4 h-4" style="color: var(--kontak-icon-color);"></i>
-                        <span>{{ __('Kirim Email') }}</span>
-                    </a>
-                    <a href="#beranda"
-                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 backdrop-blur-md hover:opacity-90 active:scale-95"
-                       style="background: var(--kontak-icon-bg); border: 1px solid var(--kontak-icon-border); color: var(--kontak-heading-color);">
-                        <i data-lucide="search" class="w-4 h-4" style="color: var(--brand-cyan);"></i>
-                        <span>{{ __('Lacak Resi') }}</span>
-                    </a>
                 </div>
 
             </div>
