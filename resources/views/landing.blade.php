@@ -297,7 +297,7 @@
                        style="color: var(--nav-link)">
                         {{ __('Produk') }}
                     </a>
-                    <a href="#landingpage" class="nav-link px-3.5 py-1.5 rounded-full text-xs lg:text-sm font-medium transition hover:opacity-80"
+                    <a href="#alur-sistem" class="nav-link px-3.5 py-1.5 rounded-full text-xs lg:text-sm font-medium transition hover:opacity-80"
                        style="color: var(--nav-link)">
                         {{ __('Alur Sistem') }}
                     </a>
@@ -375,7 +375,7 @@
             <a href="#beranda" class="block px-4 py-2 rounded-lg text-sm font-semibold" style="background: var(--nav-active-bg); color: var(--nav-active-text);">{{ __('Beranda') }}</a>
             <a href="#tentang-kami" class="block px-4 py-2 rounded-lg text-sm" style="color: var(--nav-link)">{{ __('Tentang Kami') }}</a>
             <a href="#produk" class="block px-4 py-2 rounded-lg text-sm" style="color: var(--nav-link)">{{ __('Produk') }}</a>
-            <a href="#landingpage" class="block px-4 py-2 rounded-lg text-sm" style="color: var(--nav-link)">{{ __('Alur Sistem') }}</a>
+            <a href="#alur-sistem" class="block px-4 py-2 rounded-lg text-sm" style="color: var(--nav-link)">{{ __('Alur Sistem') }}</a>
             <a href="#fitur" class="block px-4 py-2 rounded-lg text-sm" style="color: var(--nav-link)">{{ __('Fitur') }}</a>
             <a href="#kontak" class="block px-4 py-2 rounded-lg text-sm" style="color: var(--nav-link)">{{ __('Kontak') }}</a>
         </div>
@@ -397,7 +397,7 @@
             <div class="w-full lg:max-w-2xl xl:max-w-[660px] flex flex-col items-start text-left">
                 
                 {{-- Interactive Floating Glass Card: Real-time Shipment Tracking --}}
-                <a href="#landingpage"
+                <a href="#alur-sistem"
                    class="hero-anim-1 hero-track-card group relative w-full max-w-[440px] rounded-2xl p-4 sm:p-5 mb-7 flex items-center justify-between gap-4 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
                     <div class="relative z-10 flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1.5">
@@ -463,7 +463,7 @@
                         <i data-lucide="arrow-right" class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"></i>
                     </a>
 
-                    <a href="#landingpage" 
+                    <a href="#alur-sistem" 
                        class="inline-flex items-center gap-2 px-6 py-3 sm:py-3.5 rounded-full font-semibold text-sm transition-all duration-300 backdrop-blur-md hover:scale-105"
                        style="background: var(--btn-secondary-bg); border: 1px solid var(--btn-secondary-border); color: var(--btn-secondary-text);">
                         <i data-lucide="play-circle" class="w-4 h-4" style="color: var(--brand-cyan)"></i>
@@ -1028,7 +1028,7 @@
     {{-- ========================================================================= --}}
     {{-- SECTION 4: ALUR SISTEM (Interactive 5-Stage Swimlane Flowmap Showcase)   --}}
     {{-- ========================================================================= --}}
-    <section id="landingpage" class="py-16 lg:py-24 relative overflow-hidden transition-colors duration-300" style="background: var(--bg-alt);">
+    <section id="alur-sistem" class="py-16 lg:py-24 relative overflow-hidden transition-colors duration-300" style="background: var(--bg-alt);">
         
         {{-- Subtle Ambient Glows --}}
         <div class="absolute -top-32 left-1/4 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none"></div>
@@ -2074,7 +2074,7 @@
                         <li><a href="#beranda" class="hover:underline transition">Beranda</a></li>
                         <li><a href="#tentang-kami" class="hover:underline transition">Tentang Kami</a></li>
                         <li><a href="#produk" class="hover:underline transition">Katalog Produk Kopi</a></li>
-                        <li><a href="#landingpage" class="hover:underline transition">Alur Sistem & Flowmap</a></li>
+                        <li><a href="#alur-sistem" class="hover:underline transition">Alur Sistem & Flowmap</a></li>
                         <li><a href="#fitur" class="hover:underline transition">Fitur Unggulan</a></li>
                         <li><a href="#kontak" class="hover:underline transition">Kontak & Hub Santos</a></li>
                     </ul>
