@@ -259,48 +259,6 @@
                     <input type="hidden" name="origin_location_id" id="origin-select" value="{{ old('origin_location_id', 39) }}" data-lat="-23.9610" data-lng="-46.3020">
                 </div>
 
-                {{-- VISUAL ALUR MULTIMODA LOGISTIK EKSPOR (Santos ➔ Negara Tujuan ➔ Pesawat Domestik ➔ Mobil Kurir) --}}
-                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                            <i data-lucide="git-merge" class="w-3.5 h-3.5 text-cyan-500"></i>
-                            <span>Alur Multimoda Realistis (Keberangkatan Brazil ➔ Pelabuhan ➔ Pesawat Kargo ➔ Kurir)</span>
-                        </span>
-                        <span class="text-[10px] font-semibold text-cyan-600 dark:text-cyan-400">Rantai Pasok Standar Industri</span>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <div class="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 flex items-center gap-2.5 shadow-2xs">
-                            <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg flex-shrink-0">
-                                🚢
-                            </div>
-                            <div class="min-w-0">
-                                <div class="text-[11px] font-bold text-slate-800 dark:text-slate-100">1. Pelayaran Samudra</div>
-                                <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate">Pelabuhan Santos ➔ Hub Tujuan</div>
-                            </div>
-                        </div>
-
-                        <div class="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 flex items-center gap-2.5 shadow-2xs">
-                            <div class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg flex-shrink-0">
-                                ✈️
-                            </div>
-                            <div class="min-w-0">
-                                <div class="text-[11px] font-bold text-slate-800 dark:text-slate-100">2. Pesawat Domestik</div>
-                                <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate">Hub Masuk ➔ Bandara Kota</div>
-                            </div>
-                        </div>
-
-                        <div class="p-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 flex items-center gap-2.5 shadow-2xs">
-                            <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg flex-shrink-0">
-                                🚚
-                            </div>
-                            <div class="min-w-0">
-                                <div class="text-[11px] font-bold text-slate-800 dark:text-slate-100">3. Mobil Kurir Paket</div>
-                                <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate">Bandara ➔ Alamat Kafe/Toko</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 {{-- FORM TUJUAN PENGANTARAN LENGKAP --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
                     {{-- 1. Negara Tujuan --}}
