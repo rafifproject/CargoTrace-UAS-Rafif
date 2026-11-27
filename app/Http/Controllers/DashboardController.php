@@ -33,22 +33,28 @@ class DashboardController extends Controller
         $unpaidInvoicesCount = Shipment::where('payment_status', 'UNPAID')->count();
         $settlementRate = $totalShipments > 0 ? round(($paidInvoicesCount / $totalShipments) * 100, 1) : 100;
 
-        // Status Breakdown for Donut Chart
+        // Status Breakdown for Donut Chart (single aggregated query)
+        $groupedStatuses = Shipment::selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
         $statusCounts = [
-            'CREATED' => Shipment::where('status', Shipment::STATUS_CREATED)->count(),
-            'BOOKED' => Shipment::where('status', Shipment::STATUS_BOOKED)->count(),
-            'PICKED_UP' => Shipment::where('status', Shipment::STATUS_PICKED_UP)->count(),
-            'IN_TRANSIT' => Shipment::where('status', Shipment::STATUS_IN_TRANSIT)->count(),
-            'DELIVERED' => Shipment::where('status', Shipment::STATUS_DELIVERED)->count(),
+            'CREATED' => (int) ($groupedStatuses[Shipment::STATUS_CREATED] ?? 0),
+            'BOOKED' => (int) ($groupedStatuses[Shipment::STATUS_BOOKED] ?? 0),
+            'PICKED_UP' => (int) ($groupedStatuses[Shipment::STATUS_PICKED_UP] ?? 0),
+            'IN_TRANSIT' => (int) ($groupedStatuses[Shipment::STATUS_IN_TRANSIT] ?? 0),
+            'DELIVERED' => (int) ($groupedStatuses[Shipment::STATUS_DELIVERED] ?? 0),
         ];
 
-        // 30 Days Trend Simulation from actual / generated dates
+        // 30 Days Trend Simulation from a single timestamp fetch (avoids 30 sequential DB round-trips)
+        $shipmentDates = Shipment::pluck('created_at')->map(fn ($dt) => Carbon::parse($dt)->toDateString());
         $trendDates = [];
         $trendValues = [];
         for ($i = 29; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
+            $dateStr = $date->toDateString();
             $trendDates[] = $date->format('d M');
-            $count = Shipment::whereDate('created_at', '<=', $date->toDateString())->count();
+            $count = $shipmentDates->filter(fn (string $d) => $d <= $dateStr)->count();
             // Scale smoothly for realistic visual presentation
             $trendValues[] = max(1, $count + intval(sin($i / 3) * 3));
         }

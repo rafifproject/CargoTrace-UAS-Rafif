@@ -495,7 +495,7 @@ class GlobalIntelligenceService
             $curated = $this->getBaselineCuratedPorts();
             try {
                 $endpoint = "https://services1.arcgis.com/cc7nIINtrZ67dyVJ/ArcGIS/rest/services/Transportation_Use/FeatureServer/2/query";
-                $response = Http::timeout(8)->retry(2, 200)->get($endpoint, [
+                $response = Http::timeout(3)->get($endpoint, [
                     'where' => '1=1',
                     'outFields' => 'PORT_NAME,COUNTRY,LATITUDE,LONGITUDE,HARBORSIZE,HARBORTYPE,INDEX_NO',
                     'returnGeometry' => 'false',
@@ -1622,9 +1622,9 @@ class GlobalIntelligenceService
             try {
                 // Ambil ratusan bandara besar internasional dari FreeAirportDB secara concurrent
                 $responses = Http::pool(fn ($pool) => [
-                    $pool->timeout(5)->get("{$baseUrl}/airports", ['type' => 'large_airport', 'limit' => 100, 'offset' => 0]),
-                    $pool->timeout(5)->get("{$baseUrl}/airports", ['type' => 'large_airport', 'limit' => 100, 'offset' => 100]),
-                    $pool->timeout(5)->get("{$baseUrl}/airports", ['type' => 'large_airport', 'limit' => 100, 'offset' => 200]),
+                    $pool->timeout(3)->get("{$baseUrl}/airports", ['type' => 'large_airport', 'limit' => 100, 'offset' => 0]),
+                    $pool->timeout(3)->get("{$baseUrl}/airports", ['type' => 'large_airport', 'limit' => 100, 'offset' => 100]),
+                    $pool->timeout(3)->get("{$baseUrl}/airports", ['type' => 'large_airport', 'limit' => 100, 'offset' => 200]),
                 ]);
 
                 foreach ($responses as $resp) {
