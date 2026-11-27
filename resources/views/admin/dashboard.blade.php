@@ -1630,14 +1630,14 @@
                 // Sub-filter moda transportasi (Semua / Laut / Udara / Mobil Dekat)
                 const originType = (s.origin?.location_type || '').toUpperCase();
                 const destType   = (s.destination?.location_type || '').toUpperCase();
-                const isAirCargo = (s.transport_mode === 'AIR') || (originType === 'AIRPORT' || destType === 'AIRPORT');
-                const isLandCargo = (s.transport_mode === 'LAND') && (s.origin?.country && s.destination?.country && s.origin.country === s.destination.country);
+                const isLandCargo = !!s.is_last_mile || (s.transport_mode === 'LAND');
+                const isAirCargo = !isLandCargo && ((s.transport_mode === 'AIR') || (originType === 'AIRPORT' || destType === 'AIRPORT'));
                 const sMode      = isLandCargo ? 'LAND' : (isAirCargo ? 'AIR' : (s.transport_mode || 'SEA'));
 
                 if (cargoTransportFilter !== 'ALL') {
                     if (cargoTransportFilter === 'LAND' && !isLandCargo) return;
-                    if (cargoTransportFilter === 'AIR' && (!isAirCargo || s.transport_mode === 'LAND')) return;
-                    if (cargoTransportFilter === 'SEA' && (isAirCargo || s.transport_mode === 'LAND')) return;
+                    if (cargoTransportFilter === 'AIR' && !isAirCargo) return;
+                    if (cargoTransportFilter === 'SEA' && (isAirCargo || isLandCargo)) return;
                 }
 
                 const oLat = parseFloat(s.origin.latitude);
