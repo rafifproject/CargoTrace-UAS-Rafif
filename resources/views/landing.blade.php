@@ -1952,73 +1952,109 @@
                     {{ __('Hubungi perwakilan Santos Exporters S.A. di Pelabuhan Santos atau lacak langsung nomor resi kontainer Anda secara instan.') }}
                 </p>
 
-                {{-- 4 Contact Info Points with Glowing Neon Circles --}}
-                <div class="space-y-4 max-w-xl">
+                {{-- 4 Interactive Contact Info Cards (Tap-friendly for Mobile/HP & Desktop) --}}
+                <div class="space-y-3 sm:space-y-4 max-w-xl">
                     
                     {{-- Item 1: Kantor Operasional & Dermaga Santos --}}
-                    <div class="flex items-start gap-3.5 group">
+                    <a href="https://maps.google.com/?q=Terminal+Portuario+de+Santos+Cais+do+Saboo+Brasil" target="_blank" rel="noopener noreferrer"
+                       class="flex items-start gap-3.5 group p-2.5 -mx-2.5 rounded-xl transition-all duration-200 hover:bg-white/5 active:scale-[0.98]">
                         <div class="w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-all"
                              style="background: var(--kontak-icon-bg); border: 1px solid var(--kontak-icon-border); color: var(--kontak-icon-color);">
                             <i data-lucide="map-pin" class="w-5 h-5"></i>
                         </div>
-                        <div class="min-w-0 pt-0.5">
-                            <div class="text-[11px] font-extrabold uppercase tracking-wider mb-0.5" style="color: var(--kontak-heading-color);">
-                                {{ __('KANTOR OPERASIONAL & DERMAGA SANTOS') }}
+                        <div class="min-w-0 pt-0.5 flex-1">
+                            <div class="text-[11px] font-extrabold uppercase tracking-wider mb-0.5 flex items-center gap-1.5" style="color: var(--kontak-heading-color);">
+                                <span>{{ __('KANTOR OPERASIONAL & DERMAGA SANTOS') }}</span>
+                                <i data-lucide="external-link" class="w-3 h-3 opacity-60"></i>
                             </div>
                             <div class="text-xs sm:text-sm leading-snug" style="color: var(--kontak-body-color);">
                                 Santos Exporters S.A., Terminal Portuário de Santos, Cais do Saboó, Santos - SP, 11010-140, Brasil
                             </div>
                         </div>
-                    </div>
+                    </a>
 
                     {{-- Item 2: Perwakilan Asia Pasifik (Indonesia) --}}
-                    <div class="flex items-start gap-3.5 group">
+                    <a href="https://maps.google.com/?q=Pelabuhan+Tanjung+Priok+Jakarta+Utara" target="_blank" rel="noopener noreferrer"
+                       class="flex items-start gap-3.5 group p-2.5 -mx-2.5 rounded-xl transition-all duration-200 hover:bg-white/5 active:scale-[0.98]">
                         <div class="w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-all"
                              style="background: var(--kontak-icon-bg); border: 1px solid var(--kontak-icon-border); color: var(--kontak-icon-color);">
                             <i data-lucide="network" class="w-5 h-5"></i>
                         </div>
-                        <div class="min-w-0 pt-0.5">
-                            <div class="text-[11px] font-extrabold uppercase tracking-wider mb-0.5" style="color: var(--kontak-heading-color);">
-                                {{ __('PERWAKILAN ASIA PASIFIK (INDONESIA)') }}
+                        <div class="min-w-0 pt-0.5 flex-1">
+                            <div class="text-[11px] font-extrabold uppercase tracking-wider mb-0.5 flex items-center gap-1.5" style="color: var(--kontak-heading-color);">
+                                <span>{{ __('PERWAKILAN ASIA PASIFIK (INDONESIA)') }}</span>
+                                <i data-lucide="external-link" class="w-3 h-3 opacity-60"></i>
                             </div>
                             <div class="text-xs sm:text-sm leading-snug" style="color: var(--kontak-body-color);">
                                 Kawasan Logistik Maritim Pelabuhan Tanjung Priok, Jakarta Utara, 14310
                             </div>
                         </div>
-                    </div>
+                    </a>
 
-                    {{-- Item 3: Kontak Email --}}
-                    <div class="flex items-start gap-3.5 group">
+                    {{-- Item 3: Kontak Email (Clickable mailto) --}}
+                    <div class="flex items-start gap-3.5 group p-2.5 -mx-2.5 rounded-xl transition-all duration-200 hover:bg-white/5">
                         <div class="w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-all"
                              style="background: var(--kontak-icon-bg); border: 1px solid var(--kontak-icon-border); color: var(--kontak-icon-color);">
                             <i data-lucide="mail" class="w-5 h-5"></i>
                         </div>
-                        <div class="min-w-0 pt-0.5">
-                            <div class="text-[11px] font-extrabold uppercase tracking-wider mb-0.5" style="color: var(--kontak-heading-color);">
+                        <div class="min-w-0 pt-0.5 flex-1">
+                            <div class="text-[11px] font-extrabold uppercase tracking-wider mb-1" style="color: var(--kontak-heading-color);">
                                 {{ __('KONTAK EMAIL') }}
                             </div>
-                            <div class="text-xs sm:text-sm font-medium" style="color: var(--brand-cyan);">
-                                ops@cargotrace.com / export@santosexporters.br
+                            <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:text-sm font-medium" style="color: var(--brand-cyan);">
+                                <a href="mailto:ops@cargotrace.com?subject=Konsultasi%20Ekspor%20Kopi%20CargoTrace" class="underline decoration-cyan-500/40 hover:decoration-cyan-400 active:opacity-75">ops@cargotrace.com</a>
+                                <span class="opacity-50">/</span>
+                                <a href="mailto:export@santosexporters.br?subject=Export%20Inquiry%20Santos%20Coffee" class="underline decoration-cyan-500/40 hover:decoration-cyan-400 active:opacity-75">export@santosexporters.br</a>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Item 4: Layanan Telepon Operasional (24/7) --}}
-                    <div class="flex items-start gap-3.5 group">
+                    {{-- Item 4: Layanan Telepon Operasional (24/7) (Clickable tel:) --}}
+                    <div class="flex items-start gap-3.5 group p-2.5 -mx-2.5 rounded-xl transition-all duration-200 hover:bg-white/5">
                         <div class="w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-all"
                              style="background: var(--kontak-icon-bg); border: 1px solid var(--kontak-icon-border); color: var(--kontak-icon-color);">
                             <i data-lucide="phone" class="w-5 h-5"></i>
                         </div>
-                        <div class="min-w-0 pt-0.5">
-                            <div class="text-[11px] font-extrabold uppercase tracking-wider mb-0.5" style="color: var(--kontak-heading-color);">
+                        <div class="min-w-0 pt-0.5 flex-1">
+                            <div class="text-[11px] font-extrabold uppercase tracking-wider mb-1" style="color: var(--kontak-heading-color);">
                                 {{ __('LAYANAN TELEPON OPERASIONAL (24/7)') }}
                             </div>
-                            <div class="text-xs sm:text-sm font-semibold" style="color: var(--kontak-body-color);">
-                                +55 (13) 3219-4800 / +62 (21) 5088-7200
+                            <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:text-sm font-semibold" style="color: var(--kontak-body-color);">
+                                <a href="tel:+551332194800" class="hover:text-cyan-400 underline decoration-slate-500/40 active:opacity-75">+55 (13) 3219-4800</a>
+                                <span class="opacity-50">/</span>
+                                <a href="tel:+622150887200" class="hover:text-cyan-400 underline decoration-slate-500/40 active:opacity-75">+62 (21) 5088-7200</a>
                             </div>
                         </div>
                     </div>
 
+                </div>
+
+                {{-- Quick Action Buttons (Thumb-friendly untuk HP & Desktop) --}}
+                <div class="mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3">
+                    <a href="tel:+622150887200"
+                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white shadow-lg transition-all duration-200 hover:brightness-110 active:scale-95"
+                       style="background: linear-gradient(135deg, #0284c7, #2563eb);">
+                        <i data-lucide="phone-call" class="w-4 h-4"></i>
+                        <span>{{ __('Telepon 24/7') }}</span>
+                    </a>
+                    <a href="https://wa.me/622150887200?text=Halo%20CargoTrace%20Santos%2C%20saya%20ingin%20konsultasi%20pengiriman%20kopi." target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white shadow-lg transition-all duration-200 hover:brightness-110 active:scale-95"
+                       style="background: linear-gradient(135deg, #059669, #10b981);">
+                        <i data-lucide="message-circle" class="w-4 h-4"></i>
+                        <span>{{ __('WhatsApp Ops') }}</span>
+                    </a>
+                    <a href="mailto:ops@cargotrace.com?subject=Konsultasi%20Ekspor%20Kopi%20CargoTrace"
+                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 backdrop-blur-md hover:opacity-90 active:scale-95"
+                       style="background: var(--kontak-icon-bg); border: 1px solid var(--kontak-icon-border); color: var(--kontak-heading-color);">
+                        <i data-lucide="send" class="w-4 h-4" style="color: var(--kontak-icon-color);"></i>
+                        <span>{{ __('Kirim Email') }}</span>
+                    </a>
+                    <a href="#beranda"
+                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 backdrop-blur-md hover:opacity-90 active:scale-95"
+                       style="background: var(--kontak-icon-bg); border: 1px solid var(--kontak-icon-border); color: var(--kontak-heading-color);">
+                        <i data-lucide="search" class="w-4 h-4" style="color: var(--brand-cyan);"></i>
+                        <span>{{ __('Lacak Resi') }}</span>
+                    </a>
                 </div>
 
             </div>
