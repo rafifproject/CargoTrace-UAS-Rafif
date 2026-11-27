@@ -1902,7 +1902,7 @@
     {{-- ========================================================================= --}}
     {{-- SECTION 6: KONTAK & QUICK TRACK (Santos HQ & Direct Contact)              --}}
     {{-- ========================================================================= --}}
-    <section id="kontak" class="py-16 sm:py-20 lg:py-28 relative overflow-hidden transition-colors duration-300 min-h-[620px] flex items-center"
+    <section id="kontak" class="pt-14 sm:pt-20 lg:pt-28 pb-0 relative overflow-hidden transition-colors duration-300 min-h-[620px] flex flex-col justify-between"
              style="background: var(--kontak-bg-color); border-color: var(--kontak-border-color);">
 
         {{-- Desktop Panoramic Background Layer with Port of Santos Ship --}}
@@ -1912,7 +1912,7 @@
             <div class="absolute inset-0 transition-all duration-500" style="background: var(--kontak-mask-gradient);"></div>
         </div>
 
-        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 my-auto pb-12 sm:pb-16 lg:pb-24">
 
             {{-- Mobile Adaptive Visual Banner (Cleanly framed Ship & Port of Santos) --}}
             <div class="lg:hidden w-full mb-8">
@@ -2034,7 +2034,7 @@
         </div>
 
         {{-- Flowing Ocean Wave at bottom of Kontak transitioning into Footer --}}
-        <div class="w-full overflow-hidden leading-none pt-10 sm:pt-14 pointer-events-none">
+        <div class="w-full overflow-hidden leading-none pointer-events-none relative z-10">
             <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-8 sm:h-12" preserveAspectRatio="none">
                 <path d="M0,25 C320,55 640,10 960,35 C1200,55 1360,20 1440,25 L1440,60 L0,60 Z" fill="var(--brand-cyan)" opacity="0.2"/>
                 <path d="M0,35 C280,15 600,55 920,25 C1180,45 1340,15 1440,35 L1440,60 L0,60 Z" fill="var(--bg-page)"/>
