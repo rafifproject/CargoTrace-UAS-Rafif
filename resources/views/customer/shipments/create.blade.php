@@ -409,6 +409,26 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        {{-- RIGHT: Interactive Map Route Preview, Schedule, Manifest & Cost Summary --}}
+        <div class="lg:col-span-2 space-y-5">
+            {{-- Preview Rute Peta --}}
+            <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <i data-lucide="globe" class="w-4 h-4 text-cyan-500"></i>
+                        <span id="map-preview-title">Pratinjau Rute Maritim</span>
+                    </h3>
+                    <span id="route-distance-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-500">
+                        Pilih Lokasi
+                    </span>
+                </div>
+                <div id="routeMap" class="w-full h-64 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 z-10"></div>
+                <p id="route-map-caption" class="text-[11px] text-slate-400 mt-2">
+                    Garis putus-putus menunjukkan rute estimasi pelayaran dari pelabuhan asal menuju pelabuhan tujuan.
+                </p>
+            </div>
 
             {{-- 4. JADWAL KEBERANGKATAN & ESTIMASI TIBA (OTOMATIS BERDASARKAN PROSES GUDANG SANTOS & DURASI RUTE) --}}
             <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
@@ -420,51 +440,51 @@
                         </h3>
                         <p class="text-[11px] text-slate-400 mt-0.5">Dihitung otomatis: waktu sortir/packing di gudang Santos + durasi rute pelayaran ke negara tujuan.</p>
                     </div>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800 shrink-0">
                         Otomatis Sistem ✓
                     </span>
                 </div>
 
                 {{-- TIMELINE 3-LANGKAH JADWAL LOGISTIK REALISTIS --}}
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     {{-- STEP 1: HARI INI (PEMESANAN) --}}
-                    <div class="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex flex-col justify-between">
+                    <div class="p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex flex-col justify-between">
                         <div>
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Langkah 1 &bull; Hari Ini</span>
-                                <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded">Order Masuk</span>
+                            <div class="flex items-center justify-between gap-1 mb-1">
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-500">Langkah 1</span>
+                                <span class="text-[9px] font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded">Order Masuk</span>
                             </div>
-                            <div id="timeline-order-date" class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ date('d M Y') }}</div>
-                            <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                            <div id="timeline-order-date" class="text-xs font-bold text-slate-800 dark:text-slate-100">{{ date('d M Y') }}</div>
+                            <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-snug">
                                 Pemesanan kargo tercatat ke antrian ekspedisi ekspor Santos Brazil.
                             </div>
                         </div>
                     </div>
 
                     {{-- STEP 2: RENCANA BERANGKAT (ETD SANTOS) --}}
-                    <div class="p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/20 flex flex-col justify-between">
+                    <div class="p-3 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/20 flex flex-col justify-between">
                         <div>
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Langkah 2 &bull; Berangkat (ETD)</span>
-                                <span id="timeline-packing-badge" class="text-[10px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/50 px-1.5 py-0.5 rounded">Packing 2 Hari</span>
+                            <div class="flex items-center justify-between gap-1 mb-1">
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Langkah 2 (ETD)</span>
+                                <span id="timeline-packing-badge" class="text-[9px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/50 px-1.5 py-0.5 rounded">Packing 2 Hari</span>
                             </div>
-                            <div id="timeline-departure-display" class="text-sm font-bold text-amber-900 dark:text-amber-200">{{ date('d M Y', strtotime('+2 days')) }}</div>
-                            <div id="timeline-departure-note" class="text-[10px] text-amber-700/90 dark:text-amber-400/90 mt-1.5 leading-relaxed">
-                                Sortir mutu SCA, pengemasan karung goni, & stuffing kontainer di Pelabuhan Santos.
+                            <div id="timeline-departure-display" class="text-xs font-bold text-amber-900 dark:text-amber-200">{{ date('d M Y', strtotime('+2 days')) }}</div>
+                            <div id="timeline-departure-note" class="text-[10px] text-amber-700/90 dark:text-amber-400/90 mt-1 leading-snug">
+                                Sortir mutu SCA, karung goni, & stuffing kontainer Santos.
                             </div>
                         </div>
                     </div>
 
                     {{-- STEP 3: ESTIMASI TIBA (ETA TUJUAN) --}}
-                    <div class="p-3.5 rounded-xl border border-cyan-200 dark:border-cyan-900/60 bg-cyan-50/50 dark:bg-cyan-950/20 flex flex-col justify-between">
+                    <div class="p-3 rounded-xl border border-cyan-200 dark:border-cyan-900/60 bg-cyan-50/50 dark:bg-cyan-950/20 flex flex-col justify-between">
                         <div>
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-700 dark:text-cyan-400">Langkah 3 &bull; Tiba (ETA)</span>
-                                <span id="timeline-transit-badge" class="text-[10px] font-semibold text-cyan-700 dark:text-cyan-300 bg-cyan-100 dark:bg-cyan-900/50 px-1.5 py-0.5 rounded">Pelayaran ~21 Hari</span>
+                            <div class="flex items-center justify-between gap-1 mb-1">
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-cyan-700 dark:text-cyan-400">Langkah 3 (ETA)</span>
+                                <span id="timeline-transit-badge" class="text-[9px] font-semibold text-cyan-700 dark:text-cyan-300 bg-cyan-100 dark:bg-cyan-900/50 px-1.5 py-0.5 rounded">~21 Hari</span>
                             </div>
-                            <div id="timeline-arrival-display" class="text-sm font-bold text-cyan-900 dark:text-cyan-200">{{ date('d M Y', strtotime('+23 days')) }}</div>
-                            <div id="timeline-arrival-note" class="text-[10px] text-cyan-700/90 dark:text-cyan-400/90 mt-1.5 leading-relaxed">
-                                Estimasi kapal tiba di pelabuhan tujuan & dilanjutkan pengantaran ke alamat kafe.
+                            <div id="timeline-arrival-display" class="text-xs font-bold text-cyan-900 dark:text-cyan-200">{{ date('d M Y', strtotime('+23 days')) }}</div>
+                            <div id="timeline-arrival-note" class="text-[10px] text-cyan-700/90 dark:text-cyan-400/90 mt-1 leading-snug">
+                                Estimasi tiba di pelabuhan tujuan & pengantaran ke alamat.
                             </div>
                         </div>
                     </div>
@@ -484,16 +504,16 @@
                             <i data-lucide="file-check-2" class="w-4 h-4 text-cyan-500"></i>
                             <span>5. Manifest Dokumen Ekspor & Catatan Penanganan</span>
                         </h3>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Rincian deklarasi bea cukai diterbitkan otomatis mengikuti pilihan biji kopi & berat pesanan di Bagian 2.</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Rincian deklarasi bea cukai diterbitkan otomatis mengikuti pilihan biji kopi & berat pesanan.</p>
                     </div>
-                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-200 dark:border-emerald-800">
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-200 dark:border-emerald-800 shrink-0">
                         HS Code 0901.11.00 ✓
                     </span>
                 </div>
 
                 {{-- KARTU RINGKASAN MANIFEST OTOMATIS --}}
                 <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                    <div class="grid grid-cols-2 gap-3 text-xs">
                         <div>
                             <span class="text-[10px] text-slate-400 block mb-0.5">Komoditas Manifest:</span>
                             <span id="manifest-item-name-text" class="font-bold text-slate-800 dark:text-slate-200">Kopi Brazil Santos Bourbon Specialty</span>
@@ -518,7 +538,7 @@
                     <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
                         Instruksi Khusus / Catatan Penanganan Kargo (Opsional)
                     </label>
-                    <input type="text" name="notes" id="notes" value="{{ old('notes') }}" placeholder="cth. Suhu kontainer dijaga 18-20°C, kelembaban udara < 12%, perlakukan dengan hati-hati..." class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                    <input type="text" name="notes" id="notes" value="{{ old('notes') }}" placeholder="cth. Suhu kontainer dijaga 18-20°C, kelembaban udara < 12%..." class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
                 </div>
 
                 {{-- HIDDEN INPUTS MANIFEST UNTUK CONTROLLER & DATABASE --}}
@@ -526,26 +546,6 @@
                 <input type="hidden" name="hs_code" id="hs-code-input" value="{{ old('hs_code', '0901.11.00') }}">
                 <input type="hidden" name="item_qty" id="item-qty-input" value="{{ old('item_qty', 17) }}">
                 <input type="hidden" name="item_value" id="item-value-input" value="{{ old('item_value', 15000) }}">
-            </div>
-        </div>
-
-        {{-- RIGHT: Interactive Map Route Preview & Cost Summary --}}
-        <div class="lg:col-span-2 space-y-5">
-            {{-- Preview Rute Peta --}}
-            <div class="bg-white dark:bg-[#0A1128] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                        <i data-lucide="globe" class="w-4 h-4 text-cyan-500"></i>
-                        <span id="map-preview-title">Pratinjau Rute Maritim</span>
-                    </h3>
-                    <span id="route-distance-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-500">
-                        Pilih Lokasi
-                    </span>
-                </div>
-                <div id="routeMap" class="w-full h-64 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 z-10"></div>
-                <p id="route-map-caption" class="text-[11px] text-slate-400 mt-2">
-                    Garis putus-putus menunjukkan rute estimasi pelayaran dari pelabuhan asal menuju pelabuhan tujuan.
-                </p>
             </div>
 
             {{-- Kalkulator Tarif & Ringkasan Pemesanan --}}
