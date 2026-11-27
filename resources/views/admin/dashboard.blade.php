@@ -1663,7 +1663,7 @@
                 const progress = getShipmentRealtimeProgress(s);
 
                 // Buat lintasan rute (gunakan jalur samudra realistis untuk kapal laut)
-                const seaWaypoints = window.buildMaritimeWaypoints(originCoords, destCoords, isAirCargo);
+                const seaWaypoints = window.buildMaritimeWaypoints(originCoords, destCoords, isAirCargo, s.id);
                 const fullCorridor = seaWaypoints.length > 2
                     ? window.samplePolylineByRange(seaWaypoints, 0, 1, 50)
                     : createCurvedPath(originCoords, destCoords, 50, laneCurvature, laneShift);

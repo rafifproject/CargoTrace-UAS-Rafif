@@ -1401,7 +1401,7 @@
                 const vehicle = getShipmentVehicle(s);
                 const isAir = (s.transport_mode === 'AIR') || (vehicle.type === 'AIR');
                 const progress = getShipmentRealtimeProgress(s);
-                const seaWaypoints = window.buildMaritimeWaypoints(originPt, destPt, isAir);
+                const seaWaypoints = window.buildMaritimeWaypoints(originPt, destPt, isAir, s.id);
 
                 const curLoc = s.current_location || s.currentLocation;
                 const isAtOrigin = curLoc && curLoc.latitude && curLoc.longitude &&

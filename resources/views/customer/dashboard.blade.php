@@ -781,7 +781,7 @@ function initCustomerDashboardMap() {
                 const vehicle = getVehicleConfig(s);
                 const pct = Math.round(progress * 100);
                 const isAir = (vehicle.type === 'AIR' || vehicle.type === 'plane');
-                const seaWaypoints = window.buildMaritimeWaypoints(originPt, destPt, isAir);
+                const seaWaypoints = window.buildMaritimeWaypoints(originPt, destPt, isAir, s.id);
 
                 let curPt = null;
                 if (s.current_location && s.current_location.latitude && s.current_location.longitude && s.status !== 'DELIVERED') {
